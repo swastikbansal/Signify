@@ -12,6 +12,7 @@ from tensorflow.keras.callbacks import TensorBoard
 import requests
 
 
+# 'q' to exit
 class Model:
     def execute(self):
         # print("model")
