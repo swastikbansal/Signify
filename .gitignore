@@ -33,7 +33,7 @@ migrate_working_dir/
 
 # Dataset related
 Model/Dataset
-
+model/MP_Data
 
 # Symbolication related
 app.*.symbols
