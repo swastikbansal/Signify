@@ -4,13 +4,13 @@ import numpy as np
 import os
 from matplotlib import pyplot as plt
 import time
-import mediapipe as mp
+# import mediapipe as mp
 from numpy import concatenate, argmax, array, expand_dims, zeros
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import LSTM, Dense
+from tensorflow.keras.layers import Bidirectional,LSTM, Dense,Input,Flatten
 from tensorflow.keras.callbacks import TensorBoard
 import requests
-
+from glob import glob
 
 # 'q' to exit
 class Model:
@@ -66,23 +66,34 @@ class Model:
         DATA_PATH = os.path.join('MP_Data')
 
         # Labels for data
-        actions = array(['hello', 'thanks', 'iloveyou'])
+        actions = array([(i.split("\\")[-1]).split(" ")[-1] for i in glob('Dataset\*\*')])
+        # actions = array(['hello', 'thanks', 'iloveyou'])
 
-        log_dir = os.path.join('Logs')
-        tb_callback = TensorBoard(log_dir=log_dir)
+        # log_dir = os.path.join('Logs')
+        # tb_callback = TensorBoard(log_dir=log_dir)
 
         # Defining Model
-        model = Sequential()
-        
-        model.add(LSTM(64, return_sequences=True, activation='relu', input_shape=(30, 1662)))
-        model.add(LSTM(128, return_sequences=True, activation='relu'))
-        model.add(LSTM(64, return_sequences=False, activation='relu'))
-        model.add(Dense(64, activation='relu'))
-        model.add(Dense(32, activation='relu'))
-        model.add(Dense(actions.shape[0], activation='softmax'))
+        input_shape = (79, 1662)
+        num_classes =  8
+            
+        model = Sequential([        
+                Input(shape=input_shape),        
+                
+                # Bidirectional LSTM layers
+                Bidirectional(LSTM(64, return_sequences=True)),
+                Bidirectional(LSTM(128, return_sequences=True)),
+                Bidirectional(LSTM(64, return_sequences=True)),
+                
+                # Flatten the output
+                Flatten(),
+                
+                # Fully connected layer
+                Dense(128, activation='relu'),
+                Dense(num_classes, activation='softmax')
+        ])
 
         # Loading model weights
-        model_path = Path(__file__).parent / 'action.h5'
+        model_path = Path(__file__).parent / 'INCLUDE_8_V3.keras'
         model.load_weights(str(model_path))
 
         # 1. New detection variables
@@ -91,7 +102,7 @@ class Model:
         threshold = 0.9
 
         # cap = cv2.VideoCapture(0) # Default camera
-        cap = cv2.VideoCapture(1) # Secondary camera (Phone camera)
+        cap = cv2.VideoCapture(0) # Secondary camera (Phone camera)
         
         with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
             while cap.isOpened():

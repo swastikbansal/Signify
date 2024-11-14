@@ -17,10 +17,9 @@ tensorflow-io-gcs-filesystem = "0.27.0"
 pillow = "9.0.1"
 ipykernel = "^6.29.5"
 numpy = "^1.0.0"
+mediapipe = "^0.10.18"
+tensorflow = "^2.18.0"
 
-
-[tool.poetry.group.dev.dependencies]
-tensorflow-gpu = "2.10.0"
 
 [build-system]
 requires = ["poetry-core"]
