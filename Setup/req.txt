@@ -1,8 +1,0 @@
-numpy
-matplotlib
-tensorflow
-keras
-opencv-python
-mediapipe
-requests
-pathlib
