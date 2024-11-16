@@ -4,7 +4,7 @@ import numpy as np
 import os
 from matplotlib import pyplot as plt
 import time
-# import mediapipe as mp
+import mediapipe as mp
 from numpy import concatenate, argmax, array, expand_dims, zeros
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Bidirectional,LSTM, Dense,Input,Flatten
