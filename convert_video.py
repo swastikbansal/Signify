@@ -1,3 +1,7 @@
+"""
+    This file converts all the .mov files to .mp4 files in the dataset folder.
+"""
+
 from glob import glob
 import os
 import subprocess
