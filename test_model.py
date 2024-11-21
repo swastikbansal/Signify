@@ -30,15 +30,15 @@ class Model:
         DATA_PATH = os.path.join('MP_Data')
 
         # Labels for data
-        actions = array([(i.split("\\")[-1]).split(" ")[-1] for i in glob('Dataset\*\*')])
+        actions = array([(i.split("\\")[-1]).split(" ")[1:] for i in glob('MP_Data\*')])
         # actions = array(['hello', 'thanks', 'iloveyou'])
 
         # log_dir = os.path.join('Logs')
         # tb_callback = TensorBoard(log_dir=log_dir)
 
         # Defining Model
-        input_shape = (79, 1662)
-        num_classes =  8
+        input_shape = (154, 1662)
+        num_classes =  50
             
         model = Sequential([        
                 Input(shape=input_shape),        
@@ -57,7 +57,7 @@ class Model:
         ])
 
         # Loading model weights
-        model_path = Path(__file__).parent / 'INCLUDE_8_V3.keras'
+        model_path = Path(__file__).parent / 'INCLUDE_50_V3.keras'
         model.load_weights(str(model_path))
 
         # 1. New detection variables
@@ -87,7 +87,7 @@ class Model:
                     res = model.predict(expand_dims(sequence, axis=0))[0]
                     # print(actions[np.argmax(res)])
 
-                    # 3. Text Scriptq
+                    # 3. Text Script
                     if res[argmax(res)] > threshold:
                         if len(sentence) > 0:
                             if actions[argmax(res)] != sentence[-1]:
