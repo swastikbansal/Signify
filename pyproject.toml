@@ -9,18 +9,11 @@ package-mode = false
 
 [tool.poetry.dependencies]
 python = "3.10.11"
-mediapipe = "^0.10.18"
-tensorflow-io-gcs-filesystem = "0.27.0"
-tensorflow = "^2.10.0"
-ipykernel = "^6.29.5"
-pandas = "^2.2.3"
-tqdm = "^4.67.0"
 jupyter = "^1.1.1"
-ipywidgets = "^8.1.5"
-ipython = "^8.29.0"
-iprogress = "^0.4"
-
-
+tensorflow-io-gcs-filesystem = "0.27.0"
+opencv-python = "^4.10.0.84"
+mediapipe = "^0.10.18"
+tensorflow = "^2.18.0"
 
 [build-system]
 requires = ["poetry-core"]

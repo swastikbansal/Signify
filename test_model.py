@@ -9,7 +9,6 @@ import mediapipe as mp
 from numpy import concatenate, argmax, array, expand_dims, zeros
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Bidirectional,LSTM, Dense,Input,Flatten
-from tensorflow.keras.callbacks import TensorBoard
 
 import mp_helperfunc as mp_hf
 import requests
@@ -18,23 +17,19 @@ from glob import glob
 # 'q' to exit
 class Model:
     def execute(self):
-        # print("model")
-        mp_holistic = mp.solutions.holistic  # Holistic model
-        mp_drawing = mp.solutions.drawing_utils  # Drawing utilities
+        mp_holistic = mp.solutions.holistic  
+        mp_drawing = mp.solutions.drawing_utils  
 
         def draw_landmarks(image, results):
             mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_holistic.POSE_CONNECTIONS)
             mp_drawing.draw_landmarks(image, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
             mp_drawing.draw_landmarks(image, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
 
-        DATA_PATH = os.path.join('MP_Data')
+        # DATA_PATH = os.path.join('MP_Data')
 
         # Labels for data
-        actions = array([(i.split("\\")[-1]).split(" ")[1:] for i in glob('MP_Data\*')])
-        # actions = array(['hello', 'thanks', 'iloveyou'])
-
-        # log_dir = os.path.join('Logs')
-        # tb_callback = TensorBoard(log_dir=log_dir)
+        # actions = array([(i.split("\\")[-1]).split(" ")[1:] for i in glob('MP_Data\*')])
+        actions = array(['Bank', 'big large', 'Bird', 'Black', 'Boy', 'Brother', 'Car', 'Cell phone', 'Court', 'Cow', 'Death', 'Dog', 'dry', 'Election', 'Fall', 'Fan', 'Father', 'Girl', 'good', 'Good Morning', 'happy', 'Hat', 'Hello', 'hot', 'House', 'I', 'it', 'long', 'loud', 'Monday', 'new', 'Paint', 'Pen', 'Priest', 'quiet', 'Red', 'Shoes', 'short', 'small little', 'Store or Shop', 'Summer', 'T-Shirt', 'Teacher', 'Thank you', 'Time', 'train ticket', 'White', 'Window', 'Year', 'you (plural)'])
 
         # Defining Model
         input_shape = (154, 1662)
