@@ -66,7 +66,8 @@ class Model:
         actions = array(['Bank', 'big large', 'Bird', 'Black', 'Boy', 'Brother', 'Car', 'Cell phone', 'Court', 'Cow', 'Death', 'Dog', 'dry', 'Election', 'Fall', 'Fan', 'Father', 'Girl', 'good', 'Good Morning', 'happy', 'Hat', 'Hello', 'hot', 'House', 'I', 'it', 'long', 'loud', 'Monday', 'new', 'Paint', 'Pen', 'Priest', 'quiet', 'Red', 'Shoes', 'short', 'small little', 'Store or Shop', 'Summer', 'T-Shirt', 'Teacher', 'Thank you', 'Time', 'train ticket', 'White', 'Window', 'Year', 'you (plural)'])
 
         # Defining Model
-        input_shape = (154, 1662)
+        # input_shape = (154, 1662)
+        input_shape = (154, 258)
         num_classes =  50
             
         model = Sequential([        
@@ -86,7 +87,7 @@ class Model:
         ])
 
         # Loading model weights
-        model_path = Path(__file__).parent / 'Model' / 'INCLUDE_50_V3.h5'
+        model_path = Path(__file__).parent / 'Model' / 'INCLUDE_50_V3_noFace.h5'
         model.load_weights(str(model_path))
 
         # 1. New detection variables
