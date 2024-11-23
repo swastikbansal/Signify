@@ -1,17 +1,12 @@
 from pathlib import Path
 import numpy as np
-import os
-from matplotlib import pyplot as plt
-import time
 
 import cv2
 import mediapipe as mp
-from numpy import concatenate, argmax, array, expand_dims, zeros
+from numpy import  argmax, array, expand_dims 
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Bidirectional,LSTM, Dense,Input,Flatten
 
-import mp_helperfunc as mp_hf
-import requests
 from glob import glob
 
 # 'q' to exit
@@ -35,11 +30,11 @@ class Model:
         
         def extract_keypoints(results) -> np.array:        
             pose = np.array([[res.x, res.y, res.z, res.visibility] for res in results.pose_landmarks.landmark]).flatten() if results.pose_landmarks else np.zeros(33*4)
-            face = np.array([[res.x, res.y, res.z] for res in results.face_landmarks.landmark]).flatten() if results.face_landmarks else np.zeros(468*3)
+            # face = np.array([[res.x, res.y, res.z] for res in results.face_landmarks.landmark]).flatten() if results.face_landmarks else np.zeros(468*3)
             lh = np.array([[res.x, res.y, res.z] for res in results.left_hand_landmarks.landmark]).flatten() if results.left_hand_landmarks else np.zeros(21*3)
             rh = np.array([[res.x, res.y, res.z] for res in results.right_hand_landmarks.landmark]).flatten() if results.right_hand_landmarks else np.zeros(21*3)
             
-            return np.concatenate([pose, face, lh, rh])    
+            return np.concatenate([pose, lh, rh])    
         def draw_styled_landmarks(image, results) -> None:
             # Draw pose connections
             mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_holistic.POSE_CONNECTIONS,
