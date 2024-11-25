@@ -8,6 +8,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Bidirectional,LSTM, Dense,Input,Flatten, Dropout
 
 from glob import glob
+import time
 
 
 # 'q' to exit
@@ -72,41 +73,41 @@ class Model:
         num_classes =  8
             
         model = Sequential([        
-        Input(shape=input_shape),        
-        
-        # Bidirectional LSTM layers
-        Dropout(0.1),
-        Bidirectional(LSTM(64, return_sequences=True)),
-        Dropout(0.2),
-        Bidirectional(LSTM(128, return_sequences=True)),
-        Dropout(0.1),
-        Bidirectional(LSTM(64, return_sequences=True)),
-        
-        Dropout(0.5),
-        # Flatten the output
-        Flatten(),
-        
-        # Fully connected layer
-        Dense(64, activation='relu'),
-        Dense(32, activation='relu'),
-        Dense(num_classes, activation='softmax')
-])
+                Input(shape=input_shape),        
+                
+                # Bidirectional LSTM layers
+                # Dropout(0.1),
+                Bidirectional(LSTM(64, return_sequences=True)),
+                # Dropout(0.2),
+                Bidirectional(LSTM(128, return_sequences=True)),
+                # Dropout(0.1),
+                Bidirectional(LSTM(64, return_sequences=True)),
+                
+                # Dropout(0.5),
+                # Flatten the output
+                Flatten(),
+                
+                # Fully connected layer
+                Dense(64, activation='relu'),
+                # Dense(32, activation='relu'),
+                Dense(num_classes, activation='softmax')
+        ])
 
         # Loading model weights
-        model_path = Path(__file__).parent / 'Model' / 'INCLUDE_8_V_noFace_dropout.h5'
+        model_path = Path(__file__).parent / 'Model' / 'INCLUDE_8_V3_noFace.h5'
         model.load_weights(str(model_path))
 
         # 1. New detection variables
         sequence = []
         sentence = []
-        threshold = 0.7
+        threshold = 0.8
 
-        # cap = cv2.VideoCapture(0) # Default camera
-        cap = cv2.VideoCapture(0) # Secondary camera (Phone camera)
+        cap = cv2.VideoCapture(0) # Default camera
+        # cap = cv2.VideoCapture("recording.mp4")
         
         with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
+            process = True
             while cap.isOpened():
-
                 ret, frame = cap.read()
 
                 # Make detections
@@ -119,7 +120,11 @@ class Model:
                 sequence.append(keypoints)
                 sequence = sequence[-max_frames:]
 
+                if process:
+                    time.sleep(5)
+                
                 if len(sequence) == max_frames:
+                    print("Started Prediction")
                     res = model.predict(expand_dims(sequence, axis=0))[0]
                     # print(actions[np.argmax(res)])
 
@@ -142,7 +147,9 @@ class Model:
 
                 if cv2.waitKey(10) & 0xFF == ord('q'):
                     break
-
+                process = False
+                
+            print(sentence)
             cap.release()
             cv2.destroyAllWindows()
 
