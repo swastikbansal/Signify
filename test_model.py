@@ -5,9 +5,10 @@ import cv2
 import mediapipe as mp
 from numpy import  argmax, array, expand_dims 
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Bidirectional,LSTM, Dense,Input,Flatten
+from tensorflow.keras.layers import Bidirectional,LSTM, Dense,Input,Flatten, Dropout
 
 from glob import glob
+
 
 # 'q' to exit
 class Model:
@@ -57,38 +58,48 @@ class Model:
         # DATA_PATH = os.path.join('MP_Data')
 
         # Labels for data
-        # actions = array([(i.split("\\")[-1]).split(" ")[1:] for i in glob('MP_Data\*')])
-        actions = array(['Bank', 'big large', 'Bird', 'Black', 'Boy', 'Brother', 'Car', 'Cell phone', 'Court', 'Cow', 'Death', 'Dog', 'dry', 'Election', 'Fall', 'Fan', 'Father', 'Girl', 'good', 'Good Morning', 'happy', 'Hat', 'Hello', 'hot', 'House', 'I', 'it', 'long', 'loud', 'Monday', 'new', 'Paint', 'Pen', 'Priest', 'quiet', 'Red', 'Shoes', 'short', 'small little', 'Store or Shop', 'Summer', 'T-Shirt', 'Teacher', 'Thank you', 'Time', 'train ticket', 'White', 'Window', 'Year', 'you (plural)'])
+        actions = array([i.split("\\")[-1] for i in glob('MP_Data\*')])
+        # print(actions)
+        # actions = array(['Bank', 'big large', 'Bird', 'Black', 'Boy', 'Brother', 'Car', 'Cell phone', 'Court', 'Cow', 'Death', 'Dog', 'dry', 'Election', 'Fall', 'Fan', 'Father', 'Girl', 'good', 'Good Morning', 'happy', 'Hat', 'Hello', 'hot', 'House', 'I', 'it', 'long', 'loud', 'Monday', 'new', 'Paint', 'Pen', 'Priest', 'quiet', 'Red', 'Shoes', 'short', 'small little', 'Store or Shop', 'Summer', 'T-Shirt', 'Teacher', 'Thank you', 'Time', 'train ticket', 'White', 'Window', 'Year', 'you (plural)'])
 
         # Defining Model
+        max_frames = 79
         # input_shape = (154, 1662)
-        input_shape = (154, 258)
-        num_classes =  50
+        # input_shape = (79, 1662)
+        # num_classes =  50
+        # num_classes =  8
+        input_shape = (max_frames, 258)
+        num_classes =  8
             
         model = Sequential([        
-                Input(shape=input_shape),        
-                
-                # Bidirectional LSTM layers
-                Bidirectional(LSTM(64, return_sequences=True)),
-                Bidirectional(LSTM(128, return_sequences=True)),
-                Bidirectional(LSTM(64, return_sequences=True)),
-                
-                # Flatten the output
-                Flatten(),
-                
-                # Fully connected layer
-                Dense(128, activation='relu'),
-                Dense(num_classes, activation='softmax')
-        ])
+        Input(shape=input_shape),        
+        
+        # Bidirectional LSTM layers
+        Dropout(0.1),
+        Bidirectional(LSTM(64, return_sequences=True)),
+        Dropout(0.2),
+        Bidirectional(LSTM(128, return_sequences=True)),
+        Dropout(0.1),
+        Bidirectional(LSTM(64, return_sequences=True)),
+        
+        Dropout(0.5),
+        # Flatten the output
+        Flatten(),
+        
+        # Fully connected layer
+        Dense(64, activation='relu'),
+        Dense(32, activation='relu'),
+        Dense(num_classes, activation='softmax')
+])
 
         # Loading model weights
-        model_path = Path(__file__).parent / 'Model' / 'INCLUDE_50_V3_noFace.h5'
+        model_path = Path(__file__).parent / 'Model' / 'INCLUDE_8_V_noFace_dropout.h5'
         model.load_weights(str(model_path))
 
         # 1. New detection variables
         sequence = []
         sentence = []
-        threshold = 0.9
+        threshold = 0.7
 
         # cap = cv2.VideoCapture(0) # Default camera
         cap = cv2.VideoCapture(0) # Secondary camera (Phone camera)
@@ -106,9 +117,9 @@ class Model:
                 # 2. Prediction logic
                 keypoints = extract_keypoints(results)
                 sequence.append(keypoints)
-                sequence = sequence[-154:]
+                sequence = sequence[-max_frames:]
 
-                if len(sequence) == 154:
+                if len(sequence) == max_frames:
                     res = model.predict(expand_dims(sequence, axis=0))[0]
                     # print(actions[np.argmax(res)])
 
