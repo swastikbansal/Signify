@@ -104,6 +104,10 @@ class Model:
         # cap = cv2.VideoCapture(0) # Default camera
         cap = cv2.VideoCapture(0) # Secondary camera (Phone camera)
         
+        # I have to develop an algo which can detect when a sign is being performed or not if it is being performed then only it should predict the sign
+        
+        
+        
         with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
             while cap.isOpened():
 
