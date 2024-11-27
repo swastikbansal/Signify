@@ -88,7 +88,7 @@ class Model:
                 Flatten(),
                 
                 # Fully connected layer
-                Dense(64, activation='relu'),
+                Dense(128, activation='relu'),
                 # Dense(32, activation='relu'),
                 Dense(num_classes, activation='softmax')
         ])

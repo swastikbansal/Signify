@@ -132,12 +132,12 @@ class Model:
                 res = model.predict(expand_dims(sequence, axis=0))[0]
 
                 # 3. Text Script
-                if res[argmax(res)] > threshold:
-                    if len(sentence) > 0:
-                        if actions[argmax(res)] != sentence[-1]:
-                            sentence.append(actions[argmax(res)])
-                    else:
-                        sentence.append(actions[argmax(res)])
+                # if res[argmax(res)] > threshold:
+                #     if len(sentence) > 0:
+                #         if actions[argmax(res)] != sentence[-1]:
+                #             sentence.append(actions[argmax(res)])
+                #     else:
+                sentence.append(actions[argmax(res)])
                 
                     
                 print(sentence)
