@@ -136,6 +136,7 @@ class _NavBarPageState extends State<NavBarPage> {
     final tabs = {
       'voicetosign1': const Voicetosign1Widget(),
       'signtovoice2': const Signtovoice2Widget(),
+      'education': const EducationWidget(),
       'account': const AccountWidget(),
     };
     final currentIndex = tabs.keys.toList().indexOf(_currentPageName);
@@ -162,7 +163,7 @@ class _NavBarPageState extends State<NavBarPage> {
             ),
             activeIcon: const Icon(
               Icons.sign_language,
-              size: 35.0,
+              size: 30.0,
             ),
             label: FFLocalizations.of(context).getText(
               'ktfggi18' /* Voice to sign */,
@@ -176,7 +177,7 @@ class _NavBarPageState extends State<NavBarPage> {
             ),
             activeIcon: const Icon(
               Icons.spatial_audio_off_rounded,
-              size: 35.0,
+              size: 30.0,
             ),
             label: FFLocalizations.of(context).getText(
               'vgleqcd8' /* Sign to Voice */,
@@ -185,15 +186,29 @@ class _NavBarPageState extends State<NavBarPage> {
           ),
           BottomNavigationBarItem(
             icon: const Icon(
-              Icons.person_outline,
+              Icons.menu_book,
               size: 30.0,
             ),
             activeIcon: const Icon(
-              Icons.person,
-              size: 35.0,
+              Icons.menu_book,
+              size: 30.0,
             ),
             label: FFLocalizations.of(context).getText(
-              'q1v1v0pu' /* Account */,
+              'rdorkg51' /* Education */,
+            ),
+            tooltip: '',
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(
+              Icons.account_circle_outlined,
+              size: 30.0,
+            ),
+            activeIcon: const Icon(
+              Icons.account_circle_sharp,
+              size: 30.0,
+            ),
+            label: FFLocalizations.of(context).getText(
+              'i7imiuyr' /* Account */,
             ),
             tooltip: '',
           )

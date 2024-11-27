@@ -48,7 +48,10 @@
 	<true/>
 
 
-
+	<key>NSCameraUsageDescription</key>
+    <string>Allow camera to capture ISL Signs. </string>
+	<key>NSMicrophoneUsageDescription</key>
+    <string>Allow microphone access to use Speech Recognition.</string>
 
 
 	<key>UILaunchStoryboardName</key>

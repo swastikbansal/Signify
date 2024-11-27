@@ -8,10 +8,13 @@
     The path provided below has to start and end with a slash "/" in order for
     it to work correctly.
 
+    Alternatively, build your application passing the --base-href parameter
+    specifying the new root path of your web app.
+
     Fore more details:
     * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
   -->
-  <base href="/">
+  <base href="$FLUTTER_BASE_HREF">
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
@@ -26,15 +29,16 @@
   <meta name="robots" content="noindex" />
 
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png" />
+  <link rel="icon" href="Signify_(1).png" sizes="any"/>
+  
 
   <!-- Open Graph & SEO tags -->
   <meta property="og:title" content="Signify" />
   <meta property="og:description" content="Built with FlutterFlow." />
-  <meta property="og:image" content="https://storage.googleapis.com/flutterflow-prod-hosting/og_splash_gradient.png" /> 
+  <meta property="og:image" content="/assets/assets/images/color_png_(2).png" /> 
   <meta name="twitter:title" content="Signify" />
   <meta name="twitter:description" content="Built with FlutterFlow." />
-  <meta name="twitter:image" content="https://storage.googleapis.com/flutterflow-prod-hosting/og_splash_gradient.png" />
+  <meta name="twitter:image" content="/assets/assets/images/color_png_(2).png" />
   <meta name="twitter:card" content="summary_large_image" />
 
   <title> Signify </title>
@@ -42,8 +46,8 @@
     
 
   <!-- Status Bar color in Safari browser (iOS) and PWA -->
-  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f1f4f8">
-  <meta name="theme-color" media="(prefers-color-scheme: dark)"  content="#1d2428">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fab713">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)"  content="#fab713">
 
   <link rel="manifest" href="manifest.json">
   

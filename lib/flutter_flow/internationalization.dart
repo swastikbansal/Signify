@@ -146,159 +146,294 @@ bool _isSupportedLocale(Locale locale) {
 final kTranslationsMap = <Map<String, Map<String, String>>>[
   // voicetosign1
   {
-    'mofmk3y7': {
-      'en': 'Voice to Sign',
+    'wz6eakba': {
+      'en': '',
       'hi': '',
+    },
+    'v4uk70of': {
+      'en': 'Type to translate',
+      'hi': 'अनुवाद करने के लिए टाइप करें',
+    },
+    'iriw5ix1': {
+      'en': 'Voice to Sign',
+      'hi': 'आवाज़ से हस्ताक्षर',
     },
     'ktfggi18': {
       'en': 'Voice to sign',
-      'hi': '',
+      'hi': 'आवाज़ से हस्ताक्षर',
     },
   },
   // signtovoice2
   {
+    'bvy4o6by': {
+      'en': 'English',
+      'hi': '',
+    },
+    'd24i707f': {
+      'en': 'English',
+      'hi': '',
+    },
+    '7m2y2l69': {
+      'en': 'Hindi',
+      'hi': '',
+    },
+    'ibczj7lb': {
+      'en': 'Marathi',
+      'hi': '',
+    },
+    '6lmmq93s': {
+      'en': 'Telgu',
+      'hi': '',
+    },
+    '0lqgt6mm': {
+      'en': 'Punjabi',
+      'hi': '',
+    },
+    '80zs9si9': {
+      'en': 'Gujrati',
+      'hi': '',
+    },
+    'drx645ue': {
+      'en': 'Select Language',
+      'hi': '',
+    },
+    'b71xuugh': {
+      'en': 'Search...',
+      'hi': '',
+    },
+    'nt3iz8g2': {
+      'en': 'Translated Text',
+      'hi': 'अनूदित पाठ',
+    },
     'helpdw8b': {
       'en': 'Sign to Voice',
-      'hi': '',
+      'hi': 'आवाज़ के लिए संकेत',
     },
     'vgleqcd8': {
       'en': 'Sign to Voice',
-      'hi': '',
+      'hi': 'आवाज़ के लिए संकेत',
     },
   },
   // account
   {
-    '0plr8zao': {
-      'en': 'check.io',
-      'hi': '',
+    'opa1gsfg': {
+      'en': 'Account',
+      'hi': 'खाता',
     },
-    'nxfkvmms': {
-      'en': 'Platform Navigation',
-      'hi': '',
+    'pyaebrd0': {
+      'en': 'Elaine Edwards',
+      'hi': 'एलेन एडवर्ड्स',
     },
-    'fo03dr10': {
-      'en': 'Dashboard',
-      'hi': '',
+    'cxr8x8my': {
+      'en': 'elaine.edwards@google.com',
+      'hi': 'elaine.edwards@google.com',
     },
-    'htmniitf': {
-      'en': 'Chats',
-      'hi': '',
+    'ftlfnl17': {
+      'en': 'Switch to Dark Mode',
+      'hi': 'डार्क मोड पर स्विच करें',
     },
-    '2nfb9gjz': {
-      'en': 'Projects',
-      'hi': '',
+    'qadjglei': {
+      'en': 'Switch to Light Mode',
+      'hi': 'लाइट मोड पर स्विच करें',
     },
-    'pb8qio10': {
-      'en': 'Recent Orders',
-      'hi': '',
+    'uqk0102r': {
+      'en': 'Account Settings',
+      'hi': 'अकाउंट सेटिंग',
     },
-    'up0x8yda': {
-      'en': '12',
-      'hi': '',
-    },
-    '4eq04jq7': {
-      'en': 'Settings',
-      'hi': '',
-    },
-    'ytvm4q4s': {
-      'en': 'Billing',
-      'hi': '',
-    },
-    'bcuus5s2': {
-      'en': 'Explore',
-      'hi': '',
-    },
-    '0hvmjktm': {
-      'en': 'Light Mode',
-      'hi': '',
-    },
-    '5eqbgzv5': {
-      'en': 'Dark Mode',
-      'hi': '',
-    },
-    'phke9xac': {
-      'en': 'Casper Ghost',
-      'hi': '',
-    },
-    'n7bwxsbb': {
-      'en': 'admin@gmail.com',
-      'hi': '',
-    },
-    'dd8iradh': {
-      'en': 'Casper Ghost',
-      'hi': '',
-    },
-    'lyfkw2r6': {
-      'en': 'casper@ghustbusters.com',
-      'hi': '',
-    },
-    'p1ih8xhx': {
-      'en': '2,200',
-      'hi': '',
-    },
-    'tgq82f3t': {
-      'en': 'Orders Placed',
-      'hi': '',
-    },
-    'yy7ic0or': {
-      'en': '\$212.4k',
-      'hi': '',
-    },
-    '08tfmiv7': {
-      'en': 'Money Earned',
-      'hi': '',
-    },
-    'l2fk4itw': {
-      'en': 'My Account Information',
-      'hi': '',
-    },
-    'xahzriuo': {
+    '0atseb36': {
       'en': 'Change Password',
-      'hi': '',
+      'hi': 'पासवर्ड बदलें',
     },
-    '0xglczvg': {
+    'p8q20g0b': {
       'en': 'Edit Profile',
-      'hi': '',
+      'hi': 'प्रोफ़ाइल संपादित करें',
     },
-    'yfeo6cip': {
+    'fk8qzqux': {
       'en': 'Support',
-      'hi': '',
+      'hi': 'सहायता',
     },
-    'a4jmr8eo': {
+    'ykhohr2e': {
+      'en': 'Settings',
+      'hi': 'सेटिंग्स',
+    },
+    'qvrt3ym6': {
       'en': 'Tutorial',
-      'hi': '',
+      'hi': 'ट्यूटोरियल',
     },
-    'sm892sb4': {
+    '3yem8mmx': {
       'en': 'Submit a Bug',
-      'hi': '',
+      'hi': 'बग सबमिट करें',
     },
-    'gjfmltln': {
+    'wvcbff35': {
       'en': 'Submit a Feature Request',
-      'hi': '',
+      'hi': 'फ़ीचर अनुरोध सबमिट करें',
     },
-    '0s13co6n': {
-      'en': 'Light ',
-      'hi': '',
+    'l2zmexq5': {
+      'en': 'Logout',
+      'hi': 'लॉग आउट',
     },
-    'gn9s7d1u': {
-      'en': 'Dark',
-      'hi': '',
-    },
-    '5plol8na': {
-      'en': 'Log Out',
-      'hi': '',
-    },
-    '62x3ju65': {
+    'i7imiuyr': {
       'en': 'Account',
-      'hi': '',
+      'hi': 'खाता',
     },
-    'q1v1v0pu': {
-      'en': 'Account',
-      'hi': '',
+  },
+  // education
+  {
+    'p01mcqgl': {
+      'en': 'Hey Manuel',
+      'hi': 'हे मैनुअल!',
+    },
+    'ddp2sajy': {
+      'en': 'Stay up to date with the latest news below.',
+      'hi': 'नीचे दी गई ताजा खबरों से अपडेट रहें।',
+    },
+    '6xkomr20': {
+      'en': 'Search all articles...',
+      'hi': 'सभी लेख खोजें...',
+    },
+    'fzy0yjab': {
+      'en': 'HSBC is getting back into consumer lending...',
+      'hi': 'एचएसबीसी उपभोक्ता ऋण देने के क्षेत्र में वापस आ रहा है...',
+    },
+    '6nkng215': {
+      'en': 'Jackson Hewiit',
+      'hi': 'जैक्सन हेविट',
+    },
+    'p9122ujx': {
+      'en': '24',
+      'hi': '24',
+    },
+    '7zfaar95': {
+      'en': '12h',
+      'hi': '12 घंटे',
+    },
+    '0x77h9h6': {
+      'en': 'HSBC is getting back into consumer lending...',
+      'hi': 'एचएसबीसी उपभोक्ता ऋण देने के क्षेत्र में वापस आ रहा है...',
+    },
+    '8ookai0n': {
+      'en': 'Jackson Hewiit',
+      'hi': 'जैक्सन हेविट',
+    },
+    'u6lijkb0': {
+      'en': '24',
+      'hi': '24',
+    },
+    'v26i76vt': {
+      'en': '12h',
+      'hi': '12 घंटे',
+    },
+    'jduozejm': {
+      'en': 'For You',
+      'hi': 'आपके लिए',
+    },
+    'a68hn241': {
+      'en': 'Sci-Fi',
+      'hi': 'विज्ञान-कथा',
+    },
+    'rk7baojg': {
+      'en': 'Fiction',
+      'hi': 'कल्पना',
+    },
+    'ds2qf966': {
+      'en': 'Technology',
+      'hi': 'तकनीकी',
+    },
+    'okg8jrdj': {
+      'en': 'Ai News',
+      'hi': 'एआई न्यूज़',
+    },
+    'jcrcyrzm': {
+      'en': 'Startups',
+      'hi': 'स्टार्टअप',
+    },
+    '7y1ozxqa': {
+      'en': 'For You',
+      'hi': 'आपके लिए',
+    },
+    'gebkvr2g': {
+      'en': 'Popular Today',
+      'hi': 'आज लोकप्रिय',
+    },
+    'lythb4ih': {
+      'en':
+          'HSBC is getting back into consumer lending in the us according to...',
+      'hi': 'एचएसबीसी अमेरिका में उपभोक्ता ऋण देने में वापस आ रहा है...',
+    },
+    '79wf5ril': {
+      'en': 'Jackson Hewiit',
+      'hi': 'जैक्सन हेविट',
+    },
+    'x1gfjzsy': {
+      'en': '24',
+      'hi': '24',
+    },
+    'd77x6xsp': {
+      'en': '12h',
+      'hi': '12 घंटे',
+    },
+    '2tvxijww': {
+      'en': 'Read Now',
+      'hi': 'अभी पढ़ें',
+    },
+    '3qjzcg9k': {
+      'en':
+          'HSBC is getting back into consumer lending in the us according to...',
+      'hi': 'एचएसबीसी अमेरिका में उपभोक्ता ऋण देने में वापस आ रहा है...',
+    },
+    'u9ttvvk4': {
+      'en': 'Jackson Hewiit',
+      'hi': 'जैक्सन हेविट',
+    },
+    'zegojctj': {
+      'en': '24',
+      'hi': '24',
+    },
+    'tke25qsr': {
+      'en': '12h',
+      'hi': '12 घंटे',
+    },
+    'lw7fn82o': {
+      'en': 'Read Now',
+      'hi': 'अभी पढ़ें',
+    },
+    'p985k5iy': {
+      'en':
+          'HSBC is getting back into consumer lending in the us according to...',
+      'hi': 'एचएसबीसी अमेरिका में उपभोक्ता ऋण देने में वापस आ रहा है...',
+    },
+    '75khnl5b': {
+      'en': 'Jackson Hewiit',
+      'hi': 'जैक्सन हेविट',
+    },
+    '4ryf2646': {
+      'en': '24',
+      'hi': '24',
+    },
+    'm3m5b57i': {
+      'en': '12h',
+      'hi': '12 घंटे',
+    },
+    'mgptg10b': {
+      'en': 'Read Now',
+      'hi': 'अभी पढ़ें',
+    },
+    'rdorkg51': {
+      'en': 'Education',
+      'hi': 'आवाज़ के लिए संकेत',
     },
   },
   // Miscellaneous
   {
+    '3r4v0idp': {
+      'en': 'Allow camera to capture ISL Signs. ',
+      'hi': 'कैमरे को आईएसएल चिह्नों को कैप्चर करने की अनुमति दें।',
+    },
+    's3h4i5gz': {
+      'en': 'Allow microphone access to use Speech Recognition.',
+      'hi':
+          'वाक् पहचान का उपयोग करने के लिए माइक्रोफ़ोन तक पहुंच की अनुमति दें.',
+    },
     'qosu3dvi': {
       'en': '',
       'hi': '',

@@ -37,7 +37,7 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
                 color: FlutterFlowTheme.of(context).primary,
                 child: Image.asset(
                   'assets/images/color_png_(2).png',
-                  fit: BoxFit.contain,
+                  fit: BoxFit.fitWidth,
                 ),
               ),
             )
@@ -52,7 +52,7 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
                     color: FlutterFlowTheme.of(context).primary,
                     child: Image.asset(
                       'assets/images/color_png_(2).png',
-                      fit: BoxFit.contain,
+                      fit: BoxFit.fitWidth,
                     ),
                   ),
                 )
@@ -86,6 +86,16 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
               : const NavBarPage(
                   initialPage: 'account',
                   page: AccountWidget(),
+                ),
+        ),
+        FFRoute(
+          name: 'education',
+          path: '/education',
+          builder: (context, params) => params.isEmpty
+              ? const NavBarPage(initialPage: 'education')
+              : const NavBarPage(
+                  initialPage: 'education',
+                  page: EducationWidget(),
                 ),
         )
       ].map((r) => r.toRoute(appStateNotifier)).toList(),
