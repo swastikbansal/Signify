@@ -2,14 +2,15 @@
 import cv2
 import mediapipe as mp
 import numpy as np
+import time
 
 # Initialize MediaPipe Hands
 mp_hands = mp.solutions.hands
 hands = mp_hands.Hands(
     static_image_mode=False,
     max_num_hands=2,
-    min_detection_confidence=0.7,
-    min_tracking_confidence=0.7,
+    min_detection_confidence=0.5,
+    min_tracking_confidence=0.5,
 )
 mp_draw = mp.solutions.drawing_utils
 
@@ -20,13 +21,13 @@ def calculate_movement(prev_landmarks, curr_landmarks):
     # Calculate Euclidean distance between corresponding landmarks
     movement = 0
     for p, c in zip(prev_landmarks, curr_landmarks):
-        distance = np.linalg.norm(np.array([p.x, p.y]) - np.array([c.x, c.y]))
+        distance = np.linalg.norm(np.array([p.x, p.y, p.z]) - np.array([c.x, c.y, c.z]))
         movement += distance
     return movement
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture("test.mp4")
+# cap = cv2.VideoCapture(0)
 prev_landmarks = None
-movement_threshold = 8  # movement sensitivity\
 
 while cap.isOpened():
     success, image = cap.read()
@@ -43,7 +44,6 @@ while cap.isOpened():
     hand_movement = 0
     if results.multi_hand_landmarks:
         for hand_landmarks in results.multi_hand_landmarks:
-            # Draw hand landmarks on the image
             mp_draw.draw_landmarks(
                 image, hand_landmarks, mp_hands.HAND_CONNECTIONS)
             
@@ -54,17 +54,36 @@ while cap.isOpened():
     else:
         prev_landmarks = None
 
-    # Display movement value
+    # Display movement value and no. of hands
     cv2.putText(image, f'Movement: {hand_movement:.4f}', (10, 30),
                 cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
+    
+    num_hands = None
+    if results.multi_hand_landmarks:
+        num_hands = len(results.multi_hand_landmarks)
+    cv2.putText(image, f'No. of hands: {num_hands}', (10, 70),
+                cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
 
+    
+    # Decidinf movement threshold based on number of hands
+    movement_threshold = None
+    if num_hands == 1 :
+        movement_threshold = 0.13 
+    
+    if num_hands == 2 :
+        movement_threshold = 4.4 
+    
     # Check if movement exceeds threshold
-    if hand_movement > movement_threshold:
-        cv2.putText(image, 'Hand Movement Detected', (10, 70),
-                    cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+    if num_hands:
+        if hand_movement > movement_threshold:
+            cv2.putText(image, 'Hand Movement Detected', (10, 110),
+                cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
+    image = cv2.resize(image, (500, 400))
     cv2.imshow('Hand Movement Detection', image)
 
+    # time.sleep(0.3)
+    
     if cv2.waitKey(10) & 0xFF == ord('q'):
         break
 
