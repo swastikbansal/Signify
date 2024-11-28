@@ -100,7 +100,7 @@ class Model:
         # cap = cv2.VideoCapture(0) # Default camera
         # random_Video = "recording.mp4"
         
-        for i in range(10):
+        for i in range(20):
             sequence = []
             sentence = []
             threshold = 0.8
