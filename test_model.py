@@ -32,9 +32,10 @@ def mediapipe_detection(image, model) -> tuple:
 def extract_keypoints(results) -> np.array:        
     pose = np.array([[res.x, res.y, res.z, res.visibility] for res in results.pose_landmarks.landmark]).flatten() if results.pose_landmarks else np.zeros(33*4)
     # face = np.array([[res.x, res.y, res.z] for res in results.face_landmarks.landmark]).flatten() if results.face_landmarks else np.zeros(468*3)
-    lh = np.array([[res.x, res.y, res.z] for res in results.left_hand_landmarks.landmark]).flatten() if results.left_hand_landmarks else np.zeros(21*3)
-    rh = np.array([[res.x, res.y, res.z] for res in results.right_hand_landmarks.landmark]).flatten() if results.right_hand_landmarks else np.zeros(21*3)
-    return np.concatenate([pose, lh, rh])    
+    # lh = np.array([[res.x, res.y, res.z] for res in results.left_hand_landmarks.landmark]).flatten() if results.left_hand_landmarks else np.zeros(21*3)
+    # rh = np.array([[res.x, res.y, res.z] for res in results.right_hand_landmarks.landmark]).flatten() if results.right_hand_landmarks else np.zeros(21*3)
+    # return np.concatenate([pose, lh, rh])    
+    return pose    
 
 def draw_styled_landmarks(image, results) -> None:
     # Draw pose connections
@@ -44,21 +45,21 @@ def draw_styled_landmarks(image, results) -> None:
                             ) 
     
     # Draw left hand connections
-    mp_drawing.draw_landmarks(image, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS, 
-                            mp_drawing.DrawingSpec(color=(121,22,76), thickness=2, circle_radius=4), 
-                            mp_drawing.DrawingSpec(color=(121,44,250), thickness=2, circle_radius=2)
-                            ) 
+    # mp_drawing.draw_landmarks(image, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS, 
+    #                         mp_drawing.DrawingSpec(color=(121,22,76), thickness=2, circle_radius=4), 
+    #                         mp_drawing.DrawingSpec(color=(121,44,250), thickness=2, circle_radius=2)
+    #                         ) 
     
-    # Draw right hand connections  
-    mp_drawing.draw_landmarks(image, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS, 
-                            mp_drawing.DrawingSpec(color=(245,117,66), thickness=2, circle_radius=4), 
-                            mp_drawing.DrawingSpec(color=(245,66,230), thickness=2, circle_radius=2)
-                            ) 
+    # # Draw right hand connections  
+    # mp_drawing.draw_landmarks(image, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS, 
+    #                         mp_drawing.DrawingSpec(color=(245,117,66), thickness=2, circle_radius=4), 
+    #                         mp_drawing.DrawingSpec(color=(245,66,230), thickness=2, circle_radius=2)
+    #                         ) 
 
 
 # Labels for data
-actions = array([i.split("\\")[-1] for i in glob('MP_Data\*')])
-# actions = array(['Beautiful','Blind','Deaf','happy','loud','quiet','sad','Ugly'])
+# actions = array([i.split("\\")[-1] for i in glob('MP_Data\*')])
+actions = array(['Beautiful','Blind','Deaf','happy','loud','quiet','sad','Ugly'])
 # actions = array(['Bank', 'big large', 'Bird', 'Black', 'Boy', 'Brother', 'Car', 'Cell phone', 'Court', 'Cow', 'Death', 'Dog', 'dry', 'Election', 'Fall', 'Fan', 'Father', 'Girl', 'good', 'Good Morning', 'happy', 'Hat', 'Hello', 'hot', 'House', 'I', 'it', 'long', 'loud', 'Monday', 'new', 'Paint', 'Pen', 'Priest', 'quiet', 'Red', 'Shoes', 'short', 'small little', 'Store or Shop', 'Summer', 'T-Shirt', 'Teacher', 'Thank you', 'Time', 'train ticket', 'White', 'Window', 'Year', 'you (plural)'])
 
 # Defining Model
@@ -70,7 +71,8 @@ actions = array([i.split("\\")[-1] for i in glob('MP_Data\*')])
 # num_classes =  8
 
 max_frames = 79
-input_shape = (max_frames, 258)
+# input_shape = (max_frames, 258)
+input_shape = (max_frames, 132)
 num_classes =  8
 
 # Loading Model    
@@ -95,26 +97,27 @@ model = Sequential([
         Dense(num_classes, activation='softmax')
 ])
 
-model_path = Path(__file__).parent / 'Model' / 'INCLUDE_8_V3_noFace.h5'
+model_path = Path(__file__).parent / 'Model' / 'INCLUDE_8_V3_noHands.h5'
 model.load_weights(str(model_path))
 
 # New detection variables
-sequence = [[0] * 258] * max_frames # Passing an enpty list of 258 elements to start the prediction from as soon as the input feed starts
+# sequence = [[0] * 258] * max_frames # Passing an enpty list of 258 elements to start the prediction from as soon as the input feed starts
+sequence = [[0] * 132] * max_frames # Passing an enpty list of 258 elements to start the prediction from as soon as the input feed starts
 sentence = []
-threshold = 0.9
+threshold = 0.8
 
-cap = cv2.VideoCapture(0) # Default camera
-# cap = cv2.VideoCapture("Test Recordings\\test (5).mp4")
+# cap = cv2.VideoCapture(1) # Default camera
+cap = cv2.VideoCapture("Test Recordings\\test (5).mp4")
 # cap = cv2.VideoCapture("Dataset\Adjectives\\7. Deaf\MVI_9583.mp4")
 # I have to develop an algo which can detect when a sign is being performed or not if it is being performed then only it should predict the sign
 
 
-with mp_holistic.Holistic(min_detection_confidence=0.4, 
-                          min_tracking_confidence=0.4) as holistic:
+with mp_holistic.Holistic(min_detection_confidence=0.7, 
+                          min_tracking_confidence=0.7) as holistic:
     while cap.isOpened():
         ret, frame = cap.read()
 
-        frame = cv2.flip(frame, 1)
+        # frame = cv2.flip(frame, 1)
         
         # Make detections
         image, results = mediapipe_detection(frame, holistic)
@@ -151,7 +154,6 @@ with mp_holistic.Holistic(min_detection_confidence=0.4,
 
         if cv2.waitKey(10) & 0xFF == ord('q'):
             break
-        process = False
         
     print(sentence)
     cap.release()
