@@ -56,7 +56,7 @@ model = Sequential([
         Dense(num_classes, activation='softmax')
 ])
 
-model_path = Path.cwd() / 'Model' / 'INCLUDE_8_V4_noFlip.h5'
+model_path = Path.cwd() / 'Model' / 'INCLUDE_8_V4_noFace.h5'
 model.load_weights(str(model_path))
 
 # sequence = [[0] * 132]
@@ -66,8 +66,8 @@ sequence = [[0] * 258] * (max_frames // 2) # Passing an enpty list of 258 elemen
 sentence = []
 threshold = 0.9
 
-# cap = cv2.VideoCapture(1) # Default camera
-cap = cv2.VideoCapture("Test Recordings\\test (4).mp4")
+cap = cv2.VideoCapture(1) # Default camera
+# cap = cv2.VideoCapture("Test Recordings\\test (5).mp4")
 # cap = cv2.VideoCapture("Dataset\Adjectives\\7. Deaf\MVI_9583.mp4")
 
 
@@ -84,8 +84,8 @@ with mp_holistic.Holistic(min_detection_confidence=0.7,
         keypoints = mp_utils.extract_keypoints(results)
         sequence.append(keypoints)
         
-        # Predicting output in every 5 frames
-        if n_frames % 10 == 0:
+        # Predicting output in every 10 frames
+        if n_frames % 5 == 0:
             sequence = sequence[-max_frames:]
                     
             # 2. Prediction logic
