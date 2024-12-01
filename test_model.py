@@ -22,8 +22,8 @@ mp_utils = utils.MediapipeUtils(mp_holistic, mp_drawing)
 
 
 # Labels for data
-# actions = array([i.split("\\")[-1] for i in glob('MP_Data\*')])
-actions = array(['Beautiful','Blind','Deaf','happy','loud','quiet','sad','Ugly'])
+actions = array([i.split("\\")[-1] for i in glob('MP_Data\*')])
+# actions = array(['Beautiful','Blind','Deaf','happy','loud','quiet','sad','Ugly'])
 # actions = array(['Bank', 'big large', 'Bird', 'Black', 'Boy', 'Brother', 'Car', 'Cell phone', 'Court', 'Cow', 'Death', 'Dog', 'dry', 'Election', 'Fall', 'Fan', 'Father', 'Girl', 'good', 'Good Morning', 'happy', 'Hat', 'Hello', 'hot', 'House', 'I', 'it', 'long', 'loud', 'Monday', 'new', 'Paint', 'Pen', 'Priest', 'quiet', 'Red', 'Shoes', 'short', 'small little', 'Store or Shop', 'Summer', 'T-Shirt', 'Teacher', 'Thank you', 'Time', 'train ticket', 'White', 'Window', 'Year', 'you (plural)'])
 
 # Defining Model
@@ -34,10 +34,10 @@ actions = array(['Beautiful','Blind','Deaf','happy','loud','quiet','sad','Ugly']
 # input_shape = (79, 1662)
 # num_classes =  8
 
-max_frames = 79
+max_frames = 59
 input_shape = (max_frames, 258)
 # input_shape = (max_frames, 132)
-num_classes =  8
+num_classes =  len(actions)
 
 # Loading Model    
 model = Sequential([        
@@ -56,7 +56,7 @@ model = Sequential([
         Dense(num_classes, activation='softmax')
 ])
 
-model_path = Path.cwd() / 'Model' / 'INCLUDE_8_V4_noFace.h5'
+model_path = Path.cwd() / 'Model' / 'INCLUDE_8_V4_clipped.h5'
 model.load_weights(str(model_path))
 
 # sequence = [[0] * 132]
@@ -66,8 +66,8 @@ sequence = [[0] * 258] * (max_frames // 2) # Passing an enpty list of 258 elemen
 sentence = []
 threshold = 0.9
 
-cap = cv2.VideoCapture(1) # Default camera
-# cap = cv2.VideoCapture("Test Recordings\\test (5).mp4")
+# cap = cv2.VideoCapture(1) # Default camera
+cap = cv2.VideoCapture("Test Recordings\\test (5).mp4")
 # cap = cv2.VideoCapture("Dataset\Adjectives\\7. Deaf\MVI_9583.mp4")
 
 
