@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "608567453337",
+    "project_id": "signify-ddf70",
+    "storage_bucket": "signify-ddf70.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:608567453337:android:f21115f0d0352c849dfa08",
+        "android_client_info": {
+          "package_name": "com.mycompany.signify"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDD9QwIvXnRgAx7Pa5wXzSF23t6sFs5NA4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

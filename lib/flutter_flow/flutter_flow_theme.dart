@@ -63,6 +63,13 @@ abstract class FlutterFlowTheme {
   late Color error;
   late Color info;
 
+  late Color customColor1;
+  late Color customColor2;
+  late Color customColor3;
+  late Color customColor4;
+  late Color customColor5;
+  late Color customColor6;
+
   @Deprecated('Use displaySmallFamily instead')
   String get title1Family => displaySmallFamily;
   @Deprecated('Use displaySmall instead')
@@ -150,21 +157,28 @@ class LightModeTheme extends FlutterFlowTheme {
   Color get tertiaryColor => tertiary;
 
   late Color primary = const Color(0xFFFAB713);
-  late Color secondary = const Color(0xFFF5CE15);
-  late Color tertiary = const Color(0xFF80CC28);
-  late Color alternate = const Color(0xFFE0E3E7);
+  late Color secondary = const Color(0xFFF6BF22);
+  late Color tertiary = const Color(0xFFF2CD88);
+  late Color alternate = const Color(0xFFDDDDDD);
   late Color primaryText = const Color(0xFF000000);
-  late Color secondaryText = const Color(0xFF000000);
-  late Color primaryBackground = const Color(0xFFFDF8E1);
-  late Color secondaryBackground = const Color(0xFFF1F4F8);
-  late Color accent1 = const Color(0x4C242236);
-  late Color accent2 = const Color(0xFF4B644B);
-  late Color accent3 = const Color(0xFF967324);
-  late Color accent4 = const Color(0xCCFFFFFF);
-  late Color success = const Color(0xFF0A6780);
+  late Color secondaryText = const Color(0xFF292929);
+  late Color primaryBackground = const Color(0xFFFFFFFF);
+  late Color secondaryBackground = const Color(0xFFF3F3F3);
+  late Color accent1 = const Color(0xFF101524);
+  late Color accent2 = const Color(0xFFE6DD4E);
+  late Color accent3 = const Color(0xFFF075A6);
+  late Color accent4 = const Color(0xFF1E1F25);
+  late Color success = const Color(0xFF00FF00);
   late Color warning = const Color(0xFFFF6100);
   late Color error = const Color(0xFFFF0010);
-  late Color info = const Color(0xFFFFFFFF);
+  late Color info = const Color(0xFF14181B);
+
+  late Color customColor1 = const Color(0xFFE6DFF1);
+  late Color customColor2 = const Color(0xFF212325);
+  late Color customColor3 = const Color(0xFFD0C7BA);
+  late Color customColor4 = const Color(0xFFACD1BF);
+  late Color customColor5 = const Color(0xFF000000);
+  late Color customColor6 = const Color(0xFFFFFFFF);
 }
 
 abstract class Typography {
@@ -545,21 +559,28 @@ class DarkModeTheme extends FlutterFlowTheme {
   Color get tertiaryColor => tertiary;
 
   late Color primary = const Color(0xFFFAB713);
-  late Color secondary = const Color(0xFFF5CE15);
-  late Color tertiary = const Color(0xFF80CC28);
-  late Color alternate = const Color(0xFF262D34);
+  late Color secondary = const Color(0xFFF6BF22);
+  late Color tertiary = const Color(0xFFF2CD88);
+  late Color alternate = const Color(0xFF333333);
   late Color primaryText = const Color(0xFFFFFFFF);
-  late Color secondaryText = const Color(0xFFFFFFFF);
-  late Color primaryBackground = const Color(0xFF191919);
-  late Color secondaryBackground = const Color(0xFF202022);
-  late Color accent1 = const Color(0x4C242236);
-  late Color accent2 = const Color(0xFF4B644B);
-  late Color accent3 = const Color(0xFF967324);
-  late Color accent4 = const Color(0xB2262D34);
-  late Color success = const Color(0xFF0A6780);
+  late Color secondaryText = const Color(0xFFDDDDDD);
+  late Color primaryBackground = const Color(0xFF161616);
+  late Color secondaryBackground = const Color(0xFF1C1C1E);
+  late Color accent1 = const Color(0xFF101524);
+  late Color accent2 = const Color(0xFFE6DD4E);
+  late Color accent3 = const Color(0xFFF075A6);
+  late Color accent4 = const Color(0xFF1E1F25);
+  late Color success = const Color(0xFF00FF00);
   late Color warning = const Color(0xFFFF6100);
   late Color error = const Color(0xFFFF0010);
   late Color info = const Color(0xFFFFFFFF);
+
+  late Color customColor1 = const Color(0xFFE6DFF1);
+  late Color customColor2 = const Color(0xFF212325);
+  late Color customColor3 = const Color(0xFFD0C7BA);
+  late Color customColor4 = const Color(0xFFACD1BF);
+  late Color customColor5 = const Color(0xFF000000);
+  late Color customColor6 = const Color(0xFFFFFFFF);
 }
 
 extension TextStyleHelper on TextStyle {
