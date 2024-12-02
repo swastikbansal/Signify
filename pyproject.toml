@@ -12,6 +12,11 @@ python = "3.10.11"
 jupyter = "^1.1.1"
 opencv-python = "^4.10.0.84"
 mediapipe = "^0.10.18"
+tensorflow-io-gcs-filesystem = "0.27.0"
+tensorflow = "^2.18.0"
+pandas = "^2.2.3"
+tqdm = "^4.67.1"
+seaborn = "^0.13.2"
 
 [build-system]
 requires = ["poetry-core"]

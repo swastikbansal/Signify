@@ -1,11 +1,13 @@
 from pathlib import Path
 import numpy as np
 
+
 import cv2
 import mediapipe as mp
 from numpy import  argmax, array, expand_dims 
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Bidirectional,LSTM, Dense,Input,Flatten, Dropout
+from tensorflow.keras.layers import Bidirectional,LSTM, Dense,Input,Flatten, GRU
+import utils
 
 from glob import glob
 import time
@@ -16,44 +18,7 @@ import time
 mp_holistic = mp.solutions.holistic  
 mp_drawing = mp.solutions.drawing_utils  
 
-def draw_landmarks(image, results):
-    mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_holistic.POSE_CONNECTIONS)
-    mp_drawing.draw_landmarks(image, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
-    mp_drawing.draw_landmarks(image, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
-
-def mediapipe_detection(image, model) -> tuple:
-    image_ = cv2.cvtColor(image, cv2.COLOR_BGR2RGB) 
-    image_.flags.writeable = False                  
-    results = model.process(image_) 
-    image_.flags.writeable = True                   
-    image = cv2.cvtColor(image_, cv2.COLOR_RGB2BGR) 
-    return image, results
-
-def extract_keypoints(results) -> np.array:        
-    pose = np.array([[res.x, res.y, res.z, res.visibility] for res in results.pose_landmarks.landmark]).flatten() if results.pose_landmarks else np.zeros(33*4)
-    # face = np.array([[res.x, res.y, res.z] for res in results.face_landmarks.landmark]).flatten() if results.face_landmarks else np.zeros(468*3)
-    lh = np.array([[res.x, res.y, res.z] for res in results.left_hand_landmarks.landmark]).flatten() if results.left_hand_landmarks else np.zeros(21*3)
-    rh = np.array([[res.x, res.y, res.z] for res in results.right_hand_landmarks.landmark]).flatten() if results.right_hand_landmarks else np.zeros(21*3)
-    return np.concatenate([pose, lh, rh])    
-
-def draw_styled_landmarks(image, results) -> None:
-    # Draw pose connections
-    mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_holistic.POSE_CONNECTIONS,
-                            mp_drawing.DrawingSpec(color=(80,22,10), thickness=2, circle_radius=4), 
-                            mp_drawing.DrawingSpec(color=(80,44,121), thickness=2, circle_radius=2)
-                            ) 
-    
-    # Draw left hand connections
-    mp_drawing.draw_landmarks(image, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS, 
-                            mp_drawing.DrawingSpec(color=(121,22,76), thickness=2, circle_radius=4), 
-                            mp_drawing.DrawingSpec(color=(121,44,250), thickness=2, circle_radius=2)
-                            ) 
-    
-    # Draw right hand connections  
-    mp_drawing.draw_landmarks(image, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS, 
-                            mp_drawing.DrawingSpec(color=(245,117,66), thickness=2, circle_radius=4), 
-                            mp_drawing.DrawingSpec(color=(245,66,230), thickness=2, circle_radius=2)
-                            ) 
+mp_utils = utils.MediapipeUtils(mp_holistic, mp_drawing)
 
 
 # Labels for data
@@ -69,77 +34,78 @@ actions = array([i.split("\\")[-1] for i in glob('MP_Data\*')])
 # input_shape = (79, 1662)
 # num_classes =  8
 
-max_frames = 79
+max_frames = 59
 input_shape = (max_frames, 258)
-num_classes =  8
+# input_shape = (max_frames, 132)
+num_classes =  len(actions)
 
 # Loading Model    
 model = Sequential([        
         Input(shape=input_shape),        
         
-        # Bidirectional LSTM layers
-        # Dropout(0.1),
-        Bidirectional(LSTM(64, return_sequences=True)),
-        # Dropout(0.2),
-        Bidirectional(LSTM(128, return_sequences=True)),
-        # Dropout(0.1),
-        Bidirectional(LSTM(64, return_sequences=True)),
+        GRU(64, return_sequences=True),
+        GRU(128, return_sequences=True),
+        GRU(64, return_sequences=True),
         
-        # Dropout(0.5),
         # Flatten the output
         Flatten(),
         
         # Fully connected layer
-        Dense(128, activation='relu'),
-        # Dense(32, activation='relu'),
+        Dense(64, activation='relu'),
+        Dense(32, activation='relu'),
         Dense(num_classes, activation='softmax')
 ])
 
-model_path = Path(__file__).parent / 'Model' / 'INCLUDE_8_V3_noFace.h5'
+model_path = Path.cwd() / 'Model' / 'INCLUDE_8_V4_clipped.h5'
 model.load_weights(str(model_path))
 
-# New detection variables
-sequence = [[0] * 258] * max_frames # Passing an enpty list of 258 elements to start the prediction from as soon as the input feed starts
+# sequence = [[0] * 132]
+
+n_frames = 0
+sequence = [[0] * 258] * (max_frames // 2) # Passing an enpty list of 258 elements to start the prediction from as soon as the input feed starts
 sentence = []
 threshold = 0.9
 
-cap = cv2.VideoCapture(0) # Default camera
-# cap = cv2.VideoCapture("Test Recordings\\test (5).mp4")
+# cap = cv2.VideoCapture(1) # Default camera
+cap = cv2.VideoCapture("Test Recordings\\test (5).mp4")
 # cap = cv2.VideoCapture("Dataset\Adjectives\\7. Deaf\MVI_9583.mp4")
-# I have to develop an algo which can detect when a sign is being performed or not if it is being performed then only it should predict the sign
 
 
-with mp_holistic.Holistic(min_detection_confidence=0.4, 
-                          min_tracking_confidence=0.4) as holistic:
-    while cap.isOpened():
+with mp_holistic.Holistic(min_detection_confidence=0.7, 
+                          min_tracking_confidence=0.7) as holistic:
+    while cap.isOpened():    
         ret, frame = cap.read()
-
-        frame = cv2.flip(frame, 1)
         
         # Make detections
-        image, results = mediapipe_detection(frame, holistic)
+        image, results = mp_utils.mediapipe_detection(frame, holistic)
 
-        draw_styled_landmarks(image, results)
+        mp_utils.draw_styled_landmarks(image, results)
 
-        keypoints = extract_keypoints(results)
+        keypoints = mp_utils.extract_keypoints(results)
         sequence.append(keypoints)
-        sequence = sequence[-max_frames:]
-        print(len(sequence))
-                
-        # 2. Prediction logic
-        if len(sequence) == max_frames:
-            res = model.predict(expand_dims(sequence, axis=0))[0]
-            # res = model.predict(sequence)   
-            print(actions[np.argmax(res)], res[argmax(res)])
+        
+        # Predicting output in every 10 frames
+        if n_frames % 5 == 0:
+            sequence = sequence[-max_frames:]
+                    
+            # 2. Prediction logic
+            if len(sequence) == max_frames:
+            
+                res = model.predict(expand_dims(sequence, axis=0))[0]
+                # res = model.predict(sequence)   
+                print(actions[np.argmax(res)], res[argmax(res)])
 
-            # 3. Text Script
-            if res[argmax(res)] > threshold:
-                if len(sentence) > 0:
-                    if actions[argmax(res)] != sentence[-1]:
+                # 3. Text Script
+                if res[argmax(res)] > threshold:
+                    if len(sentence) > 0:
+                        if actions[argmax(res)] != sentence[-1]:
+                            sentence.append(actions[argmax(res)])
+                    else:
                         sentence.append(actions[argmax(res)])
-                else:
-                    sentence.append(actions[argmax(res)])
-
+                
+                # res = res.remove(res[argmax(res)])
+                # print(actions[np.argmax(res)], res[argmax(res)])
+                
             # if len(sentence) > 5:
             #     sentence = sentence[-5:]
 
@@ -148,10 +114,10 @@ with mp_holistic.Holistic(min_detection_confidence=0.4,
                     cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
 
         cv2.imshow('OpenCV Feed', image)
+        n_frames += 1
 
         if cv2.waitKey(10) & 0xFF == ord('q'):
             break
-        process = False
         
     print(sentence)
     cap.release()
