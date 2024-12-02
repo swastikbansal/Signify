@@ -1,5 +1,4 @@
 import '/flutter_flow/flutter_flow_animations.dart';
-import '/flutter_flow/flutter_flow_expanded_image_view.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
@@ -168,38 +167,67 @@ class _EditProfileWidgetState extends State<EditProfileWidget>
                               ),
                               alignment: const AlignmentDirectional(1.0, 0.0),
                               child: Align(
-                                alignment: const AlignmentDirectional(1.0, 0.0),
+                                alignment: const AlignmentDirectional(0.0, 0.0),
                                 child: InkWell(
                                   splashColor: Colors.transparent,
                                   focusColor: Colors.transparent,
                                   hoverColor: Colors.transparent,
                                   highlightColor: Colors.transparent,
                                   onTap: () async {
-                                    await Navigator.push(
-                                      context,
-                                      PageTransition(
-                                        type: PageTransitionType.fade,
-                                        child: FlutterFlowExpandedImageView(
-                                          image: Image.asset(
-                                            'assets/images/Signify_(1).png',
-                                            fit: BoxFit.contain,
-                                            alignment: const Alignment(0.0, 0.0),
-                                          ),
-                                          allowRotation: false,
-                                          tag: 'imageTag',
-                                          useHeroAnimation: true,
-                                        ),
-                                      ),
+                                    final selectedMedia =
+                                        await selectMediaWithSourceBottomSheet(
+                                      context: context,
+                                      allowPhoto: true,
                                     );
+                                    if (selectedMedia != null &&
+                                        selectedMedia.every((m) =>
+                                            validateFileFormat(
+                                                m.storagePath, context))) {
+                                      safeSetState(
+                                          () => _model.isDataUploading1 = true);
+                                      var selectedUploadedFiles =
+                                          <FFUploadedFile>[];
+
+                                      try {
+                                        selectedUploadedFiles = selectedMedia
+                                            .map((m) => FFUploadedFile(
+                                                  name: m.storagePath
+                                                      .split('/')
+                                                      .last,
+                                                  bytes: m.bytes,
+                                                  height: m.dimensions?.height,
+                                                  width: m.dimensions?.width,
+                                                  blurHash: m.blurHash,
+                                                ))
+                                            .toList();
+                                      } finally {
+                                        _model.isDataUploading1 = false;
+                                      }
+                                      if (selectedUploadedFiles.length ==
+                                          selectedMedia.length) {
+                                        safeSetState(() {
+                                          _model.uploadedLocalFile1 =
+                                              selectedUploadedFiles.first;
+                                        });
+                                      } else {
+                                        safeSetState(() {});
+                                        return;
+                                      }
+                                    }
                                   },
-                                  child: Hero(
-                                    tag: 'imageTag',
-                                    transitionOnUserGestures: true,
-                                    child: ClipRRect(
-                                      borderRadius:
-                                          BorderRadius.circular(100.0),
-                                      child: Image.asset(
-                                        'assets/images/Signify_(1).png',
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(100.0),
+                                    child: Image.memory(
+                                      _model.uploadedLocalFile1.bytes ??
+                                          Uint8List.fromList([]),
+                                      width: 150.0,
+                                      height: 150.0,
+                                      fit: BoxFit.cover,
+                                      alignment: const Alignment(0.0, 0.0),
+                                      errorBuilder:
+                                          (context, error, stackTrace) =>
+                                              Image.asset(
+                                        'assets/images/error_image.png',
                                         width: 150.0,
                                         height: 150.0,
                                         fit: BoxFit.cover,
@@ -227,7 +255,8 @@ class _EditProfileWidgetState extends State<EditProfileWidget>
                                 width: 40.0,
                                 height: 40.0,
                                 decoration: BoxDecoration(
-                                  color: FlutterFlowTheme.of(context).primary,
+                                  color:
+                                      FlutterFlowTheme.of(context).customColor1,
                                   borderRadius: BorderRadius.circular(18.0),
                                   border: Border.all(
                                     color:
@@ -240,17 +269,23 @@ class _EditProfileWidgetState extends State<EditProfileWidget>
                                   hoverColor: Colors.transparent,
                                   highlightColor: Colors.transparent,
                                   onTap: () async {
-                                    final selectedMedia = await selectMedia(
+                                    final selectedMedia =
+                                        await selectMediaWithSourceBottomSheet(
+                                      context: context,
                                       imageQuality: 100,
-                                      mediaSource: MediaSource.photoGallery,
-                                      multiImage: false,
+                                      allowPhoto: true,
+                                      backgroundColor:
+                                          FlutterFlowTheme.of(context)
+                                              .alternate,
+                                      textColor: FlutterFlowTheme.of(context)
+                                          .primaryText,
                                     );
                                     if (selectedMedia != null &&
                                         selectedMedia.every((m) =>
                                             validateFileFormat(
                                                 m.storagePath, context))) {
                                       safeSetState(
-                                          () => _model.isDataUploading = true);
+                                          () => _model.isDataUploading2 = true);
                                       var selectedUploadedFiles =
                                           <FFUploadedFile>[];
 
@@ -267,12 +302,12 @@ class _EditProfileWidgetState extends State<EditProfileWidget>
                                                 ))
                                             .toList();
                                       } finally {
-                                        _model.isDataUploading = false;
+                                        _model.isDataUploading2 = false;
                                       }
                                       if (selectedUploadedFiles.length ==
                                           selectedMedia.length) {
                                         safeSetState(() {
-                                          _model.uploadedLocalFile =
+                                          _model.uploadedLocalFile2 =
                                               selectedUploadedFiles.first;
                                         });
                                       } else {
@@ -284,8 +319,8 @@ class _EditProfileWidgetState extends State<EditProfileWidget>
                                   child: Icon(
                                     Icons.add,
                                     color: FlutterFlowTheme.of(context)
-                                        .primaryText,
-                                    size: 20.0,
+                                        .customColor5,
+                                    size: 24.0,
                                   ),
                                 ),
                               ),
@@ -823,7 +858,7 @@ class _EditProfileWidgetState extends State<EditProfileWidget>
                   ),
                   child: Padding(
                     padding:
-                        const EdgeInsetsDirectional.fromSTEB(20.0, 20.0, 20.0, 20.0),
+                        const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 20.0),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [

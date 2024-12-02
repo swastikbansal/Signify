@@ -3,7 +3,6 @@ import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -136,34 +135,34 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                   decoration: BoxDecoration(
                     color: FlutterFlowTheme.of(context).primaryBackground,
                   ),
-                  alignment: const AlignmentDirectional(0.0, -1.0),
+                  alignment: const AlignmentDirectional(0.0, 0.0),
                   child: SingleChildScrollView(
                     child: Column(
                       mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Container(
-                          width: double.infinity,
-                          constraints: const BoxConstraints(
-                            maxWidth: 600.0,
-                          ),
-                          decoration: BoxDecoration(
-                            color:
-                                FlutterFlowTheme.of(context).primaryBackground,
-                            borderRadius: BorderRadius.circular(0.0),
-                          ),
-                          alignment: const AlignmentDirectional(-1.0, 0.0),
-                          child: Align(
-                            alignment: const AlignmentDirectional(-1.0, 0.0),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.max,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsetsDirectional.fromSTEB(
-                                      16.0, 0.0, 0.0, 0.0),
-                                  child: Text(
+                        Padding(
+                          padding: const EdgeInsetsDirectional.fromSTEB(
+                              20.0, 0.0, 20.0, 0.0),
+                          child: Container(
+                            width: double.infinity,
+                            constraints: const BoxConstraints(
+                              maxWidth: 600.0,
+                            ),
+                            decoration: BoxDecoration(
+                              color: FlutterFlowTheme.of(context)
+                                  .primaryBackground,
+                              borderRadius: BorderRadius.circular(0.0),
+                            ),
+                            alignment: const AlignmentDirectional(0.0, 0.0),
+                            child: Align(
+                              alignment: const AlignmentDirectional(-1.0, 0.0),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
                                     FFLocalizations.of(context).getText(
                                       '5hccj91f' /* Signify */,
                                     ),
@@ -177,8 +176,8 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                               .containsKey('Space Grotesk'),
                                         ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -689,12 +688,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                           return;
                                                         }
 
-                                                        if (Navigator.of(
-                                                                context)
-                                                            .canPop()) {
-                                                          context.pop();
-                                                        }
-                                                        context.pushNamedAuth(
+                                                        context.goNamedAuth(
                                                             'voicetosign1',
                                                             context.mounted);
                                                       },
@@ -734,7 +728,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                       .titleLargeFamily,
                                                                   color: FlutterFlowTheme.of(
                                                                           context)
-                                                                      .customColor2,
+                                                                      .customColor5,
                                                                   letterSpacing:
                                                                       0.0,
                                                                   useGoogleFonts: GoogleFonts
@@ -819,9 +813,6 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                   fontFamily: FlutterFlowTheme.of(
                                                                           context)
                                                                       .labelMediumFamily,
-                                                                  color: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .primaryText,
                                                                   letterSpacing:
                                                                       0.0,
                                                                   useGoogleFonts: GoogleFonts
@@ -942,7 +933,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                   return;
                                                                 }
 
-                                                                context.goNamedAuth(
+                                                                context.pushNamedAuth(
                                                                     'voicetosign1',
                                                                     context
                                                                         .mounted);
@@ -957,7 +948,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                     .google,
                                                                 color: FlutterFlowTheme.of(
                                                                         context)
-                                                                    .primaryText,
+                                                                    .secondaryText,
                                                                 size: 20.0,
                                                               ),
                                                               options:
@@ -983,17 +974,20 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                     .secondaryBackground,
                                                                 textStyle: FlutterFlowTheme.of(
                                                                         context)
-                                                                    .titleMedium
+                                                                    .titleSmall
                                                                     .override(
                                                                       fontFamily:
                                                                           FlutterFlowTheme.of(context)
-                                                                              .titleMediumFamily,
+                                                                              .titleSmallFamily,
+                                                                      color: FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .secondaryText,
                                                                       letterSpacing:
                                                                           0.0,
                                                                       useGoogleFonts: GoogleFonts
                                                                               .asMap()
                                                                           .containsKey(
-                                                                              FlutterFlowTheme.of(context).titleMediumFamily),
+                                                                              FlutterFlowTheme.of(context).titleSmallFamily),
                                                                     ),
                                                                 elevation: 2.0,
                                                                 borderSide:
@@ -1287,7 +1281,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                             FFLocalizations.of(
                                                                     context)
                                                                 .getText(
-                                                          '8thf499r' /* Enter Password */,
+                                                          '5tsipxsg' /* Enter Password */,
                                                         ),
                                                         hintStyle:
                                                             FlutterFlowTheme.of(
@@ -1826,7 +1820,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                   return;
                                                                 }
 
-                                                                context.goNamedAuth(
+                                                                context.pushNamedAuth(
                                                                     'voicetosign1',
                                                                     context
                                                                         .mounted);
@@ -1841,7 +1835,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                     .google,
                                                                 color: FlutterFlowTheme.of(
                                                                         context)
-                                                                    .primaryText,
+                                                                    .secondaryText,
                                                                 size: 20.0,
                                                               ),
                                                               options:
@@ -1867,17 +1861,20 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                     .secondaryBackground,
                                                                 textStyle: FlutterFlowTheme.of(
                                                                         context)
-                                                                    .titleMedium
+                                                                    .titleSmall
                                                                     .override(
                                                                       fontFamily:
                                                                           FlutterFlowTheme.of(context)
-                                                                              .titleMediumFamily,
+                                                                              .titleSmallFamily,
+                                                                      color: FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .secondaryText,
                                                                       letterSpacing:
                                                                           0.0,
                                                                       useGoogleFonts: GoogleFonts
                                                                               .asMap()
                                                                           .containsKey(
-                                                                              FlutterFlowTheme.of(context).titleMediumFamily),
+                                                                              FlutterFlowTheme.of(context).titleSmallFamily),
                                                                     ),
                                                                 elevation: 2.0,
                                                                 borderSide:
@@ -1928,7 +1925,9 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                             ),
                           ),
                         ),
-                      ],
+                      ]
+                          .divide(const SizedBox(height: 20.0))
+                          .around(const SizedBox(height: 20.0)),
                     ),
                   ),
                 ),
@@ -1945,11 +1944,11 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                     height: double.infinity,
                     decoration: BoxDecoration(
                       color: FlutterFlowTheme.of(context).secondaryBackground,
-                      image: const DecorationImage(
+                      image: DecorationImage(
                         fit: BoxFit.cover,
-                        image: CachedNetworkImageProvider(
-                          'https://images.unsplash.com/photo-1508385082359-f38ae991e8f2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1374&q=80',
-                        ),
+                        image: Image.asset(
+                          'assets/images/Signify_(2).png',
+                        ).image,
                       ),
                       borderRadius: BorderRadius.circular(0.0),
                     ),

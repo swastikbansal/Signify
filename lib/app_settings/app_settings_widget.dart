@@ -128,16 +128,6 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> {
                                       .containsKey('Space Grotesk'),
                                 ),
                           ),
-                          Container(
-                            width: MediaQuery.sizeOf(context).width * 1.0,
-                            height: 1.0,
-                            decoration: BoxDecoration(
-                              color: FlutterFlowTheme.of(context).alternate,
-                              border: Border.all(
-                                color: FlutterFlowTheme.of(context).alternate,
-                              ),
-                            ),
-                          ),
                           Row(
                             mainAxisSize: MainAxisSize.max,
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -236,16 +226,6 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> {
                                       .containsKey('Space Grotesk'),
                                 ),
                           ),
-                          Container(
-                            width: MediaQuery.sizeOf(context).width * 1.0,
-                            height: 1.0,
-                            decoration: BoxDecoration(
-                              color: FlutterFlowTheme.of(context).alternate,
-                              border: Border.all(
-                                color: FlutterFlowTheme.of(context).alternate,
-                              ),
-                            ),
-                          ),
                           Column(
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -277,40 +257,35 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> {
                                       FormFieldController<String>(null),
                                   options: [
                                     FFLocalizations.of(context).getText(
-                                      '66dfixgd' /* English */,
+                                      'yo9znei4' /* English */,
                                     ),
                                     FFLocalizations.of(context).getText(
-                                      'vadi8nzl' /* Hindi */,
+                                      'pt8w0g8k' /* Hindi */,
                                     ),
                                     FFLocalizations.of(context).getText(
-                                      'xjvzabol' /* Bengali */,
+                                      'hp7t91aj' /* Bengali */,
                                     ),
                                     FFLocalizations.of(context).getText(
-                                      '131t8hna' /* Marathi */,
+                                      'svu02jeq' /* Marathi */,
                                     ),
                                     FFLocalizations.of(context).getText(
-                                      '68dl1fnu' /* Telugu */,
+                                      'wwl4dodf' /* Telugu */,
                                     ),
                                     FFLocalizations.of(context).getText(
-                                      '5skvqu7s' /* Tamil */,
+                                      'q10dlede' /* Tamil */,
                                     ),
                                     FFLocalizations.of(context).getText(
-                                      'nw2vlb4y' /* Gujarati */,
+                                      'jnwz9vkh' /* Gujarati */,
                                     ),
                                     FFLocalizations.of(context).getText(
-                                      'dl7oeu5a' /* Urdu */,
-                                    ),
-                                    FFLocalizations.of(context).getText(
-                                      'mlx5syz9' /* Kannada */,
-                                    ),
-                                    FFLocalizations.of(context).getText(
-                                      'by08j8ys' /* Punjabi */,
+                                      'xatouyew' /* Punjabi */,
                                     )
                                   ],
                                   onChanged: (val) async {
                                     safeSetState(
                                         () => _model.dropDownValue = val);
-                                    setAppLanguage(context, 'hi');
+                                    setAppLanguage(
+                                        context, _model.dropDownValue!);
                                   },
                                   width: double.infinity,
                                   height: 56.0,
@@ -337,7 +312,7 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> {
                                   ),
                                   fillColor: FlutterFlowTheme.of(context)
                                       .secondaryBackground,
-                                  elevation: 0.0,
+                                  elevation: 2.0,
                                   borderColor:
                                       FlutterFlowTheme.of(context).alternate,
                                   borderWidth: 2.0,
@@ -393,18 +368,6 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> {
                                         useGoogleFonts: GoogleFonts.asMap()
                                             .containsKey('Space Grotesk'),
                                       ),
-                                ),
-                                Container(
-                                  width: MediaQuery.sizeOf(context).width * 1.0,
-                                  height: 1.0,
-                                  decoration: BoxDecoration(
-                                    color:
-                                        FlutterFlowTheme.of(context).alternate,
-                                    border: Border.all(
-                                      color: FlutterFlowTheme.of(context)
-                                          .alternate,
-                                    ),
-                                  ),
                                 ),
                                 Row(
                                   mainAxisSize: MainAxisSize.max,
@@ -730,16 +693,6 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> {
                                   useGoogleFonts: GoogleFonts.asMap()
                                       .containsKey('Space Grotesk'),
                                 ),
-                          ),
-                          Container(
-                            width: MediaQuery.sizeOf(context).width * 1.0,
-                            height: 1.0,
-                            decoration: BoxDecoration(
-                              color: FlutterFlowTheme.of(context).alternate,
-                              border: Border.all(
-                                color: FlutterFlowTheme.of(context).alternate,
-                              ),
-                            ),
                           ),
                           Row(
                             mainAxisSize: MainAxisSize.max,

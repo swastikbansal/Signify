@@ -1,4 +1,4 @@
-package com.mycompany.signify
+package com.philosia.signify
 
 import io.flutter.embedding.android.FlutterActivity
 

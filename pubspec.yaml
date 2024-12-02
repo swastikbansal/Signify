@@ -39,6 +39,9 @@ dependencies:
   dropdown_button2: 2.3.9
   easy_debounce: 2.0.1
   file_picker: 8.1.2
+  firebase_analytics: 11.3.3
+  firebase_analytics_platform_interface: 4.2.5
+  firebase_analytics_web: 0.5.10+2
   firebase_auth: 5.3.1
   firebase_auth_platform_interface: 7.4.7
   firebase_auth_web: 5.13.2
@@ -85,7 +88,6 @@ dependencies:
   path_provider_linux: 2.2.1
   path_provider_platform_interface: 2.1.2
   path_provider_windows: 2.3.0
-  photo_view: 0.15.0
   plugin_platform_interface: 2.1.8
   provider: 6.1.2
   rxdart: 0.27.7
@@ -139,13 +141,12 @@ dev_dependencies:
 
 
 flutter_launcher_icons:
-  android: 'launcher_icon'
+  android: true
   ios: true
+  remove_alpha_ios: true
   web:
     generate: true
   image_path: 'assets/images/app_launcher_icon.png'
-  adaptive_icon_background: '#00000000'
-  adaptive_icon_foreground: 'assets/images/adaptive_foreground_icon.png'
 
 
 # For information on the generic Dart part of this file, see the
@@ -170,6 +171,71 @@ flutter:
     - assets/jsons/
 
   fonts:
+    - family: 'Aptos'
+      fonts:
+        - asset: assets/fonts/Aptos-Light.ttf
+          weight: 300
+        - asset: assets/fonts/Aptos-Light-Italic.ttf
+          weight: 300
+          style: italic
+        - asset: assets/fonts/Aptos.ttf
+        - asset: assets/fonts/Aptos-Italic.ttf
+          style: italic
+        - asset: assets/fonts/Aptos-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Aptos-SemiBold-Italic.ttf
+          weight: 600
+          style: italic
+        - asset: assets/fonts/Aptos-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Aptos-Bold-Italic.ttf
+          weight: 700
+          style: italic
+        - asset: assets/fonts/Aptos-ExtraBold.ttf
+          weight: 800
+        - asset: assets/fonts/Aptos-ExtraBold-Italic.ttf
+          weight: 800
+          style: italic
+        - asset: assets/fonts/Aptos-Black.ttf
+          weight: 900
+        - asset: assets/fonts/Aptos-Black-Italic.ttf
+          weight: 900
+          style: italic
+    - family: 'Segoe UI'
+      fonts:
+        - asset: assets/fonts/Segoe_UI.ttf
+        - asset: assets/fonts/Segoe_UI_Italic.ttf
+          style: italic
+        - asset: assets/fonts/Segoe_UI_Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Segoe_UI_Bold_Italic.ttf
+          weight: 700
+          style: italic
+    - family: 'SF Pro Display'
+      fonts:
+        - asset: assets/fonts/SFPRODISPLAYTHINITALIC.OTF
+          weight: 100
+          style: italic
+        - asset: assets/fonts/SFPRODISPLAYULTRALIGHTITALIC.OTF
+          weight: 200
+          style: italic
+        - asset: assets/fonts/SFPRODISPLAYLIGHTITALIC.OTF
+          weight: 300
+          style: italic
+        - asset: assets/fonts/SFPRODISPLAYREGULAR.OTF
+        - asset: assets/fonts/SFPRODISPLAYHEAVYITALIC.OTF
+          style: italic
+        - asset: assets/fonts/SFPRODISPLAYMEDIUM.OTF
+          weight: 500
+        - asset: assets/fonts/SFPRODISPLAYSEMIBOLDITALIC.OTF
+          weight: 600
+          style: italic
+        - asset: assets/fonts/SFPRODISPLAYBOLD.OTF
+          weight: 700
+        - asset: assets/fonts/SFPRODISPLAYBLACKITALIC.OTF
+          weight: 900
+          style: italic
+
     - family: Flutterflonts
       fonts:
         - asset: assets/fonts/flutterflonts.ttf

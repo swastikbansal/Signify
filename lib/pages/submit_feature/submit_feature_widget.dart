@@ -115,12 +115,12 @@ class _SubmitFeatureWidgetState extends State<SubmitFeatureWidget> {
                   FFLocalizations.of(context).getText(
                     '5op8imnq' /* Have an idea to make our app b... */,
                   ),
-                  style: FlutterFlowTheme.of(context).labelMedium.override(
+                  style: FlutterFlowTheme.of(context).labelLarge.override(
                         fontFamily:
-                            FlutterFlowTheme.of(context).labelMediumFamily,
-                        letterSpacing: 1.0,
+                            FlutterFlowTheme.of(context).labelLargeFamily,
+                        letterSpacing: 0.0,
                         useGoogleFonts: GoogleFonts.asMap().containsKey(
-                            FlutterFlowTheme.of(context).labelMediumFamily),
+                            FlutterFlowTheme.of(context).labelLargeFamily),
                       ),
                 ),
               ),
@@ -250,10 +250,12 @@ class _SubmitFeatureWidgetState extends State<SubmitFeatureWidget> {
                       fillColor: FlutterFlowTheme.of(context).primaryBackground,
                       contentPadding: const EdgeInsetsDirectional.fromSTEB(
                           24.0, 24.0, 20.0, 24.0),
+                      hoverColor:
+                          FlutterFlowTheme.of(context).primaryBackground,
                       prefixIcon: Icon(
                         Icons.reset_tv,
                         color: FlutterFlowTheme.of(context).primary,
-                        size: 20.0,
+                        size: 24.0,
                       ),
                       suffixIcon: _model
                               .featureRequestTextController!.text.isNotEmpty

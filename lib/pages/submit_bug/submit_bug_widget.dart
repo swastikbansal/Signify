@@ -85,17 +85,20 @@ class _SubmitBugWidgetState extends State<SubmitBugWidget> {
               ),
               Align(
                 alignment: const AlignmentDirectional(0.0, 0.0),
-                child: Text(
-                  FFLocalizations.of(context).getText(
-                    '4w6sqkk0' /* Submit a Bug */,
+                child: Padding(
+                  padding: const EdgeInsetsDirectional.fromSTEB(2.0, 0.0, 0.0, 0.0),
+                  child: Text(
+                    FFLocalizations.of(context).getText(
+                      '4w6sqkk0' /* Submit a Bug */,
+                    ),
+                    textAlign: TextAlign.start,
+                    style: FlutterFlowTheme.of(context).headlineMedium.override(
+                          fontFamily: 'Space Grotesk',
+                          letterSpacing: 0.0,
+                          useGoogleFonts:
+                              GoogleFonts.asMap().containsKey('Space Grotesk'),
+                        ),
                   ),
-                  textAlign: TextAlign.start,
-                  style: FlutterFlowTheme.of(context).headlineMedium.override(
-                        fontFamily: 'Space Grotesk',
-                        letterSpacing: 0.0,
-                        useGoogleFonts:
-                            GoogleFonts.asMap().containsKey('Space Grotesk'),
-                      ),
                 ),
               ),
             ],
@@ -174,12 +177,12 @@ class _SubmitBugWidgetState extends State<SubmitBugWidget> {
                   FFLocalizations.of(context).getText(
                     'pq65pza0' /* Oops! Found something that’s n... */,
                   ),
-                  style: FlutterFlowTheme.of(context).labelMedium.override(
+                  style: FlutterFlowTheme.of(context).labelLarge.override(
                         fontFamily:
-                            FlutterFlowTheme.of(context).labelMediumFamily,
-                        letterSpacing: 1.0,
+                            FlutterFlowTheme.of(context).labelLargeFamily,
+                        letterSpacing: 0.0,
                         useGoogleFonts: GoogleFonts.asMap().containsKey(
-                            FlutterFlowTheme.of(context).labelMediumFamily),
+                            FlutterFlowTheme.of(context).labelLargeFamily),
                       ),
                 ),
               ),
@@ -263,10 +266,12 @@ class _SubmitBugWidgetState extends State<SubmitBugWidget> {
                       fillColor: FlutterFlowTheme.of(context).primaryBackground,
                       contentPadding: const EdgeInsetsDirectional.fromSTEB(
                           24.0, 24.0, 24.0, 24.0),
+                      hoverColor:
+                          FlutterFlowTheme.of(context).primaryBackground,
                       prefixIcon: Icon(
                         Icons.bug_report,
                         color: FlutterFlowTheme.of(context).primary,
-                        size: 20.0,
+                        size: 24.0,
                       ),
                       suffixIcon:
                           _model.bugSubmitTextController!.text.isNotEmpty

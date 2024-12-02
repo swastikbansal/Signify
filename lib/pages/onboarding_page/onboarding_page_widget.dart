@@ -568,18 +568,11 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                           topLeft: Radius.circular(0.0),
                           topRight: Radius.circular(0.0),
                         ),
-                        child: Image.network(
-                          'https://images.unsplash.com/photo-1640550444366-b94e5752c479?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHw3fHxzaWduJTIwbGFuZ3VhZ2V8ZW58MHx8fHwxNzMyOTQxNTE4fDA&ixlib=rb-4.0.3&q=80&w=1080',
+                        child: Image.asset(
+                          'assets/images/Designer.jpg',
                           width: double.infinity,
                           height: 450.0,
                           fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) =>
-                              Image.asset(
-                            'assets/images/error_image.png',
-                            width: double.infinity,
-                            height: 450.0,
-                            fit: BoxFit.cover,
-                          ),
                         ),
                       ).animateOnPageLoad(
                           animationsMap['imageOnPageLoadAnimation1']!),
@@ -630,8 +623,7 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                                   0.0, 20.0, 0.0, 0.0),
                               child: Row(
                                 mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Expanded(
                                     child: FFButtonWidget(
@@ -722,18 +714,19 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                     children: [
                       Padding(
                         padding: const EdgeInsetsDirectional.fromSTEB(
-                            20.0, 20.0, 20.0, 0.0),
+                            10.0, 0.0, 10.0, 0.0),
                         child: Lottie.asset(
                           'assets/jsons/ai_lines_animation.json',
                           width: 500.0,
-                          height: 400.0,
+                          height: 450.0,
                           fit: BoxFit.contain,
                           animate: true,
                         ).animateOnPageLoad(animationsMap[
                             'lottieAnimationOnPageLoadAnimation1']!),
                       ),
                       Padding(
-                        padding: const EdgeInsets.all(20.0),
+                        padding: const EdgeInsetsDirectional.fromSTEB(
+                            20.0, 0.0, 20.0, 0.0),
                         child: Column(
                           mainAxisSize: MainAxisSize.max,
                           mainAxisAlignment: MainAxisAlignment.start,
@@ -1013,7 +1006,7 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                       ClipRRect(
                         borderRadius: BorderRadius.circular(8.0),
                         child: Image.asset(
-                          'assets/images/new_man.png',
+                          'assets/images/dffdgfdg.png',
                           width: 500.0,
                           height: 450.0,
                           fit: BoxFit.contain,
@@ -1195,7 +1188,7 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                                 animationsMap['textOnPageLoadAnimation9']!),
                             Padding(
                               padding: const EdgeInsetsDirectional.fromSTEB(
-                                  24.0, 12.0, 24.0, 12.0),
+                                  20.0, 12.0, 20.0, 12.0),
                               child: Text(
                                 FFLocalizations.of(context).getText(
                                   'p21jlt05' /* Ready to redefine communicatio... */,
@@ -1283,9 +1276,9 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                 ],
               ),
               Align(
-                alignment: const AlignmentDirectional(-0.85, 0.85),
+                alignment: const AlignmentDirectional(0.0, 1.0),
                 child: Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(0.0, 150.0, 0.0, 0.0),
+                  padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 20.0),
                   child: smooth_page_indicator.SmoothPageIndicator(
                     controller: _model.pageViewController ??=
                         PageController(initialPage: 0),
@@ -1300,10 +1293,10 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                       safeSetState(() {});
                     },
                     effect: smooth_page_indicator.ExpandingDotsEffect(
-                      expansionFactor: 3.0,
+                      expansionFactor: 4.0,
                       spacing: 6.0,
                       radius: 20.0,
-                      dotWidth: 12.0,
+                      dotWidth: 6.0,
                       dotHeight: 6.0,
                       dotColor: FlutterFlowTheme.of(context).info,
                       activeDotColor: FlutterFlowTheme.of(context).primary,

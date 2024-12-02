@@ -1,4 +1,0 @@
-NSCameraUsageDescription = "کیمرے کو ISL نشانیاں کیپچر کرنے کی اجازت دیں۔";
-NSPhotoLibraryUsageDescription = "ڈیٹا اپ لوڈ کرنے کے لیے، اس ایپ کو فوٹو لائبریری تک رسائی کی اجازت درکار ہے۔";
-NSMicrophoneUsageDescription = "اسپیچ ریکگنیشن استعمال کرنے کے لیے مائیکروفون تک رسائی کی اجازت دیں۔";
-PermissionGroupNotification = "اطلاعات کو حالیہ اپ ڈیٹس کے بارے میں مطلع کرنے کی اجازت دیں۔";

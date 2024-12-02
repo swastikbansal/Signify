@@ -104,8 +104,6 @@ class _MyAppState extends State<MyApp> {
         Locale('te'),
         Locale('ta'),
         Locale('gu'),
-        Locale('ur'),
-        Locale('kn'),
         Locale('pa'),
       ],
       theme: ThemeData(

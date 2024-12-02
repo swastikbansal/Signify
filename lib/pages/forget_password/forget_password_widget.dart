@@ -66,17 +66,20 @@ class _ForgetPasswordWidgetState extends State<ForgetPasswordWidget> {
                 context.safePop();
               },
             ),
-            Text(
-              FFLocalizations.of(context).getText(
-                'bqmgpylz' /* Forgot Password */,
+            Padding(
+              padding: const EdgeInsetsDirectional.fromSTEB(2.0, 0.0, 0.0, 0.0),
+              child: Text(
+                FFLocalizations.of(context).getText(
+                  'bqmgpylz' /* Forgot Password */,
+                ),
+                textAlign: TextAlign.start,
+                style: FlutterFlowTheme.of(context).headlineMedium.override(
+                      fontFamily: 'Space Grotesk',
+                      letterSpacing: 0.0,
+                      useGoogleFonts:
+                          GoogleFonts.asMap().containsKey('Space Grotesk'),
+                    ),
               ),
-              textAlign: TextAlign.start,
-              style: FlutterFlowTheme.of(context).headlineMedium.override(
-                    fontFamily: 'Space Grotesk',
-                    letterSpacing: 0.0,
-                    useGoogleFonts:
-                        GoogleFonts.asMap().containsKey('Space Grotesk'),
-                  ),
             ),
           ],
         ),
@@ -156,7 +159,7 @@ class _ForgetPasswordWidgetState extends State<ForgetPasswordWidget> {
                   style: FlutterFlowTheme.of(context).labelLarge.override(
                         fontFamily:
                             FlutterFlowTheme.of(context).labelLargeFamily,
-                        letterSpacing: 1.0,
+                        letterSpacing: 0.0,
                         useGoogleFonts: GoogleFonts.asMap().containsKey(
                             FlutterFlowTheme.of(context).labelLargeFamily),
                       ),
@@ -237,7 +240,12 @@ class _ForgetPasswordWidgetState extends State<ForgetPasswordWidget> {
                       contentPadding: const EdgeInsetsDirectional.fromSTEB(
                           24.0, 24.0, 20.0, 24.0),
                       hoverColor:
-                          FlutterFlowTheme.of(context).secondaryBackground,
+                          FlutterFlowTheme.of(context).primaryBackground,
+                      prefixIcon: Icon(
+                        Icons.password_sharp,
+                        color: FlutterFlowTheme.of(context).secondary,
+                        size: 24.0,
+                      ),
                       suffixIcon:
                           _model.emailAddressTextController!.text.isNotEmpty
                               ? InkWell(

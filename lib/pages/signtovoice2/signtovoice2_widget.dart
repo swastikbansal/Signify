@@ -78,109 +78,93 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Align(
-                        alignment: const AlignmentDirectional(0.0, 0.0),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            FlutterFlowDropDown<String>(
-                              controller: _model.dropDownValueController ??=
-                                  FormFieldController<String>(null),
-                              options: [
-                                FFLocalizations.of(context).getText(
-                                  'd24i707f' /* English */,
-                                ),
-                                FFLocalizations.of(context).getText(
-                                  '7m2y2l69' /* Hindi */,
-                                ),
-                                FFLocalizations.of(context).getText(
-                                  'ibczj7lb' /* Bengali */,
-                                ),
-                                FFLocalizations.of(context).getText(
-                                  '6lmmq93s' /* Marathi */,
-                                ),
-                                FFLocalizations.of(context).getText(
-                                  '0lqgt6mm' /* Telugu */,
-                                ),
-                                FFLocalizations.of(context).getText(
-                                  '80zs9si9' /* Tamil */,
-                                ),
-                                FFLocalizations.of(context).getText(
-                                  'hvk57ve7' /* Gujrati */,
-                                ),
-                                FFLocalizations.of(context).getText(
-                                  'l0oho2g0' /* Urdu */,
-                                ),
-                                FFLocalizations.of(context).getText(
-                                  'uumqpw3p' /* Kannada */,
-                                ),
-                                FFLocalizations.of(context).getText(
-                                  'uumqpw3p' /* Punjabi */,
-                                )
-                              ],
-                              onChanged: (val) => safeSetState(
-                                  () => _model.dropDownValue = val),
-                              width: 260.0,
-                              height: 60.0,
-                              textStyle: FlutterFlowTheme.of(context)
-                                  .titleSmall
-                                  .override(
-                                    fontFamily: FlutterFlowTheme.of(context)
-                                        .titleSmallFamily,
-                                    letterSpacing: 0.0,
-                                    useGoogleFonts: GoogleFonts.asMap()
-                                        .containsKey(
-                                            FlutterFlowTheme.of(context)
-                                                .titleSmallFamily),
-                                  ),
-                              hintText: FFLocalizations.of(context).getText(
-                                'drx645ue' /* Select Language */,
+                      Row(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          FlutterFlowDropDown<String>(
+                            controller: _model.dropDownValueController ??=
+                                FormFieldController<String>(null),
+                            options: [
+                              FFLocalizations.of(context).getText(
+                                'rpno13ax' /* English */,
                               ),
-                              icon: Icon(
-                                Icons.arrow_drop_down,
-                                color: FlutterFlowTheme.of(context).primaryText,
-                                size: 30.0,
+                              FFLocalizations.of(context).getText(
+                                'poexbjj4' /* Hindi */,
                               ),
-                              fillColor: FlutterFlowTheme.of(context)
-                                  .primaryBackground,
-                              elevation: 0.0,
-                              borderColor:
-                                  FlutterFlowTheme.of(context).alternate,
-                              borderWidth: 2.0,
-                              borderRadius: 16.0,
-                              margin: const EdgeInsetsDirectional.fromSTEB(
-                                  20.0, 0.0, 20.0, 0.0),
-                              hidesUnderline: true,
-                              isOverButton: false,
-                              isSearchable: false,
-                              isMultiSelect: false,
+                              FFLocalizations.of(context).getText(
+                                'qtkvhy1f' /* Bengali */,
+                              ),
+                              FFLocalizations.of(context).getText(
+                                'u9ln63gu' /* Marathi */,
+                              ),
+                              FFLocalizations.of(context).getText(
+                                'b33de32b' /* Telugu */,
+                              ),
+                              FFLocalizations.of(context).getText(
+                                'fpa9yid6' /* Tamil */,
+                              ),
+                              FFLocalizations.of(context).getText(
+                                'hann7xcl' /* Gujarati */,
+                              ),
+                              FFLocalizations.of(context).getText(
+                                'qshr5rcb' /* Punjabi */,
+                              )
+                            ],
+                            onChanged: (val) =>
+                                safeSetState(() => _model.dropDownValue = val),
+                            width: 240.0,
+                            height: 60.0,
+                            textStyle: FlutterFlowTheme.of(context)
+                                .labelLarge
+                                .override(
+                                  fontFamily: FlutterFlowTheme.of(context)
+                                      .labelLargeFamily,
+                                  letterSpacing: 0.0,
+                                  useGoogleFonts: GoogleFonts.asMap()
+                                      .containsKey(FlutterFlowTheme.of(context)
+                                          .labelLargeFamily),
+                                ),
+                            hintText: FFLocalizations.of(context).getText(
+                              'drx645ue' /* Select Language */,
                             ),
-                            Align(
-                              alignment: const AlignmentDirectional(0.0, 0.0),
-                              child: FlutterFlowIconButton(
-                                borderRadius: 100.0,
-                                buttonSize: 60.0,
-                                fillColor: FlutterFlowTheme.of(context)
-                                    .secondaryBackground,
-                                hoverColor:
-                                    FlutterFlowTheme.of(context).alternate,
-                                hoverIconColor:
-                                    FlutterFlowTheme.of(context).primary,
-                                icon: Icon(
-                                  Icons.volume_up,
-                                  color:
-                                      FlutterFlowTheme.of(context).primaryText,
-                                  size: 36.0,
-                                ),
-                                onPressed: () {
-                                  print('IconButton pressed ...');
-                                },
-                              ),
+                            icon: Icon(
+                              Icons.arrow_drop_down,
+                              color: FlutterFlowTheme.of(context).primaryText,
+                              size: 24.0,
                             ),
-                          ].divide(const SizedBox(width: 40.0)),
-                        ),
+                            fillColor:
+                                FlutterFlowTheme.of(context).primaryBackground,
+                            elevation: 2.0,
+                            borderColor: FlutterFlowTheme.of(context).alternate,
+                            borderWidth: 2.0,
+                            borderRadius: 16.0,
+                            margin: const EdgeInsetsDirectional.fromSTEB(
+                                20.0, 0.0, 20.0, 0.0),
+                            hidesUnderline: true,
+                            isOverButton: false,
+                            isSearchable: false,
+                            isMultiSelect: false,
+                          ),
+                          FlutterFlowIconButton(
+                            borderRadius: 100.0,
+                            buttonSize: 60.0,
+                            fillColor: FlutterFlowTheme.of(context)
+                                .secondaryBackground,
+                            hoverColor: FlutterFlowTheme.of(context).alternate,
+                            hoverIconColor:
+                                FlutterFlowTheme.of(context).primary,
+                            icon: Icon(
+                              Icons.volume_up,
+                              color: FlutterFlowTheme.of(context).primaryText,
+                              size: 36.0,
+                            ),
+                            onPressed: () {
+                              print('IconButton pressed ...');
+                            },
+                          ),
+                        ].divide(const SizedBox(width: 20.0)),
                       ),
                       Expanded(
                         child: Align(
