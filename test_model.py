@@ -67,7 +67,7 @@ sentence = []
 threshold = 0.9
 
 # cap = cv2.VideoCapture(1) # Default camera
-cap = cv2.VideoCapture("Test Recordings\\test (5).mp4")
+# cap = cv2.VideoCapture("Test Recordings\\test (5).mp4")
 # cap = cv2.VideoCapture("Dataset\Adjectives\\7. Deaf\MVI_9583.mp4")
 
 
