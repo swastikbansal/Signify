@@ -34,18 +34,35 @@ actions = array([i.split("\\")[-1] for i in glob('MP_Data\*')])
 # input_shape = (79, 1662)
 # num_classes =  8
 
-max_frames = 59
-input_shape = (max_frames, 258)
-# input_shape = (max_frames, 132)
+max_frames = 30
+# input_shape = (max_frames, 258)
+input_shape = (max_frames, 132)
 num_classes =  len(actions)
 
 # Loading Model    
+# model = Sequential([        
+#         Input(shape=input_shape),        
+        
+#         GRU(64, return_sequences=True),
+#         GRU(128, return_sequences=True),
+#         GRU(64, return_sequences=True),
+        
+#         # Flatten the output
+#         Flatten(),
+        
+#         # Fully connected layer
+#         Dense(64, activation='relu'),
+#         Dense(32, activation='relu'),
+#         Dense(num_classes, activation='softmax')
+# ])
 model = Sequential([        
         Input(shape=input_shape),        
         
-        GRU(64, return_sequences=True),
-        GRU(128, return_sequences=True),
-        GRU(64, return_sequences=True),
+        # Bidirectional LSTM layers
+        Bidirectional(LSTM(64, return_sequences=True)),
+        Bidirectional(LSTM(128, return_sequences=True)),
+        # Bidirectional(LSTM(64, return_sequences=True)),
+        Bidirectional(LSTM(64, return_sequences=True)),
         
         # Flatten the output
         Flatten(),
@@ -56,13 +73,13 @@ model = Sequential([
         Dense(num_classes, activation='softmax')
 ])
 
-model_path = Path.cwd() / 'Model' / 'INCLUDE_8_V4_clipped.h5'
+model_path = Path.cwd() / 'Model' / 'INCLUDE_10_V3_clipped.h5'
 model.load_weights(str(model_path))
 
-# sequence = [[0] * 132]
 
 n_frames = 0
-sequence = [[0] * 258] * (max_frames // 2) # Passing an enpty list of 258 elements to start the prediction from as soon as the input feed starts
+# sequence = [[0] * 258] * (max_frames // 2) # Passing an enpty list of 258 elements to start the prediction from as soon as the input feed starts
+sequence = [[0] * 132] * (max_frames // 2)
 sentence = []
 threshold = 0.9
 
@@ -93,6 +110,7 @@ with mp_holistic.Holistic(min_detection_confidence=0.7,
             
                 res = model.predict(expand_dims(sequence, axis=0))[0]
                 # res = model.predict(sequence)   
+                print(res)
                 print(actions[np.argmax(res)], res[argmax(res)])
 
                 # 3. Text Script
