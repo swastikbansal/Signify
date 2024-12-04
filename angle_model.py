@@ -34,12 +34,12 @@ num_classes =  len(actions)
 model = Sequential([        
         Input(shape=input_shape),        
         
-        GRU(64, return_sequences=True),
-        GRU(128, return_sequences=True),
-        GRU(64, return_sequences=True),
-        # LSTM(64, return_sequences=True),
-        # LSTM(128, return_sequences=True),
-        # LSTM(64, return_sequences=True),
+        # GRU(64, return_sequences=True),
+        # GRU(128, return_sequences=True),
+        # GRU(64, return_sequences=True),
+        LSTM(64, return_sequences=True),
+        LSTM(128, return_sequences=True),
+        LSTM(64, return_sequences=True),
         
         # Flatten the output
         Flatten(),
@@ -50,7 +50,7 @@ model = Sequential([
         Dense(num_classes, activation='softmax')
 ])
 
-model_path = Path.cwd() / 'Model' / 'INCLUDE_10_V4_angled.h5'
+model_path = Path.cwd() / 'Model' / 'INCLUDE_10_V5_angled.h5'
 model.load_weights(str(model_path))
 
 
@@ -86,7 +86,7 @@ with mp_pose.Pose(min_detection_confidence=0.7,
         
         
         # Predicting output in every 10 frames
-        if n_frames % 5 == 0:
+        if n_frames % 15 == 0:
             sequence = sequence[-max_frames:]
                     
             # 2. Prediction logic
@@ -94,7 +94,8 @@ with mp_pose.Pose(min_detection_confidence=0.7,
             
                 res = model.predict(expand_dims(sequence, axis=0))[0]
                 
-                print(res)
+                [print(j,i * 100) for i,j in zip(res,actions)]
+                
                 print(actions[np.argmax(res)], res[argmax(res)])
 
                 # 3. Text Script
