@@ -20,12 +20,12 @@ mp_drawing = mp.solutions.drawing_utils
 mp_utils = utils.MediapipeUtils(mp_pose, mp_drawing)
 
 # Labels for data
-actions = array([i.split("\\")[-1] for i in glob('MP_Data\*')])
-#actions = ['Blind','Deaf','Flat','Happy','Poor','Quiet','Rich','sad','Slow','Thick']
+# actions = array([i.split("\\")[-1] for i in glob('MP_Data\*')])
+actions = ['Blind','Deaf','Flat','Happy','Poor','Quiet','Rich','sad','Slow','Thick']
 
 # Defining Hyperparameters
 max_frames = 28
-input_shape = (max_frames, 15)
+input_shape = (max_frames, 17)
 num_classes =  len(actions)
 
 # Landmarks for finding angles
@@ -37,6 +37,9 @@ model = Sequential([
         GRU(64, return_sequences=True),
         GRU(128, return_sequences=True),
         GRU(64, return_sequences=True),
+        # LSTM(64, return_sequences=True),
+        # LSTM(128, return_sequences=True),
+        # LSTM(64, return_sequences=True),
         
         # Flatten the output
         Flatten(),
@@ -47,12 +50,12 @@ model = Sequential([
         Dense(num_classes, activation='softmax')
 ])
 
-model_path = Path.cwd() / 'Model' / 'INCLUDE_8_V4_angles.h5'
+model_path = Path.cwd() / 'Model' / 'INCLUDE_10_V4_angled.h5'
 model.load_weights(str(model_path))
 
 
 n_frames = 0
-sequence = [[0] * 15] * (max_frames // 2) 
+sequence = [[0] * 17] * (max_frames // 2) 
 sentence = []
 threshold = 0.9
 
@@ -76,13 +79,10 @@ with mp_pose.Pose(min_detection_confidence=0.7,
             
             features = np.array(mp_utils.extract_features(results))
 
-            print(len(features))
-            
-            
             sequence.append(features)    
         
         else:
-            sequence.append(np.zeros(15))
+            sequence.append(np.zeros(17))
         
         
         # Predicting output in every 10 frames
@@ -93,6 +93,8 @@ with mp_pose.Pose(min_detection_confidence=0.7,
             if len(sequence) == max_frames:
             
                 res = model.predict(expand_dims(sequence, axis=0))[0]
+                
+                print(res)
                 print(actions[np.argmax(res)], res[argmax(res)])
 
                 # 3. Text Script

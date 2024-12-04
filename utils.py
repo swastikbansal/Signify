@@ -4,6 +4,7 @@ import cv2
 
 class MediapipeUtils:
     """This class is a utility class for mediapipe containing all the required functions for mediapipe"""
+    
     def __init__(self,mp_holistic,mp_drawing):
         self.mp_holistic = mp_holistic
         self.mp_drawing = mp_drawing
@@ -35,7 +36,7 @@ class MediapipeUtils:
         return pose   
     
     def extract_features(self,results) -> list: 
-        """Function to extract specific features like angles and distances from keypints of mediapipe """
+        """Function to extract specific features like angles and distances from keypoints of mediapipe """
         
         self.angles_keypoint = []
         
@@ -72,10 +73,14 @@ class MediapipeUtils:
         # Distance between points 15 and 16 (hands)
         left_hand = results[15]
         right_hand = results[16]
+        centre = results[0]
+        
         self.distance_hands = self.calculate_distance(left_hand, right_hand)
+        self.distance_left_hand_centre = self.calculate_distance(left_hand, centre)
+        self.distance_right_hand_centre = self.calculate_distance(right_hand, centre)
         
         # Combine all features
-        features = self.angles_keypoint + [self.angle_left_arm, self.angle_right_arm, self.distance_hands]
+        features = self.angles_keypoint + [self.angle_left_arm, self.angle_right_arm, self.distance_hands, self.distance_left_hand_centre, self.distance_right_hand_centre]
         
         return features
         

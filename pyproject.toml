@@ -17,6 +17,7 @@ tensorflow = "^2.18.0"
 pandas = "^2.2.3"
 tqdm = "^4.67.1"
 seaborn = "^0.13.2"
+scikit-learn = "^1.5.2"
 
 [build-system]
 requires = ["poetry-core"]
