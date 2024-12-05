@@ -7,7 +7,6 @@ import '/auth/base_auth_user_provider.dart';
 
 import '/index.dart';
 import '/main.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 
 export 'package:go_router/go_router.dart';
@@ -102,16 +101,6 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
                 ),
         ),
         FFRoute(
-          name: 'account',
-          path: '/account',
-          builder: (context, params) => params.isEmpty
-              ? const NavBarPage(initialPage: 'account')
-              : const NavBarPage(
-                  initialPage: 'account',
-                  page: AccountWidget(),
-                ),
-        ),
-        FFRoute(
           name: 'education',
           path: '/education',
           builder: (context, params) => params.isEmpty
@@ -155,6 +144,21 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           name: 'editProfile',
           path: '/editProfile',
           builder: (context, params) => const EditProfileWidget(),
+        ),
+        FFRoute(
+          name: 'account4',
+          path: '/account4',
+          builder: (context, params) => params.isEmpty
+              ? const NavBarPage(initialPage: 'account4')
+              : const NavBarPage(
+                  initialPage: 'account4',
+                  page: Account4Widget(),
+                ),
+        ),
+        FFRoute(
+          name: 'supportPage',
+          path: '/supportPage',
+          builder: (context, params) => const SupportPageWidget(),
         )
       ].map((r) => r.toRoute(appStateNotifier)).toList(),
     );
@@ -340,9 +344,9 @@ class FFRoute {
               : builder(context, ffParams);
           final child = appStateNotifier.loading
               ? Container(
-                  color: FlutterFlowTheme.of(context).primary,
+                  color: const Color(0xFFFAB713),
                   child: Image.asset(
-                    'assets/images/Signify_(2).png',
+                    'assets/images/color_png_(2).png',
                     fit: BoxFit.contain,
                   ),
                 )

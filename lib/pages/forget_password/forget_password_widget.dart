@@ -49,37 +49,43 @@ class _ForgetPasswordWidgetState extends State<ForgetPasswordWidget> {
         automaticallyImplyLeading: false,
         leading: Row(
           mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             FlutterFlowIconButton(
               borderColor: Colors.transparent,
-              borderRadius: 30.0,
-              borderWidth: 1.0,
-              buttonSize: 60.0,
+              borderRadius: 100.0,
+              buttonSize: 50.0,
               hoverColor: FlutterFlowTheme.of(context).secondaryBackground,
               hoverIconColor: FlutterFlowTheme.of(context).primaryText,
               icon: Icon(
                 Icons.arrow_back_ios,
                 color: FlutterFlowTheme.of(context).primaryText,
-                size: 26.0,
+                size: 24.0,
               ),
               onPressed: () async {
-                context.safePop();
+                context.pushNamed(
+                  'account4',
+                  extra: <String, dynamic>{
+                    kTransitionInfoKey: const TransitionInfo(
+                      hasTransition: true,
+                      transitionType: PageTransitionType.leftToRight,
+                      duration: Duration(milliseconds: 200),
+                    ),
+                  },
+                );
               },
             ),
-            Padding(
-              padding: const EdgeInsetsDirectional.fromSTEB(2.0, 0.0, 0.0, 0.0),
-              child: Text(
-                FFLocalizations.of(context).getText(
-                  'bqmgpylz' /* Forgot Password */,
-                ),
-                textAlign: TextAlign.start,
-                style: FlutterFlowTheme.of(context).headlineMedium.override(
-                      fontFamily: 'Space Grotesk',
-                      letterSpacing: 0.0,
-                      useGoogleFonts:
-                          GoogleFonts.asMap().containsKey('Space Grotesk'),
-                    ),
+            Text(
+              FFLocalizations.of(context).getText(
+                'bqmgpylz' /* Forgot Password */,
               ),
+              textAlign: TextAlign.start,
+              style: FlutterFlowTheme.of(context).headlineSmall.override(
+                    fontFamily: 'Space Grotesk',
+                    letterSpacing: 0.0,
+                    useGoogleFonts:
+                        GoogleFonts.asMap().containsKey('Space Grotesk'),
+                  ),
             ),
           ],
         ),
@@ -151,7 +157,7 @@ class _ForgetPasswordWidgetState extends State<ForgetPasswordWidget> {
                   ),
                 ),
               Padding(
-                padding: const EdgeInsetsDirectional.fromSTEB(16.0, 20.0, 16.0, 4.0),
+                padding: const EdgeInsetsDirectional.fromSTEB(16.0, 20.0, 16.0, 20.0),
                 child: Text(
                   FFLocalizations.of(context).getText(
                     'ytjuex9j' /* We will send you an email with... */,
@@ -166,7 +172,7 @@ class _ForgetPasswordWidgetState extends State<ForgetPasswordWidget> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsetsDirectional.fromSTEB(16.0, 30.0, 16.0, 30.0),
+                padding: const EdgeInsetsDirectional.fromSTEB(16.0, 24.0, 16.0, 24.0),
                 child: SizedBox(
                   width: double.infinity,
                   child: TextFormField(
@@ -210,35 +216,34 @@ class _ForgetPasswordWidgetState extends State<ForgetPasswordWidget> {
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(
                           color: FlutterFlowTheme.of(context).alternate,
-                          width: 2.0,
+                          width: 1.0,
                         ),
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderSide: BorderSide(
                           color: FlutterFlowTheme.of(context).primary,
-                          width: 2.0,
+                          width: 1.0,
                         ),
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                       errorBorder: OutlineInputBorder(
                         borderSide: BorderSide(
                           color: FlutterFlowTheme.of(context).error,
-                          width: 2.0,
+                          width: 1.0,
                         ),
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                       focusedErrorBorder: OutlineInputBorder(
                         borderSide: BorderSide(
                           color: FlutterFlowTheme.of(context).error,
-                          width: 2.0,
+                          width: 1.0,
                         ),
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                       filled: true,
                       fillColor: FlutterFlowTheme.of(context).primaryBackground,
-                      contentPadding: const EdgeInsetsDirectional.fromSTEB(
-                          24.0, 24.0, 20.0, 24.0),
+                      contentPadding: const EdgeInsets.all(24.0),
                       hoverColor:
                           FlutterFlowTheme.of(context).primaryBackground,
                       prefixIcon: Icon(
@@ -256,7 +261,7 @@ class _ForgetPasswordWidgetState extends State<ForgetPasswordWidget> {
                                   child: const Icon(
                                     Icons.clear,
                                     color: Color(0xFF757575),
-                                    size: 22.0,
+                                    size: 24.0,
                                   ),
                                 )
                               : null,
@@ -316,10 +321,6 @@ class _ForgetPasswordWidgetState extends State<ForgetPasswordWidget> {
                               FlutterFlowTheme.of(context).titleMediumFamily),
                         ),
                     elevation: 2.0,
-                    borderSide: BorderSide(
-                      color: FlutterFlowTheme.of(context).alternate,
-                      width: 2.0,
-                    ),
                     borderRadius: BorderRadius.circular(12.0),
                     hoverColor: FlutterFlowTheme.of(context).secondary,
                   ),

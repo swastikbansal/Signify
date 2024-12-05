@@ -48,61 +48,48 @@ class _SubmitBugWidgetState extends State<SubmitBugWidget> {
       appBar: AppBar(
         backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
         automaticallyImplyLeading: false,
-        leading: Align(
-          alignment: const AlignmentDirectional(0.0, 0.0),
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Align(
-                alignment: const AlignmentDirectional(0.0, 0.0),
-                child: FlutterFlowIconButton(
-                  borderColor: Colors.transparent,
-                  borderRadius: 30.0,
-                  borderWidth: 1.0,
-                  buttonSize: 60.0,
-                  hoverColor: FlutterFlowTheme.of(context).secondaryBackground,
-                  hoverIconColor: FlutterFlowTheme.of(context).primaryText,
-                  icon: Icon(
-                    Icons.arrow_back_ios,
-                    color: FlutterFlowTheme.of(context).primaryText,
-                    size: 24.0,
-                  ),
-                  onPressed: () async {
-                    context.pushNamed(
-                      'account',
-                      extra: <String, dynamic>{
-                        kTransitionInfoKey: const TransitionInfo(
-                          hasTransition: true,
-                          transitionType: PageTransitionType.leftToRight,
-                          duration: Duration(milliseconds: 400),
-                        ),
-                      },
-                    );
-                  },
-                ),
+        leading: Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            FlutterFlowIconButton(
+              borderColor: Colors.transparent,
+              borderRadius: 100.0,
+              buttonSize: 50.0,
+              hoverColor: FlutterFlowTheme.of(context).secondaryBackground,
+              hoverIconColor: FlutterFlowTheme.of(context).primaryText,
+              icon: Icon(
+                Icons.arrow_back_ios,
+                color: FlutterFlowTheme.of(context).primaryText,
+                size: 24.0,
               ),
-              Align(
-                alignment: const AlignmentDirectional(0.0, 0.0),
-                child: Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(2.0, 0.0, 0.0, 0.0),
-                  child: Text(
-                    FFLocalizations.of(context).getText(
-                      '4w6sqkk0' /* Submit a Bug */,
+              onPressed: () async {
+                context.pushNamed(
+                  'account4',
+                  extra: <String, dynamic>{
+                    kTransitionInfoKey: const TransitionInfo(
+                      hasTransition: true,
+                      transitionType: PageTransitionType.leftToRight,
+                      duration: Duration(milliseconds: 200),
                     ),
-                    textAlign: TextAlign.start,
-                    style: FlutterFlowTheme.of(context).headlineMedium.override(
-                          fontFamily: 'Space Grotesk',
-                          letterSpacing: 0.0,
-                          useGoogleFonts:
-                              GoogleFonts.asMap().containsKey('Space Grotesk'),
-                        ),
-                  ),
-                ),
+                  },
+                );
+              },
+            ),
+            Text(
+              FFLocalizations.of(context).getText(
+                '4w6sqkk0' /* Submit a Bug */,
               ),
-            ],
-          ),
+              textAlign: TextAlign.start,
+              style: FlutterFlowTheme.of(context).headlineSmall.override(
+                    fontFamily: 'Space Grotesk',
+                    letterSpacing: 0.0,
+                    useGoogleFonts:
+                        GoogleFonts.asMap().containsKey('Space Grotesk'),
+                  ),
+            ),
+          ],
         ),
         actions: const [],
         centerTitle: false,
@@ -237,35 +224,34 @@ class _SubmitBugWidgetState extends State<SubmitBugWidget> {
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(
                           color: FlutterFlowTheme.of(context).alternate,
-                          width: 2.0,
+                          width: 1.0,
                         ),
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderSide: BorderSide(
                           color: FlutterFlowTheme.of(context).primary,
-                          width: 2.0,
+                          width: 1.0,
                         ),
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                       errorBorder: OutlineInputBorder(
                         borderSide: BorderSide(
                           color: FlutterFlowTheme.of(context).error,
-                          width: 2.0,
+                          width: 1.0,
                         ),
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                       focusedErrorBorder: OutlineInputBorder(
                         borderSide: BorderSide(
                           color: FlutterFlowTheme.of(context).error,
-                          width: 2.0,
+                          width: 1.0,
                         ),
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                       filled: true,
                       fillColor: FlutterFlowTheme.of(context).primaryBackground,
-                      contentPadding: const EdgeInsetsDirectional.fromSTEB(
-                          24.0, 24.0, 24.0, 24.0),
+                      contentPadding: const EdgeInsets.all(24.0),
                       hoverColor:
                           FlutterFlowTheme.of(context).primaryBackground,
                       prefixIcon: Icon(
@@ -283,7 +269,7 @@ class _SubmitBugWidgetState extends State<SubmitBugWidget> {
                                   child: const Icon(
                                     Icons.clear,
                                     color: Color(0xFF757575),
-                                    size: 22.0,
+                                    size: 24.0,
                                   ),
                                 )
                               : null,
@@ -335,12 +321,12 @@ class _SubmitBugWidgetState extends State<SubmitBugWidget> {
                               FlutterFlowTheme.of(context).titleMediumFamily),
                         ),
                     elevation: 2.0,
-                    borderSide: BorderSide(
-                      color: FlutterFlowTheme.of(context).alternate,
-                      width: 2.0,
-                    ),
                     borderRadius: BorderRadius.circular(12.0),
                     hoverColor: FlutterFlowTheme.of(context).secondary,
+                    hoverBorderSide: BorderSide(
+                      color: FlutterFlowTheme.of(context).alternate,
+                    ),
+                    hoverTextColor: FlutterFlowTheme.of(context).primaryText,
                   ),
                 ),
               ),

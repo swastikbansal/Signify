@@ -50,42 +50,46 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> {
         appBar: AppBar(
           backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
           automaticallyImplyLeading: false,
-          leading: Align(
-            alignment: const AlignmentDirectional(0.0, 0.0),
-            child: FlutterFlowIconButton(
-              borderRadius: 10.0,
-              buttonSize: 60.0,
-              hoverColor: FlutterFlowTheme.of(context).secondaryBackground,
-              icon: Icon(
-                Icons.arrow_back_ios,
-                color: FlutterFlowTheme.of(context).primaryText,
-                size: 24.0,
-              ),
-              onPressed: () async {
-                context.pushNamed(
-                  'account',
-                  extra: <String, dynamic>{
-                    kTransitionInfoKey: const TransitionInfo(
-                      hasTransition: true,
-                      transitionType: PageTransitionType.leftToRight,
-                      duration: Duration(milliseconds: 200),
-                    ),
-                  },
-                );
-              },
-            ),
-          ),
-          title: Text(
-            FFLocalizations.of(context).getText(
-              'vyjrewaq' /* Settings */,
-            ),
-            textAlign: TextAlign.start,
-            style: FlutterFlowTheme.of(context).headlineMedium.override(
-                  fontFamily: 'Space Grotesk',
-                  letterSpacing: 0.0,
-                  useGoogleFonts:
-                      GoogleFonts.asMap().containsKey('Space Grotesk'),
+          leading: Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              FlutterFlowIconButton(
+                borderRadius: 100.0,
+                buttonSize: 50.0,
+                hoverColor: FlutterFlowTheme.of(context).secondaryBackground,
+                hoverIconColor: FlutterFlowTheme.of(context).primaryText,
+                icon: Icon(
+                  Icons.arrow_back_ios,
+                  color: FlutterFlowTheme.of(context).primaryText,
+                  size: 24.0,
                 ),
+                onPressed: () async {
+                  context.pushNamed(
+                    'account4',
+                    extra: <String, dynamic>{
+                      kTransitionInfoKey: const TransitionInfo(
+                        hasTransition: true,
+                        transitionType: PageTransitionType.leftToRight,
+                        duration: Duration(milliseconds: 200),
+                      ),
+                    },
+                  );
+                },
+              ),
+              Text(
+                FFLocalizations.of(context).getText(
+                  'vyjrewaq' /* App Settings */,
+                ),
+                textAlign: TextAlign.start,
+                style: FlutterFlowTheme.of(context).headlineSmall.override(
+                      fontFamily: 'Space Grotesk',
+                      letterSpacing: 0.0,
+                      useGoogleFonts:
+                          GoogleFonts.asMap().containsKey('Space Grotesk'),
+                    ),
+              ),
+            ],
           ),
           actions: const [],
           centerTitle: false,
@@ -94,7 +98,7 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> {
         body: SafeArea(
           top: true,
           child: Padding(
-            padding: const EdgeInsetsDirectional.fromSTEB(20.0, 20.0, 20.0, 20.0),
+            padding: const EdgeInsets.all(16.0),
             child: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -110,8 +114,7 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> {
                       ),
                     ),
                     child: Padding(
-                      padding: const EdgeInsetsDirectional.fromSTEB(
-                          20.0, 20.0, 20.0, 20.0),
+                      padding: const EdgeInsets.all(16.0),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -120,7 +123,7 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> {
                               'klldvmud' /* Notifications */,
                             ),
                             style: FlutterFlowTheme.of(context)
-                                .headlineSmall
+                                .titleLarge
                                 .override(
                                   fontFamily: 'Space Grotesk',
                                   letterSpacing: 0.0,
@@ -208,8 +211,7 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> {
                       ),
                     ),
                     child: Padding(
-                      padding: const EdgeInsetsDirectional.fromSTEB(
-                          20.0, 20.0, 20.0, 20.0),
+                      padding: const EdgeInsets.all(16.0),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -218,7 +220,7 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> {
                               'f7vbbyaa' /* General */,
                             ),
                             style: FlutterFlowTheme.of(context)
-                                .headlineSmall
+                                .titleLarge
                                 .override(
                                   fontFamily: 'Space Grotesk',
                                   letterSpacing: 0.0,
@@ -315,10 +317,9 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> {
                                   elevation: 2.0,
                                   borderColor:
                                       FlutterFlowTheme.of(context).alternate,
-                                  borderWidth: 2.0,
+                                  borderWidth: 0.0,
                                   borderRadius: 16.0,
-                                  margin: const EdgeInsetsDirectional.fromSTEB(
-                                      20.0, 12.0, 20.0, 12.0),
+                                  margin: const EdgeInsets.all(12.0),
                                   hidesUnderline: true,
                                   isOverButton: false,
                                   isSearchable: false,
@@ -351,8 +352,7 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> {
                             borderRadius: BorderRadius.circular(16.0),
                           ),
                           child: Padding(
-                            padding: const EdgeInsetsDirectional.fromSTEB(
-                                20.0, 20.0, 20.0, 20.0),
+                            padding: const EdgeInsets.all(16.0),
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
@@ -361,7 +361,7 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> {
                                     'wpoc5fsz' /* Additional Settings */,
                                   ),
                                   style: FlutterFlowTheme.of(context)
-                                      .headlineSmall
+                                      .titleLarge
                                       .override(
                                         fontFamily: 'Space Grotesk',
                                         letterSpacing: 0.0,
@@ -667,7 +667,6 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> {
                     ),
                   ),
                   Container(
-                    width: MediaQuery.sizeOf(context).width * 1.0,
                     decoration: BoxDecoration(
                       color: FlutterFlowTheme.of(context).primaryBackground,
                       borderRadius: BorderRadius.circular(16.0),
@@ -676,8 +675,7 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> {
                       ),
                     ),
                     child: Padding(
-                      padding: const EdgeInsetsDirectional.fromSTEB(
-                          20.0, 20.0, 20.0, 20.0),
+                      padding: const EdgeInsets.all(16.0),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -686,7 +684,7 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> {
                               'ris323yh' /* About */,
                             ),
                             style: FlutterFlowTheme.of(context)
-                                .headlineSmall
+                                .titleLarge
                                 .override(
                                   fontFamily: 'Space Grotesk',
                                   letterSpacing: 0.0,
@@ -847,8 +845,6 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> {
                     ),
                   ),
                   Container(
-                    width: MediaQuery.sizeOf(context).width * 1.0,
-                    height: 160.0,
                     decoration: BoxDecoration(
                       color: FlutterFlowTheme.of(context).primaryBackground,
                       borderRadius: BorderRadius.circular(16.0),
@@ -858,8 +854,7 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> {
                       ),
                     ),
                     child: Padding(
-                      padding: const EdgeInsetsDirectional.fromSTEB(
-                          20.0, 20.0, 20.0, 20.0),
+                      padding: const EdgeInsets.all(16.0),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         mainAxisAlignment: MainAxisAlignment.start,
@@ -869,7 +864,7 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> {
                               'tmmii36i' /* Follow us on */,
                             ),
                             style: FlutterFlowTheme.of(context)
-                                .headlineSmall
+                                .titleLarge
                                 .override(
                                   fontFamily: 'Space Grotesk',
                                   letterSpacing: 0.0,

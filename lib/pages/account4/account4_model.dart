@@ -1,8 +1,8 @@
 import '/flutter_flow/flutter_flow_util.dart';
-import 'account_widget.dart' show AccountWidget;
+import 'account4_widget.dart' show Account4Widget;
 import 'package:flutter/material.dart';
 
-class AccountModel extends FlutterFlowModel<AccountWidget> {
+class Account4Model extends FlutterFlowModel<Account4Widget> {
   @override
   void initState(BuildContext context) {}
 

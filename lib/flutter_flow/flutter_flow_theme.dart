@@ -156,17 +156,17 @@ class LightModeTheme extends FlutterFlowTheme {
   @Deprecated('Use tertiary instead')
   Color get tertiaryColor => tertiary;
 
-  late Color primary = const Color(0xFFFAB713);
-  late Color secondary = const Color(0xFFF6BF22);
-  late Color tertiary = const Color(0xFFF2CD88);
+  late Color primary = const Color(0xFFFFBF00);
+  late Color secondary = const Color(0xFFF6BF33);
+  late Color tertiary = const Color(0xFFFFDB58);
   late Color alternate = const Color(0xFFDDDDDD);
   late Color primaryText = const Color(0xFF000000);
   late Color secondaryText = const Color(0xFF292929);
   late Color primaryBackground = const Color(0xFFFFFFFF);
   late Color secondaryBackground = const Color(0xFFF3F3F3);
-  late Color accent1 = const Color(0xFF101524);
+  late Color accent1 = const Color(0xFF14213D);
   late Color accent2 = const Color(0xFFE6DD4E);
-  late Color accent3 = const Color(0xFFF075A6);
+  late Color accent3 = const Color(0xFFE5E5E5);
   late Color accent4 = const Color(0xFF1E1F25);
   late Color success = const Color(0xFF00FF00);
   late Color warning = const Color(0xFFFF6100);
@@ -558,17 +558,17 @@ class DarkModeTheme extends FlutterFlowTheme {
   @Deprecated('Use tertiary instead')
   Color get tertiaryColor => tertiary;
 
-  late Color primary = const Color(0xFFFAB713);
-  late Color secondary = const Color(0xFFF6BF22);
-  late Color tertiary = const Color(0xFFF2CD88);
+  late Color primary = const Color(0xFFFFBF00);
+  late Color secondary = const Color(0xFFF6BF33);
+  late Color tertiary = const Color(0xFFFFDB58);
   late Color alternate = const Color(0xFF333333);
   late Color primaryText = const Color(0xFFFFFFFF);
   late Color secondaryText = const Color(0xFFDDDDDD);
   late Color primaryBackground = const Color(0xFF161616);
-  late Color secondaryBackground = const Color(0xFF1C1C1E);
-  late Color accent1 = const Color(0xFF101524);
+  late Color secondaryBackground = const Color(0xFF1C1C1C);
+  late Color accent1 = const Color(0xFF14213D);
   late Color accent2 = const Color(0xFFE6DD4E);
-  late Color accent3 = const Color(0xFFF075A6);
+  late Color accent3 = const Color(0xFFE5E5E5);
   late Color accent4 = const Color(0xFF1E1F25);
   late Color success = const Color(0xFF00FF00);
   late Color warning = const Color(0xFFFF6100);

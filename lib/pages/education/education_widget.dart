@@ -3,6 +3,7 @@ import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/form_field_controller.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'education_model.dart';
@@ -79,7 +80,7 @@ class _EducationWidgetState extends State<EducationWidget> {
             FFLocalizations.of(context).getText(
               'p01mcqgl' /*  */,
             ),
-            style: FlutterFlowTheme.of(context).headlineMedium.override(
+            style: FlutterFlowTheme.of(context).headlineSmall.override(
                   fontFamily: 'Space Grotesk',
                   letterSpacing: 0.0,
                   useGoogleFonts:
@@ -131,7 +132,7 @@ class _EducationWidgetState extends State<EducationWidget> {
                 ),
                 Padding(
                   padding:
-                      const EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 16.0, 8.0),
+                      const EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 16.0, 5.0),
                   child: TextFormField(
                     controller: _model.textController,
                     focusNode: _model.textFieldFocusNode,
@@ -139,7 +140,7 @@ class _EducationWidgetState extends State<EducationWidget> {
                     obscureText: false,
                     decoration: InputDecoration(
                       labelText: FFLocalizations.of(context).getText(
-                        '6xkomr20' /* Search.... */,
+                        '6xkomr20' /* Search */,
                       ),
                       labelStyle: FlutterFlowTheme.of(context)
                           .labelMedium
@@ -151,7 +152,7 @@ class _EducationWidgetState extends State<EducationWidget> {
                                 FlutterFlowTheme.of(context).labelMediumFamily),
                           ),
                       hintText: FFLocalizations.of(context).getText(
-                        '5n3r76t4' /* Search for specific words or p... */,
+                        '5n3r76t4' /* Search for any resource */,
                       ),
                       hintStyle: FlutterFlowTheme.of(context)
                           .labelMedium
@@ -166,33 +167,32 @@ class _EducationWidgetState extends State<EducationWidget> {
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(
                           color: FlutterFlowTheme.of(context).alternate,
-                          width: 2.0,
+                          width: 1.0,
                         ),
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderSide: BorderSide(
                           color: FlutterFlowTheme.of(context).primary,
-                          width: 2.0,
+                          width: 1.0,
                         ),
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                       errorBorder: OutlineInputBorder(
                         borderSide: BorderSide(
                           color: FlutterFlowTheme.of(context).error,
-                          width: 2.0,
+                          width: 1.0,
                         ),
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                       focusedErrorBorder: OutlineInputBorder(
                         borderSide: BorderSide(
                           color: FlutterFlowTheme.of(context).error,
-                          width: 2.0,
+                          width: 1.0,
                         ),
                         borderRadius: BorderRadius.circular(12.0),
                       ),
-                      contentPadding:
-                          const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 0.0, 0.0),
+                      contentPadding: const EdgeInsets.all(16.0),
                       hoverColor:
                           FlutterFlowTheme.of(context).secondaryBackground,
                       suffixIcon: Icon(
@@ -208,6 +208,7 @@ class _EducationWidgetState extends State<EducationWidget> {
                               FlutterFlowTheme.of(context).bodyMediumFamily),
                           lineHeight: 1.0,
                         ),
+                    maxLines: 2,
                     minLines: 1,
                     cursorColor: FlutterFlowTheme.of(context).primary,
                     validator:
@@ -216,17 +217,13 @@ class _EducationWidgetState extends State<EducationWidget> {
                 ),
                 Container(
                   width: double.infinity,
-                  height: 290.0,
+                  height: 280.0,
                   decoration: BoxDecoration(
                     color: FlutterFlowTheme.of(context).primaryBackground,
+                    borderRadius: BorderRadius.circular(0.0),
                   ),
                   child: ListView(
-                    padding: const EdgeInsets.fromLTRB(
-                      16.0,
-                      0,
-                      16.0,
-                      0,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     scrollDirection: Axis.horizontal,
                     children: [
                       Padding(
@@ -266,8 +263,13 @@ class _EducationWidgetState extends State<EducationWidget> {
                                       child: ClipRRect(
                                         borderRadius:
                                             BorderRadius.circular(6.0),
-                                        child: Image.network(
-                                          'https://images.unsplash.com/photo-1535572290543-960a8046f5af?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwyNHx8bGV0dGVyc3xlbnwwfHx8fDE3MzI2ODA2NDV8MA&ixlib=rb-4.0.3&q=80&w=1080',
+                                        child: CachedNetworkImage(
+                                          fadeInDuration:
+                                              const Duration(milliseconds: 500),
+                                          fadeOutDuration:
+                                              const Duration(milliseconds: 500),
+                                          imageUrl:
+                                              'https://images.unsplash.com/photo-1535572290543-960a8046f5af?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwyNHx8bGV0dGVyc3xlbnwwfHx8fDE3MzI2ODA2NDV8MA&ixlib=rb-4.0.3&q=80&w=1080',
                                           width: 120.0,
                                           height: 120.0,
                                           fit: BoxFit.cover,
@@ -412,8 +414,13 @@ class _EducationWidgetState extends State<EducationWidget> {
                                       child: ClipRRect(
                                         borderRadius:
                                             BorderRadius.circular(6.0),
-                                        child: Image.network(
-                                          'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwyMHx8dG9nZXRoZXJ8ZW58MHx8fHwxNzMyNzkxMDMwfDA&ixlib=rb-4.0.3&q=80&w=1080',
+                                        child: CachedNetworkImage(
+                                          fadeInDuration:
+                                              const Duration(milliseconds: 500),
+                                          fadeOutDuration:
+                                              const Duration(milliseconds: 500),
+                                          imageUrl:
+                                              'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwyMHx8dG9nZXRoZXJ8ZW58MHx8fHwxNzMyNzkxMDMwfDA&ixlib=rb-4.0.3&q=80&w=1080',
                                           width: 120.0,
                                           height: 120.0,
                                           fit: BoxFit.cover,
@@ -515,114 +522,108 @@ class _EducationWidgetState extends State<EducationWidget> {
                           ),
                         ),
                       ),
-                    ].divide(const SizedBox(width: 12.0)),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(0.0, 4.0, 0.0, 0.0),
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsetsDirectional.fromSTEB(
-                              0.0, 8.0, 0.0, 8.0),
-                          child: FlutterFlowChoiceChips(
-                            options: [
-                              ChipData(FFLocalizations.of(context).getText(
-                                'jduozejm' /* For You */,
-                              )),
-                              ChipData(FFLocalizations.of(context).getText(
-                                'a68hn241' /* Sports */,
-                              )),
-                              ChipData(FFLocalizations.of(context).getText(
-                                'rk7baojg' /* News */,
-                              )),
-                              ChipData(FFLocalizations.of(context).getText(
-                                'ds2qf966' /* Technology */,
-                              )),
-                              ChipData(FFLocalizations.of(context).getText(
-                                'okg8jrdj' /* History */,
-                              )),
-                              ChipData(FFLocalizations.of(context).getText(
-                                'jcrcyrzm' /* Maths */,
-                              ))
-                            ],
-                            onChanged: (val) => safeSetState(() =>
-                                _model.choiceChipsValue = val?.firstOrNull),
-                            selectedChipStyle: ChipStyle(
-                              backgroundColor:
-                                  FlutterFlowTheme.of(context).primary,
-                              textStyle: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .override(
-                                    fontFamily: FlutterFlowTheme.of(context)
-                                        .bodyMediumFamily,
-                                    color: FlutterFlowTheme.of(context).info,
-                                    letterSpacing: 0.0,
-                                    useGoogleFonts: GoogleFonts.asMap()
-                                        .containsKey(
-                                            FlutterFlowTheme.of(context)
-                                                .bodyMediumFamily),
-                                  ),
-                              iconColor:
-                                  FlutterFlowTheme.of(context).customColor5,
-                              iconSize: 18.0,
-                              elevation: 2.0,
-                              borderColor:
-                                  FlutterFlowTheme.of(context).alternate,
-                              borderWidth: 1.0,
-                              borderRadius: BorderRadius.circular(16.0),
-                            ),
-                            unselectedChipStyle: ChipStyle(
-                              backgroundColor:
-                                  FlutterFlowTheme.of(context).alternate,
-                              textStyle: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .override(
-                                    fontFamily: FlutterFlowTheme.of(context)
-                                        .bodyMediumFamily,
-                                    color: FlutterFlowTheme.of(context)
-                                        .secondaryText,
-                                    letterSpacing: 0.0,
-                                    useGoogleFonts: GoogleFonts.asMap()
-                                        .containsKey(
-                                            FlutterFlowTheme.of(context)
-                                                .bodyMediumFamily),
-                                  ),
-                              iconColor: const Color(0x00000000),
-                              iconSize: 18.0,
-                              elevation: 0.0,
-                              borderColor: FlutterFlowTheme.of(context)
-                                  .secondaryBackground,
-                              borderWidth: 1.0,
-                              borderRadius: BorderRadius.circular(16.0),
-                            ),
-                            chipSpacing: 8.0,
-                            rowSpacing: 12.0,
-                            multiselect: false,
-                            initialized: _model.choiceChipsValue != null,
-                            alignment: WrapAlignment.start,
-                            controller: _model.choiceChipsValueController ??=
-                                FormFieldController<List<String>>(
-                              [
-                                FFLocalizations.of(context).getText(
-                                  '7y1ozxqa' /* For You */,
-                                )
-                              ],
-                            ),
-                            wrapped: true,
-                          ),
-                        ),
-                      ]
-                          .addToStart(const SizedBox(width: 16.0))
-                          .addToEnd(const SizedBox(width: 16.0)),
-                    ),
+                    ].divide(const SizedBox(width: 16.0)),
                   ),
                 ),
                 Divider(
-                  height: 8.0,
+                  height: 1.0,
+                  thickness: 1.0,
+                  color: FlutterFlowTheme.of(context).alternate,
+                ),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: FlutterFlowChoiceChips(
+                          options: [
+                            ChipData(FFLocalizations.of(context).getText(
+                              'jduozejm' /* For You */,
+                            )),
+                            ChipData(FFLocalizations.of(context).getText(
+                              'a68hn241' /* Sports */,
+                            )),
+                            ChipData(FFLocalizations.of(context).getText(
+                              'rk7baojg' /* News */,
+                            )),
+                            ChipData(FFLocalizations.of(context).getText(
+                              'ds2qf966' /* Technology */,
+                            )),
+                            ChipData(FFLocalizations.of(context).getText(
+                              'okg8jrdj' /* History */,
+                            )),
+                            ChipData(FFLocalizations.of(context).getText(
+                              'jcrcyrzm' /* Maths */,
+                            ))
+                          ],
+                          onChanged: (val) => safeSetState(
+                              () => _model.choiceChipsValue = val?.firstOrNull),
+                          selectedChipStyle: ChipStyle(
+                            backgroundColor:
+                                FlutterFlowTheme.of(context).primary,
+                            textStyle: FlutterFlowTheme.of(context)
+                                .bodyMedium
+                                .override(
+                                  fontFamily: FlutterFlowTheme.of(context)
+                                      .bodyMediumFamily,
+                                  color: FlutterFlowTheme.of(context).info,
+                                  letterSpacing: 0.0,
+                                  useGoogleFonts: GoogleFonts.asMap()
+                                      .containsKey(FlutterFlowTheme.of(context)
+                                          .bodyMediumFamily),
+                                ),
+                            iconColor:
+                                FlutterFlowTheme.of(context).customColor5,
+                            iconSize: 18.0,
+                            elevation: 2.0,
+                            borderRadius: BorderRadius.circular(16.0),
+                          ),
+                          unselectedChipStyle: ChipStyle(
+                            backgroundColor:
+                                FlutterFlowTheme.of(context).alternate,
+                            textStyle: FlutterFlowTheme.of(context)
+                                .bodyMedium
+                                .override(
+                                  fontFamily: FlutterFlowTheme.of(context)
+                                      .bodyMediumFamily,
+                                  color: FlutterFlowTheme.of(context)
+                                      .secondaryText,
+                                  letterSpacing: 0.0,
+                                  useGoogleFonts: GoogleFonts.asMap()
+                                      .containsKey(FlutterFlowTheme.of(context)
+                                          .bodyMediumFamily),
+                                ),
+                            iconColor: const Color(0x00000000),
+                            iconSize: 18.0,
+                            elevation: 0.0,
+                            borderRadius: BorderRadius.circular(16.0),
+                          ),
+                          chipSpacing: 8.0,
+                          rowSpacing: 12.0,
+                          multiselect: false,
+                          initialized: _model.choiceChipsValue != null,
+                          alignment: WrapAlignment.start,
+                          controller: _model.choiceChipsValueController ??=
+                              FormFieldController<List<String>>(
+                            [
+                              FFLocalizations.of(context).getText(
+                                '7y1ozxqa' /* For You */,
+                              )
+                            ],
+                          ),
+                          wrapped: true,
+                        ),
+                      ),
+                    ]
+                        .addToStart(const SizedBox(width: 16.0))
+                        .addToEnd(const SizedBox(width: 16.0)),
+                  ),
+                ),
+                Divider(
+                  height: 1.0,
                   thickness: 1.0,
                   color: FlutterFlowTheme.of(context).alternate,
                 ),
@@ -646,14 +647,14 @@ class _EducationWidgetState extends State<EducationWidget> {
                     0,
                     8.0,
                     0,
-                    44.0,
+                    36.0,
                   ),
                   shrinkWrap: true,
                   scrollDirection: Axis.vertical,
                   children: [
                     Padding(
                       padding:
-                          const EdgeInsetsDirectional.fromSTEB(10.0, 0.0, 10.0, 10.0),
+                          const EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 16.0),
                       child: Container(
                         width: 100.0,
                         decoration: BoxDecoration(
@@ -685,8 +686,13 @@ class _EducationWidgetState extends State<EducationWidget> {
                                     padding: const EdgeInsets.all(2.0),
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(10.0),
-                                      child: Image.network(
-                                        'https://images.unsplash.com/photo-1524683745036-b46f52b8505a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHw3fHxzY2llbmNlfGVufDB8fHx8MTczMjc5MDUxMXww&ixlib=rb-4.0.3&q=80&w=1080',
+                                      child: CachedNetworkImage(
+                                        fadeInDuration:
+                                            const Duration(milliseconds: 500),
+                                        fadeOutDuration:
+                                            const Duration(milliseconds: 500),
+                                        imageUrl:
+                                            'https://images.unsplash.com/photo-1524683745036-b46f52b8505a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHw3fHxzY2llbmNlfGVufDB8fHx8MTczMjc5MDUxMXww&ixlib=rb-4.0.3&q=80&w=1080',
                                         width: 120.0,
                                         height: 120.0,
                                         fit: BoxFit.cover,
@@ -710,18 +716,18 @@ class _EducationWidgetState extends State<EducationWidget> {
                                           'lythb4ih' /* Recent studies in Chemical Eng... */,
                                         ),
                                         style: FlutterFlowTheme.of(context)
-                                            .bodyLarge
+                                            .bodyMedium
                                             .override(
                                               fontFamily:
                                                   FlutterFlowTheme.of(context)
-                                                      .bodyLargeFamily,
+                                                      .bodyMediumFamily,
                                               letterSpacing: 0.0,
-                                              useGoogleFonts:
-                                                  GoogleFonts.asMap()
-                                                      .containsKey(
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .bodyLargeFamily),
+                                              useGoogleFonts: GoogleFonts
+                                                      .asMap()
+                                                  .containsKey(
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .bodyMediumFamily),
                                             ),
                                       ),
                                       Padding(
@@ -871,7 +877,7 @@ class _EducationWidgetState extends State<EducationWidget> {
                     ),
                     Padding(
                       padding:
-                          const EdgeInsetsDirectional.fromSTEB(10.0, 0.0, 10.0, 10.0),
+                          const EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 16.0),
                       child: Container(
                         width: 100.0,
                         decoration: BoxDecoration(
@@ -901,8 +907,13 @@ class _EducationWidgetState extends State<EducationWidget> {
                                   padding: const EdgeInsets.all(2.0),
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(10.0),
-                                    child: Image.network(
-                                      'https://images.unsplash.com/photo-1642444616393-df04dcb1492c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxNHx8Z2FtZXN8ZW58MHx8fHwxNzMyNzkwNjA1fDA&ixlib=rb-4.0.3&q=80&w=1080',
+                                    child: CachedNetworkImage(
+                                      fadeInDuration:
+                                          const Duration(milliseconds: 500),
+                                      fadeOutDuration:
+                                          const Duration(milliseconds: 500),
+                                      imageUrl:
+                                          'https://images.unsplash.com/photo-1642444616393-df04dcb1492c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxNHx8Z2FtZXN8ZW58MHx8fHwxNzMyNzkwNjA1fDA&ixlib=rb-4.0.3&q=80&w=1080',
                                       width: 120.0,
                                       height: 120.0,
                                       fit: BoxFit.cover,
@@ -925,18 +936,18 @@ class _EducationWidgetState extends State<EducationWidget> {
                                           '3qjzcg9k' /* How gaming industry has evolve... */,
                                         ),
                                         style: FlutterFlowTheme.of(context)
-                                            .bodyLarge
+                                            .bodyMedium
                                             .override(
                                               fontFamily:
                                                   FlutterFlowTheme.of(context)
-                                                      .bodyLargeFamily,
+                                                      .bodyMediumFamily,
                                               letterSpacing: 0.0,
-                                              useGoogleFonts:
-                                                  GoogleFonts.asMap()
-                                                      .containsKey(
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .bodyLargeFamily),
+                                              useGoogleFonts: GoogleFonts
+                                                      .asMap()
+                                                  .containsKey(
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .bodyMediumFamily),
                                             ),
                                       ),
                                       Padding(
@@ -1086,7 +1097,7 @@ class _EducationWidgetState extends State<EducationWidget> {
                     ),
                     Padding(
                       padding:
-                          const EdgeInsetsDirectional.fromSTEB(10.0, 0.0, 10.0, 10.0),
+                          const EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 16.0),
                       child: Container(
                         width: 100.0,
                         decoration: BoxDecoration(
@@ -1116,8 +1127,13 @@ class _EducationWidgetState extends State<EducationWidget> {
                                   padding: const EdgeInsets.all(2.0),
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(10.0),
-                                    child: Image.network(
-                                      'https://images.unsplash.com/photo-1604866830893-c13cafa515d5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxib29rc3xlbnwwfHx8fDE3MzI3ODQ2NzB8MA&ixlib=rb-4.0.3&q=80&w=1080',
+                                    child: CachedNetworkImage(
+                                      fadeInDuration:
+                                          const Duration(milliseconds: 500),
+                                      fadeOutDuration:
+                                          const Duration(milliseconds: 500),
+                                      imageUrl:
+                                          'https://images.unsplash.com/photo-1604866830893-c13cafa515d5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxib29rc3xlbnwwfHx8fDE3MzI3ODQ2NzB8MA&ixlib=rb-4.0.3&q=80&w=1080',
                                       width: 120.0,
                                       height: 120.0,
                                       fit: BoxFit.cover,
@@ -1140,18 +1156,18 @@ class _EducationWidgetState extends State<EducationWidget> {
                                           'p985k5iy' /* Why reading books is important... */,
                                         ),
                                         style: FlutterFlowTheme.of(context)
-                                            .bodyLarge
+                                            .bodyMedium
                                             .override(
                                               fontFamily:
                                                   FlutterFlowTheme.of(context)
-                                                      .bodyLargeFamily,
+                                                      .bodyMediumFamily,
                                               letterSpacing: 0.0,
-                                              useGoogleFonts:
-                                                  GoogleFonts.asMap()
-                                                      .containsKey(
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .bodyLargeFamily),
+                                              useGoogleFonts: GoogleFonts
+                                                      .asMap()
+                                                  .containsKey(
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .bodyMediumFamily),
                                             ),
                                       ),
                                       Padding(
@@ -1167,7 +1183,7 @@ class _EducationWidgetState extends State<EducationWidget> {
                                               child: Text(
                                                 FFLocalizations.of(context)
                                                     .getText(
-                                                  '75khnl5b' /* Prof. Aman Shukla */,
+                                                  '75khnl5b' /* Aman Singh */,
                                                 ),
                                                 style:
                                                     FlutterFlowTheme.of(context)
@@ -1234,19 +1250,19 @@ class _EducationWidgetState extends State<EducationWidget> {
                                                 ),
                                                 style:
                                                     FlutterFlowTheme.of(context)
-                                                        .labelSmall
+                                                        .bodySmall
                                                         .override(
                                                           fontFamily:
                                                               FlutterFlowTheme.of(
                                                                       context)
-                                                                  .labelSmallFamily,
+                                                                  .bodySmallFamily,
                                                           letterSpacing: 0.0,
                                                           useGoogleFonts: GoogleFonts
                                                                   .asMap()
                                                               .containsKey(
                                                                   FlutterFlowTheme.of(
                                                                           context)
-                                                                      .labelSmallFamily),
+                                                                      .bodySmallFamily),
                                                         ),
                                               ),
                                             ),

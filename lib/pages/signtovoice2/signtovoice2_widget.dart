@@ -80,7 +80,7 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget> {
                     children: [
                       Row(
                         mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           FlutterFlowDropDown<String>(
@@ -114,17 +114,17 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget> {
                             ],
                             onChanged: (val) =>
                                 safeSetState(() => _model.dropDownValue = val),
-                            width: 240.0,
+                            width: 180.0,
                             height: 60.0,
                             textStyle: FlutterFlowTheme.of(context)
-                                .labelLarge
+                                .labelMedium
                                 .override(
                                   fontFamily: FlutterFlowTheme.of(context)
-                                      .labelLargeFamily,
+                                      .labelMediumFamily,
                                   letterSpacing: 0.0,
                                   useGoogleFonts: GoogleFonts.asMap()
                                       .containsKey(FlutterFlowTheme.of(context)
-                                          .labelLargeFamily),
+                                          .labelMediumFamily),
                                 ),
                             hintText: FFLocalizations.of(context).getText(
                               'drx645ue' /* Select Language */,
@@ -138,33 +138,51 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget> {
                                 FlutterFlowTheme.of(context).primaryBackground,
                             elevation: 2.0,
                             borderColor: FlutterFlowTheme.of(context).alternate,
-                            borderWidth: 2.0,
+                            borderWidth: 1.0,
                             borderRadius: 16.0,
-                            margin: const EdgeInsetsDirectional.fromSTEB(
-                                20.0, 0.0, 20.0, 0.0),
+                            margin: const EdgeInsets.all(16.0),
                             hidesUnderline: true,
                             isOverButton: false,
                             isSearchable: false,
                             isMultiSelect: false,
                           ),
                           FlutterFlowIconButton(
-                            borderRadius: 100.0,
+                            borderRadius: 50.0,
                             buttonSize: 60.0,
                             fillColor: FlutterFlowTheme.of(context)
                                 .secondaryBackground,
-                            hoverColor: FlutterFlowTheme.of(context).alternate,
+                            hoverColor:
+                                FlutterFlowTheme.of(context).primaryBackground,
                             hoverIconColor:
                                 FlutterFlowTheme.of(context).primary,
                             icon: Icon(
-                              Icons.volume_up,
+                              Icons.camera_alt,
                               color: FlutterFlowTheme.of(context).primaryText,
-                              size: 36.0,
+                              size: 30.0,
                             ),
                             onPressed: () {
                               print('IconButton pressed ...');
                             },
                           ),
-                        ].divide(const SizedBox(width: 20.0)),
+                          FlutterFlowIconButton(
+                            borderRadius: 50.0,
+                            buttonSize: 60.0,
+                            fillColor: FlutterFlowTheme.of(context)
+                                .secondaryBackground,
+                            hoverColor:
+                                FlutterFlowTheme.of(context).primaryBackground,
+                            hoverIconColor:
+                                FlutterFlowTheme.of(context).primary,
+                            icon: Icon(
+                              Icons.volume_up,
+                              color: FlutterFlowTheme.of(context).primaryText,
+                              size: 30.0,
+                            ),
+                            onPressed: () {
+                              print('IconButton pressed ...');
+                            },
+                          ),
+                        ],
                       ),
                       Expanded(
                         child: Align(

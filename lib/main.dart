@@ -134,7 +134,7 @@ class _MyAppState extends State<MyApp> {
               return const Color(0xffffffff);
             }
             if (states.contains(WidgetState.hovered)) {
-              return const Color(0xff1c1c1e);
+              return const Color(0xff1c1c1c);
             }
             return const Color(0xffffffff);
           }),
@@ -174,7 +174,7 @@ class _NavBarPageState extends State<NavBarPage> {
       'voicetosign1': const Voicetosign1Widget(),
       'signtovoice2': const Signtovoice2Widget(),
       'education': const EducationWidget(),
-      'account': const AccountWidget(),
+      'account4': const Account4Widget(),
     };
     final currentIndex = tabs.keys.toList().indexOf(_currentPageName);
 
@@ -241,11 +241,11 @@ class _NavBarPageState extends State<NavBarPage> {
               size: 30.0,
             ),
             activeIcon: const Icon(
-              Icons.account_circle_sharp,
+              Icons.account_circle_rounded,
               size: 30.0,
             ),
             label: FFLocalizations.of(context).getText(
-              'i7imiuyr' /* Account */,
+              'k68wh7xs' /* Account */,
             ),
             tooltip: '',
           )
