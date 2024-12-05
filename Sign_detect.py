@@ -18,6 +18,7 @@ mp_draw = mp.solutions.drawing_utils
 def calculate_movement(prev_landmarks, curr_landmarks):
     if prev_landmarks is None:
         return 0
+    
     # Calculate Euclidean distance between corresponding landmarks
     movement = 0
     for p, c in zip(prev_landmarks, curr_landmarks):
