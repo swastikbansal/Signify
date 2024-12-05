@@ -9,6 +9,8 @@ class MediapipeUtils:
         self.mp_holistic = mp_holistic
         self.mp_drawing = mp_drawing
         
+        self.features = []
+        
         self.angle_landmarks = ((12,14),
                                 (14,16),
                                 (11,13),
@@ -37,6 +39,7 @@ class MediapipeUtils:
     
     def extract_features(self,results) -> list: 
         """Function to extract specific features like angles and distances from keypoints of mediapipe """
+        self.features = []
         
         self.angles_keypoint = []
         
@@ -48,7 +51,9 @@ class MediapipeUtils:
                             
                 ang = self.calculate_angles(vector)
                 self.angles_keypoint.extend(ang)
-            
+        
+        self.features.extend(self.angles_keypoint)
+        
         # Calculate angles between vectors
         # Left arm: vectors 15-13 and 13-11
         left_wrist = np.array([results[15].x, results[15].y, results[15].z])
@@ -60,6 +65,7 @@ class MediapipeUtils:
 
         self.angle_left_arm = self.calculate_angles_between(vector_left_wrist_elbow, vector_left_elbow_shoulder)
 
+
         # Right arm: vectors 16-14 and 14-12
         right_wrist = np.array([results[16].x, results[16].y, results[16].z])
         right_elbow = np.array([results[14].x, results[14].y, results[14].z])
@@ -70,20 +76,61 @@ class MediapipeUtils:
 
         self.angle_right_arm = self.calculate_angles_between(vector_right_wrist_elbow, vector_right_elbow_shoulder)
         
+        self.features.extend([self.angle_left_arm, self.angle_right_arm])
+        
+        # Right arm: vectors 12-14 and 11-12
+        vector_11_12 = left_shoulder - right_shoulder # 11-12
+        vector_12_14 = right_shoulder - right_elbow  # 12-14
+
+        self.angle_right_shoulder = self.calculate_angles_between(vector_11_12, vector_12_14)
+        
+        # Right arm: vectors 12-14 and 11-12
+        vector_11_12 = left_shoulder - right_shoulder # 11-12
+        vector_11_13 = left_shoulder - left_elbow  # 12-14
+
+        self.angle_left_sholder = self.calculate_angles_between(vector_11_12, vector_12_14)
+        self.features.extend([self.angle_left_sholder, self.angle_right_shoulder])
+        
         # Distance between points 15 and 16 (hands)
         left_hand = results[15]
         right_hand = results[16]
         centre = results[0]
         
-        self.distance_hands = self.calculate_distance(left_hand, right_hand)
+        # self.distance_hands = self.calculate_distance(left_hand, right_hand)
         self.distance_left_hand_centre = self.calculate_distance(left_hand, centre)
         self.distance_right_hand_centre = self.calculate_distance(right_hand, centre)
         
-        # Combine all features
-        features = self.angles_keypoint + [self.angle_left_arm, self.angle_right_arm, self.distance_hands, self.distance_left_hand_centre, self.distance_right_hand_centre]
+        self.features.extend([self.distance_left_hand_centre, self.distance_right_hand_centre])
         
-        return features
-        
+        self.left_hand_direction_x ,self.left_hand_direction_y, self.left_hand_direction_z = self.extract_hand_direction(15,17,19,results)
+        self.right_hand_direction_x, self.right_hand_direction_y, self.right_hand_direction_z = self.extract_hand_direction(16,18,20,results)
+
+        self.features.extend([self.left_hand_direction_x, self.left_hand_direction_y, self.left_hand_direction_z,
+                            self.right_hand_direction_x, self.right_hand_direction_y, self.right_hand_direction_z])
+                
+        return self.features
+    
+    def extract_hand_direction(self, wrist, pinky, index, results):
+        """Extracts the direction vector of the hand."""
+        wrist = np.array([results[wrist].x, results[wrist].y, results[wrist].z])
+        pinky = np.array([results[pinky].x, results[pinky].y, results[pinky].z])
+        index = np.array([results[index].x, results[index].y, results[index].z])
+
+        # Calculate vectors on the hand plane
+        vector_a = pinky - wrist
+        vector_b = index - wrist
+
+        # Compute normal vector (hand plane normal)
+        normal_vector = np.cross(vector_a, vector_b)
+        normal_vector /= np.linalg.norm(normal_vector)
+
+        # Compute direction vector (from wrist to midpoint of pinky and index)
+        mid_finger = (pinky + index) / 2
+        direction_vector = mid_finger - wrist
+        direction_vector /= np.linalg.norm(direction_vector)
+
+        return direction_vector
+    
     def draw_styled_landmarks(self,image, results) -> None:
         """Function to draw pose connections"""
         self.mp_drawing.draw_landmarks(image, results.pose_landmarks, self.mp_holistic.POSE_CONNECTIONS,

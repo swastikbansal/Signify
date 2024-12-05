@@ -25,7 +25,8 @@ actions = ['Blind','Deaf','Flat','Happy','Poor','Quiet','Rich','sad','Slow','Thi
 
 # Defining Hyperparameters
 max_frames = 28
-input_shape = (max_frames, 17)
+features = 24
+input_shape = (max_frames, features)
 num_classes =  len(actions)
 
 # Landmarks for finding angles
@@ -34,12 +35,12 @@ num_classes =  len(actions)
 model = Sequential([        
         Input(shape=input_shape),        
         
-        # GRU(64, return_sequences=True),
-        # GRU(128, return_sequences=True),
-        # GRU(64, return_sequences=True),
-        LSTM(64, return_sequences=True),
-        LSTM(128, return_sequences=True),
-        LSTM(64, return_sequences=True),
+        GRU(64, return_sequences=True),
+        GRU(128, return_sequences=True),
+        GRU(64, return_sequences=True),
+        # LSTM(64, return_sequences=True),
+        # LSTM(128, return_sequences=True),
+        # LSTM(64, return_sequences=True),
         
         # Flatten the output
         Flatten(),
@@ -50,17 +51,17 @@ model = Sequential([
         Dense(num_classes, activation='softmax')
 ])
 
-model_path = Path.cwd() / 'Model' / 'INCLUDE_10_V5_angled.h5'
+model_path = Path.cwd() / 'Model' / 'INCLUDE_10_V4_angled.h5'
 model.load_weights(str(model_path))
 
 
 n_frames = 0
-sequence = [[0] * 17] * (max_frames // 2) 
+sequence = [[0] * features] * (max_frames // 2) 
 sentence = []
 threshold = 0.9
 
-cap = cv2.VideoCapture(1) # Default camera
-# cap = cv2.VideoCapture("Test Recordings\\test (5).mp4")
+# cap = cv2.VideoCapture(0) # Default camera
+cap = cv2.VideoCapture("Test Recordings\\test (5).mp4")
 # cap = cv2.VideoCapture("Dataset\Adjectives\\7. Deaf\MVI_9583.mp4")
 
 
@@ -82,10 +83,10 @@ with mp_pose.Pose(min_detection_confidence=0.7,
             sequence.append(features)    
         
         else:
-            sequence.append(np.zeros(17))
+            sequence.append(np.zeros(24))
         
         
-        # Predicting output in every 10 frames
+        # Predicting output in every 15 frames
         if n_frames % 15 == 0:
             sequence = sequence[-max_frames:]
                     
