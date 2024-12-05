@@ -1,12 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
 
 import '/auth/base_auth_user_provider.dart';
 
 import '/index.dart';
 import '/main.dart';
+import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 
 export 'package:go_router/go_router.dart';
@@ -343,11 +345,14 @@ class FFRoute {
                 )
               : builder(context, ffParams);
           final child = appStateNotifier.loading
-              ? Container(
-                  color: const Color(0xFFFAB713),
-                  child: Image.asset(
-                    'assets/images/color_png_(2).png',
-                    fit: BoxFit.contain,
+              ? Center(
+                  child: SizedBox(
+                    width: 60.0,
+                    height: 60.0,
+                    child: SpinKitRipple(
+                      color: FlutterFlowTheme.of(context).primary,
+                      size: 60.0,
+                    ),
                   ),
                 )
               : page;

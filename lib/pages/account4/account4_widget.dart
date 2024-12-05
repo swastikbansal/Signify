@@ -152,9 +152,7 @@ class _Account4WidgetState extends State<Account4Widget> {
                                 extra: <String, dynamic>{
                                   kTransitionInfoKey: const TransitionInfo(
                                     hasTransition: true,
-                                    transitionType: PageTransitionType.scale,
-                                    alignment: Alignment.bottomCenter,
-                                    duration: Duration(milliseconds: 600),
+                                    transitionType: PageTransitionType.fade,
                                   ),
                                 },
                               );
@@ -164,7 +162,7 @@ class _Account4WidgetState extends State<Account4Widget> {
                             ),
                             icon: FaIcon(
                               FontAwesomeIcons.edit,
-                              color: FlutterFlowTheme.of(context).primary,
+                              color: FlutterFlowTheme.of(context).primaryText,
                               size: 20.0,
                             ),
                             options: FFButtonOptions(
@@ -181,7 +179,8 @@ class _Account4WidgetState extends State<Account4Widget> {
                                   .override(
                                     fontFamily: FlutterFlowTheme.of(context)
                                         .bodyMediumFamily,
-                                    color: FlutterFlowTheme.of(context).primary,
+                                    color: FlutterFlowTheme.of(context)
+                                        .primaryText,
                                     letterSpacing: 0.0,
                                     useGoogleFonts: GoogleFonts.asMap()
                                         .containsKey(
@@ -253,7 +252,6 @@ class _Account4WidgetState extends State<Account4Widget> {
                                     hasTransition: true,
                                     transitionType:
                                         PageTransitionType.rightToLeft,
-                                    duration: Duration(milliseconds: 400),
                                   ),
                                 },
                               );
@@ -316,7 +314,6 @@ class _Account4WidgetState extends State<Account4Widget> {
                                     hasTransition: true,
                                     transitionType:
                                         PageTransitionType.rightToLeft,
-                                    duration: Duration(milliseconds: 400),
                                   ),
                                 },
                               );
@@ -649,7 +646,6 @@ class _Account4WidgetState extends State<Account4Widget> {
                                     hasTransition: true,
                                     transitionType:
                                         PageTransitionType.rightToLeft,
-                                    duration: Duration(milliseconds: 400),
                                   ),
                                 },
                               );
@@ -787,7 +783,6 @@ class _Account4WidgetState extends State<Account4Widget> {
                                     hasTransition: true,
                                     transitionType:
                                         PageTransitionType.rightToLeft,
-                                    duration: Duration(milliseconds: 400),
                                   ),
                                 },
                               );
@@ -849,7 +844,6 @@ class _Account4WidgetState extends State<Account4Widget> {
                                     hasTransition: true,
                                     transitionType:
                                         PageTransitionType.rightToLeft,
-                                    duration: Duration(milliseconds: 400),
                                   ),
                                 },
                               );

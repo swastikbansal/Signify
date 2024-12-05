@@ -71,7 +71,6 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> {
                       kTransitionInfoKey: const TransitionInfo(
                         hasTransition: true,
                         transitionType: PageTransitionType.leftToRight,
-                        duration: Duration(milliseconds: 200),
                       ),
                     },
                   );

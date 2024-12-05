@@ -85,7 +85,7 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget> {
                         decoration: InputDecoration(
                           isDense: false,
                           labelText: FFLocalizations.of(context).getText(
-                            'wz6eakba' /* Your Message... */,
+                            'wz6eakba' /* Your Message */,
                           ),
                           labelStyle: FlutterFlowTheme.of(context)
                               .labelMedium
@@ -147,7 +147,7 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget> {
                           filled: true,
                           fillColor:
                               FlutterFlowTheme.of(context).primaryBackground,
-                          contentPadding: const EdgeInsets.all(24.0),
+                          contentPadding: const EdgeInsets.all(16.0),
                           hoverColor: FlutterFlowTheme.of(context).alternate,
                         ),
                         style: FlutterFlowTheme.of(context).titleSmall.override(
@@ -157,7 +157,7 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget> {
                               useGoogleFonts: GoogleFonts.asMap().containsKey(
                                   FlutterFlowTheme.of(context)
                                       .titleSmallFamily),
-                              lineHeight: 1.0,
+                              lineHeight: 2.0,
                             ),
                         textAlign: TextAlign.start,
                         maxLines: 10,
@@ -167,22 +167,19 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget> {
                             _model.textControllerValidator.asValidator(context),
                       ),
                     ),
-                    Align(
-                      alignment: const AlignmentDirectional(1.0, 0.0),
-                      child: FlutterFlowIconButton(
-                        borderRadius: 100.0,
-                        buttonSize: 50.0,
-                        hoverColor: FlutterFlowTheme.of(context).alternate,
-                        hoverIconColor: FlutterFlowTheme.of(context).primary,
-                        icon: FaIcon(
-                          FontAwesomeIcons.microphone,
-                          color: FlutterFlowTheme.of(context).primaryText,
-                          size: 30.0,
-                        ),
-                        onPressed: () {
-                          print('IconButton pressed ...');
-                        },
+                    FlutterFlowIconButton(
+                      borderRadius: 100.0,
+                      buttonSize: 50.0,
+                      hoverColor: FlutterFlowTheme.of(context).alternate,
+                      hoverIconColor: FlutterFlowTheme.of(context).primary,
+                      icon: FaIcon(
+                        FontAwesomeIcons.microphone,
+                        color: FlutterFlowTheme.of(context).secondaryText,
+                        size: 24.0,
                       ),
+                      onPressed: () {
+                        print('IconButton pressed ...');
+                      },
                     ),
                     Align(
                       alignment: const AlignmentDirectional(0.0, 0.0),

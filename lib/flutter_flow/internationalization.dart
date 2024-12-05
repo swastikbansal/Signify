@@ -164,7 +164,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
   // voicetosign1
   {
     'wz6eakba': {
-      'en': 'Your Message...',
+      'en': 'Your Message',
       'bn': 'আপনার বার্তা...',
       'gu': 'તમારો સંદેશ...',
       'hi': 'आपका संदेश...',
@@ -967,16 +967,6 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
   },
   // authPage
   {
-    '5hccj91f': {
-      'en': 'Signify',
-      'bn': 'বোঝান',
-      'gu': 'સંકેત આપો',
-      'hi': 'प्रकट करना',
-      'mr': 'सूचित करा',
-      'pa': 'ਸੰਕੇਤ',
-      'ta': 'அடையாளப்படுத்து',
-      'te': 'సూచించు',
-    },
     'qc8jhwf0': {
       'en': 'Sign In',
       'bn': 'সাইন ইন করুন',
@@ -1027,6 +1017,16 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'ta': 'கடவுச்சொல்லை உள்ளிடவும்',
       'te': 'పాస్‌వర్డ్‌ని నమోదు చేయండి',
     },
+    '83rkrhee': {
+      'en': 'Forgot Password ?',
+      'bn': '',
+      'gu': '',
+      'hi': '',
+      'mr': '',
+      'pa': '',
+      'ta': '',
+      'te': '',
+    },
     '31lncwmn': {
       'en': 'Sign In',
       'bn': 'সাইন ইন করুন',
@@ -1037,15 +1037,15 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'ta': 'உள்நுழையவும்',
       'te': 'సైన్ ఇన్ చేయండి',
     },
-    'z707851l': {
-      'en': 'Forgot Password ?',
-      'bn': 'পাসওয়ার্ড ভুলে গেছেন?',
-      'gu': 'પાસવર્ડ ભૂલી ગયા છો?',
-      'hi': 'पासवर्ड भूल गए ?',
-      'mr': 'पासवर्ड विसरलात?',
-      'pa': 'ਪਾਸਵਰਡ ਭੁੱਲ ਗਏ ?',
-      'ta': 'கடவுச்சொல் மறந்துவிட்டதா?',
-      'te': 'పాస్‌వర్డ్ మర్చిపోయారా?',
+    'c2w1y8g8': {
+      'en': 'or sign in with',
+      'bn': 'অথবা এর সাথে সাইন আপ করুন',
+      'gu': 'અથવા સાથે સાઇન અપ કરો',
+      'hi': 'या साइन अप करें',
+      'mr': 'किंवा सह साइन अप करा',
+      'pa': 'ਜਾਂ ਨਾਲ ਸਾਈਨ ਅੱਪ ਕਰੋ',
+      'ta': 'அல்லது உடன் பதிவு செய்யவும்',
+      'te': 'లేదా సైన్ అప్ చేయండి',
     },
     '81nyey0l': {
       'en': 'Continue with Google',
@@ -1156,6 +1156,16 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'pa': 'Google ਨਾਲ ਜਾਰੀ ਰੱਖੋ',
       'ta': 'Google உடன் தொடரவும்',
       'te': 'Googleతో కొనసాగించండి',
+    },
+    '3gmio52t': {
+      'en': 'Signify',
+      'bn': '',
+      'gu': '',
+      'hi': '',
+      'mr': '',
+      'pa': '',
+      'ta': '',
+      'te': '',
     },
     't5zq1y98': {
       'en': 'Home',

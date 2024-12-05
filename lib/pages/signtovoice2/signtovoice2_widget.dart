@@ -83,72 +83,77 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget> {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          FlutterFlowDropDown<String>(
-                            controller: _model.dropDownValueController ??=
-                                FormFieldController<String>(null),
-                            options: [
-                              FFLocalizations.of(context).getText(
-                                'rpno13ax' /* English */,
-                              ),
-                              FFLocalizations.of(context).getText(
-                                'poexbjj4' /* Hindi */,
-                              ),
-                              FFLocalizations.of(context).getText(
-                                'qtkvhy1f' /* Bengali */,
-                              ),
-                              FFLocalizations.of(context).getText(
-                                'u9ln63gu' /* Marathi */,
-                              ),
-                              FFLocalizations.of(context).getText(
-                                'b33de32b' /* Telugu */,
-                              ),
-                              FFLocalizations.of(context).getText(
-                                'fpa9yid6' /* Tamil */,
-                              ),
-                              FFLocalizations.of(context).getText(
-                                'hann7xcl' /* Gujarati */,
-                              ),
-                              FFLocalizations.of(context).getText(
-                                'qshr5rcb' /* Punjabi */,
-                              )
-                            ],
-                            onChanged: (val) =>
-                                safeSetState(() => _model.dropDownValue = val),
-                            width: 180.0,
-                            height: 60.0,
-                            textStyle: FlutterFlowTheme.of(context)
-                                .labelMedium
-                                .override(
-                                  fontFamily: FlutterFlowTheme.of(context)
-                                      .labelMediumFamily,
-                                  letterSpacing: 0.0,
-                                  useGoogleFonts: GoogleFonts.asMap()
-                                      .containsKey(FlutterFlowTheme.of(context)
-                                          .labelMediumFamily),
+                          Align(
+                            alignment: const AlignmentDirectional(0.0, 0.0),
+                            child: FlutterFlowDropDown<String>(
+                              controller: _model.dropDownValueController ??=
+                                  FormFieldController<String>(null),
+                              options: [
+                                FFLocalizations.of(context).getText(
+                                  'rpno13ax' /* English */,
                                 ),
-                            hintText: FFLocalizations.of(context).getText(
-                              'drx645ue' /* Select Language */,
+                                FFLocalizations.of(context).getText(
+                                  'poexbjj4' /* Hindi */,
+                                ),
+                                FFLocalizations.of(context).getText(
+                                  'qtkvhy1f' /* Bengali */,
+                                ),
+                                FFLocalizations.of(context).getText(
+                                  'u9ln63gu' /* Marathi */,
+                                ),
+                                FFLocalizations.of(context).getText(
+                                  'b33de32b' /* Telugu */,
+                                ),
+                                FFLocalizations.of(context).getText(
+                                  'fpa9yid6' /* Tamil */,
+                                ),
+                                FFLocalizations.of(context).getText(
+                                  'hann7xcl' /* Gujarati */,
+                                ),
+                                FFLocalizations.of(context).getText(
+                                  'qshr5rcb' /* Punjabi */,
+                                )
+                              ],
+                              onChanged: (val) => safeSetState(
+                                  () => _model.dropDownValue = val),
+                              width: 180.0,
+                              height: 50.0,
+                              textStyle: FlutterFlowTheme.of(context)
+                                  .labelMedium
+                                  .override(
+                                    fontFamily: FlutterFlowTheme.of(context)
+                                        .labelMediumFamily,
+                                    letterSpacing: 0.0,
+                                    useGoogleFonts: GoogleFonts.asMap()
+                                        .containsKey(
+                                            FlutterFlowTheme.of(context)
+                                                .labelMediumFamily),
+                                  ),
+                              hintText: FFLocalizations.of(context).getText(
+                                'drx645ue' /* Select Language */,
+                              ),
+                              icon: Icon(
+                                Icons.arrow_drop_down,
+                                color: FlutterFlowTheme.of(context).primaryText,
+                                size: 24.0,
+                              ),
+                              fillColor: FlutterFlowTheme.of(context)
+                                  .primaryBackground,
+                              elevation: 2.0,
+                              borderColor:
+                                  FlutterFlowTheme.of(context).alternate,
+                              borderWidth: 1.0,
+                              borderRadius: 16.0,
+                              margin: const EdgeInsets.all(12.0),
+                              hidesUnderline: true,
+                              isOverButton: false,
+                              isSearchable: false,
+                              isMultiSelect: false,
                             ),
-                            icon: Icon(
-                              Icons.arrow_drop_down,
-                              color: FlutterFlowTheme.of(context).primaryText,
-                              size: 24.0,
-                            ),
-                            fillColor:
-                                FlutterFlowTheme.of(context).primaryBackground,
-                            elevation: 2.0,
-                            borderColor: FlutterFlowTheme.of(context).alternate,
-                            borderWidth: 1.0,
-                            borderRadius: 16.0,
-                            margin: const EdgeInsets.all(16.0),
-                            hidesUnderline: true,
-                            isOverButton: false,
-                            isSearchable: false,
-                            isMultiSelect: false,
                           ),
                           FlutterFlowIconButton(
                             borderRadius: 50.0,
-                            buttonSize: 60.0,
+                            buttonSize: 50.0,
                             fillColor: FlutterFlowTheme.of(context)
                                 .secondaryBackground,
                             hoverColor:
@@ -158,7 +163,7 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget> {
                             icon: Icon(
                               Icons.camera_alt,
                               color: FlutterFlowTheme.of(context).primaryText,
-                              size: 30.0,
+                              size: 24.0,
                             ),
                             onPressed: () {
                               print('IconButton pressed ...');
@@ -166,7 +171,7 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget> {
                           ),
                           FlutterFlowIconButton(
                             borderRadius: 50.0,
-                            buttonSize: 60.0,
+                            buttonSize: 50.0,
                             fillColor: FlutterFlowTheme.of(context)
                                 .secondaryBackground,
                             hoverColor:
@@ -176,7 +181,7 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget> {
                             icon: Icon(
                               Icons.volume_up,
                               color: FlutterFlowTheme.of(context).primaryText,
-                              size: 30.0,
+                              size: 24.0,
                             ),
                             onPressed: () {
                               print('IconButton pressed ...');

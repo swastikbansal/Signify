@@ -9,14 +9,14 @@ service cloud.firestore {
     }
 
     match /users/{parent}/featureRequest/{document} {
-      allow create: if request.auth.uid == request.resource.data.description;
+      allow create: if request.auth.uid == parent;
       allow read: if request.auth.uid == parent;
       allow write: if request.auth.uid == parent;
       allow delete: if request.auth.uid == parent;
     }
 
     match /users/{parent}/bugReport/{document} {
-      allow create: if request.auth.uid == request.resource.data.description;
+      allow create: if request.auth.uid == parent;
       allow read: if request.auth.uid == parent;
       allow write: if request.auth.uid == parent;
       allow delete: if request.auth.uid == parent;

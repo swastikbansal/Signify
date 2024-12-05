@@ -1177,7 +1177,7 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                                 '6of0ekmf' /* Your Journey Begins */,
                               ),
                               style: FlutterFlowTheme.of(context)
-                                  .headlineMedium
+                                  .headlineSmall
                                   .override(
                                     fontFamily: 'Space Grotesk',
                                     letterSpacing: 0.0,
@@ -1195,15 +1195,15 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                                 ),
                                 textAlign: TextAlign.center,
                                 style: FlutterFlowTheme.of(context)
-                                    .labelLarge
+                                    .labelMedium
                                     .override(
                                       fontFamily: FlutterFlowTheme.of(context)
-                                          .labelLargeFamily,
+                                          .labelMediumFamily,
                                       letterSpacing: 0.0,
                                       useGoogleFonts: GoogleFonts.asMap()
                                           .containsKey(
                                               FlutterFlowTheme.of(context)
-                                                  .labelLargeFamily),
+                                                  .labelMediumFamily),
                                     ),
                               ).animateOnPageLoad(
                                   animationsMap['textOnPageLoadAnimation10']!),
@@ -1228,38 +1228,35 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                                   '3guo8uqw' /* Get Started */,
                                 ),
                                 options: FFButtonOptions(
-                                  width: 200.0,
-                                  height: 60.0,
+                                  width: 160.0,
+                                  height: 50.0,
                                   padding: const EdgeInsetsDirectional.fromSTEB(
                                       0.0, 0.0, 0.0, 0.0),
                                   iconPadding: const EdgeInsetsDirectional.fromSTEB(
                                       0.0, 0.0, 0.0, 0.0),
                                   color: FlutterFlowTheme.of(context).primary,
                                   textStyle: FlutterFlowTheme.of(context)
-                                      .titleMedium
+                                      .titleSmall
                                       .override(
                                         fontFamily: FlutterFlowTheme.of(context)
-                                            .titleMediumFamily,
+                                            .titleSmallFamily,
                                         color: FlutterFlowTheme.of(context)
                                             .customColor5,
                                         letterSpacing: 0.0,
                                         useGoogleFonts: GoogleFonts.asMap()
                                             .containsKey(
                                                 FlutterFlowTheme.of(context)
-                                                    .titleMediumFamily),
+                                                    .titleSmallFamily),
                                       ),
                                   elevation: 2.0,
                                   borderSide: BorderSide(
-                                    color:
-                                        FlutterFlowTheme.of(context).alternate,
-                                    width: 2.0,
+                                    color: FlutterFlowTheme.of(context).primary,
                                   ),
                                   borderRadius: BorderRadius.circular(40.0),
                                   hoverColor: FlutterFlowTheme.of(context)
                                       .primaryBackground,
                                   hoverBorderSide: BorderSide(
                                     color: FlutterFlowTheme.of(context).primary,
-                                    width: 2.0,
                                   ),
                                   hoverTextColor:
                                       FlutterFlowTheme.of(context).primaryText,
@@ -1278,7 +1275,7 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
               Align(
                 alignment: const AlignmentDirectional(0.0, 1.0),
                 child: Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 20.0),
+                  padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 24.0),
                   child: smooth_page_indicator.SmoothPageIndicator(
                     controller: _model.pageViewController ??=
                         PageController(initialPage: 0),
@@ -1294,10 +1291,10 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                     },
                     effect: smooth_page_indicator.ExpandingDotsEffect(
                       expansionFactor: 4.0,
-                      spacing: 6.0,
-                      radius: 20.0,
-                      dotWidth: 6.0,
-                      dotHeight: 6.0,
+                      spacing: 8.0,
+                      radius: 8.0,
+                      dotWidth: 8.0,
+                      dotHeight: 2.0,
                       dotColor: FlutterFlowTheme.of(context).info,
                       activeDotColor: FlutterFlowTheme.of(context).primary,
                       paintStyle: PaintingStyle.fill,

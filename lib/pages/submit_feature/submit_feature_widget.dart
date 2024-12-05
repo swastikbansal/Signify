@@ -72,7 +72,6 @@ class _SubmitFeatureWidgetState extends State<SubmitFeatureWidget> {
                     kTransitionInfoKey: const TransitionInfo(
                       hasTransition: true,
                       transitionType: PageTransitionType.leftToRight,
-                      duration: Duration(milliseconds: 200),
                     ),
                   },
                 );

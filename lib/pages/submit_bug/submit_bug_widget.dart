@@ -71,7 +71,6 @@ class _SubmitBugWidgetState extends State<SubmitBugWidget> {
                     kTransitionInfoKey: const TransitionInfo(
                       hasTransition: true,
                       transitionType: PageTransitionType.leftToRight,
-                      duration: Duration(milliseconds: 200),
                     ),
                   },
                 );

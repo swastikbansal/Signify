@@ -63,16 +63,7 @@ class _ForgetPasswordWidgetState extends State<ForgetPasswordWidget> {
                 size: 24.0,
               ),
               onPressed: () async {
-                context.pushNamed(
-                  'account4',
-                  extra: <String, dynamic>{
-                    kTransitionInfoKey: const TransitionInfo(
-                      hasTransition: true,
-                      transitionType: PageTransitionType.leftToRight,
-                      duration: Duration(milliseconds: 200),
-                    ),
-                  },
-                );
+                context.safePop();
               },
             ),
             Text(

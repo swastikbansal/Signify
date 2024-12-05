@@ -106,8 +106,7 @@ class _EditProfileWidgetState extends State<EditProfileWidget>
                     extra: <String, dynamic>{
                       kTransitionInfoKey: const TransitionInfo(
                         hasTransition: true,
-                        transitionType: PageTransitionType.leftToRight,
-                        duration: Duration(milliseconds: 200),
+                        transitionType: PageTransitionType.fade,
                       ),
                     },
                   );
@@ -179,73 +178,23 @@ class _EditProfileWidgetState extends State<EditProfileWidget>
                                 alignment: const AlignmentDirectional(1.0, 0.0),
                                 child: Align(
                                   alignment: const AlignmentDirectional(0.0, 0.0),
-                                  child: InkWell(
-                                    splashColor: Colors.transparent,
-                                    focusColor: Colors.transparent,
-                                    hoverColor: Colors.transparent,
-                                    highlightColor: Colors.transparent,
-                                    onTap: () async {
-                                      final selectedMedia =
-                                          await selectMediaWithSourceBottomSheet(
-                                        context: context,
-                                        allowPhoto: true,
-                                      );
-                                      if (selectedMedia != null &&
-                                          selectedMedia.every((m) =>
-                                              validateFileFormat(
-                                                  m.storagePath, context))) {
-                                        safeSetState(() =>
-                                            _model.isDataUploading1 = true);
-                                        var selectedUploadedFiles =
-                                            <FFUploadedFile>[];
-
-                                        try {
-                                          selectedUploadedFiles = selectedMedia
-                                              .map((m) => FFUploadedFile(
-                                                    name: m.storagePath
-                                                        .split('/')
-                                                        .last,
-                                                    bytes: m.bytes,
-                                                    height:
-                                                        m.dimensions?.height,
-                                                    width: m.dimensions?.width,
-                                                    blurHash: m.blurHash,
-                                                  ))
-                                              .toList();
-                                        } finally {
-                                          _model.isDataUploading1 = false;
-                                        }
-                                        if (selectedUploadedFiles.length ==
-                                            selectedMedia.length) {
-                                          safeSetState(() {
-                                            _model.uploadedLocalFile1 =
-                                                selectedUploadedFiles.first;
-                                          });
-                                        } else {
-                                          safeSetState(() {});
-                                          return;
-                                        }
-                                      }
-                                    },
-                                    child: ClipRRect(
-                                      borderRadius:
-                                          BorderRadius.circular(100.0),
-                                      child: Image.memory(
-                                        _model.uploadedLocalFile1.bytes ??
-                                            Uint8List.fromList([]),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(100.0),
+                                    child: Image.memory(
+                                      _model.uploadedLocalFile.bytes ??
+                                          Uint8List.fromList([]),
+                                      width: 150.0,
+                                      height: 150.0,
+                                      fit: BoxFit.cover,
+                                      alignment: const Alignment(0.0, 0.0),
+                                      errorBuilder:
+                                          (context, error, stackTrace) =>
+                                              Image.asset(
+                                        'assets/images/error_image.png',
                                         width: 150.0,
                                         height: 150.0,
                                         fit: BoxFit.cover,
                                         alignment: const Alignment(0.0, 0.0),
-                                        errorBuilder:
-                                            (context, error, stackTrace) =>
-                                                Image.asset(
-                                          'assets/images/error_image.png',
-                                          width: 150.0,
-                                          height: 150.0,
-                                          fit: BoxFit.cover,
-                                          alignment: const Alignment(0.0, 0.0),
-                                        ),
                                       ),
                                     ),
                                   ),
@@ -285,6 +234,8 @@ class _EditProfileWidgetState extends State<EditProfileWidget>
                                       final selectedMedia =
                                           await selectMediaWithSourceBottomSheet(
                                         context: context,
+                                        maxWidth: 1000.00,
+                                        maxHeight: 1000.00,
                                         imageQuality: 100,
                                         allowPhoto: true,
                                         backgroundColor:
@@ -298,7 +249,7 @@ class _EditProfileWidgetState extends State<EditProfileWidget>
                                               validateFileFormat(
                                                   m.storagePath, context))) {
                                         safeSetState(() =>
-                                            _model.isDataUploading2 = true);
+                                            _model.isDataUploading = true);
                                         var selectedUploadedFiles =
                                             <FFUploadedFile>[];
 
@@ -316,12 +267,12 @@ class _EditProfileWidgetState extends State<EditProfileWidget>
                                                   ))
                                               .toList();
                                         } finally {
-                                          _model.isDataUploading2 = false;
+                                          _model.isDataUploading = false;
                                         }
                                         if (selectedUploadedFiles.length ==
                                             selectedMedia.length) {
                                           safeSetState(() {
-                                            _model.uploadedLocalFile2 =
+                                            _model.uploadedLocalFile =
                                                 selectedUploadedFiles.first;
                                           });
                                         } else {
@@ -840,7 +791,6 @@ class _EditProfileWidgetState extends State<EditProfileWidget>
                         controller: _model.textController7,
                         focusNode: _model.textFieldFocusNode7,
                         autofocus: false,
-                        textInputAction: TextInputAction.done,
                         obscureText: false,
                         decoration: InputDecoration(
                           labelText: FFLocalizations.of(context).getText(
