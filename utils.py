@@ -10,12 +10,6 @@ class MediapipeUtils:
         self.mp_drawing = mp_drawing
         
         self.features = []
-        
-        self.angle_landmarks = ((12,14),
-                                (14,16),
-                                (11,13),
-                                (13,15))
-        self.angles_keypoint = []
 
 
     def mediapipe_detection(self,image, model) -> tuple:
@@ -36,25 +30,16 @@ class MediapipeUtils:
         # rh = np.array([[res.x, res.y, res.z] for res in results.right_hand_landmarks.landmark]).flatten() if results.right_hand_landmarks else np.zeros(21*3)
         # return np.concatenate([pose, lh, rh])    
         return pose   
-    
-    def extract_features(self,results) -> list: 
-        """Function to extract specific features like angles and distances from keypoints of mediapipe """
+    def extract_features(self, results):
+        """Extract features from pose landmarks."""
         self.features = []
-        
-        self.angles_keypoint = []
-        
-        for idx in self.angle_landmarks:
-                p1 = results[idx[0]]                
-                p2 = results[idx[1]]    
-                                
-                vector = np.array([p2.x - p1.x, p2.y - p1.y, p2.z - p1.z])
-                            
-                ang = self.calculate_angles(vector)
-                self.angles_keypoint.extend(ang)
-        
-        self.features.extend(self.angles_keypoint)
-        
-        # Calculate angles between vectors
+
+        # Extract X, Y, Z coordinates for specified landmarks
+        landmark_indices = [13, 14, 15, 16]
+        for idx in landmark_indices:
+            lm = results[idx]
+            self.features.extend([lm.x, lm.y, lm.z])
+
         # Left arm: vectors 15-13 and 13-11
         left_wrist = np.array([results[15].x, results[15].y, results[15].z])
         left_elbow = np.array([results[13].x, results[13].y, results[13].z])
@@ -63,8 +48,15 @@ class MediapipeUtils:
         vector_left_wrist_elbow = left_wrist - left_elbow
         vector_left_elbow_shoulder = left_elbow - left_shoulder
 
-        self.angle_left_arm = self.calculate_angles_between(vector_left_wrist_elbow, vector_left_elbow_shoulder)
+        # Calculate angle
+        angle_left_arm = self.calculate_angles_between(vector_left_wrist_elbow, vector_left_elbow_shoulder)
 
+        # Convert angle to radians
+        angle_left_arm_rad = np.deg2rad(angle_left_arm)
+
+        # Compute sine and cosine
+        sin_left_arm = np.sin(angle_left_arm_rad)
+        cos_left_arm = np.cos(angle_left_arm_rad)
 
         # Right arm: vectors 16-14 and 14-12
         right_wrist = np.array([results[16].x, results[16].y, results[16].z])
@@ -74,40 +66,53 @@ class MediapipeUtils:
         vector_right_wrist_elbow = right_wrist - right_elbow
         vector_right_elbow_shoulder = right_elbow - right_shoulder
 
-        self.angle_right_arm = self.calculate_angles_between(vector_right_wrist_elbow, vector_right_elbow_shoulder)
-        
-        self.features.extend([self.angle_left_arm, self.angle_right_arm])
-        
-        # Right arm: vectors 12-14 and 11-12
-        vector_11_12 = left_shoulder - right_shoulder # 11-12
-        vector_12_14 = right_shoulder - right_elbow  # 12-14
+        angle_right_arm = self.calculate_angles_between(vector_right_wrist_elbow, vector_right_elbow_shoulder)
 
-        self.angle_right_shoulder = self.calculate_angles_between(vector_11_12, vector_12_14)
-        
-        # Right arm: vectors 12-14 and 11-12
-        vector_11_12 = left_shoulder - right_shoulder # 11-12
-        vector_11_13 = left_shoulder - left_elbow  # 12-14
+        angle_right_arm_rad = np.deg2rad(angle_right_arm)
+        sin_right_arm = np.sin(angle_right_arm_rad)
+        cos_right_arm = np.cos(angle_right_arm_rad)
 
-        self.angle_left_sholder = self.calculate_angles_between(vector_11_12, vector_12_14)
-        self.features.extend([self.angle_left_sholder, self.angle_right_shoulder])
-        
+        # Extend sine and cosine of angles into features
+        self.features.extend([sin_left_arm, cos_left_arm, sin_right_arm, cos_right_arm])
+
+        # Shoulders: compute angles and apply sine and cosine transformation
+        # Right shoulder: vectors 12-14 and 11-12
+        vector_11_12 = left_shoulder - right_shoulder  # 11-12
+        vector_12_14 = right_shoulder - right_elbow    # 12-14
+        angle_right_shoulder = self.calculate_angles_between(vector_11_12, vector_12_14)
+        angle_right_shoulder_rad = np.deg2rad(angle_right_shoulder)
+        sin_right_shoulder = np.sin(angle_right_shoulder_rad)
+        cos_right_shoulder = np.cos(angle_right_shoulder_rad)
+
+        # Left shoulder: vectors 11-13 and 11-12
+        vector_11_13 = left_shoulder - left_elbow      # 11-13
+        angle_left_shoulder = self.calculate_angles_between(vector_11_12, vector_11_13)
+        angle_left_shoulder_rad = np.deg2rad(angle_left_shoulder)
+        sin_left_shoulder = np.sin(angle_left_shoulder_rad)
+        cos_left_shoulder = np.cos(angle_left_shoulder_rad)
+
+        self.features.extend([sin_left_shoulder, cos_left_shoulder, sin_right_shoulder, cos_right_shoulder])
+
         # Distance between points 15 and 16 (hands)
         left_hand = results[15]
         right_hand = results[16]
-        centre = results[0]
-        
-        # self.distance_hands = self.calculate_distance(left_hand, right_hand)
-        self.distance_left_hand_centre = self.calculate_distance(left_hand, centre)
-        self.distance_right_hand_centre = self.calculate_distance(right_hand, centre)
-        
-        self.features.extend([self.distance_left_hand_centre, self.distance_right_hand_centre])
-        
-        self.left_hand_direction_x ,self.left_hand_direction_y, self.left_hand_direction_z = self.extract_hand_direction(15,17,19,results)
-        self.right_hand_direction_x, self.right_hand_direction_y, self.right_hand_direction_z = self.extract_hand_direction(16,18,20,results)
+        center = results[0]
 
-        self.features.extend([self.left_hand_direction_x, self.left_hand_direction_y, self.left_hand_direction_z,
-                            self.right_hand_direction_x, self.right_hand_direction_y, self.right_hand_direction_z])
-                
+        distance_hands = self.calculate_distance(left_hand, right_hand)
+        distance_left_hand_center = self.calculate_distance(left_hand, center)
+        distance_right_hand_center = self.calculate_distance(right_hand, center)
+
+        # Extend distances into features
+        self.features.extend([distance_hands, distance_left_hand_center, distance_right_hand_center])
+
+        # Extract hand direction vectors (optional)
+        direction_vector_left_hand = self.extract_hand_direction(15, 17, 19, results)
+        direction_vector_right_hand = self.extract_hand_direction(16, 18, 20, results)
+
+        # Extend hand direction components into features
+        self.features.extend(direction_vector_left_hand)
+        self.features.extend(direction_vector_right_hand)
+
         return self.features
     
     def extract_hand_direction(self, wrist, pinky, index, results):

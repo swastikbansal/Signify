@@ -21,11 +21,11 @@ mp_utils = utils.MediapipeUtils(mp_pose, mp_drawing)
 
 # Labels for data
 # actions = array([i.split("\\")[-1] for i in glob('MP_Data\*')])
-actions = ['Blind','Deaf','Flat','Happy','Poor','Quiet','Rich','sad','Slow','Thick']
+actions = ['Blind','Deaf','Flat','Happy','Poor','Quiet','Rich','Sad','Slow','Thick']
 
 # Defining Hyperparameters
-max_frames = 28
-features = 24
+max_frames = 26
+features = 47
 input_shape = (max_frames, features)
 num_classes =  len(actions)
 
@@ -54,14 +54,13 @@ model = Sequential([
 model_path = Path.cwd() / 'Model' / 'INCLUDE_10_V4_angled.h5'
 model.load_weights(str(model_path))
 
-
 n_frames = 0
 sequence = [[0] * features] * (max_frames // 2) 
 sentence = []
 threshold = 0.9
 
-# cap = cv2.VideoCapture(0) # Default camera
-cap = cv2.VideoCapture("Test Recordings\\test (5).mp4")
+cap = cv2.VideoCapture(0) # Default camera
+# cap = cv2.VideoCapture("Test Recordings\\test (5).mp4")
 # cap = cv2.VideoCapture("Dataset\Adjectives\\7. Deaf\MVI_9583.mp4")
 
 
@@ -69,22 +68,16 @@ with mp_pose.Pose(min_detection_confidence=0.7,
                           min_tracking_confidence=0.7) as pose:
     while cap.isOpened():    
         ret, frame = cap.read()
-        
         image, results = mp_utils.mediapipe_detection(frame, pose)
-
         mp_utils.draw_styled_landmarks(image, results)
         
         if results.pose_landmarks:
-        
             results = results.pose_landmarks.landmark
-            
             features = np.array(mp_utils.extract_features(results))
-
             sequence.append(features)    
         
         else:
-            sequence.append(np.zeros(24))
-        
+            sequence.append(np.zeros(47))
         
         # Predicting output in every 15 frames
         if n_frames % 15 == 0:
