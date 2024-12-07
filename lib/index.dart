@@ -14,3 +14,6 @@ export '/pages/app_settings/app_settings_widget.dart' show AppSettingsWidget;
 export '/pages/edit_profile/edit_profile_widget.dart' show EditProfileWidget;
 export '/pages/account4/account4_widget.dart' show Account4Widget;
 export '/pages/support_page/support_page_widget.dart' show SupportPageWidget;
+export '/pages/selectlanguage/selectlanguage_widget.dart'
+    show SelectlanguageWidget;
+export '/pages/accounttest/accounttest_widget.dart' show AccounttestWidget;

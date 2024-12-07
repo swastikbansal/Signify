@@ -592,7 +592,7 @@ class _SupportPageWidgetState extends State<SupportPageWidget> {
                               'vvbe7382' /* Submit Feedback */,
                             ),
                             options: FFButtonOptions(
-                              width: MediaQuery.sizeOf(context).width * 0.55,
+                              width: MediaQuery.sizeOf(context).width * 0.56,
                               height: 50.0,
                               padding: const EdgeInsetsDirectional.fromSTEB(
                                   0.0, 0.0, 0.0, 0.0),

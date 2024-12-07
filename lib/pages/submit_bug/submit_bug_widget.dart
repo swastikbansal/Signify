@@ -65,15 +65,7 @@ class _SubmitBugWidgetState extends State<SubmitBugWidget> {
                 size: 24.0,
               ),
               onPressed: () async {
-                context.pushNamed(
-                  'account4',
-                  extra: <String, dynamic>{
-                    kTransitionInfoKey: const TransitionInfo(
-                      hasTransition: true,
-                      transitionType: PageTransitionType.leftToRight,
-                    ),
-                  },
-                );
+                context.pushNamed('account4');
               },
             ),
             Text(

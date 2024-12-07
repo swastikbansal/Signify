@@ -80,7 +80,7 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget> {
                         controller: _model.textController,
                         focusNode: _model.textFieldFocusNode,
                         autofocus: false,
-                        textCapitalization: TextCapitalization.none,
+                        textCapitalization: TextCapitalization.sentences,
                         obscureText: false,
                         decoration: InputDecoration(
                           isDense: false,
@@ -121,28 +121,28 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget> {
                               color: FlutterFlowTheme.of(context).alternate,
                               width: 1.0,
                             ),
-                            borderRadius: BorderRadius.circular(16.0),
+                            borderRadius: BorderRadius.circular(12.0),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
                               color: FlutterFlowTheme.of(context).primary,
                               width: 1.0,
                             ),
-                            borderRadius: BorderRadius.circular(16.0),
+                            borderRadius: BorderRadius.circular(12.0),
                           ),
                           errorBorder: OutlineInputBorder(
                             borderSide: BorderSide(
                               color: FlutterFlowTheme.of(context).error,
                               width: 1.0,
                             ),
-                            borderRadius: BorderRadius.circular(16.0),
+                            borderRadius: BorderRadius.circular(12.0),
                           ),
                           focusedErrorBorder: OutlineInputBorder(
                             borderSide: BorderSide(
                               color: FlutterFlowTheme.of(context).error,
                               width: 1.0,
                             ),
-                            borderRadius: BorderRadius.circular(16.0),
+                            borderRadius: BorderRadius.circular(12.0),
                           ),
                           filled: true,
                           fillColor:
@@ -160,7 +160,7 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget> {
                               lineHeight: 2.0,
                             ),
                         textAlign: TextAlign.start,
-                        maxLines: 10,
+                        maxLines: 5,
                         minLines: 1,
                         cursorColor: FlutterFlowTheme.of(context).primary,
                         validator:
@@ -185,15 +185,15 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget> {
                       alignment: const AlignmentDirectional(0.0, 0.0),
                       child: FlutterFlowIconButton(
                         borderRadius: 100.0,
-                        buttonSize: 50.0,
-                        fillColor: FlutterFlowTheme.of(context).primary,
+                        buttonSize: 60.0,
+                        fillColor:
+                            FlutterFlowTheme.of(context).secondaryBackground,
                         hoverColor:
                             FlutterFlowTheme.of(context).primaryBackground,
-                        hoverIconColor:
-                            FlutterFlowTheme.of(context).primaryText,
+                        hoverIconColor: FlutterFlowTheme.of(context).primary,
                         icon: Icon(
                           Icons.send_rounded,
-                          color: FlutterFlowTheme.of(context).customColor5,
+                          color: FlutterFlowTheme.of(context).primary,
                           size: 30.0,
                         ),
                         showLoadingIndicator: true,

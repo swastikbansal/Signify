@@ -9,7 +9,6 @@ import 'backend/firebase/firebase_config.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import 'flutter_flow/flutter_flow_util.dart';
 import 'flutter_flow/internationalization.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'index.dart';
 
 void main() async {
@@ -105,6 +104,10 @@ class _MyAppState extends State<MyApp> {
         Locale('ta'),
         Locale('gu'),
         Locale('pa'),
+        Locale('ur'),
+        Locale('kn'),
+        Locale('ml'),
+        Locale('as'),
       ],
       theme: ThemeData(
         brightness: Brightness.light,
@@ -194,12 +197,12 @@ class _NavBarPageState extends State<NavBarPage> {
         type: BottomNavigationBarType.fixed,
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: const FaIcon(
-              FontAwesomeIcons.americanSignLanguageInterpreting,
+            icon: const Icon(
+              Icons.sign_language_outlined,
               size: 30.0,
             ),
-            activeIcon: const FaIcon(
-              FontAwesomeIcons.americanSignLanguageInterpreting,
+            activeIcon: const Icon(
+              Icons.sign_language,
               size: 30.0,
             ),
             label: FFLocalizations.of(context).getText(

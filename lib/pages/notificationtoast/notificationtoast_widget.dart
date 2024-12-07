@@ -68,14 +68,17 @@ class _NotificationtoastWidgetState extends State<NotificationtoastWidget> {
               width: 36.0,
               height: 36.0,
               decoration: BoxDecoration(
-                color: FlutterFlowTheme.of(context).accent2,
+                color: FlutterFlowTheme.of(context).primaryBackground,
                 shape: BoxShape.circle,
+                border: Border.all(
+                  color: FlutterFlowTheme.of(context).alternate,
+                ),
               ),
               child: Padding(
                 padding: const EdgeInsets.all(4.0),
                 child: Icon(
                   Icons.add_task_rounded,
-                  color: FlutterFlowTheme.of(context).secondary,
+                  color: FlutterFlowTheme.of(context).primary,
                   size: 24.0,
                 ),
               ),

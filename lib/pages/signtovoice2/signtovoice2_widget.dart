@@ -112,6 +112,18 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget> {
                                 ),
                                 FFLocalizations.of(context).getText(
                                   'qshr5rcb' /* Punjabi */,
+                                ),
+                                FFLocalizations.of(context).getText(
+                                  'zw3yahpp' /* Urdu */,
+                                ),
+                                FFLocalizations.of(context).getText(
+                                  'f1lmzpqr' /* Kannada */,
+                                ),
+                                FFLocalizations.of(context).getText(
+                                  'o714o7gt' /* Malayalam */,
+                                ),
+                                FFLocalizations.of(context).getText(
+                                  '7620rj83' /* Assamese */,
                                 )
                               ],
                               onChanged: (val) => safeSetState(
@@ -143,7 +155,7 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget> {
                               borderColor:
                                   FlutterFlowTheme.of(context).alternate,
                               borderWidth: 1.0,
-                              borderRadius: 16.0,
+                              borderRadius: 12.0,
                               margin: const EdgeInsets.all(12.0),
                               hidesUnderline: true,
                               isOverButton: false,

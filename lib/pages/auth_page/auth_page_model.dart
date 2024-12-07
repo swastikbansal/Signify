@@ -19,6 +19,10 @@ class AuthPageModel extends FlutterFlowModel<AuthPageWidget> {
   TextEditingController? passwordTextController;
   late bool passwordVisibility;
   String? Function(BuildContext, String?)? passwordTextControllerValidator;
+  // State field(s) for display_name widget.
+  FocusNode? displayNameFocusNode;
+  TextEditingController? displayNameTextController;
+  String? Function(BuildContext, String?)? displayNameTextControllerValidator;
   // State field(s) for emailAddress_Create widget.
   FocusNode? emailAddressCreateFocusNode;
   TextEditingController? emailAddressCreateTextController;
@@ -52,6 +56,9 @@ class AuthPageModel extends FlutterFlowModel<AuthPageWidget> {
 
     passwordFocusNode?.dispose();
     passwordTextController?.dispose();
+
+    displayNameFocusNode?.dispose();
+    displayNameTextController?.dispose();
 
     emailAddressCreateFocusNode?.dispose();
     emailAddressCreateTextController?.dispose();

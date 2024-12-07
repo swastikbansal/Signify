@@ -1,14 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
 
 import '/auth/base_auth_user_provider.dart';
 
 import '/index.dart';
 import '/main.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 
 export 'package:go_router/go_router.dart';
@@ -74,13 +72,13 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
       debugLogDiagnostics: true,
       refreshListenable: appStateNotifier,
       errorBuilder: (context, state) =>
-          appStateNotifier.loggedIn ? const NavBarPage() : const OnboardingPageWidget(),
+          appStateNotifier.loggedIn ? const NavBarPage() : const SelectlanguageWidget(),
       routes: [
         FFRoute(
           name: '_initialize',
           path: '/',
           builder: (context, _) =>
-              appStateNotifier.loggedIn ? const NavBarPage() : const OnboardingPageWidget(),
+              appStateNotifier.loggedIn ? const NavBarPage() : const SelectlanguageWidget(),
         ),
         FFRoute(
           name: 'voicetosign1',
@@ -161,6 +159,16 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           name: 'supportPage',
           path: '/supportPage',
           builder: (context, params) => const SupportPageWidget(),
+        ),
+        FFRoute(
+          name: 'selectlanguage',
+          path: '/selectLanguage',
+          builder: (context, params) => const SelectlanguageWidget(),
+        ),
+        FFRoute(
+          name: 'accounttest',
+          path: '/accounttest',
+          builder: (context, params) => const AccounttestWidget(),
         )
       ].map((r) => r.toRoute(appStateNotifier)).toList(),
     );
@@ -331,7 +339,7 @@ class FFRoute {
 
           if (requireAuth && !appStateNotifier.loggedIn) {
             appStateNotifier.setRedirectLocationIfUnset(state.uri.toString());
-            return '/onboardingPage';
+            return '/selectLanguage';
           }
           return null;
         },
@@ -345,14 +353,11 @@ class FFRoute {
                 )
               : builder(context, ffParams);
           final child = appStateNotifier.loading
-              ? Center(
-                  child: SizedBox(
-                    width: 60.0,
-                    height: 60.0,
-                    child: SpinKitRipple(
-                      color: FlutterFlowTheme.of(context).primary,
-                      size: 60.0,
-                    ),
+              ? Container(
+                  color: const Color(0xFFFAB713),
+                  child: Image.asset(
+                    'assets/images/color_png_(2).png',
+                    fit: BoxFit.contain,
                   ),
                 )
               : page;

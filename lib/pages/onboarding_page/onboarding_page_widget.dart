@@ -1210,7 +1210,7 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                             ),
                             Padding(
                               padding: const EdgeInsetsDirectional.fromSTEB(
-                                  0.0, 40.0, 0.0, 0.0),
+                                  0.0, 44.0, 0.0, 0.0),
                               child: FFButtonWidget(
                                 onPressed: () async {
                                   context.pushNamed(
@@ -1252,7 +1252,7 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                                   borderSide: BorderSide(
                                     color: FlutterFlowTheme.of(context).primary,
                                   ),
-                                  borderRadius: BorderRadius.circular(40.0),
+                                  borderRadius: BorderRadius.circular(12.0),
                                   hoverColor: FlutterFlowTheme.of(context)
                                       .primaryBackground,
                                   hoverBorderSide: BorderSide(

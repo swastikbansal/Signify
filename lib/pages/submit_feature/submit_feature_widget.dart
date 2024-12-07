@@ -66,15 +66,7 @@ class _SubmitFeatureWidgetState extends State<SubmitFeatureWidget> {
                 size: 24.0,
               ),
               onPressed: () async {
-                context.pushNamed(
-                  'account4',
-                  extra: <String, dynamic>{
-                    kTransitionInfoKey: const TransitionInfo(
-                      hasTransition: true,
-                      transitionType: PageTransitionType.leftToRight,
-                    ),
-                  },
-                );
+                context.pushNamed('account4');
               },
             ),
             Align(

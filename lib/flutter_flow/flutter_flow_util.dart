@@ -41,6 +41,7 @@ void _setTimeagoLocales() {
   timeago.setLocaleMessages('hi', timeago.HiMessages());
   timeago.setLocaleMessages('hi_short', timeago.HiShortMessages());
   timeago.setLocaleMessages('ta', timeago.TaMessages());
+  timeago.setLocaleMessages('ur', timeago.UrMessages());
 }
 
 String dateTimeFormat(String format, DateTime? dateTime, {String? locale}) {

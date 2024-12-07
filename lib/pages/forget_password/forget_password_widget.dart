@@ -26,8 +26,8 @@ class _ForgetPasswordWidgetState extends State<ForgetPasswordWidget> {
     super.initState();
     _model = createModel(context, () => ForgetPasswordModel());
 
-    _model.emailAddressTextController ??= TextEditingController();
-    _model.emailAddressFocusNode ??= FocusNode();
+    _model.resetemailAddressTextController ??= TextEditingController();
+    _model.resetemailAddressFocusNode ??= FocusNode();
 
     WidgetsBinding.instance.addPostFrameCallback((_) => safeSetState(() {}));
   }
@@ -167,10 +167,10 @@ class _ForgetPasswordWidgetState extends State<ForgetPasswordWidget> {
                 child: SizedBox(
                   width: double.infinity,
                   child: TextFormField(
-                    controller: _model.emailAddressTextController,
-                    focusNode: _model.emailAddressFocusNode,
+                    controller: _model.resetemailAddressTextController,
+                    focusNode: _model.resetemailAddressFocusNode,
                     onChanged: (_) => EasyDebounce.debounce(
-                      '_model.emailAddressTextController',
+                      '_model.resetemailAddressTextController',
                       const Duration(milliseconds: 2000),
                       () => safeSetState(() {}),
                     ),
@@ -242,20 +242,20 @@ class _ForgetPasswordWidgetState extends State<ForgetPasswordWidget> {
                         color: FlutterFlowTheme.of(context).secondary,
                         size: 24.0,
                       ),
-                      suffixIcon:
-                          _model.emailAddressTextController!.text.isNotEmpty
-                              ? InkWell(
-                                  onTap: () async {
-                                    _model.emailAddressTextController?.clear();
-                                    safeSetState(() {});
-                                  },
-                                  child: const Icon(
-                                    Icons.clear,
-                                    color: Color(0xFF757575),
-                                    size: 24.0,
-                                  ),
-                                )
-                              : null,
+                      suffixIcon: _model
+                              .resetemailAddressTextController!.text.isNotEmpty
+                          ? InkWell(
+                              onTap: () async {
+                                _model.resetemailAddressTextController?.clear();
+                                safeSetState(() {});
+                              },
+                              child: const Icon(
+                                Icons.clear,
+                                color: Color(0xFF757575),
+                                size: 24.0,
+                              ),
+                            )
+                          : null,
                     ),
                     style: FlutterFlowTheme.of(context).bodyMedium.override(
                           fontFamily:
@@ -267,7 +267,7 @@ class _ForgetPasswordWidgetState extends State<ForgetPasswordWidget> {
                     maxLines: null,
                     keyboardType: TextInputType.emailAddress,
                     cursorColor: FlutterFlowTheme.of(context).primary,
-                    validator: _model.emailAddressTextControllerValidator
+                    validator: _model.resetemailAddressTextControllerValidator
                         .asValidator(context),
                   ),
                 ),
@@ -276,7 +276,7 @@ class _ForgetPasswordWidgetState extends State<ForgetPasswordWidget> {
                 alignment: const AlignmentDirectional(0.0, 0.0),
                 child: FFButtonWidget(
                   onPressed: () async {
-                    if (_model.emailAddressTextController.text.isEmpty) {
+                    if (_model.resetemailAddressTextController.text.isEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text(
@@ -287,7 +287,7 @@ class _ForgetPasswordWidgetState extends State<ForgetPasswordWidget> {
                       return;
                     }
                     await authManager.resetPassword(
-                      email: _model.emailAddressTextController.text,
+                      email: _model.resetemailAddressTextController.text,
                       context: context,
                     );
                   },
@@ -295,7 +295,7 @@ class _ForgetPasswordWidgetState extends State<ForgetPasswordWidget> {
                     'x5ujc8ou' /* Send Link */,
                   ),
                   options: FFButtonOptions(
-                    width: 260.0,
+                    width: 240.0,
                     height: 50.0,
                     padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
                     iconPadding:
