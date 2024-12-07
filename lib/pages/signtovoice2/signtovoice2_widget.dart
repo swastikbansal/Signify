@@ -70,7 +70,7 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Container(
-                width: 340.0,
+                width: 350.0,
                 height: 480.0,
                 decoration: BoxDecoration(
                   color: FlutterFlowTheme.of(context).primaryBackground,
