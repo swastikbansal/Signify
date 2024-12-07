@@ -21,7 +21,7 @@ mp_utils = utils.MediapipeUtils(mp_pose, mp_drawing)
 
 # Labels for data
 # actions = array([i.split("\\")[-1] for i in glob('MP_Data\*')])
-actions = ['Blind','Deaf','Flat','Happy','Poor','Quiet','Rich','Sad','Slow','Thick']
+actions = ['Flat','Happy','Poor','Quiet','Rich','Sad','Slow','Thick']
 
 # Defining Hyperparameters
 max_frames = 26

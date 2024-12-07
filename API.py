@@ -115,7 +115,7 @@ def process_video(video_path):
         cv2.destroyAllWindows()
         return sentence
 
-@app.route('/download', methods=['GET','POST'])
+@app.route('/predict', methods=['GET','POST'])
 def download_video():
     data = request.get_json()
     
