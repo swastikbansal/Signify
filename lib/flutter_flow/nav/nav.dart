@@ -156,11 +156,6 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           builder: (context, params) => const SelectlanguageWidget(),
         ),
         FFRoute(
-          name: 'accounttest',
-          path: '/accounttest',
-          builder: (context, params) => const AccounttestWidget(),
-        ),
-        FFRoute(
           name: 'reportBug',
           path: '/reportBug',
           builder: (context, params) => const ReportBugWidget(),

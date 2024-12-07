@@ -901,7 +901,8 @@ class _Account4WidgetState extends State<Account4Widget> {
                       ),
                     ]
                         .divide(const SizedBox(height: 24.0))
-                        .around(const SizedBox(height: 24.0)),
+                        .addToStart(const SizedBox(height: 24.0))
+                        .addToEnd(const SizedBox(height: 36.0)),
                   ),
                 ),
               ),

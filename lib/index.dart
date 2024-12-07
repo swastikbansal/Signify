@@ -13,7 +13,6 @@ export '/pages/account4/account4_widget.dart' show Account4Widget;
 export '/pages/support_page/support_page_widget.dart' show SupportPageWidget;
 export '/pages/selectlanguage/selectlanguage_widget.dart'
     show SelectlanguageWidget;
-export '/pages/accounttest/accounttest_widget.dart' show AccounttestWidget;
 export '/pages/report_bug/report_bug_widget.dart' show ReportBugWidget;
 export '/pages/request_feature/request_feature_widget.dart'
     show RequestFeatureWidget;
