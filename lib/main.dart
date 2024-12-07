@@ -10,6 +10,7 @@ import 'backend/firebase/firebase_config.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import 'flutter_flow/flutter_flow_util.dart';
 import 'flutter_flow/internationalization.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'index.dart';
 
 void main() async {
@@ -229,11 +230,11 @@ class _NavBarPageState extends State<NavBarPage> {
           ),
           BottomNavigationBarItem(
             icon: const Icon(
-              Icons.menu_book,
+              Icons.menu_book_rounded,
               size: 30.0,
             ),
-            activeIcon: const Icon(
-              Icons.menu_book,
+            activeIcon: const FaIcon(
+              FontAwesomeIcons.bookReader,
               size: 30.0,
             ),
             label: FFLocalizations.of(context).getText(

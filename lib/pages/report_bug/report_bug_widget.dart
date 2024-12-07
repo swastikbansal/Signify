@@ -136,7 +136,7 @@ class _ReportBugWidgetState extends State<ReportBugWidget> {
                           children: [
                             TextSpan(
                               text: FFLocalizations.of(context).getText(
-                                'hrjagwkd' /* Hey  */,
+                                'hrjagwkd' /* Welcome  */,
                               ),
                               style: FlutterFlowTheme.of(context)
                                   .titleMedium
@@ -166,7 +166,7 @@ class _ReportBugWidgetState extends State<ReportBugWidget> {
                             ),
                             TextSpan(
                               text: FFLocalizations.of(context).getText(
-                                '0uhzj3xr' /*  ! */,
+                                '0uhzj3xr' /* ! */,
                               ),
                               style: FlutterFlowTheme.of(context)
                                   .titleMedium

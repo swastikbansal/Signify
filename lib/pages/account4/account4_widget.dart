@@ -119,14 +119,21 @@ class _Account4WidgetState extends State<Account4Widget> {
                                       width: 2.0,
                                     ),
                                   ),
-                                  child: Image.network(
-                                    account4UsersRecord.photoUrl,
-                                    fit: BoxFit.contain,
-                                    errorBuilder:
-                                        (context, error, stackTrace) =>
-                                            Image.asset(
-                                      'assets/images/error_image.png',
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(100.0),
+                                    child: Image.network(
+                                      account4UsersRecord.photoUrl,
+                                      width: 120.0,
+                                      height: 120.0,
                                       fit: BoxFit.contain,
+                                      errorBuilder:
+                                          (context, error, stackTrace) =>
+                                              Image.asset(
+                                        'assets/images/error_image.png',
+                                        width: 120.0,
+                                        height: 120.0,
+                                        fit: BoxFit.contain,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -137,12 +144,16 @@ class _Account4WidgetState extends State<Account4Widget> {
                                     Text(
                                       account4UsersRecord.displayName,
                                       style: FlutterFlowTheme.of(context)
-                                          .titleLarge
+                                          .titleMedium
                                           .override(
-                                            fontFamily: 'Space Grotesk',
+                                            fontFamily:
+                                                FlutterFlowTheme.of(context)
+                                                    .titleMediumFamily,
                                             letterSpacing: 0.0,
                                             useGoogleFonts: GoogleFonts.asMap()
-                                                .containsKey('Space Grotesk'),
+                                                .containsKey(
+                                                    FlutterFlowTheme.of(context)
+                                                        .titleMediumFamily),
                                           ),
                                     ),
                                     Text(
@@ -164,7 +175,7 @@ class _Account4WidgetState extends State<Account4Widget> {
                                     ),
                                   ],
                                 ),
-                              ].divide(const SizedBox(width: 24.0)),
+                              ].divide(const SizedBox(width: 16.0)),
                             ),
                             FFButtonWidget(
                               onPressed: () async {

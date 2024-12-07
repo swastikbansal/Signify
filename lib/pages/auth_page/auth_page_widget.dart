@@ -125,7 +125,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
         key: scaffoldKey,
-        backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+        backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
         body: SafeArea(
           top: true,
           child: Padding(
@@ -142,11 +142,10 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Container(
-                          width: 100.0,
+                          width: 120.0,
                           height: 100.0,
-                          decoration: BoxDecoration(
-                            color:
-                                FlutterFlowTheme.of(context).primaryBackground,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.rectangle,
                           ),
                           child: ClipRRect(
                             borderRadius: const BorderRadius.only(
@@ -157,7 +156,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                             ),
                             child: Image.asset(
                               'assets/images/Signify_Big_Transparent_(1).png',
-                              fit: BoxFit.contain,
+                              fit: BoxFit.cover,
                             ),
                           ),
                         ),
@@ -181,19 +180,15 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                   child: Container(
                     width: double.infinity,
                     height: 650.0,
-                    decoration: BoxDecoration(
-                      color: FlutterFlowTheme.of(context).primaryBackground,
-                    ),
+                    decoration: const BoxDecoration(),
                     child: Column(
                       mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Container(
                           width: double.infinity,
-                          height: 600.0,
+                          height: 650.0,
                           decoration: BoxDecoration(
-                            color:
-                                FlutterFlowTheme.of(context).primaryBackground,
                             borderRadius: BorderRadius.circular(0.0),
                           ),
                           child: Padding(
@@ -396,9 +391,10 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                               12.0),
                                                     ),
                                                     filled: true,
-                                                    fillColor: FlutterFlowTheme
-                                                            .of(context)
-                                                        .secondaryBackground,
+                                                    fillColor:
+                                                        FlutterFlowTheme.of(
+                                                                context)
+                                                            .primaryBackground,
                                                     hoverColor:
                                                         FlutterFlowTheme.of(
                                                                 context)
@@ -548,9 +544,10 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                               12.0),
                                                     ),
                                                     filled: true,
-                                                    fillColor: FlutterFlowTheme
-                                                            .of(context)
-                                                        .secondaryBackground,
+                                                    fillColor:
+                                                        FlutterFlowTheme.of(
+                                                                context)
+                                                            .primaryBackground,
                                                     hoverColor:
                                                         FlutterFlowTheme.of(
                                                                 context)
@@ -839,7 +836,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                         0.0),
                                                             color: FlutterFlowTheme
                                                                     .of(context)
-                                                                .secondaryBackground,
+                                                                .primaryBackground,
                                                             textStyle:
                                                                 FlutterFlowTheme.of(
                                                                         context)
@@ -1023,7 +1020,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                   fillColor:
                                                       FlutterFlowTheme.of(
                                                               context)
-                                                          .secondaryBackground,
+                                                          .primaryBackground,
                                                   hoverColor:
                                                       FlutterFlowTheme.of(
                                                               context)
@@ -1169,9 +1166,10 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                               12.0),
                                                     ),
                                                     filled: true,
-                                                    fillColor: FlutterFlowTheme
-                                                            .of(context)
-                                                        .secondaryBackground,
+                                                    fillColor:
+                                                        FlutterFlowTheme.of(
+                                                                context)
+                                                            .primaryBackground,
                                                     hoverColor:
                                                         FlutterFlowTheme.of(
                                                                 context)
@@ -1325,9 +1323,10 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                               12.0),
                                                     ),
                                                     filled: true,
-                                                    fillColor: FlutterFlowTheme
-                                                            .of(context)
-                                                        .secondaryBackground,
+                                                    fillColor:
+                                                        FlutterFlowTheme.of(
+                                                                context)
+                                                            .primaryBackground,
                                                     hoverColor:
                                                         FlutterFlowTheme.of(
                                                                 context)
@@ -1501,9 +1500,10 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                               12.0),
                                                     ),
                                                     filled: true,
-                                                    fillColor: FlutterFlowTheme
-                                                            .of(context)
-                                                        .secondaryBackground,
+                                                    fillColor:
+                                                        FlutterFlowTheme.of(
+                                                                context)
+                                                            .primaryBackground,
                                                     hoverColor:
                                                         FlutterFlowTheme.of(
                                                                 context)
@@ -1803,7 +1803,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                           0.0),
                                                               color: FlutterFlowTheme
                                                                       .of(context)
-                                                                  .secondaryBackground,
+                                                                  .primaryBackground,
                                                               textStyle:
                                                                   FlutterFlowTheme.of(
                                                                           context)

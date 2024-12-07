@@ -133,7 +133,7 @@ class _RequestFeatureWidgetState extends State<RequestFeatureWidget> {
                             children: [
                               TextSpan(
                                 text: FFLocalizations.of(context).getText(
-                                  'lbpyeatm' /* Hey  */,
+                                  'lbpyeatm' /* Welcome  */,
                                 ),
                                 style: FlutterFlowTheme.of(context)
                                     .titleMedium
@@ -163,7 +163,7 @@ class _RequestFeatureWidgetState extends State<RequestFeatureWidget> {
                               ),
                               TextSpan(
                                 text: FFLocalizations.of(context).getText(
-                                  'kq8g0cq3' /*  ! */,
+                                  'kq8g0cq3' /* ! */,
                                 ),
                                 style: FlutterFlowTheme.of(context)
                                     .titleMedium

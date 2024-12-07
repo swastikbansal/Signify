@@ -1195,34 +1195,6 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
   },
   // forgotPassword
   {
-    'ew4bnws1': {
-      'en': 'Hii ',
-      'as': '',
-      'bn': '',
-      'gu': '',
-      'hi': '',
-      'kn': '',
-      'ml': '',
-      'mr': '',
-      'pa': '',
-      'ta': '',
-      'te': '',
-      'ur': '',
-    },
-    '46435ppm': {
-      'en': ' !',
-      'as': '',
-      'bn': '',
-      'gu': '',
-      'hi': '',
-      'kn': '',
-      'ml': '',
-      'mr': '',
-      'pa': '',
-      'ta': '',
-      'te': '',
-      'ur': '',
-    },
     'durh70hp': {
       'en': 'Forgot Password?',
       'as': '',
@@ -3099,7 +3071,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'ur': '',
     },
     'hrjagwkd': {
-      'en': 'Hey ',
+      'en': 'Welcome ',
       'as': '',
       'bn': '',
       'gu': '',
@@ -3113,7 +3085,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'ur': '',
     },
     '0uhzj3xr': {
-      'en': ' !',
+      'en': '!',
       'as': '',
       'bn': '',
       'gu': '',
@@ -3425,7 +3397,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'ur': '',
     },
     'lbpyeatm': {
-      'en': 'Hey ',
+      'en': 'Welcome ',
       'as': '',
       'bn': '',
       'gu': '',
@@ -3439,7 +3411,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'ur': '',
     },
     'kq8g0cq3': {
-      'en': ' !',
+      'en': '!',
       'as': '',
       'bn': '',
       'gu': '',
