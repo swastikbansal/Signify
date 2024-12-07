@@ -9,7 +9,7 @@ from pathlib import Path
 
 from tqdm.notebook import tqdm
 
-from numpy import  argmax, array, expand_dims 
+from numpy import  argmax, expand_dims 
 import numpy as np
 
 import utils
@@ -25,7 +25,7 @@ actions = ['Blind','Deaf','Flat','Happy','Poor','Quiet','Rich','Sad','Slow','Thi
 
 # Defining Hyperparameters
 max_frames = 26
-features = 47
+features = 23
 input_shape = (max_frames, features)
 num_classes =  len(actions)
 
@@ -59,7 +59,7 @@ sequence = [[0] * features] * (max_frames // 2)
 sentence = []
 threshold = 0.9
 
-cap = cv2.VideoCapture(0) # Default camera
+cap = cv2.VideoCapture(1) # Default camera
 # cap = cv2.VideoCapture("Test Recordings\\test (5).mp4")
 # cap = cv2.VideoCapture("Dataset\Adjectives\\7. Deaf\MVI_9583.mp4")
 
@@ -77,7 +77,7 @@ with mp_pose.Pose(min_detection_confidence=0.7,
             sequence.append(features)    
         
         else:
-            sequence.append(np.zeros(47))
+            sequence.append(np.zeros(23))
         
         # Predicting output in every 15 frames
         if n_frames % 15 == 0:

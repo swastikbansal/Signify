@@ -106,12 +106,12 @@ class MediapipeUtils:
         self.features.extend([distance_hands, distance_left_hand_center, distance_right_hand_center])
 
         # Extract hand direction vectors (optional)
-        direction_vector_left_hand = self.extract_hand_direction(15, 17, 19, results)
-        direction_vector_right_hand = self.extract_hand_direction(16, 18, 20, results)
+        # direction_vector_left_hand = self.extract_hand_direction(15, 17, 19, results)
+        # direction_vector_right_hand = self.extract_hand_direction(16, 18, 20, results)
 
         # Extend hand direction components into features
-        self.features.extend(direction_vector_left_hand)
-        self.features.extend(direction_vector_right_hand)
+        # self.features.extend(direction_vector_left_hand)
+        # self.features.extend(direction_vector_right_hand)
 
         return self.features
     
