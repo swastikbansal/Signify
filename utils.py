@@ -8,7 +8,10 @@ class MediapipeUtils:
     def __init__(self,mp_holistic,mp_drawing):
         self.mp_holistic = mp_holistic
         self.mp_drawing = mp_drawing
-        
+        self.angle_landmarks = ((12,14),
+                                (14,16),
+                                (11,13),
+                                (13,15))
         self.features = []
 
 
@@ -23,23 +26,39 @@ class MediapipeUtils:
 
     def extract_keypoints(self,results) -> np.array:
         """Function to extract features from mediapipe results"""        
-        pose = np.array([[res.x, res.y, res.z, res.visibility] for res in results.pose_landmarks.landmark]).flatten() if results.pose_landmarks else np.zeros(33*4)
-        
+        pose = np.array([[res.x, res.y, res.z, res.visibility] for res in results.pose_landmarks.landmark]).flatten() if results.pose_landmarks else np.zeros(33*4)    
         # face = np.array([[res.x, res.y, res.z] for res in results.face_landmarks.landmark]).flatten() if results.face_landmarks else np.zeros(468*3)
         # lh = np.array([[res.x, res.y, res.z] for res in results.left_hand_landmarks.landmark]).flatten() if results.left_hand_landmarks else np.zeros(21*3)
         # rh = np.array([[res.x, res.y, res.z] for res in results.right_hand_landmarks.landmark]).flatten() if results.right_hand_landmarks else np.zeros(21*3)
         # return np.concatenate([pose, lh, rh])    
         return pose   
+    
     def extract_features(self, results):
         """Extract features from pose landmarks."""
         self.features = []
-
+        self.angles_keypoint = []
+        
         # Extract X, Y, Z coordinates for specified landmarks
         landmark_indices = [13, 14, 15, 16]
         for idx in landmark_indices:
             lm = results[idx]
             self.features.extend([lm.x, lm.y, lm.z])
 
+        
+        for idx in self.angle_landmarks:
+                p1 = results[idx[0]]                
+                p2 = results[idx[1]]    
+                                
+                vector = np.array([p2.x - p1.x, p2.y - p1.y, p2.z - p1.z])
+                            
+                ang = self.calculate_angles(vector)
+                sin_ang_x,sin_ang_y,sin_ang_z = np.sin(ang)
+                cos_ang_x,cos_ang_y,cos_ang_z = np.cos(ang)
+                self.angles_keypoint.extend([sin_ang_x,sin_ang_y,sin_ang_z
+                                            ,cos_ang_x,cos_ang_y,cos_ang_z])
+        
+        self.features.extend(self.angles_keypoint)        
+    
         # Left arm: vectors 15-13 and 13-11
         left_wrist = np.array([results[15].x, results[15].y, results[15].z])
         left_elbow = np.array([results[13].x, results[13].y, results[13].z])
@@ -99,11 +118,21 @@ class MediapipeUtils:
         center = results[0]
 
         distance_hands = self.calculate_distance(left_hand, right_hand)
-        distance_left_hand_center = self.calculate_distance(left_hand, center)
-        distance_right_hand_center = self.calculate_distance(right_hand, center)
+        left_hand_horizontal = left_hand.x - center.x
+        left_hand_vertical = left_hand.y - center.y
 
+        # Horizontal and vertical vectors between right hand and center (16 - 0)
+        right_hand_horizontal = np.array(right_hand.x - center.x)
+        right_hand_vertical = np.array(right_hand.y - center.y)
+        self.features.extend([distance_hands ,
+                              left_hand_horizontal, left_hand_vertical,
+                              right_hand_horizontal, right_hand_vertical])
+        
+        # distance_left_hand_center = self.calculate_distance(left_hand, center)
+        # distance_right_hand_center = self.calculate_distance(right_hand, center)
+        
         # Extend distances into features
-        self.features.extend([distance_hands, distance_left_hand_center, distance_right_hand_center])
+        # self.features.extend([distance_hands, distance_left_hand_center, distance_right_hand_center])
 
         # Extract hand direction vectors (optional)
         # direction_vector_left_hand = self.extract_hand_direction(15, 17, 19, results)
@@ -112,7 +141,7 @@ class MediapipeUtils:
         # Extend hand direction components into features
         # self.features.extend(direction_vector_left_hand)
         # self.features.extend(direction_vector_right_hand)
-
+        
         return self.features
     
     def extract_hand_direction(self, wrist, pinky, index, results):
@@ -139,8 +168,8 @@ class MediapipeUtils:
     def draw_styled_landmarks(self,image, results) -> None:
         """Function to draw pose connections"""
         self.mp_drawing.draw_landmarks(image, results.pose_landmarks, self.mp_holistic.POSE_CONNECTIONS,
-                                self.mp_drawing.DrawingSpec(color=(80,22,10), thickness=2, circle_radius=4), 
-                                self.mp_drawing.DrawingSpec(color=(80,44,121), thickness=2, circle_radius=2)
+                                    self.mp_drawing.DrawingSpec(color=(80,22,10), thickness=2, circle_radius=4), 
+                                    self.mp_drawing.DrawingSpec(color=(80,44,121), thickness=2, circle_radius=2)
                                 ) 
         
         # Draw left hand connections

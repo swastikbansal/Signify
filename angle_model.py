@@ -25,7 +25,7 @@ actions = ['Flat','Happy','Poor','Quiet','Rich','Sad','Slow','Thick']
 
 # Defining Hyperparameters
 max_frames = 26
-features = 23
+features = 49
 input_shape = (max_frames, features)
 num_classes =  len(actions)
 
@@ -51,7 +51,7 @@ model = Sequential([
         Dense(num_classes, activation='softmax')
 ])
 
-model_path = Path.cwd() / 'Model' / 'INCLUDE_10_V4_angled.h5'
+model_path = Path.cwd() / 'Model' / 'INCLUDE_8_V4_angled.h5'
 model.load_weights(str(model_path))
 
 n_frames = 0
@@ -77,7 +77,7 @@ with mp_pose.Pose(min_detection_confidence=0.7,
             sequence.append(features)    
         
         else:
-            sequence.append(np.zeros(23))
+            sequence.append(np.zeros(49))
         
         # Predicting output in every 15 frames
         if n_frames % 15 == 0:

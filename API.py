@@ -137,20 +137,25 @@ def download_video():
         filename = os.path.basename(parsed_url.path)
         filename = f"downloads\{secure_filename(filename)}"
         
-        # Save the video locally
-        with open(filename, 'wb') as f:
-            for chunk in response.iter_content(chunk_size=8192):
-                f.write(chunk)
+        if filename not in glob('downloads\*'):           
+            # Save the video locally
+            with open(filename, 'wb') as f:
+                for chunk in response.iter_content(chunk_size=8192):
+                    f.write(chunk)
+            
+            print(f"{filename} saved")
         
-        print(f"{filename} saved")
+        else:
+            print(f"{filename} already exists")
         
         # Process the video
         prediction = process_video(filename)
         
         return jsonify({'prediction': prediction}), 200
     
-    except requests.exceptions.RequestException as e:
+    except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
 
         
 if __name__ == '__main__':
