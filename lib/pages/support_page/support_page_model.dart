@@ -13,6 +13,8 @@ class SupportPageModel extends FlutterFlowModel<SupportPageWidget> {
   FocusNode? textFieldFocusNode2;
   TextEditingController? textController2;
   String? Function(BuildContext, String?)? textController2Validator;
+  // State field(s) for RatingBar widget.
+  double? ratingBarValue;
 
   @override
   void initState(BuildContext context) {}

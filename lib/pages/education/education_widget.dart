@@ -74,21 +74,22 @@ class _EducationWidgetState extends State<EducationWidget> {
             appBar: AppBar(
               backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
               automaticallyImplyLeading: false,
-              leading: Padding(
-                padding: const EdgeInsetsDirectional.fromSTEB(16.0, 6.0, 0.0, 6.0),
-                child: Container(
-                  width: 46.0,
-                  height: 46.0,
-                  decoration: BoxDecoration(
-                    color: FlutterFlowTheme.of(context).accent1,
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: FlutterFlowTheme.of(context).primary,
-                      width: 2.0,
+              leading: Row(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Container(
+                    width: 56.0,
+                    height: 56.0,
+                    decoration: BoxDecoration(
+                      color: FlutterFlowTheme.of(context).accent1,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: FlutterFlowTheme.of(context).primary,
+                        width: 2.0,
+                      ),
                     ),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(2.0),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(50.0),
                       child: Image.network(
@@ -102,53 +103,66 @@ class _EducationWidgetState extends State<EducationWidget> {
                       ),
                     ),
                   ),
-                ),
-              ),
-              title: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    educationUsersRecord.displayName,
-                    style: FlutterFlowTheme.of(context).titleLarge.override(
-                          fontFamily:
-                              FlutterFlowTheme.of(context).titleLargeFamily,
-                          letterSpacing: 0.0,
-                          useGoogleFonts: GoogleFonts.asMap().containsKey(
-                              FlutterFlowTheme.of(context).titleLargeFamily),
+                  Row(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            educationUsersRecord.displayName,
+                            style: FlutterFlowTheme.of(context)
+                                .titleLarge
+                                .override(
+                                  fontFamily: FlutterFlowTheme.of(context)
+                                      .titleLargeFamily,
+                                  letterSpacing: 0.0,
+                                  useGoogleFonts: GoogleFonts.asMap()
+                                      .containsKey(FlutterFlowTheme.of(context)
+                                          .titleLargeFamily),
+                                ),
+                          ),
+                          Text(
+                            educationUsersRecord.email,
+                            style: FlutterFlowTheme.of(context)
+                                .bodyMedium
+                                .override(
+                                  fontFamily: FlutterFlowTheme.of(context)
+                                      .bodyMediumFamily,
+                                  letterSpacing: 0.0,
+                                  useGoogleFonts: GoogleFonts.asMap()
+                                      .containsKey(FlutterFlowTheme.of(context)
+                                          .bodyMediumFamily),
+                                ),
+                          ),
+                        ].divide(const SizedBox(height: 2.0)),
+                      ),
+                      FlutterFlowIconButton(
+                        borderColor: Colors.transparent,
+                        borderRadius: 20.0,
+                        buttonSize: 50.0,
+                        hoverColor: FlutterFlowTheme.of(context).alternate,
+                        hoverIconColor:
+                            FlutterFlowTheme.of(context).primaryText,
+                        icon: Icon(
+                          Icons.notifications_none,
+                          color: FlutterFlowTheme.of(context).primaryText,
+                          size: 24.0,
                         ),
+                        onPressed: () {
+                          print('IconButton pressed ...');
+                        },
+                      ),
+                    ].divide(const SizedBox(width: 90.0)),
                   ),
-                  Text(
-                    educationUsersRecord.email,
-                    style: FlutterFlowTheme.of(context).bodyMedium.override(
-                          fontFamily:
-                              FlutterFlowTheme.of(context).bodyMediumFamily,
-                          letterSpacing: 0.0,
-                          useGoogleFonts: GoogleFonts.asMap().containsKey(
-                              FlutterFlowTheme.of(context).bodyMediumFamily),
-                        ),
-                  ),
-                ].divide(const SizedBox(height: 2.0)),
+                ].divide(const SizedBox(width: 16.0)).around(const SizedBox(width: 16.0)),
               ),
-              actions: [
-                Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 16.0, 0.0),
-                  child: FlutterFlowIconButton(
-                    borderColor: Colors.transparent,
-                    borderRadius: 20.0,
-                    buttonSize: 40.0,
-                    icon: Icon(
-                      Icons.notifications_none,
-                      color: FlutterFlowTheme.of(context).primaryText,
-                      size: 24.0,
-                    ),
-                    onPressed: () {
-                      print('IconButton pressed ...');
-                    },
-                  ),
-                ),
-              ],
+              actions: const [],
               centerTitle: false,
+              toolbarHeight: 66.0,
               elevation: 0.0,
             ),
             body: SafeArea(
@@ -156,11 +170,12 @@ class _EducationWidgetState extends State<EducationWidget> {
               child: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
                       padding:
-                          const EdgeInsetsDirectional.fromSTEB(16.0, 5.0, 0.0, 5.0),
+                          const EdgeInsetsDirectional.fromSTEB(16.0, 8.0, 0.0, 8.0),
                       child: Text(
                         FFLocalizations.of(context).getText(
                           'ddp2sajy' /* Stay up to date with us. */,
@@ -178,7 +193,7 @@ class _EducationWidgetState extends State<EducationWidget> {
                     ),
                     Padding(
                       padding:
-                          const EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 16.0, 5.0),
+                          const EdgeInsetsDirectional.fromSTEB(16.0, 8.0, 16.0, 0.0),
                       child: TextFormField(
                         controller: _model.textController,
                         focusNode: _model.textFieldFocusNode,
@@ -712,7 +727,7 @@ class _EducationWidgetState extends State<EducationWidget> {
                     ListView(
                       padding: const EdgeInsets.fromLTRB(
                         0,
-                        8.0,
+                        12.0,
                         0,
                         36.0,
                       ),
@@ -1430,7 +1445,7 @@ class _EducationWidgetState extends State<EducationWidget> {
                         ),
                       ],
                     ),
-                  ],
+                  ].addToStart(const SizedBox(height: 8.0)),
                 ),
               ),
             ),

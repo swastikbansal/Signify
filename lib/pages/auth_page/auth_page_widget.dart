@@ -399,8 +399,6 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                     fillColor: FlutterFlowTheme
                                                             .of(context)
                                                         .secondaryBackground,
-                                                    contentPadding:
-                                                        const EdgeInsets.all(18.0),
                                                     hoverColor:
                                                         FlutterFlowTheme.of(
                                                                 context)
@@ -422,6 +420,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                         context)
                                                                     .bodyLargeFamily),
                                                       ),
+                                                  minLines: 1,
                                                   keyboardType: TextInputType
                                                       .emailAddress,
                                                   cursorColor:
@@ -552,8 +551,6 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                     fillColor: FlutterFlowTheme
                                                             .of(context)
                                                         .secondaryBackground,
-                                                    contentPadding:
-                                                        const EdgeInsets.all(18.0),
                                                     hoverColor:
                                                         FlutterFlowTheme.of(
                                                                 context)
@@ -597,6 +594,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                         context)
                                                                     .bodyLargeFamily),
                                                       ),
+                                                  minLines: 1,
                                                   cursorColor:
                                                       FlutterFlowTheme.of(
                                                               context)
@@ -614,7 +612,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                     Colors.transparent,
                                                 onTap: () async {
                                                   context.pushNamed(
-                                                      'forgetPassword');
+                                                      'forgotPassword');
                                                 },
                                                 child: Text(
                                                   FFLocalizations.of(context)
@@ -1026,8 +1024,6 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                       FlutterFlowTheme.of(
                                                               context)
                                                           .secondaryBackground,
-                                                  contentPadding:
-                                                      const EdgeInsets.all(18.0),
                                                   hoverColor:
                                                       FlutterFlowTheme.of(
                                                               context)
@@ -1176,8 +1172,6 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                     fillColor: FlutterFlowTheme
                                                             .of(context)
                                                         .secondaryBackground,
-                                                    contentPadding:
-                                                        const EdgeInsets.all(18.0),
                                                     hoverColor:
                                                         FlutterFlowTheme.of(
                                                                 context)
@@ -1203,6 +1197,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                         context)
                                                                     .bodyLargeFamily),
                                                       ),
+                                                  minLines: 1,
                                                   keyboardType: TextInputType
                                                       .emailAddress,
                                                   cursorColor:
@@ -1333,8 +1328,6 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                     fillColor: FlutterFlowTheme
                                                             .of(context)
                                                         .secondaryBackground,
-                                                    contentPadding:
-                                                        const EdgeInsets.all(18.0),
                                                     hoverColor:
                                                         FlutterFlowTheme.of(
                                                                 context)
@@ -1382,6 +1375,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                         context)
                                                                     .bodyLargeFamily),
                                                       ),
+                                                  minLines: 1,
                                                   cursorColor:
                                                       FlutterFlowTheme.of(
                                                               context)
@@ -1510,8 +1504,6 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                     fillColor: FlutterFlowTheme
                                                             .of(context)
                                                         .secondaryBackground,
-                                                    contentPadding:
-                                                        const EdgeInsets.all(18.0),
                                                     hoverColor:
                                                         FlutterFlowTheme.of(
                                                                 context)

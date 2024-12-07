@@ -716,7 +716,7 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                         padding: const EdgeInsetsDirectional.fromSTEB(
                             10.0, 0.0, 10.0, 0.0),
                         child: Lottie.asset(
-                          'assets/jsons/ai_lines_animation.json',
+                          'assets/jsons/AI_Lines_Signify_Animation.json',
                           width: 500.0,
                           height: 450.0,
                           fit: BoxFit.contain,

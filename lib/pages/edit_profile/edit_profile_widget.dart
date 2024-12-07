@@ -155,168 +155,118 @@ class _EditProfileWidgetState extends State<EditProfileWidget>
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Align(
-                    alignment: const AlignmentDirectional(0.0, 0.0),
-                    child: Material(
-                      color: Colors.transparent,
-                      elevation: 2.0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(0.0),
+                  Container(
+                    width: 150.0,
+                    height: 150.0,
+                    decoration: BoxDecoration(
+                      color: FlutterFlowTheme.of(context).primaryBackground,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: FlutterFlowTheme.of(context).primary,
+                        width: 2.0,
                       ),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(0.0),
-                          border: Border.all(
-                            color: FlutterFlowTheme.of(context).alternate,
-                          ),
-                        ),
-                        child: SizedBox(
-                          width: 150.0,
-                          height: 150.0,
-                          child: Stack(
-                            children: [
-                              Align(
-                                alignment: const AlignmentDirectional(0.0, 0.0),
-                                child: Material(
-                                  color: Colors.transparent,
-                                  elevation: 2.0,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(100.0),
-                                  ),
-                                  child: Container(
-                                    width: 150.0,
-                                    height: 150.0,
-                                    decoration: BoxDecoration(
-                                      color: FlutterFlowTheme.of(context)
-                                          .primaryBackground,
-                                      borderRadius:
-                                          BorderRadius.circular(100.0),
-                                      border: Border.all(
-                                        color: FlutterFlowTheme.of(context)
-                                            .alternate,
-                                        width: 2.0,
-                                      ),
-                                    ),
-                                    alignment: const AlignmentDirectional(1.0, 0.0),
-                                    child: Align(
-                                      alignment: const AlignmentDirectional(0.0, 0.0),
-                                      child: InkWell(
-                                        splashColor: Colors.transparent,
-                                        focusColor: Colors.transparent,
-                                        hoverColor: Colors.transparent,
-                                        highlightColor: Colors.transparent,
-                                        onTap: () async {
-                                          final selectedMedia =
-                                              await selectMediaWithSourceBottomSheet(
-                                            context: context,
-                                            allowPhoto: true,
-                                            backgroundColor:
-                                                FlutterFlowTheme.of(context)
-                                                    .secondaryBackground,
-                                            textColor:
-                                                FlutterFlowTheme.of(context)
-                                                    .primaryText,
-                                          );
-                                          if (selectedMedia != null &&
-                                              selectedMedia.every((m) =>
-                                                  validateFileFormat(
-                                                      m.storagePath,
-                                                      context))) {
-                                            safeSetState(() =>
-                                                _model.isDataUploading = true);
-                                            var selectedUploadedFiles =
-                                                <FFUploadedFile>[];
-
-                                            var downloadUrls = <String>[];
-                                            try {
-                                              showUploadMessage(
-                                                context,
-                                                'Uploading file...',
-                                                showLoading: true,
-                                              );
-                                              selectedUploadedFiles =
-                                                  selectedMedia
-                                                      .map(
-                                                          (m) => FFUploadedFile(
-                                                                name: m
-                                                                    .storagePath
-                                                                    .split('/')
-                                                                    .last,
-                                                                bytes: m.bytes,
-                                                                height: m
-                                                                    .dimensions
-                                                                    ?.height,
-                                                                width: m
-                                                                    .dimensions
-                                                                    ?.width,
-                                                                blurHash:
-                                                                    m.blurHash,
-                                                              ))
-                                                      .toList();
-
-                                              downloadUrls = (await Future.wait(
-                                                selectedMedia.map(
-                                                  (m) async => await uploadData(
-                                                      m.storagePath, m.bytes),
-                                                ),
-                                              ))
-                                                  .where((u) => u != null)
-                                                  .map((u) => u!)
-                                                  .toList();
-                                            } finally {
-                                              ScaffoldMessenger.of(context)
-                                                  .hideCurrentSnackBar();
-                                              _model.isDataUploading = false;
-                                            }
-                                            if (selectedUploadedFiles.length ==
-                                                    selectedMedia.length &&
-                                                downloadUrls.length ==
-                                                    selectedMedia.length) {
-                                              safeSetState(() {
-                                                _model.uploadedLocalFile =
-                                                    selectedUploadedFiles.first;
-                                                _model.uploadedFileUrl =
-                                                    downloadUrls.first;
-                                              });
-                                              showUploadMessage(
-                                                  context, 'Success!');
-                                            } else {
-                                              safeSetState(() {});
-                                              showUploadMessage(context,
-                                                  'Failed to upload data');
-                                              return;
-                                            }
-                                          }
-                                        },
-                                        child: ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(100.0),
-                                          child: Image.network(
-                                            editProfileUsersRecord.photoUrl,
-                                            width: 150.0,
-                                            height: 150.0,
-                                            fit: BoxFit.cover,
-                                            alignment: const Alignment(0.0, 0.0),
-                                            errorBuilder:
-                                                (context, error, stackTrace) =>
-                                                    Image.asset(
-                                              'assets/images/error_image.png',
-                                              width: 150.0,
-                                              height: 150.0,
-                                              fit: BoxFit.cover,
-                                              alignment: const Alignment(0.0, 0.0),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
+                    ),
+                    child: Stack(
+                      children: [
+                        Align(
+                          alignment: const AlignmentDirectional(0.0, 0.0),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(100.0),
+                            child: Image.network(
+                              editProfileUsersRecord.photoUrl,
+                              width: 150.0,
+                              height: 150.0,
+                              fit: BoxFit.cover,
+                              alignment: const Alignment(0.0, 0.0),
+                              errorBuilder: (context, error, stackTrace) =>
+                                  Image.asset(
+                                'assets/images/error_image.png',
+                                width: 150.0,
+                                height: 150.0,
+                                fit: BoxFit.cover,
+                                alignment: const Alignment(0.0, 0.0),
                               ),
-                            ],
+                            ),
                           ),
                         ),
-                      ),
+                        Align(
+                          alignment: const AlignmentDirectional(1.0, 1.0),
+                          child: FlutterFlowIconButton(
+                            borderRadius: 50.0,
+                            buttonSize: 50.0,
+                            fillColor: FlutterFlowTheme.of(context).alternate,
+                            hoverColor: FlutterFlowTheme.of(context)
+                                .secondaryBackground,
+                            hoverIconColor:
+                                FlutterFlowTheme.of(context).primary,
+                            icon: Icon(
+                              Icons.add,
+                              color: FlutterFlowTheme.of(context).primaryText,
+                              size: 30.0,
+                            ),
+                            showLoadingIndicator: true,
+                            onPressed: () async {
+                              final selectedMedia =
+                                  await selectMediaWithSourceBottomSheet(
+                                context: context,
+                                maxWidth: 1000.00,
+                                maxHeight: 1000.00,
+                                imageQuality: 100,
+                                allowPhoto: true,
+                                backgroundColor:
+                                    FlutterFlowTheme.of(context).alternate,
+                                textColor:
+                                    FlutterFlowTheme.of(context).primaryText,
+                              );
+                              if (selectedMedia != null &&
+                                  selectedMedia.every((m) => validateFileFormat(
+                                      m.storagePath, context))) {
+                                safeSetState(
+                                    () => _model.isDataUploading = true);
+                                var selectedUploadedFiles = <FFUploadedFile>[];
+
+                                var downloadUrls = <String>[];
+                                try {
+                                  selectedUploadedFiles = selectedMedia
+                                      .map((m) => FFUploadedFile(
+                                            name: m.storagePath.split('/').last,
+                                            bytes: m.bytes,
+                                            height: m.dimensions?.height,
+                                            width: m.dimensions?.width,
+                                            blurHash: m.blurHash,
+                                          ))
+                                      .toList();
+
+                                  downloadUrls = (await Future.wait(
+                                    selectedMedia.map(
+                                      (m) async => await uploadData(
+                                          m.storagePath, m.bytes),
+                                    ),
+                                  ))
+                                      .where((u) => u != null)
+                                      .map((u) => u!)
+                                      .toList();
+                                } finally {
+                                  _model.isDataUploading = false;
+                                }
+                                if (selectedUploadedFiles.length ==
+                                        selectedMedia.length &&
+                                    downloadUrls.length ==
+                                        selectedMedia.length) {
+                                  safeSetState(() {
+                                    _model.uploadedLocalFile =
+                                        selectedUploadedFiles.first;
+                                    _model.uploadedFileUrl = downloadUrls.first;
+                                  });
+                                } else {
+                                  safeSetState(() {});
+                                  return;
+                                }
+                              }
+                            },
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   Container(
@@ -959,22 +909,28 @@ class _EditProfileWidgetState extends State<EditProfileWidget>
                         alignment: const AlignmentDirectional(0.0, 0.0),
                         child: FFButtonWidget(
                           onPressed: () async {
-                            await editProfileUsersRecord.reference
-                                .update(createUsersRecordData(
-                              email: editProfileUsersRecord.email,
-                              displayName: editProfileUsersRecord.displayName,
-                              photoUrl: _model.uploadedFileUrl,
-                              uid: editProfileUsersRecord.uid,
-                              phoneNumber: editProfileUsersRecord.phoneNumber,
-                              userName: editProfileUsersRecord.displayName,
-                              userState: editProfileUsersRecord.userState,
-                              userCity: editProfileUsersRecord.userCity,
-                              bio: editProfileUsersRecord.bio,
-                            ));
+                            await editProfileUsersRecord.reference.update({
+                              ...createUsersRecordData(
+                                email: editProfileUsersRecord.email,
+                                displayName: editProfileUsersRecord.displayName,
+                                photoUrl: _model.uploadedFileUrl,
+                                uid: editProfileUsersRecord.uid,
+                                phoneNumber: editProfileUsersRecord.phoneNumber,
+                                userName: editProfileUsersRecord.displayName,
+                                userState: editProfileUsersRecord.userState,
+                                userCity: editProfileUsersRecord.userCity,
+                                bio: editProfileUsersRecord.bio,
+                              ),
+                              ...mapToFirestore(
+                                {
+                                  'edited_time': FieldValue.serverTimestamp(),
+                                },
+                              ),
+                            });
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(
-                                  'Data updated successfully.',
+                                  'Changes saved successfully.',
                                   style: FlutterFlowTheme.of(context)
                                       .bodyLarge
                                       .override(
@@ -1006,28 +962,27 @@ class _EditProfileWidgetState extends State<EditProfileWidget>
                             iconAlignment: IconAlignment.end,
                             iconPadding: const EdgeInsetsDirectional.fromSTEB(
                                 0.0, 0.0, 0.0, 0.0),
-                            color:
-                                FlutterFlowTheme.of(context).primaryBackground,
+                            color: FlutterFlowTheme.of(context).primary,
                             textStyle: FlutterFlowTheme.of(context)
                                 .titleSmall
                                 .override(
                                   fontFamily: FlutterFlowTheme.of(context)
                                       .titleSmallFamily,
-                                  color: FlutterFlowTheme.of(context).success,
+                                  color:
+                                      FlutterFlowTheme.of(context).customColor5,
                                   letterSpacing: 0.0,
                                   useGoogleFonts: GoogleFonts.asMap()
                                       .containsKey(FlutterFlowTheme.of(context)
                                           .titleSmallFamily),
                                 ),
-                            borderSide: BorderSide(
-                              color: FlutterFlowTheme.of(context).alternate,
+                            borderSide: const BorderSide(
                               width: 1.0,
                             ),
-                            borderRadius: BorderRadius.circular(28.0),
+                            borderRadius: BorderRadius.circular(12.0),
                             hoverColor:
                                 FlutterFlowTheme.of(context).primaryBackground,
                             hoverBorderSide: BorderSide(
-                              color: FlutterFlowTheme.of(context).success,
+                              color: FlutterFlowTheme.of(context).primary,
                               width: 1.0,
                             ),
                             hoverTextColor:

@@ -147,8 +147,8 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget> {
                           filled: true,
                           fillColor:
                               FlutterFlowTheme.of(context).primaryBackground,
-                          contentPadding: const EdgeInsets.all(16.0),
-                          hoverColor: FlutterFlowTheme.of(context).alternate,
+                          hoverColor:
+                              FlutterFlowTheme.of(context).primaryBackground,
                         ),
                         style: FlutterFlowTheme.of(context).titleSmall.override(
                               fontFamily:
@@ -193,7 +193,7 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget> {
                         hoverIconColor: FlutterFlowTheme.of(context).primary,
                         icon: Icon(
                           Icons.send_rounded,
-                          color: FlutterFlowTheme.of(context).primary,
+                          color: FlutterFlowTheme.of(context).primaryText,
                           size: 30.0,
                         ),
                         showLoadingIndicator: true,

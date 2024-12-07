@@ -116,24 +116,14 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           builder: (context, params) => const OnboardingPageWidget(),
         ),
         FFRoute(
-          name: 'forgetPassword',
-          path: '/forgetPassword',
-          builder: (context, params) => const ForgetPasswordWidget(),
+          name: 'forgotPassword',
+          path: '/forgotPassword',
+          builder: (context, params) => const ForgotPasswordWidget(),
         ),
         FFRoute(
           name: 'authPage',
           path: '/authPage',
           builder: (context, params) => const AuthPageWidget(),
-        ),
-        FFRoute(
-          name: 'submitBug',
-          path: '/submitBug',
-          builder: (context, params) => const SubmitBugWidget(),
-        ),
-        FFRoute(
-          name: 'submitFeature',
-          path: '/submitFeature',
-          builder: (context, params) => const SubmitFeatureWidget(),
         ),
         FFRoute(
           name: 'appSettings',
@@ -169,6 +159,16 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           name: 'accounttest',
           path: '/accounttest',
           builder: (context, params) => const AccounttestWidget(),
+        ),
+        FFRoute(
+          name: 'reportBug',
+          path: '/reportBug',
+          builder: (context, params) => const ReportBugWidget(),
+        ),
+        FFRoute(
+          name: 'requestFeature',
+          path: '/requestFeature',
+          builder: (context, params) => const RequestFeatureWidget(),
         )
       ].map((r) => r.toRoute(appStateNotifier)).toList(),
     );

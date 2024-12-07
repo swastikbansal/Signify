@@ -43,11 +43,11 @@ class _SelectlanguageWidgetState extends State<SelectlanguageWidget> {
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
         key: scaffoldKey,
-        backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+        backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
         body: SafeArea(
           top: true,
           child: Padding(
-            padding: const EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
+            padding: const EdgeInsets.all(16.0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.start,
@@ -56,8 +56,7 @@ class _SelectlanguageWidgetState extends State<SelectlanguageWidget> {
                 Container(
                   width: 160.0,
                   height: 160.0,
-                  decoration: BoxDecoration(
-                    color: FlutterFlowTheme.of(context).primaryBackground,
+                  decoration: const BoxDecoration(
                     shape: BoxShape.circle,
                   ),
                   child: ClipRRect(
@@ -123,7 +122,7 @@ class _SelectlanguageWidgetState extends State<SelectlanguageWidget> {
                         width: 240.0,
                         height: 50.0,
                         backgroundColor:
-                            FlutterFlowTheme.of(context).secondaryBackground,
+                            FlutterFlowTheme.of(context).primaryBackground,
                         borderColor: FlutterFlowTheme.of(context).alternate,
                         dropdownColor:
                             FlutterFlowTheme.of(context).primaryBackground,
@@ -211,7 +210,7 @@ class _SelectlanguageWidgetState extends State<SelectlanguageWidget> {
                           size: 24.0,
                         ),
                         fillColor:
-                            FlutterFlowTheme.of(context).secondaryBackground,
+                            FlutterFlowTheme.of(context).primaryBackground,
                         elevation: 5.0,
                         borderColor: FlutterFlowTheme.of(context).alternate,
                         borderWidth: 1.0,

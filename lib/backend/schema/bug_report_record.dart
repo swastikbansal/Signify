@@ -15,15 +15,45 @@ class BugReportRecord extends FirestoreRecord {
     _initializeFields();
   }
 
-  // "description" field.
-  String? _description;
-  String get description => _description ?? '';
-  bool hasDescription() => _description != null;
+  // "bugtitle" field.
+  String? _bugtitle;
+  String get bugtitle => _bugtitle ?? '';
+  bool hasBugtitle() => _bugtitle != null;
+
+  // "bugdescription" field.
+  String? _bugdescription;
+  String get bugdescription => _bugdescription ?? '';
+  bool hasBugdescription() => _bugdescription != null;
+
+  // "bugtype" field.
+  String? _bugtype;
+  String get bugtype => _bugtype ?? '';
+  bool hasBugtype() => _bugtype != null;
+
+  // "bugimage" field.
+  String? _bugimage;
+  String get bugimage => _bugimage ?? '';
+  bool hasBugimage() => _bugimage != null;
+
+  // "recreationsteps" field.
+  String? _recreationsteps;
+  String get recreationsteps => _recreationsteps ?? '';
+  bool hasRecreationsteps() => _recreationsteps != null;
+
+  // "deviceinfo" field.
+  String? _deviceinfo;
+  String get deviceinfo => _deviceinfo ?? '';
+  bool hasDeviceinfo() => _deviceinfo != null;
 
   DocumentReference get parentReference => reference.parent.parent!;
 
   void _initializeFields() {
-    _description = snapshotData['description'] as String?;
+    _bugtitle = snapshotData['bugtitle'] as String?;
+    _bugdescription = snapshotData['bugdescription'] as String?;
+    _bugtype = snapshotData['bugtype'] as String?;
+    _bugimage = snapshotData['bugimage'] as String?;
+    _recreationsteps = snapshotData['recreationsteps'] as String?;
+    _deviceinfo = snapshotData['deviceinfo'] as String?;
   }
 
   static Query<Map<String, dynamic>> collection([DocumentReference? parent]) =>
@@ -66,11 +96,21 @@ class BugReportRecord extends FirestoreRecord {
 }
 
 Map<String, dynamic> createBugReportRecordData({
-  String? description,
+  String? bugtitle,
+  String? bugdescription,
+  String? bugtype,
+  String? bugimage,
+  String? recreationsteps,
+  String? deviceinfo,
 }) {
   final firestoreData = mapToFirestore(
     <String, dynamic>{
-      'description': description,
+      'bugtitle': bugtitle,
+      'bugdescription': bugdescription,
+      'bugtype': bugtype,
+      'bugimage': bugimage,
+      'recreationsteps': recreationsteps,
+      'deviceinfo': deviceinfo,
     }.withoutNulls,
   );
 
@@ -82,11 +122,23 @@ class BugReportRecordDocumentEquality implements Equality<BugReportRecord> {
 
   @override
   bool equals(BugReportRecord? e1, BugReportRecord? e2) {
-    return e1?.description == e2?.description;
+    return e1?.bugtitle == e2?.bugtitle &&
+        e1?.bugdescription == e2?.bugdescription &&
+        e1?.bugtype == e2?.bugtype &&
+        e1?.bugimage == e2?.bugimage &&
+        e1?.recreationsteps == e2?.recreationsteps &&
+        e1?.deviceinfo == e2?.deviceinfo;
   }
 
   @override
-  int hash(BugReportRecord? e) => const ListEquality().hash([e?.description]);
+  int hash(BugReportRecord? e) => const ListEquality().hash([
+        e?.bugtitle,
+        e?.bugdescription,
+        e?.bugtype,
+        e?.bugimage,
+        e?.recreationsteps,
+        e?.deviceinfo
+      ]);
 
   @override
   bool isValidKey(Object? o) => o is BugReportRecord;
