@@ -635,7 +635,7 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                                       ),
                                       options: FFButtonOptions(
                                         width: double.infinity,
-                                        height: 60.0,
+                                        height: 50.0,
                                         padding: const EdgeInsetsDirectional.fromSTEB(
                                             0.0, 0.0, 0.0, 0.0),
                                         iconPadding:
@@ -682,16 +682,18 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                                     borderColor: Colors.transparent,
                                     borderRadius: 30.0,
                                     borderWidth: 1.0,
-                                    buttonSize: 60.0,
-                                    hoverColor:
-                                        FlutterFlowTheme.of(context).alternate,
+                                    buttonSize: 50.0,
+                                    fillColor: FlutterFlowTheme.of(context)
+                                        .secondaryBackground,
+                                    hoverColor: FlutterFlowTheme.of(context)
+                                        .secondaryBackground,
                                     hoverIconColor:
                                         FlutterFlowTheme.of(context).primary,
                                     icon: Icon(
                                       Icons.navigate_next_rounded,
                                       color: FlutterFlowTheme.of(context)
                                           .primaryText,
-                                      size: 40.0,
+                                      size: 36.0,
                                     ),
                                     onPressed: () async {
                                       await _model.pageViewController?.nextPage(
@@ -784,7 +786,7 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                                       ),
                                       options: FFButtonOptions(
                                         width: double.infinity,
-                                        height: 60.0,
+                                        height: 50.0,
                                         padding: const EdgeInsets.all(0.0),
                                         iconPadding:
                                             const EdgeInsetsDirectional.fromSTEB(
@@ -830,7 +832,9 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                                     borderColor: Colors.transparent,
                                     borderRadius: 30.0,
                                     borderWidth: 1.0,
-                                    buttonSize: 60.0,
+                                    buttonSize: 50.0,
+                                    fillColor: FlutterFlowTheme.of(context)
+                                        .secondaryBackground,
                                     hoverColor: FlutterFlowTheme.of(context)
                                         .secondaryBackground,
                                     hoverIconColor:
@@ -839,7 +843,7 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                                       Icons.navigate_next_rounded,
                                       color: FlutterFlowTheme.of(context)
                                           .primaryText,
-                                      size: 40.0,
+                                      size: 36.0,
                                     ),
                                     onPressed: () async {
                                       await _model.pageViewController?.nextPage(
@@ -926,7 +930,7 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                                       ),
                                       options: FFButtonOptions(
                                         width: double.infinity,
-                                        height: 60.0,
+                                        height: 50.0,
                                         padding: const EdgeInsetsDirectional.fromSTEB(
                                             0.0, 0.0, 0.0, 0.0),
                                         iconPadding:
@@ -973,7 +977,9 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                                     borderColor: Colors.transparent,
                                     borderRadius: 30.0,
                                     borderWidth: 1.0,
-                                    buttonSize: 60.0,
+                                    buttonSize: 50.0,
+                                    fillColor: FlutterFlowTheme.of(context)
+                                        .secondaryBackground,
                                     hoverColor: FlutterFlowTheme.of(context)
                                         .secondaryBackground,
                                     hoverIconColor:
@@ -982,7 +988,7 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                                       Icons.navigate_next_rounded,
                                       color: FlutterFlowTheme.of(context)
                                           .primaryText,
-                                      size: 40.0,
+                                      size: 36.0,
                                     ),
                                     onPressed: () async {
                                       await _model.pageViewController?.nextPage(
@@ -1075,7 +1081,7 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                                       ),
                                       options: FFButtonOptions(
                                         width: double.infinity,
-                                        height: 60.0,
+                                        height: 50.0,
                                         padding: const EdgeInsetsDirectional.fromSTEB(
                                             0.0, 0.0, 0.0, 0.0),
                                         iconPadding:
@@ -1122,7 +1128,9 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                                     borderColor: Colors.transparent,
                                     borderRadius: 30.0,
                                     borderWidth: 1.0,
-                                    buttonSize: 60.0,
+                                    buttonSize: 50.0,
+                                    fillColor: FlutterFlowTheme.of(context)
+                                        .secondaryBackground,
                                     hoverColor: FlutterFlowTheme.of(context)
                                         .secondaryBackground,
                                     hoverIconColor:
@@ -1131,7 +1139,7 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                                       Icons.navigate_next_rounded,
                                       color: FlutterFlowTheme.of(context)
                                           .primaryText,
-                                      size: 40.0,
+                                      size: 36.0,
                                     ),
                                     onPressed: () async {
                                       await _model.pageViewController?.nextPage(
@@ -1292,10 +1300,10 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                     effect: smooth_page_indicator.ExpandingDotsEffect(
                       expansionFactor: 4.0,
                       spacing: 8.0,
-                      radius: 8.0,
+                      radius: 2.0,
                       dotWidth: 8.0,
-                      dotHeight: 2.0,
-                      dotColor: FlutterFlowTheme.of(context).info,
+                      dotHeight: 4.0,
+                      dotColor: FlutterFlowTheme.of(context).primaryText,
                       activeDotColor: FlutterFlowTheme.of(context).primary,
                       paintStyle: PaintingStyle.fill,
                     ),

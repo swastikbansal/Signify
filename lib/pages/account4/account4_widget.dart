@@ -224,7 +224,7 @@ class _Account4WidgetState extends State<Account4Widget> {
                                   color: FlutterFlowTheme.of(context).alternate,
                                   width: 1.0,
                                 ),
-                                borderRadius: BorderRadius.circular(24.0),
+                                borderRadius: BorderRadius.circular(12.0),
                                 hoverColor: FlutterFlowTheme.of(context)
                                     .primaryBackground,
                                 hoverBorderSide: BorderSide(
@@ -246,6 +246,7 @@ class _Account4WidgetState extends State<Account4Widget> {
                           borderRadius: BorderRadius.circular(12.0),
                           border: Border.all(
                             color: FlutterFlowTheme.of(context).alternate,
+                            width: 1.0,
                           ),
                         ),
                         child: Padding(
@@ -517,7 +518,7 @@ class _Account4WidgetState extends State<Account4Widget> {
                                 ],
                               ),
                               Divider(
-                                thickness: 0.0,
+                                thickness: 1.0,
                                 color: FlutterFlowTheme.of(context).alternate,
                               ),
                               InkWell(
@@ -573,7 +574,7 @@ class _Account4WidgetState extends State<Account4Widget> {
                                 ),
                               ),
                               Divider(
-                                thickness: 0.0,
+                                thickness: 1.0,
                                 color: FlutterFlowTheme.of(context).alternate,
                               ),
                               InkWell(
@@ -630,7 +631,7 @@ class _Account4WidgetState extends State<Account4Widget> {
                                 ),
                               ),
                               Divider(
-                                thickness: 0.0,
+                                thickness: 1.0,
                                 color: FlutterFlowTheme.of(context).alternate,
                               ),
                               InkWell(
@@ -688,7 +689,7 @@ class _Account4WidgetState extends State<Account4Widget> {
                                 ),
                               ),
                               Divider(
-                                thickness: 0.0,
+                                thickness: 1.0,
                                 color: FlutterFlowTheme.of(context).alternate,
                               ),
                               Row(
@@ -735,7 +736,7 @@ class _Account4WidgetState extends State<Account4Widget> {
                                 ],
                               ),
                               Divider(
-                                thickness: 0.0,
+                                thickness: 1.0,
                                 color: FlutterFlowTheme.of(context).alternate,
                               ),
                               InkWell(
@@ -791,7 +792,7 @@ class _Account4WidgetState extends State<Account4Widget> {
                                 ),
                               ),
                               Divider(
-                                thickness: 0.0,
+                                thickness: 1.0,
                                 color: FlutterFlowTheme.of(context).alternate,
                               ),
                               InkWell(
@@ -887,7 +888,7 @@ class _Account4WidgetState extends State<Account4Widget> {
                               color: FlutterFlowTheme.of(context).alternate,
                               width: 1.0,
                             ),
-                            borderRadius: BorderRadius.circular(30.0),
+                            borderRadius: BorderRadius.circular(12.0),
                             hoverColor:
                                 FlutterFlowTheme.of(context).primaryBackground,
                             hoverBorderSide: BorderSide(
@@ -901,7 +902,7 @@ class _Account4WidgetState extends State<Account4Widget> {
                       ),
                     ]
                         .divide(const SizedBox(height: 24.0))
-                        .addToStart(const SizedBox(height: 24.0))
+                        .addToStart(const SizedBox(height: 16.0))
                         .addToEnd(const SizedBox(height: 36.0)),
                   ),
                 ),

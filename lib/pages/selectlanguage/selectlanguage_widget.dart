@@ -151,7 +151,7 @@ class _SelectlanguageWidgetState extends State<SelectlanguageWidget> {
                     ),
                     Padding(
                       padding:
-                          const EdgeInsetsDirectional.fromSTEB(0.0, 8.0, 0.0, 0.0),
+                          const EdgeInsetsDirectional.fromSTEB(0.0, 12.0, 0.0, 0.0),
                       child: Text(
                         FFLocalizations.of(context).getText(
                           'pf9hvmso' /* Select you hand preference */,
@@ -218,7 +218,8 @@ class _SelectlanguageWidgetState extends State<SelectlanguageWidget> {
                       isMultiSelect: false,
                     ),
                     Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding:
+                          const EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
                       child: Text(
                         FFLocalizations.of(context).getText(
                           'hl1npvsk' /* Our model works better if we k... */,

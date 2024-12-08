@@ -70,7 +70,7 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Padding(
-                padding: const EdgeInsetsDirectional.fromSTEB(8.0, 0.0, 8.0, 0.0),
+                padding: const EdgeInsets.all(8.0),
                 child: Container(
                   width: double.infinity,
                   height: 420.0,
@@ -78,7 +78,7 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget> {
                     color: FlutterFlowTheme.of(context).primaryBackground,
                     borderRadius: BorderRadius.circular(12.0),
                     border: Border.all(
-                      color: FlutterFlowTheme.of(context).secondaryBackground,
+                      color: FlutterFlowTheme.of(context).alternate,
                     ),
                   ),
                 ),

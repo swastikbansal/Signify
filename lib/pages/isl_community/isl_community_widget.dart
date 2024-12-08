@@ -8,25 +8,25 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'islcommunity_model.dart';
-export 'islcommunity_model.dart';
+import 'isl_community_model.dart';
+export 'isl_community_model.dart';
 
-class IslcommunityWidget extends StatefulWidget {
-  const IslcommunityWidget({super.key});
+class IslCommunityWidget extends StatefulWidget {
+  const IslCommunityWidget({super.key});
 
   @override
-  State<IslcommunityWidget> createState() => _IslcommunityWidgetState();
+  State<IslCommunityWidget> createState() => _IslCommunityWidgetState();
 }
 
-class _IslcommunityWidgetState extends State<IslcommunityWidget> {
-  late IslcommunityModel _model;
+class _IslCommunityWidgetState extends State<IslCommunityWidget> {
+  late IslCommunityModel _model;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
     super.initState();
-    _model = createModel(context, () => IslcommunityModel());
+    _model = createModel(context, () => IslCommunityModel());
 
     WidgetsBinding.instance.addPostFrameCallback((_) => safeSetState(() {}));
   }
@@ -60,7 +60,7 @@ class _IslcommunityWidgetState extends State<IslcommunityWidget> {
           );
         }
 
-        final islcommunityUsersRecord = snapshot.data!;
+        final islCommunityUsersRecord = snapshot.data!;
 
         return GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
@@ -148,7 +148,7 @@ class _IslcommunityWidgetState extends State<IslcommunityWidget> {
                                       ),
                                       TextSpan(
                                         text:
-                                            islcommunityUsersRecord.displayName,
+                                            islCommunityUsersRecord.displayName,
                                         style: FlutterFlowTheme.of(context)
                                             .headlineSmall
                                             .override(

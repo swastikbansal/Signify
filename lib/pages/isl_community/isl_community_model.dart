@@ -1,8 +1,8 @@
 import '/flutter_flow/flutter_flow_util.dart';
-import 'islcommunity_widget.dart' show IslcommunityWidget;
+import 'isl_community_widget.dart' show IslCommunityWidget;
 import 'package:flutter/material.dart';
 
-class IslcommunityModel extends FlutterFlowModel<IslcommunityWidget> {
+class IslCommunityModel extends FlutterFlowModel<IslCommunityWidget> {
   @override
   void initState(BuildContext context) {}
 

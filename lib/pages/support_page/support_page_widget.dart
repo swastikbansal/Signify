@@ -645,7 +645,7 @@ class _SupportPageWidgetState extends State<SupportPageWidget> {
                                       duration: const Duration(milliseconds: 4000),
                                       backgroundColor:
                                           FlutterFlowTheme.of(context)
-                                              .secondary,
+                                              .alternate,
                                     ),
                                   );
 

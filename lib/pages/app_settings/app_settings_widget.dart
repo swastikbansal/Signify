@@ -100,7 +100,7 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> {
                       borderRadius: BorderRadius.circular(12.0),
                       border: Border.all(
                         color: FlutterFlowTheme.of(context).alternate,
-                        width: 0.0,
+                        width: 1.0,
                       ),
                     ),
                     child: Stack(
@@ -187,7 +187,7 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> {
                                 ],
                               ),
                               Divider(
-                                thickness: 0.0,
+                                thickness: 2.0,
                                 color: FlutterFlowTheme.of(context).alternate,
                               ),
                               Row(
@@ -267,7 +267,7 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> {
                                 ],
                               ),
                               Divider(
-                                thickness: 0.0,
+                                thickness: 2.0,
                                 color: FlutterFlowTheme.of(context).alternate,
                               ),
                               Row(
@@ -389,7 +389,7 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> {
                                 ),
                               ),
                               Divider(
-                                thickness: 0.0,
+                                thickness: 1.0,
                                 color: FlutterFlowTheme.of(context).alternate,
                               ),
                               Row(
@@ -423,7 +423,7 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> {
                                 ],
                               ),
                               Divider(
-                                thickness: 0.0,
+                                thickness: 1.0,
                                 color: FlutterFlowTheme.of(context).alternate,
                               ),
                               Row(
@@ -457,7 +457,7 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> {
                                 ],
                               ),
                               Divider(
-                                thickness: 0.0,
+                                thickness: 1.0,
                                 color: FlutterFlowTheme.of(context).alternate,
                               ),
                               Row(
@@ -502,6 +502,7 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> {
                       borderRadius: BorderRadius.circular(12.0),
                       border: Border.all(
                         color: FlutterFlowTheme.of(context).alternate,
+                        width: 1.0,
                       ),
                     ),
                     child: Padding(
@@ -556,6 +557,7 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> {
                               color: FlutterFlowTheme.of(context).alternate,
                               border: Border.all(
                                 color: FlutterFlowTheme.of(context).alternate,
+                                width: 1.0,
                               ),
                             ),
                           ),
@@ -667,7 +669,7 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> {
                       borderRadius: BorderRadius.circular(12.0),
                       border: Border.all(
                         color: FlutterFlowTheme.of(context).alternate,
-                        width: 0.0,
+                        width: 1.0,
                       ),
                     ),
                     child: Padding(
@@ -696,6 +698,7 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> {
                               color: FlutterFlowTheme.of(context).alternate,
                               border: Border.all(
                                 color: FlutterFlowTheme.of(context).alternate,
+                                width: 1.0,
                               ),
                             ),
                           ),

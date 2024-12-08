@@ -326,62 +326,69 @@ class _ForgotPasswordWidgetState extends State<ForgotPasswordWidget> {
             ),
             Align(
               alignment: const AlignmentDirectional(0.0, 0.0),
-              child: FFButtonWidget(
-                onPressed: () async {
-                  if (_model.resetemailAddressTextController.text.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          'Email required!',
+              child: Padding(
+                padding: const EdgeInsetsDirectional.fromSTEB(0.0, 8.0, 0.0, 0.0),
+                child: FFButtonWidget(
+                  onPressed: () async {
+                    if (_model.resetemailAddressTextController.text.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'Email required!',
+                          ),
                         ),
+                      );
+                      return;
+                    }
+                    await authManager.resetPassword(
+                      email: _model.resetemailAddressTextController.text,
+                      context: context,
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          'Link sent to your email.',
+                          style: FlutterFlowTheme.of(context)
+                              .labelLarge
+                              .override(
+                                fontFamily: FlutterFlowTheme.of(context)
+                                    .labelLargeFamily,
+                                color: FlutterFlowTheme.of(context).primaryText,
+                                letterSpacing: 0.0,
+                                useGoogleFonts: GoogleFonts.asMap().containsKey(
+                                    FlutterFlowTheme.of(context)
+                                        .labelLargeFamily),
+                              ),
+                        ),
+                        duration: const Duration(milliseconds: 4000),
+                        backgroundColor: FlutterFlowTheme.of(context).alternate,
                       ),
                     );
-                    return;
-                  }
-                  await authManager.resetPassword(
-                    email: _model.resetemailAddressTextController.text,
-                    context: context,
-                  );
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'Link sent to your email.',
-                        style: FlutterFlowTheme.of(context).labelLarge.override(
-                              fontFamily:
-                                  FlutterFlowTheme.of(context).labelLargeFamily,
-                              color: FlutterFlowTheme.of(context).primaryText,
-                              letterSpacing: 0.0,
-                              useGoogleFonts: GoogleFonts.asMap().containsKey(
-                                  FlutterFlowTheme.of(context)
-                                      .labelLargeFamily),
-                            ),
-                      ),
-                      duration: const Duration(milliseconds: 4000),
-                      backgroundColor: FlutterFlowTheme.of(context).alternate,
-                    ),
-                  );
-                },
-                text: FFLocalizations.of(context).getText(
-                  'x5ujc8ou' /* Send Link */,
-                ),
-                options: FFButtonOptions(
-                  width: 240.0,
-                  height: 50.0,
-                  padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
-                  iconPadding:
-                      const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
-                  color: FlutterFlowTheme.of(context).primary,
-                  textStyle: FlutterFlowTheme.of(context).titleMedium.override(
-                        fontFamily:
-                            FlutterFlowTheme.of(context).titleMediumFamily,
-                        color: FlutterFlowTheme.of(context).customColor5,
-                        letterSpacing: 0.0,
-                        useGoogleFonts: GoogleFonts.asMap().containsKey(
-                            FlutterFlowTheme.of(context).titleMediumFamily),
-                      ),
-                  elevation: 2.0,
-                  borderRadius: BorderRadius.circular(12.0),
-                  hoverColor: FlutterFlowTheme.of(context).secondary,
+                  },
+                  text: FFLocalizations.of(context).getText(
+                    'x5ujc8ou' /* Send Link */,
+                  ),
+                  options: FFButtonOptions(
+                    width: 240.0,
+                    height: 50.0,
+                    padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
+                    iconPadding:
+                        const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
+                    color: FlutterFlowTheme.of(context).primary,
+                    textStyle: FlutterFlowTheme.of(context)
+                        .titleMedium
+                        .override(
+                          fontFamily:
+                              FlutterFlowTheme.of(context).titleMediumFamily,
+                          color: FlutterFlowTheme.of(context).customColor5,
+                          letterSpacing: 0.0,
+                          useGoogleFonts: GoogleFonts.asMap().containsKey(
+                              FlutterFlowTheme.of(context).titleMediumFamily),
+                        ),
+                    elevation: 2.0,
+                    borderRadius: BorderRadius.circular(12.0),
+                    hoverColor: FlutterFlowTheme.of(context).secondary,
+                  ),
                 ),
               ),
             ),

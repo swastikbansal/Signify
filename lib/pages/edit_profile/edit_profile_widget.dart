@@ -964,18 +964,19 @@ class _EditProfileWidgetState extends State<EditProfileWidget>
                                 0.0, 0.0, 0.0, 0.0),
                             color: FlutterFlowTheme.of(context).primary,
                             textStyle: FlutterFlowTheme.of(context)
-                                .titleSmall
+                                .titleMedium
                                 .override(
                                   fontFamily: FlutterFlowTheme.of(context)
-                                      .titleSmallFamily,
+                                      .titleMediumFamily,
                                   color:
                                       FlutterFlowTheme.of(context).customColor5,
                                   letterSpacing: 0.0,
                                   useGoogleFonts: GoogleFonts.asMap()
                                       .containsKey(FlutterFlowTheme.of(context)
-                                          .titleSmallFamily),
+                                          .titleMediumFamily),
                                 ),
-                            borderSide: const BorderSide(
+                            borderSide: BorderSide(
+                              color: FlutterFlowTheme.of(context).primary,
                               width: 1.0,
                             ),
                             borderRadius: BorderRadius.circular(12.0),

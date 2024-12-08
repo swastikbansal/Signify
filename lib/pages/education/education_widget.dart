@@ -6,6 +6,7 @@ import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/form_field_controller.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -197,7 +198,14 @@ class _EducationWidgetState extends State<EducationWidget> {
                       child: TextFormField(
                         controller: _model.textController,
                         focusNode: _model.textFieldFocusNode,
+                        onChanged: (_) => EasyDebounce.debounce(
+                          '_model.textController',
+                          const Duration(milliseconds: 2000),
+                          () => safeSetState(() {}),
+                        ),
                         autofocus: false,
+                        textCapitalization: TextCapitalization.words,
+                        textInputAction: TextInputAction.done,
                         obscureText: false,
                         decoration: InputDecoration(
                           labelText: FFLocalizations.of(context).getText(
@@ -258,10 +266,25 @@ class _EducationWidgetState extends State<EducationWidget> {
                           contentPadding: const EdgeInsets.all(16.0),
                           hoverColor:
                               FlutterFlowTheme.of(context).secondaryBackground,
-                          suffixIcon: Icon(
-                            Icons.search_rounded,
+                          prefixIcon: Icon(
+                            Icons.search,
                             color: FlutterFlowTheme.of(context).secondaryText,
+                            size: 24.0,
                           ),
+                          suffixIcon: _model.textController!.text.isNotEmpty
+                              ? InkWell(
+                                  onTap: () async {
+                                    _model.textController?.clear();
+                                    safeSetState(() {});
+                                  },
+                                  child: Icon(
+                                    Icons.clear,
+                                    color: FlutterFlowTheme.of(context)
+                                        .secondaryText,
+                                    size: 24.0,
+                                  ),
+                                )
+                              : null,
                         ),
                         style: FlutterFlowTheme.of(context).bodyMedium.override(
                               fontFamily:
@@ -341,6 +364,7 @@ class _EducationWidgetState extends State<EducationWidget> {
                                               color:
                                                   FlutterFlowTheme.of(context)
                                                       .primary,
+                                              width: 2.0,
                                             ),
                                           ),
                                           child: Padding(
@@ -486,7 +510,7 @@ class _EducationWidgetState extends State<EducationWidget> {
                               hoverColor: Colors.transparent,
                               highlightColor: Colors.transparent,
                               onTap: () async {
-                                context.pushNamed('islcommunity');
+                                context.pushNamed('islCommunity');
                               },
                               child: Container(
                                 width: 260.0,
@@ -519,6 +543,7 @@ class _EducationWidgetState extends State<EducationWidget> {
                                               color:
                                                   FlutterFlowTheme.of(context)
                                                       .primary,
+                                              width: 2.0,
                                             ),
                                           ),
                                           child: Padding(

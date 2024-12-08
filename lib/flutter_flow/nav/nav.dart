@@ -121,11 +121,6 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           builder: (context, params) => const ForgotPasswordWidget(),
         ),
         FFRoute(
-          name: 'authPage',
-          path: '/authPage',
-          builder: (context, params) => const AuthPageWidget(),
-        ),
-        FFRoute(
           name: 'appSettings',
           path: '/appSettings',
           builder: (context, params) => const AppSettingsWidget(),
@@ -171,9 +166,14 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           builder: (context, params) => const IslDictWidget(),
         ),
         FFRoute(
-          name: 'islcommunity',
-          path: '/islcommunity',
-          builder: (context, params) => const IslcommunityWidget(),
+          name: 'islCommunity',
+          path: '/islCommunity',
+          builder: (context, params) => const IslCommunityWidget(),
+        ),
+        FFRoute(
+          name: 'authPage',
+          path: '/authPage',
+          builder: (context, params) => const AuthPageWidget(),
         )
       ].map((r) => r.toRoute(appStateNotifier)).toList(),
     );
