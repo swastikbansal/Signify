@@ -71,7 +71,7 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget> {
             children: [
               Container(
                 width: 350.0,
-                height: 480.0,
+                height: 420.0,
                 decoration: BoxDecoration(
                   color: FlutterFlowTheme.of(context).primaryBackground,
                   borderRadius: BorderRadius.circular(12.0),
@@ -331,7 +331,7 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget> {
                                           ),
                                       textAlign: TextAlign.center,
                                       maxLines: 10,
-                                      minLines: 2,
+                                      minLines: 3,
                                       cursorColor:
                                           FlutterFlowTheme.of(context).primary,
                                       validator: _model.textControllerValidator

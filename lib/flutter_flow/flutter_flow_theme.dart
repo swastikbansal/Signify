@@ -69,6 +69,22 @@ abstract class FlutterFlowTheme {
   late Color customColor4;
   late Color customColor5;
   late Color customColor6;
+  late Color accentDict1;
+  late Color accentDict2;
+  late Color accentDict3;
+  late Color accentDict4;
+  late Color accentDict5;
+  late Color accentDict6;
+  late Color accentDict7;
+  late Color accentDict8;
+  late Color buttonShadow;
+  late Color buttonShadow2;
+  late Color gradient1;
+  late Color gradient2;
+  late Color accentDict11;
+  late Color accentDict22;
+  late Color accentDict33;
+  late Color accentDict44;
 
   @Deprecated('Use displaySmallFamily instead')
   String get title1Family => displaySmallFamily;
@@ -179,6 +195,22 @@ class LightModeTheme extends FlutterFlowTheme {
   late Color customColor4 = const Color(0xFFACD1BF);
   late Color customColor5 = const Color(0xFF000000);
   late Color customColor6 = const Color(0xFFFFFFFF);
+  late Color accentDict1 = const Color(0xFFFFD4AF);
+  late Color accentDict2 = const Color(0xFFFFC0CF);
+  late Color accentDict3 = const Color(0xFFB555CB);
+  late Color accentDict4 = const Color(0xFF64BDCF);
+  late Color accentDict5 = const Color(0xFF58B878);
+  late Color accentDict6 = const Color(0xFFCFC33B);
+  late Color accentDict7 = const Color(0xFFC9874F);
+  late Color accentDict8 = const Color(0xFFCA5C77);
+  late Color buttonShadow = const Color(0xFF163959);
+  late Color buttonShadow2 = const Color(0xFF3E1674);
+  late Color gradient1 = const Color(0xFFBA5DA2);
+  late Color gradient2 = const Color(0xFF714AB4);
+  late Color accentDict11 = const Color(0xFFEAB7F6);
+  late Color accentDict22 = const Color(0xFFB7EBF6);
+  late Color accentDict33 = const Color(0xFFB7F6CC);
+  late Color accentDict44 = const Color(0xFFF6ED8E);
 }
 
 abstract class Typography {
@@ -581,6 +613,22 @@ class DarkModeTheme extends FlutterFlowTheme {
   late Color customColor4 = const Color(0xFFACD1BF);
   late Color customColor5 = const Color(0xFF000000);
   late Color customColor6 = const Color(0xFFFFFFFF);
+  late Color accentDict1 = const Color(0xFFFFD4AF);
+  late Color accentDict2 = const Color(0xFFFFC0CF);
+  late Color accentDict3 = const Color(0xFFB555CB);
+  late Color accentDict4 = const Color(0xFF64BDCF);
+  late Color accentDict5 = const Color(0xFF58B878);
+  late Color accentDict6 = const Color(0xFFCFC33B);
+  late Color accentDict7 = const Color(0xFFC9874F);
+  late Color accentDict8 = const Color(0xFFCA5C77);
+  late Color buttonShadow = const Color(0xFF163959);
+  late Color buttonShadow2 = const Color(0xFF3E1674);
+  late Color gradient1 = const Color(0xFFBA5DA2);
+  late Color gradient2 = const Color(0xFF714AB4);
+  late Color accentDict11 = const Color(0xFFEAB7F6);
+  late Color accentDict22 = const Color(0xFFB7EBF6);
+  late Color accentDict33 = const Color(0xFFB7F6CC);
+  late Color accentDict44 = const Color(0xFFF6ED8E);
 }
 
 extension TextStyleHelper on TextStyle {

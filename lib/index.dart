@@ -16,3 +16,5 @@ export '/pages/selectlanguage/selectlanguage_widget.dart'
 export '/pages/report_bug/report_bug_widget.dart' show ReportBugWidget;
 export '/pages/request_feature/request_feature_widget.dart'
     show RequestFeatureWidget;
+export '/pages/isl_dict/isl_dict_widget.dart' show IslDictWidget;
+export '/pages/islcommunity/islcommunity_widget.dart' show IslcommunityWidget;

@@ -293,157 +293,185 @@ class _EducationWidgetState extends State<EducationWidget> {
                           Padding(
                             padding: const EdgeInsetsDirectional.fromSTEB(
                                 0.0, 16.0, 0.0, 16.0),
-                            child: Container(
-                              width: 260.0,
-                              decoration: BoxDecoration(
-                                color: FlutterFlowTheme.of(context)
-                                    .secondaryBackground,
-                                borderRadius: BorderRadius.circular(12.0),
-                                border: Border.all(
-                                  color: FlutterFlowTheme.of(context).alternate,
+                            child: InkWell(
+                              splashColor: Colors.transparent,
+                              focusColor: Colors.transparent,
+                              hoverColor: Colors.transparent,
+                              highlightColor: Colors.transparent,
+                              onTap: () async {
+                                context.pushNamed(
+                                  'islDict',
+                                  extra: <String, dynamic>{
+                                    kTransitionInfoKey: const TransitionInfo(
+                                      hasTransition: true,
+                                      transitionType: PageTransitionType.fade,
+                                    ),
+                                  },
+                                );
+                              },
+                              child: Container(
+                                width: 260.0,
+                                decoration: BoxDecoration(
+                                  color: FlutterFlowTheme.of(context)
+                                      .secondaryBackground,
+                                  borderRadius: BorderRadius.circular(12.0),
+                                  border: Border.all(
+                                    color:
+                                        FlutterFlowTheme.of(context).alternate,
+                                  ),
                                 ),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.max,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Expanded(
-                                      child: Container(
-                                        width: double.infinity,
-                                        height: 120.0,
-                                        decoration: BoxDecoration(
-                                          color: FlutterFlowTheme.of(context)
-                                              .accent1,
-                                          borderRadius:
-                                              BorderRadius.circular(8.0),
-                                          border: Border.all(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.max,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Expanded(
+                                        child: Container(
+                                          width: double.infinity,
+                                          height: 120.0,
+                                          decoration: BoxDecoration(
                                             color: FlutterFlowTheme.of(context)
-                                                .primary,
-                                          ),
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(2.0),
-                                          child: ClipRRect(
+                                                .accent1,
                                             borderRadius:
-                                                BorderRadius.circular(6.0),
-                                            child: CachedNetworkImage(
-                                              fadeInDuration:
-                                                  const Duration(milliseconds: 500),
-                                              fadeOutDuration:
-                                                  const Duration(milliseconds: 500),
-                                              imageUrl:
-                                                  'https://images.unsplash.com/photo-1535572290543-960a8046f5af?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwyNHx8bGV0dGVyc3xlbnwwfHx8fDE3MzI2ODA2NDV8MA&ixlib=rb-4.0.3&q=80&w=1080',
-                                              width: 120.0,
-                                              height: 120.0,
-                                              fit: BoxFit.cover,
+                                                BorderRadius.circular(8.0),
+                                            border: Border.all(
+                                              color:
+                                                  FlutterFlowTheme.of(context)
+                                                      .primary,
+                                            ),
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(2.0),
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(6.0),
+                                              child: CachedNetworkImage(
+                                                fadeInDuration:
+                                                    const Duration(milliseconds: 500),
+                                                fadeOutDuration:
+                                                    const Duration(milliseconds: 500),
+                                                imageUrl:
+                                                    'https://images.unsplash.com/photo-1535572290543-960a8046f5af?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwyNHx8bGV0dGVyc3xlbnwwfHx8fDE3MzI2ODA2NDV8MA&ixlib=rb-4.0.3&q=80&w=1080',
+                                                width: 120.0,
+                                                height: 120.0,
+                                                fit: BoxFit.cover,
+                                              ),
                                             ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsetsDirectional.fromSTEB(
-                                          4.0, 8.0, 4.0, 4.0),
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.max,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            FFLocalizations.of(context).getText(
-                                              'fzy0yjab' /* Indian Sign Language Dictionar... */,
+                                      Padding(
+                                        padding: const EdgeInsetsDirectional.fromSTEB(
+                                            4.0, 8.0, 4.0, 4.0),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.max,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              FFLocalizations.of(context)
+                                                  .getText(
+                                                'fzy0yjab' /* Indian Sign Language Dictionar... */,
+                                              ),
+                                              style:
+                                                  FlutterFlowTheme.of(context)
+                                                      .bodyMedium
+                                                      .override(
+                                                        fontFamily:
+                                                            FlutterFlowTheme.of(
+                                                                    context)
+                                                                .bodyMediumFamily,
+                                                        letterSpacing: 0.0,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        useGoogleFonts: GoogleFonts
+                                                                .asMap()
+                                                            .containsKey(
+                                                                FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .bodyMediumFamily),
+                                                      ),
                                             ),
-                                            style: FlutterFlowTheme.of(context)
-                                                .bodyMedium
-                                                .override(
-                                                  fontFamily:
-                                                      FlutterFlowTheme.of(
-                                                              context)
-                                                          .bodyMediumFamily,
-                                                  letterSpacing: 0.0,
-                                                  fontWeight: FontWeight.w500,
-                                                  useGoogleFonts: GoogleFonts
-                                                          .asMap()
-                                                      .containsKey(
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .bodyMediumFamily),
-                                                ),
-                                          ),
-                                          Padding(
-                                            padding:
-                                                const EdgeInsetsDirectional.fromSTEB(
-                                                    0.0, 4.0, 0.0, 0.0),
-                                            child: Wrap(
-                                              spacing: 0.0,
-                                              runSpacing: 0.0,
-                                              alignment: WrapAlignment.start,
-                                              crossAxisAlignment:
-                                                  WrapCrossAlignment.start,
-                                              direction: Axis.horizontal,
-                                              runAlignment: WrapAlignment.start,
-                                              verticalDirection:
-                                                  VerticalDirection.down,
-                                              clipBehavior: Clip.none,
-                                              children: [
-                                                Padding(
-                                                  padding: const EdgeInsetsDirectional
-                                                      .fromSTEB(
-                                                          0.0, 0.0, 12.0, 0.0),
-                                                  child: Text(
-                                                    FFLocalizations.of(context)
-                                                        .getText(
-                                                      '6nkng215' /* Search for ISL signs and learn... */,
-                                                    ),
-                                                    style: FlutterFlowTheme.of(
-                                                            context)
-                                                        .labelSmall
-                                                        .override(
-                                                          fontFamily:
-                                                              FlutterFlowTheme.of(
-                                                                      context)
-                                                                  .labelSmallFamily,
-                                                          letterSpacing: 0.0,
-                                                          useGoogleFonts: GoogleFonts
-                                                                  .asMap()
-                                                              .containsKey(
-                                                                  FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .labelSmallFamily),
-                                                        ),
-                                                  ),
-                                                ),
-                                                Align(
-                                                  alignment:
-                                                      const AlignmentDirectional(
-                                                          1.0, 1.0),
-                                                  child: Padding(
+                                            Padding(
+                                              padding: const EdgeInsetsDirectional
+                                                  .fromSTEB(0.0, 4.0, 0.0, 0.0),
+                                              child: Wrap(
+                                                spacing: 0.0,
+                                                runSpacing: 0.0,
+                                                alignment: WrapAlignment.start,
+                                                crossAxisAlignment:
+                                                    WrapCrossAlignment.start,
+                                                direction: Axis.horizontal,
+                                                runAlignment:
+                                                    WrapAlignment.start,
+                                                verticalDirection:
+                                                    VerticalDirection.down,
+                                                clipBehavior: Clip.none,
+                                                children: [
+                                                  Padding(
                                                     padding:
                                                         const EdgeInsetsDirectional
                                                             .fromSTEB(0.0, 0.0,
-                                                                4.0, 0.0),
-                                                    child: Icon(
-                                                      Icons
-                                                          .keyboard_control_rounded,
-                                                      color:
+                                                                12.0, 0.0),
+                                                    child: Text(
+                                                      FFLocalizations.of(
+                                                              context)
+                                                          .getText(
+                                                        '6nkng215' /* Search for ISL signs and learn... */,
+                                                      ),
+                                                      style:
                                                           FlutterFlowTheme.of(
                                                                   context)
-                                                              .primaryText,
-                                                      size: 20.0,
+                                                              .labelSmall
+                                                              .override(
+                                                                fontFamily: FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .labelSmallFamily,
+                                                                letterSpacing:
+                                                                    0.0,
+                                                                useGoogleFonts: GoogleFonts
+                                                                        .asMap()
+                                                                    .containsKey(
+                                                                        FlutterFlowTheme.of(context)
+                                                                            .labelSmallFamily),
+                                                              ),
                                                     ),
                                                   ),
-                                                ),
-                                              ],
+                                                  Align(
+                                                    alignment:
+                                                        const AlignmentDirectional(
+                                                            1.0, 1.0),
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsetsDirectional
+                                                              .fromSTEB(
+                                                                  0.0,
+                                                                  0.0,
+                                                                  4.0,
+                                                                  0.0),
+                                                      child: Icon(
+                                                        Icons
+                                                            .keyboard_control_rounded,
+                                                        color:
+                                                            FlutterFlowTheme.of(
+                                                                    context)
+                                                                .primaryText,
+                                                        size: 20.0,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
                                             ),
-                                          ),
-                                        ].divide(const SizedBox(height: 4.0)),
+                                          ].divide(const SizedBox(height: 4.0)),
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
@@ -451,150 +479,176 @@ class _EducationWidgetState extends State<EducationWidget> {
                           Padding(
                             padding: const EdgeInsetsDirectional.fromSTEB(
                                 0.0, 16.0, 0.0, 16.0),
-                            child: Container(
-                              width: 260.0,
-                              decoration: BoxDecoration(
-                                color: FlutterFlowTheme.of(context)
-                                    .secondaryBackground,
-                                borderRadius: BorderRadius.circular(12.0),
-                                border: Border.all(
-                                  color: FlutterFlowTheme.of(context).alternate,
+                            child: InkWell(
+                              splashColor: Colors.transparent,
+                              focusColor: Colors.transparent,
+                              hoverColor: Colors.transparent,
+                              highlightColor: Colors.transparent,
+                              onTap: () async {
+                                context.pushNamed(
+                                  'islcommunity',
+                                  extra: <String, dynamic>{
+                                    kTransitionInfoKey: const TransitionInfo(
+                                      hasTransition: true,
+                                      transitionType: PageTransitionType.fade,
+                                    ),
+                                  },
+                                );
+                              },
+                              child: Container(
+                                width: 260.0,
+                                decoration: BoxDecoration(
+                                  color: FlutterFlowTheme.of(context)
+                                      .secondaryBackground,
+                                  borderRadius: BorderRadius.circular(12.0),
+                                  border: Border.all(
+                                    color:
+                                        FlutterFlowTheme.of(context).alternate,
+                                  ),
                                 ),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.max,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Expanded(
-                                      child: Container(
-                                        width: double.infinity,
-                                        height: 120.0,
-                                        decoration: BoxDecoration(
-                                          color: FlutterFlowTheme.of(context)
-                                              .accent1,
-                                          borderRadius:
-                                              BorderRadius.circular(8.0),
-                                          border: Border.all(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.max,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Expanded(
+                                        child: Container(
+                                          width: double.infinity,
+                                          height: 120.0,
+                                          decoration: BoxDecoration(
                                             color: FlutterFlowTheme.of(context)
-                                                .primary,
-                                          ),
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(2.0),
-                                          child: ClipRRect(
+                                                .accent1,
                                             borderRadius:
-                                                BorderRadius.circular(6.0),
-                                            child: CachedNetworkImage(
-                                              fadeInDuration:
-                                                  const Duration(milliseconds: 500),
-                                              fadeOutDuration:
-                                                  const Duration(milliseconds: 500),
-                                              imageUrl:
-                                                  'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwyMHx8dG9nZXRoZXJ8ZW58MHx8fHwxNzMyNzkxMDMwfDA&ixlib=rb-4.0.3&q=80&w=1080',
-                                              width: 120.0,
-                                              height: 120.0,
-                                              fit: BoxFit.cover,
+                                                BorderRadius.circular(8.0),
+                                            border: Border.all(
+                                              color:
+                                                  FlutterFlowTheme.of(context)
+                                                      .primary,
+                                            ),
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(2.0),
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(6.0),
+                                              child: CachedNetworkImage(
+                                                fadeInDuration:
+                                                    const Duration(milliseconds: 500),
+                                                fadeOutDuration:
+                                                    const Duration(milliseconds: 500),
+                                                imageUrl:
+                                                    'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwyMHx8dG9nZXRoZXJ8ZW58MHx8fHwxNzMyNzkxMDMwfDA&ixlib=rb-4.0.3&q=80&w=1080',
+                                                width: 120.0,
+                                                height: 120.0,
+                                                fit: BoxFit.cover,
+                                              ),
                                             ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsetsDirectional.fromSTEB(
-                                          4.0, 8.0, 4.0, 4.0),
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.max,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            FFLocalizations.of(context).getText(
-                                              '0x77h9h6' /* Indian Sign Language Community */,
+                                      Padding(
+                                        padding: const EdgeInsetsDirectional.fromSTEB(
+                                            4.0, 8.0, 4.0, 4.0),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.max,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              FFLocalizations.of(context)
+                                                  .getText(
+                                                '0x77h9h6' /* Indian Sign Language Community */,
+                                              ),
+                                              style:
+                                                  FlutterFlowTheme.of(context)
+                                                      .bodyMedium
+                                                      .override(
+                                                        fontFamily:
+                                                            FlutterFlowTheme.of(
+                                                                    context)
+                                                                .bodyMediumFamily,
+                                                        letterSpacing: 0.0,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        useGoogleFonts: GoogleFonts
+                                                                .asMap()
+                                                            .containsKey(
+                                                                FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .bodyMediumFamily),
+                                                      ),
                                             ),
-                                            style: FlutterFlowTheme.of(context)
-                                                .bodyMedium
-                                                .override(
-                                                  fontFamily:
-                                                      FlutterFlowTheme.of(
+                                            Padding(
+                                              padding: const EdgeInsetsDirectional
+                                                  .fromSTEB(0.0, 4.0, 0.0, 0.0),
+                                              child: Wrap(
+                                                spacing: 0.0,
+                                                runSpacing: 0.0,
+                                                alignment: WrapAlignment.start,
+                                                crossAxisAlignment:
+                                                    WrapCrossAlignment.start,
+                                                direction: Axis.horizontal,
+                                                runAlignment:
+                                                    WrapAlignment.start,
+                                                verticalDirection:
+                                                    VerticalDirection.down,
+                                                clipBehavior: Clip.none,
+                                                children: [
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsetsDirectional
+                                                            .fromSTEB(0.0, 0.0,
+                                                                12.0, 0.0),
+                                                    child: Text(
+                                                      FFLocalizations.of(
                                                               context)
-                                                          .bodyMediumFamily,
-                                                  letterSpacing: 0.0,
-                                                  fontWeight: FontWeight.w500,
-                                                  useGoogleFonts: GoogleFonts
-                                                          .asMap()
-                                                      .containsKey(
+                                                          .getText(
+                                                        '8ookai0n' /* Connect with more people and s... */,
+                                                      ),
+                                                      style:
                                                           FlutterFlowTheme.of(
                                                                   context)
-                                                              .bodyMediumFamily),
-                                                ),
-                                          ),
-                                          Padding(
-                                            padding:
-                                                const EdgeInsetsDirectional.fromSTEB(
-                                                    0.0, 4.0, 0.0, 0.0),
-                                            child: Wrap(
-                                              spacing: 0.0,
-                                              runSpacing: 0.0,
-                                              alignment: WrapAlignment.start,
-                                              crossAxisAlignment:
-                                                  WrapCrossAlignment.start,
-                                              direction: Axis.horizontal,
-                                              runAlignment: WrapAlignment.start,
-                                              verticalDirection:
-                                                  VerticalDirection.down,
-                                              clipBehavior: Clip.none,
-                                              children: [
-                                                Padding(
-                                                  padding: const EdgeInsetsDirectional
-                                                      .fromSTEB(
-                                                          0.0, 0.0, 12.0, 0.0),
-                                                  child: Text(
-                                                    FFLocalizations.of(context)
-                                                        .getText(
-                                                      '8ookai0n' /* Connect with more people and s... */,
+                                                              .labelSmall
+                                                              .override(
+                                                                fontFamily: FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .labelSmallFamily,
+                                                                letterSpacing:
+                                                                    0.0,
+                                                                useGoogleFonts: GoogleFonts
+                                                                        .asMap()
+                                                                    .containsKey(
+                                                                        FlutterFlowTheme.of(context)
+                                                                            .labelSmallFamily),
+                                                              ),
                                                     ),
-                                                    style: FlutterFlowTheme.of(
-                                                            context)
-                                                        .labelSmall
-                                                        .override(
-                                                          fontFamily:
-                                                              FlutterFlowTheme.of(
-                                                                      context)
-                                                                  .labelSmallFamily,
-                                                          letterSpacing: 0.0,
-                                                          useGoogleFonts: GoogleFonts
-                                                                  .asMap()
-                                                              .containsKey(
-                                                                  FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .labelSmallFamily),
-                                                        ),
                                                   ),
-                                                ),
-                                                Align(
-                                                  alignment:
-                                                      const AlignmentDirectional(
-                                                          1.0, 1.0),
-                                                  child: Icon(
-                                                    Icons
-                                                        .keyboard_control_outlined,
-                                                    color: FlutterFlowTheme.of(
-                                                            context)
-                                                        .primaryText,
-                                                    size: 20.0,
+                                                  Align(
+                                                    alignment:
+                                                        const AlignmentDirectional(
+                                                            1.0, 1.0),
+                                                    child: Icon(
+                                                      Icons
+                                                          .keyboard_control_outlined,
+                                                      color:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .primaryText,
+                                                      size: 20.0,
+                                                    ),
                                                   ),
-                                                ),
-                                              ],
+                                                ],
+                                              ),
                                             ),
-                                          ),
-                                        ].divide(const SizedBox(height: 4.0)),
+                                          ].divide(const SizedBox(height: 4.0)),
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),

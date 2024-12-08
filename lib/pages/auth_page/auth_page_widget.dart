@@ -415,7 +415,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                 FlutterFlowTheme.of(
                                                                         context)
                                                                     .bodyLargeFamily),
-                                                        lineHeight: 2.0,
+                                                        lineHeight: 1.0,
                                                       ),
                                                   minLines: 1,
                                                   keyboardType: TextInputType
@@ -591,7 +591,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                 FlutterFlowTheme.of(
                                                                         context)
                                                                     .bodyLargeFamily),
-                                                        lineHeight: 2.0,
+                                                        lineHeight: 1.0,
                                                       ),
                                                   minLines: 1,
                                                   cursorColor:
@@ -890,8 +890,8 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                 ],
                                               ),
                                             ]
-                                                .divide(const SizedBox(height: 16.0))
-                                                .around(const SizedBox(height: 16.0)),
+                                                .divide(const SizedBox(height: 24.0))
+                                                .around(const SizedBox(height: 24.0)),
                                           ).animateOnPageLoad(animationsMap[
                                               'columnOnPageLoadAnimation1']!),
                                         ),
@@ -1043,7 +1043,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                   FlutterFlowTheme.of(
                                                                           context)
                                                                       .bodyLargeFamily),
-                                                          lineHeight: 2.0,
+                                                          lineHeight: 1.0,
                                                         ),
                                                 minLines: 1,
                                                 cursorColor:
@@ -1197,7 +1197,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                 FlutterFlowTheme.of(
                                                                         context)
                                                                     .bodyLargeFamily),
-                                                        lineHeight: 2.0,
+                                                        lineHeight: 1.0,
                                                       ),
                                                   minLines: 1,
                                                   keyboardType: TextInputType
@@ -1377,7 +1377,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                 FlutterFlowTheme.of(
                                                                         context)
                                                                     .bodyLargeFamily),
-                                                        lineHeight: 2.0,
+                                                        lineHeight: 1.0,
                                                       ),
                                                   minLines: 1,
                                                   cursorColor:
@@ -1555,7 +1555,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                 FlutterFlowTheme.of(
                                                                         context)
                                                                     .bodyLargeFamily),
-                                                        lineHeight: 2.0,
+                                                        lineHeight: 1.0,
                                                       ),
                                                   minLines: 1,
                                                   cursorColor:
@@ -1860,8 +1860,8 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                 ],
                                               ),
                                             ]
-                                                .divide(const SizedBox(height: 16.0))
-                                                .around(const SizedBox(height: 16.0)),
+                                                .divide(const SizedBox(height: 24.0))
+                                                .around(const SizedBox(height: 24.0)),
                                           ).animateOnPageLoad(animationsMap[
                                               'columnOnPageLoadAnimation2']!),
                                         ),

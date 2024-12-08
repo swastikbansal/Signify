@@ -47,9 +47,9 @@ class _SelectlanguageWidgetState extends State<SelectlanguageWidget> {
         body: SafeArea(
           top: true,
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
             child: Column(
-              mainAxisSize: MainAxisSize.min,
+              mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -339,7 +339,7 @@ class _SelectlanguageWidgetState extends State<SelectlanguageWidget> {
                     ),
                   ]
                       .divide(const SizedBox(height: 16.0))
-                      .addToStart(const SizedBox(height: 24.0)),
+                      .addToStart(const SizedBox(height: 16.0)),
                 ),
               ],
             ),

@@ -164,6 +164,16 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           name: 'requestFeature',
           path: '/requestFeature',
           builder: (context, params) => const RequestFeatureWidget(),
+        ),
+        FFRoute(
+          name: 'islDict',
+          path: '/islDict',
+          builder: (context, params) => const IslDictWidget(),
+        ),
+        FFRoute(
+          name: 'islcommunity',
+          path: '/islcommunity',
+          builder: (context, params) => const IslcommunityWidget(),
         )
       ].map((r) => r.toRoute(appStateNotifier)).toList(),
     );
