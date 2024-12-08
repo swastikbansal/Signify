@@ -8,6 +8,8 @@ import mediapipe as mp
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Bidirectional,LSTM, Dense,Input,Flatten, GRU
 
+import google.generativeai as genai
+
 from glob import glob
 from pathlib import Path
 
@@ -28,11 +30,11 @@ def process_video(video_path):
 
     # Labels for data
     # actions = array([i.split("\\")[-1] for i in glob('MP_Data\*')])
-    actions = ['Blind','Deaf','Flat','Happy','Poor','Quiet','Rich','Sad','Slow','Thick']
+    actions = ['Flat','Happy','Poor','Quiet','Rich','Sad','Slow','Thick']
 
     # Defining Hyperparameters
     max_frames = 26
-    features = 23
+    features = 49
     input_shape = (max_frames, features)
     num_classes =  len(actions)
 
@@ -58,7 +60,7 @@ def process_video(video_path):
             Dense(num_classes, activation='softmax')
     ])
 
-    model_path = Path.cwd() / 'Model' / 'INCLUDE_10_V4_angled.h5'
+    model_path = Path.cwd() / 'Model' / 'INCLUDE_8_V4_angled.h5'
     model.load_weights(str(model_path))
 
     n_frames = 0
@@ -81,7 +83,7 @@ def process_video(video_path):
                 sequence.append(features)    
             
             else:
-                sequence.append(np.zeros(23))
+                sequence.append(np.zeros(49))
             
             # Predicting output in every 15 frames
             if n_frames % 15 == 0:
@@ -115,8 +117,12 @@ def process_video(video_path):
         cv2.destroyAllWindows()
         return sentence
 
+@app.route('/')
+def home():
+    return 'API is working'
+
 @app.route('/predict', methods=['GET','POST'])
-def download_video():
+def predict_video():
     data = request.get_json()
     
     if not data or 'link' not in data:
@@ -151,7 +157,14 @@ def download_video():
         # Process the video
         prediction = process_video(filename)
         
-        return jsonify({'prediction': prediction}), 200
+        genai.configure(api_key="AIzaSyBwC9kfjLF_qvb004UsCZIt6ho-XuzPWrg")
+
+        model = genai.GenerativeModel(model_name="gemini-1.5-flash")
+        response = model.generate_content(f"Genarte an meaningful setence from the list of prediction: {prediction} of a INDIAN Sign Language prediction model. Do not specifuy thats it is a INDIAN Sign Language prediction model just give the sentence.") 
+        print(response.text)
+        
+        
+        return jsonify({'sentence': response.text, 'prediction':prediction}), 200
     
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -159,4 +172,5 @@ def download_video():
 
         
 if __name__ == '__main__':
-    app.run(host='192.168.29.42', port=5000, debug=True)
+    app.run(host='192.168.29.42', port=3000, debug=True)
+    # app.run(host='127.0.0.1', port=5000, debug=True)
