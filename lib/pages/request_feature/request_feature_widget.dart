@@ -539,6 +539,8 @@ class _RequestFeatureWidgetState extends State<RequestFeatureWidget> {
                                       FlutterFlowTheme.of(context).customColor5,
                                   iconSize: 18.0,
                                   elevation: 0.0,
+                                  borderColor:
+                                      FlutterFlowTheme.of(context).primary,
                                   borderRadius: BorderRadius.circular(20.0),
                                 ),
                                 unselectedChipStyle: ChipStyle(
@@ -558,9 +560,11 @@ class _RequestFeatureWidgetState extends State<RequestFeatureWidget> {
                                                     .bodySmallFamily),
                                       ),
                                   iconColor:
-                                      FlutterFlowTheme.of(context).primaryText,
+                                      FlutterFlowTheme.of(context).customColor5,
                                   iconSize: 18.0,
                                   elevation: 0.0,
+                                  borderColor:
+                                      FlutterFlowTheme.of(context).alternate,
                                   borderRadius: BorderRadius.circular(20.0),
                                 ),
                                 chipSpacing: 8.0,

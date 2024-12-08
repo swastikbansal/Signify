@@ -234,8 +234,8 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget> {
                                       color: FlutterFlowTheme.of(context)
                                           .alternate,
                                       offset: const Offset(
-                                        1.0,
-                                        1.0,
+                                        0.0,
+                                        0.0,
                                       ),
                                       spreadRadius: 2.0,
                                     )
