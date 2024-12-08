@@ -187,7 +187,7 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> {
                                 ],
                               ),
                               Divider(
-                                thickness: 2.0,
+                                thickness: 1.0,
                                 color: FlutterFlowTheme.of(context).alternate,
                               ),
                               Row(
@@ -267,7 +267,7 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> {
                                 ],
                               ),
                               Divider(
-                                thickness: 2.0,
+                                thickness: 1.0,
                                 color: FlutterFlowTheme.of(context).alternate,
                               ),
                               Row(
@@ -346,7 +346,7 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> {
                                 ],
                               ),
                               Divider(
-                                thickness: 0.0,
+                                thickness: 1.0,
                                 color: FlutterFlowTheme.of(context).alternate,
                               ),
                               InkWell(

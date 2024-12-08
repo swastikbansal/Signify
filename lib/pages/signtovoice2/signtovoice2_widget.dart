@@ -3,7 +3,11 @@ import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/form_field_controller.dart';
+import '/walkthroughs/signify_screen_2.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart'
+    show TutorialCoachMark;
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'signtovoice2_model.dart';
 export 'signtovoice2_model.dart';
@@ -24,6 +28,13 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget> {
   void initState() {
     super.initState();
     _model = createModel(context, () => Signtovoice2Model());
+
+    // On page load action.
+    SchedulerBinding.instance.addPostFrameCallback((_) async {
+      safeSetState(() =>
+          _model.signifyScreen2Controller = createPageWalkthrough(context));
+      _model.signifyScreen2Controller?.show(context: context);
+    });
 
     _model.textController ??= TextEditingController();
     _model.textFieldFocusNode ??= FocusNode();
@@ -73,7 +84,7 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget> {
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
                   width: double.infinity,
-                  height: 420.0,
+                  height: 500.0,
                   decoration: BoxDecoration(
                     color: FlutterFlowTheme.of(context).primaryBackground,
                     borderRadius: BorderRadius.circular(12.0),
@@ -154,13 +165,13 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget> {
                             'drx645ue' /* Select Language */,
                           ),
                           icon: Icon(
-                            Icons.arrow_drop_down,
-                            color: FlutterFlowTheme.of(context).primaryText,
+                            Icons.keyboard_arrow_down,
+                            color: FlutterFlowTheme.of(context).secondaryText,
                             size: 24.0,
                           ),
                           fillColor:
                               FlutterFlowTheme.of(context).primaryBackground,
-                          elevation: 5.0,
+                          elevation: 2.0,
                           borderColor: FlutterFlowTheme.of(context).alternate,
                           borderWidth: 1.0,
                           borderRadius: 12.0,
@@ -169,6 +180,9 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget> {
                           isOverButton: false,
                           isSearchable: false,
                           isMultiSelect: false,
+                        ).addWalkthrough(
+                          dropDownB9wm9jo8,
+                          _model.signifyScreen2Controller,
                         ),
                         FlutterFlowIconButton(
                           borderRadius: 50.0,
@@ -186,6 +200,9 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget> {
                           onPressed: () {
                             print('IconButton pressed ...');
                           },
+                        ).addWalkthrough(
+                          iconButtonPl161kuq,
+                          _model.signifyScreen2Controller,
                         ),
                         FlutterFlowIconButton(
                           borderRadius: 50.0,
@@ -203,6 +220,9 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget> {
                           onPressed: () {
                             print('IconButton pressed ...');
                           },
+                        ).addWalkthrough(
+                          iconButton9jd3gtk2,
+                          _model.signifyScreen2Controller,
                         ),
                       ],
                     ),
@@ -215,13 +235,13 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget> {
                           Expanded(
                             child: Material(
                               color: Colors.transparent,
-                              elevation: 5.0,
+                              elevation: 4.0,
                               shape: const RoundedRectangleBorder(
                                 borderRadius: BorderRadius.only(
                                   bottomLeft: Radius.circular(0.0),
                                   bottomRight: Radius.circular(0.0),
-                                  topLeft: Radius.circular(46.0),
-                                  topRight: Radius.circular(46.0),
+                                  topLeft: Radius.circular(36.0),
+                                  topRight: Radius.circular(36.0),
                                 ),
                               ),
                               child: Container(
@@ -243,10 +263,15 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget> {
                                   borderRadius: const BorderRadius.only(
                                     bottomLeft: Radius.circular(0.0),
                                     bottomRight: Radius.circular(0.0),
-                                    topLeft: Radius.circular(46.0),
-                                    topRight: Radius.circular(46.0),
+                                    topLeft: Radius.circular(36.0),
+                                    topRight: Radius.circular(36.0),
                                   ),
                                   shape: BoxShape.rectangle,
+                                  border: Border.all(
+                                    color: FlutterFlowTheme.of(context)
+                                        .secondaryBackground,
+                                    width: 1.0,
+                                  ),
                                 ),
                                 child: Align(
                                   alignment: const AlignmentDirectional(0.0, 0.0),
@@ -347,6 +372,9 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget> {
                       ),
                     ),
                   ].divide(const SizedBox(height: 24.0)),
+                ).addWalkthrough(
+                  column7du8ugv9,
+                  _model.signifyScreen2Controller,
                 ),
               ),
             ].divide(const SizedBox(height: 16.0)),
@@ -355,4 +383,15 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget> {
       ),
     );
   }
+
+  TutorialCoachMark createPageWalkthrough(BuildContext context) =>
+      TutorialCoachMark(
+        targets: createWalkthroughTargets(context),
+        onFinish: () async {
+          safeSetState(() => _model.signifyScreen2Controller = null);
+        },
+        onSkip: () {
+          return true;
+        },
+      );
 }

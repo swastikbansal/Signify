@@ -4,9 +4,13 @@ import '/flutter_flow/flutter_flow_choice_chips.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/form_field_controller.dart';
+import '/walkthroughs/signify_screen_3.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart'
+    show TutorialCoachMark;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'education_model.dart';
@@ -28,6 +32,13 @@ class _EducationWidgetState extends State<EducationWidget> {
   void initState() {
     super.initState();
     _model = createModel(context, () => EducationModel());
+
+    // On page load action.
+    SchedulerBinding.instance.addPostFrameCallback((_) async {
+      safeSetState(() =>
+          _model.signifyScreen3Controller = createPageWalkthrough(context));
+      _model.signifyScreen3Controller?.show(context: context);
+    });
 
     _model.textController ??= TextEditingController();
     _model.textFieldFocusNode ??= FocusNode();
@@ -76,7 +87,7 @@ class _EducationWidgetState extends State<EducationWidget> {
               automaticallyImplyLeading: false,
               leading: Row(
                 mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Align(
@@ -100,8 +111,9 @@ class _EducationWidgetState extends State<EducationWidget> {
                     size: 24.0,
                   ),
                 ]
-                    .divide(const SizedBox(width: 160.0))
-                    .addToStart(const SizedBox(width: 16.0)),
+                    .divide(const SizedBox(width: 180.0))
+                    .addToStart(const SizedBox(width: 16.0))
+                    .addToEnd(const SizedBox(width: 16.0)),
               ),
               actions: const [],
               centerTitle: false,
@@ -116,7 +128,7 @@ class _EducationWidgetState extends State<EducationWidget> {
                   children: [
                     Padding(
                       padding:
-                          const EdgeInsetsDirectional.fromSTEB(16.0, 8.0, 0.0, 8.0),
+                          const EdgeInsetsDirectional.fromSTEB(16.0, 8.0, 0.0, 0.0),
                       child: RichText(
                         textScaler: MediaQuery.of(context).textScaler,
                         text: TextSpan(
@@ -185,7 +197,7 @@ class _EducationWidgetState extends State<EducationWidget> {
                     ),
                     Padding(
                       padding:
-                          const EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 0.0, 16.0),
+                          const EdgeInsetsDirectional.fromSTEB(16.0, 2.0, 0.0, 16.0),
                       child: Text(
                         FFLocalizations.of(context).getText(
                           'ddp2sajy' /* Stay up to date with us. */,
@@ -508,6 +520,9 @@ class _EducationWidgetState extends State<EducationWidget> {
                                   ),
                                 ),
                               ),
+                            ).addWalkthrough(
+                              container3o25fvbt,
+                              _model.signifyScreen3Controller,
                             ),
                           ),
                           Padding(
@@ -678,9 +693,15 @@ class _EducationWidgetState extends State<EducationWidget> {
                                   ),
                                 ),
                               ),
+                            ).addWalkthrough(
+                              containerB46jpjgu,
+                              _model.signifyScreen3Controller,
                             ),
                           ),
                         ].divide(const SizedBox(width: 16.0)),
+                      ).addWalkthrough(
+                        listView86zm3y4x,
+                        _model.signifyScreen3Controller,
                       ),
                     ),
                     Divider(
@@ -1053,6 +1074,9 @@ class _EducationWidgetState extends State<EducationWidget> {
                                 ],
                               ),
                             ),
+                          ).addWalkthrough(
+                            containerIld7clv3,
+                            _model.signifyScreen3Controller,
                           ),
                         ),
                         Padding(
@@ -1536,4 +1560,15 @@ class _EducationWidgetState extends State<EducationWidget> {
       },
     );
   }
+
+  TutorialCoachMark createPageWalkthrough(BuildContext context) =>
+      TutorialCoachMark(
+        targets: createWalkthroughTargets(context),
+        onFinish: () async {
+          safeSetState(() => _model.signifyScreen3Controller = null);
+        },
+        onSkip: () {
+          return true;
+        },
+      );
 }

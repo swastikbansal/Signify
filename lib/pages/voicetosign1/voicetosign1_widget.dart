@@ -1,7 +1,12 @@
+import '/auth/base_auth_user_provider.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
+import '/walkthroughs/signify_screen_1.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart'
+    show TutorialCoachMark;
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'voicetosign1_model.dart';
@@ -23,6 +28,15 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget> {
   void initState() {
     super.initState();
     _model = createModel(context, () => Voicetosign1Model());
+
+    // On page load action.
+    SchedulerBinding.instance.addPostFrameCallback((_) async {
+      if (loggedIn == true) {
+        safeSetState(() =>
+            _model.signifyScreen1Controller = createPageWalkthrough(context));
+        _model.signifyScreen1Controller?.show(context: context);
+      }
+    });
 
     _model.textController ??= TextEditingController();
     _model.textFieldFocusNode ??= FocusNode();
@@ -64,154 +78,168 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget> {
         ),
         body: SafeArea(
           top: true,
-          child: Align(
-            alignment: const AlignmentDirectional(0.0, 1.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Row(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: TextFormField(
-                        controller: _model.textController,
-                        focusNode: _model.textFieldFocusNode,
-                        autofocus: false,
-                        textCapitalization: TextCapitalization.sentences,
-                        obscureText: false,
-                        decoration: InputDecoration(
-                          isDense: false,
-                          labelText: FFLocalizations.of(context).getText(
-                            'wz6eakba' /* Your Message */,
-                          ),
-                          labelStyle: FlutterFlowTheme.of(context)
-                              .labelMedium
-                              .override(
-                                fontFamily: FlutterFlowTheme.of(context)
-                                    .labelMediumFamily,
-                                color:
-                                    FlutterFlowTheme.of(context).secondaryText,
-                                fontSize: 14.0,
-                                letterSpacing: 0.0,
-                                useGoogleFonts: GoogleFonts.asMap().containsKey(
-                                    FlutterFlowTheme.of(context)
-                                        .labelMediumFamily),
-                                lineHeight: 1.0,
-                              ),
-                          alignLabelWithHint: false,
-                          hintText: FFLocalizations.of(context).getText(
-                            'v4uk70of' /* Type to translate... */,
-                          ),
-                          hintStyle: FlutterFlowTheme.of(context)
-                              .labelMedium
-                              .override(
-                                fontFamily: FlutterFlowTheme.of(context)
-                                    .labelMediumFamily,
-                                letterSpacing: 0.0,
-                                useGoogleFonts: GoogleFonts.asMap().containsKey(
-                                    FlutterFlowTheme.of(context)
-                                        .labelMediumFamily),
-                                lineHeight: 1.0,
-                              ),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: FlutterFlowTheme.of(context).alternate,
-                              width: 1.0,
-                            ),
-                            borderRadius: BorderRadius.circular(12.0),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: FlutterFlowTheme.of(context).primary,
-                              width: 1.0,
-                            ),
-                            borderRadius: BorderRadius.circular(12.0),
-                          ),
-                          errorBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: FlutterFlowTheme.of(context).error,
-                              width: 1.0,
-                            ),
-                            borderRadius: BorderRadius.circular(12.0),
-                          ),
-                          focusedErrorBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: FlutterFlowTheme.of(context).error,
-                              width: 1.0,
-                            ),
-                            borderRadius: BorderRadius.circular(12.0),
-                          ),
-                          filled: true,
-                          fillColor:
-                              FlutterFlowTheme.of(context).primaryBackground,
-                          hoverColor:
-                              FlutterFlowTheme.of(context).primaryBackground,
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Row(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      controller: _model.textController,
+                      focusNode: _model.textFieldFocusNode,
+                      autofocus: false,
+                      textCapitalization: TextCapitalization.sentences,
+                      obscureText: false,
+                      decoration: InputDecoration(
+                        isDense: false,
+                        labelText: FFLocalizations.of(context).getText(
+                          'wz6eakba' /* Your Message */,
                         ),
-                        style: FlutterFlowTheme.of(context).titleSmall.override(
-                              fontFamily:
-                                  FlutterFlowTheme.of(context).titleSmallFamily,
+                        labelStyle: FlutterFlowTheme.of(context)
+                            .labelMedium
+                            .override(
+                              fontFamily: FlutterFlowTheme.of(context)
+                                  .labelMediumFamily,
+                              color: FlutterFlowTheme.of(context).secondaryText,
+                              fontSize: 14.0,
                               letterSpacing: 0.0,
                               useGoogleFonts: GoogleFonts.asMap().containsKey(
                                   FlutterFlowTheme.of(context)
-                                      .titleSmallFamily),
+                                      .labelMediumFamily),
                               lineHeight: 1.0,
                             ),
-                        textAlign: TextAlign.start,
-                        maxLines: 5,
-                        minLines: 1,
-                        cursorColor: FlutterFlowTheme.of(context).primary,
-                        validator:
-                            _model.textControllerValidator.asValidator(context),
+                        alignLabelWithHint: false,
+                        hintText: FFLocalizations.of(context).getText(
+                          'v4uk70of' /* Type to translate... */,
+                        ),
+                        hintStyle:
+                            FlutterFlowTheme.of(context).labelMedium.override(
+                                  fontFamily: FlutterFlowTheme.of(context)
+                                      .labelMediumFamily,
+                                  letterSpacing: 0.0,
+                                  useGoogleFonts: GoogleFonts.asMap()
+                                      .containsKey(FlutterFlowTheme.of(context)
+                                          .labelMediumFamily),
+                                  lineHeight: 1.0,
+                                ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: FlutterFlowTheme.of(context).alternate,
+                            width: 1.0,
+                          ),
+                          borderRadius: BorderRadius.circular(12.0),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: FlutterFlowTheme.of(context).primary,
+                            width: 1.0,
+                          ),
+                          borderRadius: BorderRadius.circular(12.0),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: FlutterFlowTheme.of(context).error,
+                            width: 1.0,
+                          ),
+                          borderRadius: BorderRadius.circular(12.0),
+                        ),
+                        focusedErrorBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: FlutterFlowTheme.of(context).error,
+                            width: 1.0,
+                          ),
+                          borderRadius: BorderRadius.circular(12.0),
+                        ),
+                        filled: true,
+                        fillColor:
+                            FlutterFlowTheme.of(context).primaryBackground,
+                        hoverColor:
+                            FlutterFlowTheme.of(context).primaryBackground,
                       ),
+                      style: FlutterFlowTheme.of(context).titleSmall.override(
+                            fontFamily:
+                                FlutterFlowTheme.of(context).titleSmallFamily,
+                            letterSpacing: 0.0,
+                            useGoogleFonts: GoogleFonts.asMap().containsKey(
+                                FlutterFlowTheme.of(context).titleSmallFamily),
+                            lineHeight: 2.0,
+                          ),
+                      textAlign: TextAlign.start,
+                      maxLines: 6,
+                      minLines: 1,
+                      cursorColor: FlutterFlowTheme.of(context).primary,
+                      validator:
+                          _model.textControllerValidator.asValidator(context),
                     ),
-                    FlutterFlowIconButton(
+                  ),
+                  FlutterFlowIconButton(
+                    borderRadius: 100.0,
+                    buttonSize: 50.0,
+                    hoverColor: FlutterFlowTheme.of(context).alternate,
+                    hoverIconColor: FlutterFlowTheme.of(context).primary,
+                    icon: FaIcon(
+                      FontAwesomeIcons.microphone,
+                      color: FlutterFlowTheme.of(context).secondaryText,
+                      size: 24.0,
+                    ),
+                    onPressed: () {
+                      print('IconButton pressed ...');
+                    },
+                  ).addWalkthrough(
+                    iconButtonIwoicpe5,
+                    _model.signifyScreen1Controller,
+                  ),
+                  Align(
+                    alignment: const AlignmentDirectional(0.0, 0.0),
+                    child: FlutterFlowIconButton(
                       borderRadius: 100.0,
                       buttonSize: 50.0,
-                      hoverColor: FlutterFlowTheme.of(context).alternate,
+                      fillColor:
+                          FlutterFlowTheme.of(context).secondaryBackground,
+                      hoverColor:
+                          FlutterFlowTheme.of(context).primaryBackground,
                       hoverIconColor: FlutterFlowTheme.of(context).primary,
-                      icon: FaIcon(
-                        FontAwesomeIcons.microphone,
-                        color: FlutterFlowTheme.of(context).secondaryText,
-                        size: 24.0,
+                      icon: Icon(
+                        Icons.send_rounded,
+                        color: FlutterFlowTheme.of(context).primaryText,
+                        size: 30.0,
                       ),
+                      showLoadingIndicator: true,
                       onPressed: () {
                         print('IconButton pressed ...');
                       },
+                    ).addWalkthrough(
+                      iconButtonO625l09g,
+                      _model.signifyScreen1Controller,
                     ),
-                    Align(
-                      alignment: const AlignmentDirectional(0.0, 0.0),
-                      child: FlutterFlowIconButton(
-                        borderRadius: 100.0,
-                        buttonSize: 50.0,
-                        fillColor:
-                            FlutterFlowTheme.of(context).secondaryBackground,
-                        hoverColor:
-                            FlutterFlowTheme.of(context).primaryBackground,
-                        hoverIconColor: FlutterFlowTheme.of(context).primary,
-                        icon: Icon(
-                          Icons.send_rounded,
-                          color: FlutterFlowTheme.of(context).primaryText,
-                          size: 30.0,
-                        ),
-                        showLoadingIndicator: true,
-                        onPressed: () {
-                          print('IconButton pressed ...');
-                        },
-                      ),
-                    ),
-                  ]
-                      .divide(const SizedBox(width: 8.0))
-                      .addToStart(const SizedBox(width: 16.0))
-                      .addToEnd(const SizedBox(width: 16.0)),
-                ),
-              ].addToEnd(const SizedBox(height: 20.0)),
-            ),
+                  ),
+                ]
+                    .divide(const SizedBox(width: 8.0))
+                    .addToStart(const SizedBox(width: 16.0))
+                    .addToEnd(const SizedBox(width: 16.0)),
+              ).addWalkthrough(
+                row3qnw9877,
+                _model.signifyScreen1Controller,
+              ),
+            ].addToEnd(const SizedBox(height: 24.0)),
           ),
         ),
       ),
     );
   }
+
+  TutorialCoachMark createPageWalkthrough(BuildContext context) =>
+      TutorialCoachMark(
+        targets: createWalkthroughTargets(context),
+        onFinish: () async {
+          safeSetState(() => _model.signifyScreen1Controller = null);
+        },
+        onSkip: () {
+          return true;
+        },
+      );
 }

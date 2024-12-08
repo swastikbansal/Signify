@@ -460,7 +460,7 @@ class _ReportBugWidgetState extends State<ReportBugWidget> {
                                   size: 24.0,
                                 ),
                                 fillColor: FlutterFlowTheme.of(context)
-                                    .secondaryBackground,
+                                    .primaryBackground,
                                 elevation: 2.0,
                                 borderColor:
                                     FlutterFlowTheme.of(context).alternate,

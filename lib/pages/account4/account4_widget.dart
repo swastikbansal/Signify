@@ -3,7 +3,11 @@ import '/backend/backend.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
+import '/walkthroughs/signify_screen_4.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart'
+    show TutorialCoachMark;
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -26,6 +30,13 @@ class _Account4WidgetState extends State<Account4Widget> {
   void initState() {
     super.initState();
     _model = createModel(context, () => Account4Model());
+
+    // On page load action.
+    SchedulerBinding.instance.addPostFrameCallback((_) async {
+      safeSetState(() =>
+          _model.signifyScreen4Controller = createPageWalkthrough(context));
+      _model.signifyScreen4Controller?.show(context: context);
+    });
 
     WidgetsBinding.instance.addPostFrameCallback((_) => safeSetState(() {}));
   }
@@ -236,6 +247,9 @@ class _Account4WidgetState extends State<Account4Widget> {
                               ),
                             ),
                           ].divide(const SizedBox(height: 24.0)),
+                        ).addWalkthrough(
+                          columnOfubeq9b,
+                          _model.signifyScreen4Controller,
                         ),
                       ),
                       Container(
@@ -850,6 +864,9 @@ class _Account4WidgetState extends State<Account4Widget> {
                             ].divide(const SizedBox(height: 8.0)),
                           ),
                         ),
+                      ).addWalkthrough(
+                        containerXdqk8aw2,
+                        _model.signifyScreen4Controller,
                       ),
                       Align(
                         alignment: const AlignmentDirectional(0.0, 0.0),
@@ -913,4 +930,15 @@ class _Account4WidgetState extends State<Account4Widget> {
       },
     );
   }
+
+  TutorialCoachMark createPageWalkthrough(BuildContext context) =>
+      TutorialCoachMark(
+        targets: createWalkthroughTargets(context),
+        onFinish: () async {
+          safeSetState(() => _model.signifyScreen4Controller = null);
+        },
+        onSkip: () {
+          return true;
+        },
+      );
 }

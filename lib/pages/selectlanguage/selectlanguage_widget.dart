@@ -116,38 +116,33 @@ class _SelectlanguageWidgetState extends State<SelectlanguageWidget> {
                                 FlutterFlowTheme.of(context).titleLargeFamily),
                           ),
                     ),
-                    Align(
-                      alignment: const AlignmentDirectional(0.0, 0.0),
-                      child: FlutterFlowLanguageSelector(
-                        width: 240.0,
-                        height: 50.0,
-                        backgroundColor:
-                            FlutterFlowTheme.of(context).primaryBackground,
-                        borderColor: FlutterFlowTheme.of(context).alternate,
-                        dropdownColor:
-                            FlutterFlowTheme.of(context).primaryBackground,
-                        dropdownIconColor:
-                            FlutterFlowTheme.of(context).secondaryText,
-                        borderRadius: 12.0,
-                        textStyle: FlutterFlowTheme.of(context)
-                            .bodyMedium
-                            .override(
-                              fontFamily:
-                                  FlutterFlowTheme.of(context).bodyMediumFamily,
-                              letterSpacing: 0.0,
-                              useGoogleFonts: GoogleFonts.asMap().containsKey(
-                                  FlutterFlowTheme.of(context)
-                                      .bodyMediumFamily),
-                              lineHeight: 2.0,
-                            ),
-                        hideFlags: true,
-                        flagSize: 24.0,
-                        flagTextGap: 8.0,
-                        currentLanguage:
-                            FFLocalizations.of(context).languageCode,
-                        languages: FFLocalizations.languages(),
-                        onChanged: (lang) => setAppLanguage(context, lang),
-                      ),
+                    FlutterFlowLanguageSelector(
+                      width: 240.0,
+                      height: 50.0,
+                      backgroundColor:
+                          FlutterFlowTheme.of(context).primaryBackground,
+                      borderColor: FlutterFlowTheme.of(context).alternate,
+                      dropdownColor:
+                          FlutterFlowTheme.of(context).primaryBackground,
+                      dropdownIconColor:
+                          FlutterFlowTheme.of(context).secondaryText,
+                      borderRadius: 12.0,
+                      textStyle: FlutterFlowTheme.of(context)
+                          .bodyMedium
+                          .override(
+                            fontFamily:
+                                FlutterFlowTheme.of(context).bodyMediumFamily,
+                            letterSpacing: 0.0,
+                            useGoogleFonts: GoogleFonts.asMap().containsKey(
+                                FlutterFlowTheme.of(context).bodyMediumFamily),
+                            lineHeight: 2.0,
+                          ),
+                      hideFlags: true,
+                      flagSize: 24.0,
+                      flagTextGap: 8.0,
+                      currentLanguage: FFLocalizations.of(context).languageCode,
+                      languages: FFLocalizations.languages(),
+                      onChanged: (lang) => setAppLanguage(context, lang),
                     ),
                     Padding(
                       padding:
@@ -311,29 +306,22 @@ class _SelectlanguageWidgetState extends State<SelectlanguageWidget> {
                         ),
                       ),
                     ),
-                    Align(
-                      alignment: const AlignmentDirectional(0.0, 0.0),
-                      child: Padding(
-                        padding:
-                            const EdgeInsetsDirectional.fromSTEB(0.0, 24.0, 0.0, 0.0),
-                        child: Text(
-                          FFLocalizations.of(context).getText(
-                            'v088ak2u' /* Disclaimer: The app translatio... */,
-                          ),
-                          textAlign: TextAlign.center,
-                          style: FlutterFlowTheme.of(context)
-                              .bodySmall
-                              .override(
-                                fontFamily: FlutterFlowTheme.of(context)
-                                    .bodySmallFamily,
-                                color:
-                                    FlutterFlowTheme.of(context).secondaryText,
-                                letterSpacing: 0.0,
-                                useGoogleFonts: GoogleFonts.asMap().containsKey(
-                                    FlutterFlowTheme.of(context)
-                                        .bodySmallFamily),
-                              ),
+                    Padding(
+                      padding:
+                          const EdgeInsetsDirectional.fromSTEB(0.0, 36.0, 0.0, 8.0),
+                      child: Text(
+                        FFLocalizations.of(context).getText(
+                          'v088ak2u' /* Disclaimer: The app translatio... */,
                         ),
+                        textAlign: TextAlign.center,
+                        style: FlutterFlowTheme.of(context).bodySmall.override(
+                              fontFamily:
+                                  FlutterFlowTheme.of(context).bodySmallFamily,
+                              color: FlutterFlowTheme.of(context).secondaryText,
+                              letterSpacing: 0.0,
+                              useGoogleFonts: GoogleFonts.asMap().containsKey(
+                                  FlutterFlowTheme.of(context).bodySmallFamily),
+                            ),
                       ),
                     ),
                   ]

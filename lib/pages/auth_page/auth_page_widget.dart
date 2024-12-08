@@ -1216,7 +1216,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                         milliseconds: 2000),
                                                     () => safeSetState(() {}),
                                                   ),
-                                                  autofocus: true,
+                                                  autofocus: false,
                                                   autofillHints: const [
                                                     AutofillHints.email
                                                   ],

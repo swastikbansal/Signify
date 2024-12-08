@@ -703,7 +703,7 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                                     },
                                   ).animateOnPageLoad(animationsMap[
                                       'iconButtonOnPageLoadAnimation1']!),
-                                ].divide(const SizedBox(width: 160.0)),
+                                ].divide(const SizedBox(width: 180.0)),
                               ),
                             ),
                           ],
@@ -853,7 +853,7 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                                     },
                                   ).animateOnPageLoad(animationsMap[
                                       'iconButtonOnPageLoadAnimation2']!),
-                                ].divide(const SizedBox(width: 160.0)),
+                                ].divide(const SizedBox(width: 180.0)),
                               ),
                             ),
                           ],
@@ -998,7 +998,7 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                                     },
                                   ).animateOnPageLoad(animationsMap[
                                       'iconButtonOnPageLoadAnimation3']!),
-                                ].divide(const SizedBox(width: 160.0)),
+                                ].divide(const SizedBox(width: 180.0)),
                               ),
                             ),
                           ],
@@ -1149,7 +1149,7 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                                     },
                                   ).animateOnPageLoad(animationsMap[
                                       'iconButtonOnPageLoadAnimation4']!),
-                                ].divide(const SizedBox(width: 160.0)),
+                                ].divide(const SizedBox(width: 180.0)),
                               ),
                             ),
                           ],
@@ -1218,7 +1218,7 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                             ),
                             Padding(
                               padding: const EdgeInsetsDirectional.fromSTEB(
-                                  0.0, 44.0, 0.0, 0.0),
+                                  0.0, 36.0, 0.0, 0.0),
                               child: FFButtonWidget(
                                 onPressed: () async {
                                   context.pushNamed(

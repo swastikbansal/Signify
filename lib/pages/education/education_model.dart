@@ -1,11 +1,14 @@
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/form_field_controller.dart';
 import 'education_widget.dart' show EducationWidget;
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart'
+    show TutorialCoachMark;
 import 'package:flutter/material.dart';
 
 class EducationModel extends FlutterFlowModel<EducationWidget> {
   ///  State fields for stateful widgets in this page.
 
+  TutorialCoachMark? signifyScreen3Controller;
   // State field(s) for TextField widget.
   FocusNode? textFieldFocusNode;
   TextEditingController? textController;
@@ -22,6 +25,7 @@ class EducationModel extends FlutterFlowModel<EducationWidget> {
 
   @override
   void dispose() {
+    signifyScreen3Controller?.finish();
     textFieldFocusNode?.dispose();
     textController?.dispose();
   }
