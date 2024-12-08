@@ -167,78 +167,76 @@ class _SelectlanguageWidgetState extends State<SelectlanguageWidget> {
                             ),
                       ),
                     ),
-                    Align(
-                      alignment: const AlignmentDirectional(0.0, 0.0),
-                      child: FlutterFlowDropDown<int>(
-                        controller: _model.dropDownValueController ??=
-                            FormFieldController<int>(
-                          _model.dropDownValue ??= 1,
-                        ),
-                        options: List<int>.from([1, 0, 2]),
-                        optionLabels: [
-                          FFLocalizations.of(context).getText(
-                            'sg91yjho' /* Right Handed Signer */,
-                          ),
-                          FFLocalizations.of(context).getText(
-                            'u72icawo' /* Left Hnaded Signer */,
-                          ),
-                          FFLocalizations.of(context).getText(
-                            'qky9ny2q' /* Ambidextrous */,
-                          )
-                        ],
-                        onChanged: (val) =>
-                            safeSetState(() => _model.dropDownValue = val),
-                        width: 240.0,
-                        height: 50.0,
-                        textStyle: FlutterFlowTheme.of(context)
-                            .bodyMedium
-                            .override(
-                              fontFamily:
-                                  FlutterFlowTheme.of(context).bodyMediumFamily,
-                              letterSpacing: 0.0,
-                              useGoogleFonts: GoogleFonts.asMap().containsKey(
-                                  FlutterFlowTheme.of(context)
-                                      .bodyMediumFamily),
-                              lineHeight: 2.0,
-                            ),
-                        hintText: FFLocalizations.of(context).getText(
-                          'ehg1ge1w' /* Select */,
-                        ),
-                        icon: Icon(
-                          Icons.keyboard_arrow_down_rounded,
-                          color: FlutterFlowTheme.of(context).secondaryText,
-                          size: 24.0,
-                        ),
-                        fillColor:
-                            FlutterFlowTheme.of(context).primaryBackground,
-                        elevation: 5.0,
-                        borderColor: FlutterFlowTheme.of(context).alternate,
-                        borderWidth: 1.0,
-                        borderRadius: 12.0,
-                        margin: const EdgeInsets.all(12.0),
-                        hidesUnderline: true,
-                        isOverButton: false,
-                        isSearchable: false,
-                        isMultiSelect: false,
+                    FlutterFlowDropDown<int>(
+                      controller: _model.dropDownValueController ??=
+                          FormFieldController<int>(
+                        _model.dropDownValue ??= 1,
                       ),
-                    ),
-                    Text(
-                      FFLocalizations.of(context).getText(
-                        'hl1npvsk' /* Our model works better if we k... */,
-                      ),
-                      textAlign: TextAlign.center,
-                      style: FlutterFlowTheme.of(context).bodySmall.override(
+                      options: List<int>.from([1, 0, 2]),
+                      optionLabels: [
+                        FFLocalizations.of(context).getText(
+                          'sg91yjho' /* Right Handed Signer */,
+                        ),
+                        FFLocalizations.of(context).getText(
+                          'u72icawo' /* Left Hnaded Signer */,
+                        ),
+                        FFLocalizations.of(context).getText(
+                          'qky9ny2q' /* Ambidextrous */,
+                        )
+                      ],
+                      onChanged: (val) =>
+                          safeSetState(() => _model.dropDownValue = val),
+                      width: 240.0,
+                      height: 50.0,
+                      textStyle: FlutterFlowTheme.of(context)
+                          .bodyMedium
+                          .override(
                             fontFamily:
-                                FlutterFlowTheme.of(context).bodySmallFamily,
-                            color: FlutterFlowTheme.of(context).secondaryText,
+                                FlutterFlowTheme.of(context).bodyMediumFamily,
                             letterSpacing: 0.0,
                             useGoogleFonts: GoogleFonts.asMap().containsKey(
-                                FlutterFlowTheme.of(context).bodySmallFamily),
+                                FlutterFlowTheme.of(context).bodyMediumFamily),
+                            lineHeight: 2.0,
                           ),
+                      hintText: FFLocalizations.of(context).getText(
+                        'ehg1ge1w' /* Select */,
+                      ),
+                      icon: Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        color: FlutterFlowTheme.of(context).secondaryText,
+                        size: 24.0,
+                      ),
+                      fillColor: FlutterFlowTheme.of(context).primaryBackground,
+                      elevation: 5.0,
+                      borderColor: FlutterFlowTheme.of(context).alternate,
+                      borderWidth: 1.0,
+                      borderRadius: 12.0,
+                      margin: const EdgeInsets.all(12.0),
+                      hidesUnderline: true,
+                      isOverButton: false,
+                      isSearchable: false,
+                      isMultiSelect: false,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        FFLocalizations.of(context).getText(
+                          'hl1npvsk' /* Our model works better if we k... */,
+                        ),
+                        textAlign: TextAlign.center,
+                        style: FlutterFlowTheme.of(context).bodySmall.override(
+                              fontFamily:
+                                  FlutterFlowTheme.of(context).bodySmallFamily,
+                              color: FlutterFlowTheme.of(context).secondaryText,
+                              letterSpacing: 0.0,
+                              useGoogleFonts: GoogleFonts.asMap().containsKey(
+                                  FlutterFlowTheme.of(context).bodySmallFamily),
+                            ),
+                      ),
                     ),
                     Padding(
                       padding:
-                          const EdgeInsetsDirectional.fromSTEB(0.0, 12.0, 0.0, 0.0),
+                          const EdgeInsetsDirectional.fromSTEB(0.0, 8.0, 0.0, 0.0),
                       child: FFButtonWidget(
                         onPressed: () async {
                           if (loggedIn) {
@@ -316,7 +314,7 @@ class _SelectlanguageWidgetState extends State<SelectlanguageWidget> {
                       alignment: const AlignmentDirectional(0.0, 0.0),
                       child: Padding(
                         padding:
-                            const EdgeInsetsDirectional.fromSTEB(0.0, 36.0, 0.0, 0.0),
+                            const EdgeInsetsDirectional.fromSTEB(0.0, 24.0, 0.0, 0.0),
                         child: Text(
                           FFLocalizations.of(context).getText(
                             'v088ak2u' /* Disclaimer: The app translatio... */,

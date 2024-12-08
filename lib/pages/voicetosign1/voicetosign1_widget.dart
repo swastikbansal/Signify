@@ -157,7 +157,7 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget> {
                               useGoogleFonts: GoogleFonts.asMap().containsKey(
                                   FlutterFlowTheme.of(context)
                                       .titleSmallFamily),
-                              lineHeight: 2.0,
+                              lineHeight: 1.0,
                             ),
                         textAlign: TextAlign.start,
                         maxLines: 5,
@@ -185,7 +185,7 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget> {
                       alignment: const AlignmentDirectional(0.0, 0.0),
                       child: FlutterFlowIconButton(
                         borderRadius: 100.0,
-                        buttonSize: 60.0,
+                        buttonSize: 50.0,
                         fillColor:
                             FlutterFlowTheme.of(context).secondaryBackground,
                         hoverColor:

@@ -4508,7 +4508,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'te': '',
       'ur': '',
     },
-    'wnup500u': {
+    'uscq0w9r': {
       'en': 'View All',
       'as': '',
       'bn': '',
@@ -4669,7 +4669,8 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
   // Miscellaneous
   {
     '6bo2bsxy': {
-      'en': '',
+      'en':
+          'In order to take a picture or video, this app requires permission to access the camera.',
       'as': '',
       'bn':
           'একটি ছবি বা ভিডিও তোলার জন্য, এই অ্যাপটির ক্যামেরা অ্যাক্সেস করার অনুমতি প্রয়োজন।',
@@ -4690,7 +4691,8 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'ur': '',
     },
     '0jwkgtkj': {
-      'en': '',
+      'en':
+          'In order to upload data, this app requires permission to access the photo library.',
       'as': '',
       'bn':
           'ডেটা আপলোড করার জন্য, এই অ্যাপটির ফটো লাইব্রেরি অ্যাক্সেস করার অনুমতি প্রয়োজন।',

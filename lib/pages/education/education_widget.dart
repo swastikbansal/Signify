@@ -288,6 +288,7 @@ class _EducationWidgetState extends State<EducationWidget> {
                       ),
                       child: ListView(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        primary: false,
                         scrollDirection: Axis.horizontal,
                         children: [
                           Padding(
@@ -485,15 +486,7 @@ class _EducationWidgetState extends State<EducationWidget> {
                               hoverColor: Colors.transparent,
                               highlightColor: Colors.transparent,
                               onTap: () async {
-                                context.pushNamed(
-                                  'islcommunity',
-                                  extra: <String, dynamic>{
-                                    kTransitionInfoKey: const TransitionInfo(
-                                      hasTransition: true,
-                                      transitionType: PageTransitionType.fade,
-                                    ),
-                                  },
-                                );
+                                context.pushNamed('islcommunity');
                               },
                               child: Container(
                                 width: 260.0,
@@ -785,6 +778,7 @@ class _EducationWidgetState extends State<EducationWidget> {
                         0,
                         36.0,
                       ),
+                      primary: false,
                       shrinkWrap: true,
                       scrollDirection: Axis.vertical,
                       children: [

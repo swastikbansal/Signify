@@ -327,6 +327,7 @@ class _IslDictWidgetState extends State<IslDictWidget> {
                               padding: const EdgeInsetsDirectional.fromSTEB(
                                   8.0, 0.0, 8.0, 0.0),
                               child: SingleChildScrollView(
+                                primary: false,
                                 child: Column(
                                   mainAxisSize: MainAxisSize.max,
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -1700,6 +1701,10 @@ class _IslDictWidgetState extends State<IslDictWidget> {
                                       )
                                     ],
                                     borderRadius: BorderRadius.circular(16.0),
+                                    border: Border.all(
+                                      color: FlutterFlowTheme.of(context)
+                                          .alternate,
+                                    ),
                                   ),
                                   child: Padding(
                                     padding: const EdgeInsets.all(16.0),
@@ -2033,6 +2038,10 @@ class _IslDictWidgetState extends State<IslDictWidget> {
                                       )
                                     ],
                                     borderRadius: BorderRadius.circular(16.0),
+                                    border: Border.all(
+                                      color: FlutterFlowTheme.of(context)
+                                          .alternate,
+                                    ),
                                   ),
                                   child: Padding(
                                     padding: const EdgeInsetsDirectional.fromSTEB(
@@ -2075,19 +2084,21 @@ class _IslDictWidgetState extends State<IslDictWidget> {
                                               ),
                                               style:
                                                   FlutterFlowTheme.of(context)
-                                                      .titleSmall
+                                                      .titleMedium
                                                       .override(
                                                         fontFamily:
                                                             FlutterFlowTheme.of(
                                                                     context)
-                                                                .titleSmallFamily,
+                                                                .titleMediumFamily,
                                                         letterSpacing: 0.0,
+                                                        fontWeight:
+                                                            FontWeight.w800,
                                                         useGoogleFonts: GoogleFonts
                                                                 .asMap()
                                                             .containsKey(
                                                                 FlutterFlowTheme.of(
                                                                         context)
-                                                                    .titleSmallFamily),
+                                                                    .titleMediumFamily),
                                                       ),
                                             ),
                                             Text(
@@ -2160,7 +2171,7 @@ class _IslDictWidgetState extends State<IslDictWidget> {
                                                                 .secondaryText,
                                                         letterSpacing: 0.0,
                                                         fontWeight:
-                                                            FontWeight.w800,
+                                                            FontWeight.bold,
                                                         useGoogleFonts: GoogleFonts
                                                                 .asMap()
                                                             .containsKey(
@@ -2180,7 +2191,9 @@ class _IslDictWidgetState extends State<IslDictWidget> {
                                                   ),
                                                   child: Padding(
                                                     padding:
-                                                        const EdgeInsets.all(12.0),
+                                                        const EdgeInsetsDirectional
+                                                            .fromSTEB(12.0, 8.0,
+                                                                12.0, 8.0),
                                                     child: Text(
                                                       FFLocalizations.of(
                                                               context)
@@ -2220,7 +2233,9 @@ class _IslDictWidgetState extends State<IslDictWidget> {
                                                   ),
                                                   child: Padding(
                                                     padding:
-                                                        const EdgeInsets.all(12.0),
+                                                        const EdgeInsetsDirectional
+                                                            .fromSTEB(12.0, 8.0,
+                                                                12.0, 8.0),
                                                     child: Text(
                                                       FFLocalizations.of(
                                                               context)

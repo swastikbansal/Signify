@@ -179,95 +179,92 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                   padding: const EdgeInsetsDirectional.fromSTEB(0.0, 100.0, 0.0, 0.0),
                   child: Container(
                     width: double.infinity,
-                    height: 650.0,
+                    height: double.infinity,
                     decoration: const BoxDecoration(),
                     child: Column(
                       mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        Container(
-                          width: double.infinity,
-                          height: 650.0,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(0.0),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsetsDirectional.fromSTEB(
-                                16.0, 0.0, 16.0, 0.0),
-                            child: Column(
-                              children: [
-                                Align(
-                                  alignment: const Alignment(0.0, 0),
-                                  child: TabBar(
-                                    isScrollable: true,
-                                    tabAlignment: TabAlignment.center,
-                                    labelColor: FlutterFlowTheme.of(context)
-                                        .primaryText,
-                                    unselectedLabelColor:
-                                        FlutterFlowTheme.of(context)
-                                            .secondaryText,
-                                    labelPadding: const EdgeInsets.all(16.0),
-                                    labelStyle: FlutterFlowTheme.of(context)
-                                        .displaySmall
-                                        .override(
-                                          fontFamily:
-                                              FlutterFlowTheme.of(context)
-                                                  .displaySmallFamily,
-                                          letterSpacing: 0.0,
-                                          useGoogleFonts: GoogleFonts.asMap()
-                                              .containsKey(
-                                                  FlutterFlowTheme.of(context)
-                                                      .displaySmallFamily),
+                        Expanded(
+                          child: Container(
+                            width: double.infinity,
+                            height: double.infinity,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(0.0),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsetsDirectional.fromSTEB(
+                                  32.0, 0.0, 32.0, 0.0),
+                              child: Column(
+                                children: [
+                                  Align(
+                                    alignment: const Alignment(0.0, 0),
+                                    child: TabBar(
+                                      isScrollable: true,
+                                      tabAlignment: TabAlignment.center,
+                                      labelColor: FlutterFlowTheme.of(context)
+                                          .primaryText,
+                                      unselectedLabelColor:
+                                          FlutterFlowTheme.of(context)
+                                              .secondaryText,
+                                      labelPadding: const EdgeInsets.all(16.0),
+                                      labelStyle: FlutterFlowTheme.of(context)
+                                          .headlineLarge
+                                          .override(
+                                            fontFamily:
+                                                FlutterFlowTheme.of(context)
+                                                    .headlineLargeFamily,
+                                            letterSpacing: 0.0,
+                                            useGoogleFonts: GoogleFonts.asMap()
+                                                .containsKey(
+                                                    FlutterFlowTheme.of(context)
+                                                        .headlineLargeFamily),
+                                          ),
+                                      unselectedLabelStyle: FlutterFlowTheme.of(
+                                              context)
+                                          .headlineLarge
+                                          .override(
+                                            fontFamily:
+                                                FlutterFlowTheme.of(context)
+                                                    .headlineLargeFamily,
+                                            letterSpacing: 0.0,
+                                            useGoogleFonts: GoogleFonts.asMap()
+                                                .containsKey(
+                                                    FlutterFlowTheme.of(context)
+                                                        .headlineLargeFamily),
+                                          ),
+                                      indicatorColor:
+                                          FlutterFlowTheme.of(context).primary,
+                                      indicatorWeight: 4.0,
+                                      padding: const EdgeInsetsDirectional.fromSTEB(
+                                          0.0, 0.0, 0.0, 16.0),
+                                      tabs: [
+                                        Tab(
+                                          text: FFLocalizations.of(context)
+                                              .getText(
+                                            'qc8jhwf0' /* Sign In */,
+                                          ),
                                         ),
-                                    unselectedLabelStyle: FlutterFlowTheme.of(
-                                            context)
-                                        .displaySmall
-                                        .override(
-                                          fontFamily:
-                                              FlutterFlowTheme.of(context)
-                                                  .displaySmallFamily,
-                                          letterSpacing: 0.0,
-                                          useGoogleFonts: GoogleFonts.asMap()
-                                              .containsKey(
-                                                  FlutterFlowTheme.of(context)
-                                                      .displaySmallFamily),
+                                        Tab(
+                                          text: FFLocalizations.of(context)
+                                              .getText(
+                                            'gmecwj06' /* Sign Up */,
+                                          ),
                                         ),
-                                    indicatorColor:
-                                        FlutterFlowTheme.of(context).primary,
-                                    indicatorWeight: 4.0,
-                                    padding: const EdgeInsetsDirectional.fromSTEB(
-                                        0.0, 0.0, 0.0, 16.0),
-                                    tabs: [
-                                      Tab(
-                                        text:
-                                            FFLocalizations.of(context).getText(
-                                          'qc8jhwf0' /* Sign In */,
-                                        ),
-                                      ),
-                                      Tab(
-                                        text:
-                                            FFLocalizations.of(context).getText(
-                                          'gmecwj06' /* Sign Up */,
-                                        ),
-                                      ),
-                                    ],
-                                    controller: _model.tabBarController,
-                                    onTap: (i) async {
-                                      [() async {}, () async {}][i]();
-                                    },
+                                      ],
+                                      controller: _model.tabBarController,
+                                      onTap: (i) async {
+                                        [() async {}, () async {}][i]();
+                                      },
+                                    ),
                                   ),
-                                ),
-                                Expanded(
-                                  child: TabBarView(
-                                    controller: _model.tabBarController,
-                                    children: [
-                                      KeepAliveWidgetWrapper(
-                                        builder: (context) => Padding(
-                                          padding:
-                                              const EdgeInsetsDirectional.fromSTEB(
-                                                  16.0, 0.0, 16.0, 0.0),
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.max,
+                                  Expanded(
+                                    child: TabBarView(
+                                      controller: _model.tabBarController,
+                                      children: [
+                                        KeepAliveWidgetWrapper(
+                                          builder: (context) => Column(
+                                            mainAxisSize: MainAxisSize.min,
                                             mainAxisAlignment:
                                                 MainAxisAlignment.start,
                                             crossAxisAlignment:
@@ -415,7 +412,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                 FlutterFlowTheme.of(
                                                                         context)
                                                                     .bodyLargeFamily),
-                                                        lineHeight: 1.0,
+                                                        lineHeight: 2.0,
                                                       ),
                                                   minLines: 1,
                                                   keyboardType: TextInputType
@@ -591,7 +588,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                 FlutterFlowTheme.of(
                                                                         context)
                                                                     .bodyLargeFamily),
-                                                        lineHeight: 1.0,
+                                                        lineHeight: 2.0,
                                                       ),
                                                   minLines: 1,
                                                   cursorColor:
@@ -821,7 +818,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                           options:
                                                               FFButtonOptions(
                                                             width: 240.0,
-                                                            height: 50.0,
+                                                            height: 44.0,
                                                             padding:
                                                                 const EdgeInsetsDirectional
                                                                     .fromSTEB(
@@ -890,18 +887,14 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                 ],
                                               ),
                                             ]
-                                                .divide(const SizedBox(height: 24.0))
-                                                .around(const SizedBox(height: 24.0)),
+                                                .divide(const SizedBox(height: 16.0))
+                                                .addToStart(
+                                                    const SizedBox(height: 24.0)),
                                           ).animateOnPageLoad(animationsMap[
                                               'columnOnPageLoadAnimation1']!),
                                         ),
-                                      ),
-                                      KeepAliveWidgetWrapper(
-                                        builder: (context) => Padding(
-                                          padding:
-                                              const EdgeInsetsDirectional.fromSTEB(
-                                                  16.0, 0.0, 16.0, 0.0),
-                                          child: Column(
+                                        KeepAliveWidgetWrapper(
+                                          builder: (context) => Column(
                                             mainAxisSize: MainAxisSize.max,
                                             mainAxisAlignment:
                                                 MainAxisAlignment.start,
@@ -1043,7 +1036,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                   FlutterFlowTheme.of(
                                                                           context)
                                                                       .bodyLargeFamily),
-                                                          lineHeight: 1.0,
+                                                          lineHeight: 2.0,
                                                         ),
                                                 minLines: 1,
                                                 cursorColor:
@@ -1197,7 +1190,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                 FlutterFlowTheme.of(
                                                                         context)
                                                                     .bodyLargeFamily),
-                                                        lineHeight: 1.0,
+                                                        lineHeight: 2.0,
                                                       ),
                                                   minLines: 1,
                                                   keyboardType: TextInputType
@@ -1227,6 +1220,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                   obscureText: !_model
                                                       .passwordCreateVisibility,
                                                   decoration: InputDecoration(
+                                                    isDense: false,
                                                     labelText:
                                                         FFLocalizations.of(
                                                                 context)
@@ -1377,7 +1371,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                 FlutterFlowTheme.of(
                                                                         context)
                                                                     .bodyLargeFamily),
-                                                        lineHeight: 1.0,
+                                                        lineHeight: 2.0,
                                                       ),
                                                   minLines: 1,
                                                   cursorColor:
@@ -1555,7 +1549,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                 FlutterFlowTheme.of(
                                                                         context)
                                                                     .bodyLargeFamily),
-                                                        lineHeight: 1.0,
+                                                        lineHeight: 2.0,
                                                       ),
                                                   minLines: 1,
                                                   cursorColor:
@@ -1570,117 +1564,129 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                               Align(
                                                 alignment: const AlignmentDirectional(
                                                     0.0, 0.0),
-                                                child: FFButtonWidget(
-                                                  onPressed: () async {
-                                                    GoRouter.of(context)
-                                                        .prepareAuthEvent();
-                                                    if (_model
-                                                            .passwordCreateTextController
-                                                            .text !=
-                                                        _model
-                                                            .passwordConfirmTextController
-                                                            .text) {
-                                                      ScaffoldMessenger.of(
-                                                              context)
-                                                          .showSnackBar(
-                                                        const SnackBar(
-                                                          content: Text(
-                                                            'Passwords don\'t match!',
-                                                          ),
-                                                        ),
-                                                      );
-                                                      return;
-                                                    }
-
-                                                    final user = await authManager
-                                                        .createAccountWithEmail(
-                                                      context,
-                                                      _model
-                                                          .emailAddressCreateTextController
-                                                          .text,
-                                                      _model
-                                                          .passwordCreateTextController
-                                                          .text,
-                                                    );
-                                                    if (user == null) {
-                                                      return;
-                                                    }
-
-                                                    await UsersRecord.collection
-                                                        .doc(user.uid)
-                                                        .update({
-                                                      ...createUsersRecordData(
-                                                        displayName: _model
-                                                            .displayNameTextController
-                                                            .text,
-                                                      ),
-                                                      ...mapToFirestore(
-                                                        {
-                                                          'created_time': FieldValue
-                                                              .serverTimestamp(),
-                                                        },
-                                                      ),
-                                                    });
-
-                                                    context.goNamedAuth(
-                                                        'voicetosign1',
-                                                        context.mounted);
-                                                  },
-                                                  text: FFLocalizations.of(
-                                                          context)
-                                                      .getText(
-                                                    '1swkicbs' /* Create Account */,
-                                                  ),
-                                                  options: FFButtonOptions(
-                                                    width: 240.0,
-                                                    height: 50.0,
-                                                    padding:
-                                                        const EdgeInsetsDirectional
-                                                            .fromSTEB(0.0, 0.0,
-                                                                0.0, 0.0),
-                                                    iconPadding:
-                                                        const EdgeInsets.all(0.0),
-                                                    color: FlutterFlowTheme.of(
-                                                            context)
-                                                        .primary,
-                                                    textStyle: FlutterFlowTheme
-                                                            .of(context)
-                                                        .titleMedium
-                                                        .override(
-                                                          fontFamily:
-                                                              FlutterFlowTheme.of(
-                                                                      context)
-                                                                  .titleMediumFamily,
-                                                          color: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .customColor5,
-                                                          letterSpacing: 0.0,
-                                                          useGoogleFonts: GoogleFonts
-                                                                  .asMap()
-                                                              .containsKey(
-                                                                  FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .titleMediumFamily),
-                                                        ),
-                                                    elevation: 2.0,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            12.0),
-                                                    hoverColor:
-                                                        FlutterFlowTheme.of(
+                                                child: Padding(
+                                                  padding: const EdgeInsetsDirectional
+                                                      .fromSTEB(
+                                                          0.0, 8.0, 0.0, 0.0),
+                                                  child: FFButtonWidget(
+                                                    onPressed: () async {
+                                                      GoRouter.of(context)
+                                                          .prepareAuthEvent();
+                                                      if (_model
+                                                              .passwordCreateTextController
+                                                              .text !=
+                                                          _model
+                                                              .passwordConfirmTextController
+                                                              .text) {
+                                                        ScaffoldMessenger.of(
                                                                 context)
-                                                            .primaryBackground,
-                                                    hoverBorderSide: BorderSide(
+                                                            .showSnackBar(
+                                                          const SnackBar(
+                                                            content: Text(
+                                                              'Passwords don\'t match!',
+                                                            ),
+                                                          ),
+                                                        );
+                                                        return;
+                                                      }
+
+                                                      final user = await authManager
+                                                          .createAccountWithEmail(
+                                                        context,
+                                                        _model
+                                                            .emailAddressCreateTextController
+                                                            .text,
+                                                        _model
+                                                            .passwordCreateTextController
+                                                            .text,
+                                                      );
+                                                      if (user == null) {
+                                                        return;
+                                                      }
+
+                                                      await UsersRecord
+                                                          .collection
+                                                          .doc(user.uid)
+                                                          .update({
+                                                        ...createUsersRecordData(
+                                                          displayName: _model
+                                                              .displayNameTextController
+                                                              .text,
+                                                        ),
+                                                        ...mapToFirestore(
+                                                          {
+                                                            'created_time':
+                                                                FieldValue
+                                                                    .serverTimestamp(),
+                                                          },
+                                                        ),
+                                                      });
+
+                                                      context.goNamedAuth(
+                                                          'voicetosign1',
+                                                          context.mounted);
+                                                    },
+                                                    text: FFLocalizations.of(
+                                                            context)
+                                                        .getText(
+                                                      '1swkicbs' /* Create Account */,
+                                                    ),
+                                                    options: FFButtonOptions(
+                                                      width: 240.0,
+                                                      height: 50.0,
+                                                      padding:
+                                                          const EdgeInsetsDirectional
+                                                              .fromSTEB(
+                                                                  0.0,
+                                                                  0.0,
+                                                                  0.0,
+                                                                  0.0),
+                                                      iconPadding:
+                                                          const EdgeInsets.all(0.0),
                                                       color:
                                                           FlutterFlowTheme.of(
                                                                   context)
                                                               .primary,
+                                                      textStyle:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .titleMedium
+                                                              .override(
+                                                                fontFamily: FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .titleMediumFamily,
+                                                                color: FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .customColor5,
+                                                                letterSpacing:
+                                                                    0.0,
+                                                                useGoogleFonts: GoogleFonts
+                                                                        .asMap()
+                                                                    .containsKey(
+                                                                        FlutterFlowTheme.of(context)
+                                                                            .titleMediumFamily),
+                                                              ),
+                                                      elevation: 2.0,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              12.0),
+                                                      hoverColor:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .primaryBackground,
+                                                      hoverBorderSide:
+                                                          BorderSide(
+                                                        color:
+                                                            FlutterFlowTheme.of(
+                                                                    context)
+                                                                .primary,
+                                                      ),
+                                                      hoverTextColor:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .primaryText,
+                                                      hoverElevation: 2.0,
                                                     ),
-                                                    hoverTextColor:
-                                                        FlutterFlowTheme.of(
-                                                                context)
-                                                            .primaryText,
-                                                    hoverElevation: 2.0,
                                                   ),
                                                 ),
                                               ),
@@ -1792,7 +1798,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                             options:
                                                                 FFButtonOptions(
                                                               width: 240.0,
-                                                              height: 50.0,
+                                                              height: 44.0,
                                                               padding:
                                                                   const EdgeInsetsDirectional
                                                                       .fromSTEB(
@@ -1860,16 +1866,17 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                 ],
                                               ),
                                             ]
-                                                .divide(const SizedBox(height: 24.0))
-                                                .around(const SizedBox(height: 24.0)),
+                                                .divide(const SizedBox(height: 16.0))
+                                                .addToStart(
+                                                    const SizedBox(height: 24.0)),
                                           ).animateOnPageLoad(animationsMap[
                                               'columnOnPageLoadAnimation2']!),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         ),
