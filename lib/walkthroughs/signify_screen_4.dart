@@ -19,13 +19,13 @@ List<TargetFocus> createWalkthroughTargets(BuildContext context) => [
         enableOverlayTab: true,
         alignSkip: Alignment.bottomCenter,
         shape: ShapeLightFocus.Circle,
-        color: FlutterFlowTheme.of(context).alternate,
+        color: FlutterFlowTheme.of(context).info,
         contents: [
           TargetContent(
             align: ContentAlign.bottom,
             builder: (context, __) => WalkelementCardsmallWidget(
               title: FFLocalizations.of(context).getText(
-                'kjfv53gp' /*  */,
+                'kjfv53gp' /* Your Personal Account */,
               ),
               description: FFLocalizations.of(context).getText(
                 '9neu6n5i' /* Manage your profile, settings,... */,
@@ -43,7 +43,7 @@ List<TargetFocus> createWalkthroughTargets(BuildContext context) => [
         enableOverlayTab: true,
         alignSkip: Alignment.bottomCenter,
         shape: ShapeLightFocus.RRect,
-        color: FlutterFlowTheme.of(context).alternate,
+        color: FlutterFlowTheme.of(context).info,
         contents: [
           TargetContent(
             align: ContentAlign.bottom,
@@ -67,7 +67,7 @@ List<TargetFocus> createWalkthroughTargets(BuildContext context) => [
         enableOverlayTab: true,
         alignSkip: Alignment.bottomCenter,
         shape: ShapeLightFocus.RRect,
-        color: FlutterFlowTheme.of(context).alternate,
+        color: FlutterFlowTheme.of(context).info,
         contents: [
           TargetContent(
             align: ContentAlign.top,

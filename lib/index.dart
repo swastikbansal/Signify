@@ -1,7 +1,7 @@
 // Export pages
 export '/pages/voicetosign1/voicetosign1_widget.dart' show Voicetosign1Widget;
 export '/pages/signtovoice2/signtovoice2_widget.dart' show Signtovoice2Widget;
-export '/pages/education/education_widget.dart' show EducationWidget;
+export '/pages/education3/education3_widget.dart' show Education3Widget;
 export '/pages/onboarding_page/onboarding_page_widget.dart'
     show OnboardingPageWidget;
 export '/pages/forgot_password/forgot_password_widget.dart'

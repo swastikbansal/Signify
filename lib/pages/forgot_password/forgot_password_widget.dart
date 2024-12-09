@@ -344,26 +344,6 @@ class _ForgotPasswordWidgetState extends State<ForgotPasswordWidget> {
                       email: _model.resetemailAddressTextController.text,
                       context: context,
                     );
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          'Link sent to your email.',
-                          style: FlutterFlowTheme.of(context)
-                              .labelLarge
-                              .override(
-                                fontFamily: FlutterFlowTheme.of(context)
-                                    .labelLargeFamily,
-                                color: FlutterFlowTheme.of(context).primaryText,
-                                letterSpacing: 0.0,
-                                useGoogleFonts: GoogleFonts.asMap().containsKey(
-                                    FlutterFlowTheme.of(context)
-                                        .labelLargeFamily),
-                              ),
-                        ),
-                        duration: const Duration(milliseconds: 4000),
-                        backgroundColor: FlutterFlowTheme.of(context).alternate,
-                      ),
-                    );
                   },
                   text: FFLocalizations.of(context).getText(
                     'x5ujc8ou' /* Send Link */,

@@ -50,7 +50,6 @@ class _WalkelementCardsmallWidgetState
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: double.infinity,
       constraints: const BoxConstraints(
         minWidth: 300.0,
         minHeight: 100.0,
@@ -59,22 +58,11 @@ class _WalkelementCardsmallWidgetState
       ),
       decoration: BoxDecoration(
         color: FlutterFlowTheme.of(context).secondaryBackground,
-        boxShadow: [
-          BoxShadow(
-            blurRadius: 2.0,
-            color: FlutterFlowTheme.of(context).alternate,
-            offset: const Offset(
-              0.0,
-              0.0,
-            ),
-            spreadRadius: 1.0,
-          )
-        ],
         borderRadius: BorderRadius.circular(12.0),
         shape: BoxShape.rectangle,
         border: Border.all(
-          color: FlutterFlowTheme.of(context).alternate,
-          width: 1.0,
+          color: FlutterFlowTheme.of(context).primaryBackground,
+          width: 2.0,
         ),
       ),
       child: Padding(
@@ -84,33 +72,25 @@ class _WalkelementCardsmallWidgetState
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SafeArea(
-              child: Container(
-                constraints: const BoxConstraints(
-                  minWidth: 80.0,
-                  minHeight: 80.0,
-                  maxWidth: 100.0,
-                  maxHeight: 100.0,
+            Container(
+              width: 100.0,
+              height: 100.0,
+              decoration: BoxDecoration(
+                color: FlutterFlowTheme.of(context).secondaryBackground,
+                borderRadius: BorderRadius.circular(12.0),
+                shape: BoxShape.rectangle,
+                border: Border.all(
+                  color: FlutterFlowTheme.of(context).primary,
+                  width: 2.0,
                 ),
-                decoration: BoxDecoration(
-                  color: FlutterFlowTheme.of(context).secondaryBackground,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(2.0),
+                child: ClipRRect(
                   borderRadius: BorderRadius.circular(12.0),
-                  border: Border.all(
-                    color: FlutterFlowTheme.of(context).primary,
-                    width: 2.0,
-                  ),
-                ),
-                alignment: const AlignmentDirectional(0.0, 0.0),
-                child: Padding(
-                  padding: const EdgeInsets.all(2.0),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12.0),
-                    child: Image.network(
-                      widget.img!,
-                      width: double.infinity,
-                      height: double.infinity,
-                      fit: BoxFit.cover,
-                    ),
+                  child: Image.network(
+                    widget.img!,
+                    fit: BoxFit.cover,
                   ),
                 ),
               ),

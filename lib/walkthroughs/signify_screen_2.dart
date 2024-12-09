@@ -21,7 +21,7 @@ List<TargetFocus> createWalkthroughTargets(BuildContext context) => [
         enableOverlayTab: true,
         alignSkip: Alignment.bottomCenter,
         shape: ShapeLightFocus.Circle,
-        color: FlutterFlowTheme.of(context).alternate,
+        color: FlutterFlowTheme.of(context).info,
         contents: [
           TargetContent(
             align: ContentAlign.top,
@@ -45,7 +45,7 @@ List<TargetFocus> createWalkthroughTargets(BuildContext context) => [
         enableOverlayTab: true,
         alignSkip: Alignment.bottomCenter,
         shape: ShapeLightFocus.RRect,
-        color: FlutterFlowTheme.of(context).alternate,
+        color: FlutterFlowTheme.of(context).info,
         contents: [
           TargetContent(
             align: ContentAlign.top,
@@ -69,7 +69,7 @@ List<TargetFocus> createWalkthroughTargets(BuildContext context) => [
         enableOverlayTab: true,
         alignSkip: Alignment.bottomCenter,
         shape: ShapeLightFocus.Circle,
-        color: FlutterFlowTheme.of(context).alternate,
+        color: FlutterFlowTheme.of(context).info,
         contents: [
           TargetContent(
             align: ContentAlign.top,
@@ -93,7 +93,7 @@ List<TargetFocus> createWalkthroughTargets(BuildContext context) => [
         enableOverlayTab: true,
         alignSkip: Alignment.bottomCenter,
         shape: ShapeLightFocus.Circle,
-        color: FlutterFlowTheme.of(context).alternate,
+        color: FlutterFlowTheme.of(context).info,
         contents: [
           TargetContent(
             align: ContentAlign.top,

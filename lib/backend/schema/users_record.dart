@@ -70,6 +70,16 @@ class UsersRecord extends FirestoreRecord {
   String get userCity => _userCity ?? '';
   bool hasUserCity() => _userCity != null;
 
+  // "loggedin_time" field.
+  DateTime? _loggedinTime;
+  DateTime? get loggedinTime => _loggedinTime;
+  bool hasLoggedinTime() => _loggedinTime != null;
+
+  // "user_location" field.
+  String? _userLocation;
+  String get userLocation => _userLocation ?? '';
+  bool hasUserLocation() => _userLocation != null;
+
   void _initializeFields() {
     _email = snapshotData['email'] as String?;
     _displayName = snapshotData['display_name'] as String?;
@@ -82,6 +92,8 @@ class UsersRecord extends FirestoreRecord {
     _userName = snapshotData['user_name'] as String?;
     _userState = snapshotData['user_state'] as String?;
     _userCity = snapshotData['user_city'] as String?;
+    _loggedinTime = snapshotData['loggedin_time'] as DateTime?;
+    _userLocation = snapshotData['user_location'] as String?;
   }
 
   static CollectionReference get collection =>
@@ -129,6 +141,8 @@ Map<String, dynamic> createUsersRecordData({
   String? userName,
   String? userState,
   String? userCity,
+  DateTime? loggedinTime,
+  String? userLocation,
 }) {
   final firestoreData = mapToFirestore(
     <String, dynamic>{
@@ -143,6 +157,8 @@ Map<String, dynamic> createUsersRecordData({
       'user_name': userName,
       'user_state': userState,
       'user_city': userCity,
+      'loggedin_time': loggedinTime,
+      'user_location': userLocation,
     }.withoutNulls,
   );
 
@@ -164,7 +180,9 @@ class UsersRecordDocumentEquality implements Equality<UsersRecord> {
         e1?.bio == e2?.bio &&
         e1?.userName == e2?.userName &&
         e1?.userState == e2?.userState &&
-        e1?.userCity == e2?.userCity;
+        e1?.userCity == e2?.userCity &&
+        e1?.loggedinTime == e2?.loggedinTime &&
+        e1?.userLocation == e2?.userLocation;
   }
 
   @override
@@ -179,7 +197,9 @@ class UsersRecordDocumentEquality implements Equality<UsersRecord> {
         e?.bio,
         e?.userName,
         e?.userState,
-        e?.userCity
+        e?.userCity,
+        e?.loggedinTime,
+        e?.userLocation
       ]);
 
   @override

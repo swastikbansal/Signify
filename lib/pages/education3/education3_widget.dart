@@ -13,31 +13,45 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'education_model.dart';
-export 'education_model.dart';
+import 'education3_model.dart';
+export 'education3_model.dart';
 
-class EducationWidget extends StatefulWidget {
-  const EducationWidget({super.key});
+class Education3Widget extends StatefulWidget {
+  const Education3Widget({super.key});
 
   @override
-  State<EducationWidget> createState() => _EducationWidgetState();
+  State<Education3Widget> createState() => _Education3WidgetState();
 }
 
-class _EducationWidgetState extends State<EducationWidget> {
-  late EducationModel _model;
+class _Education3WidgetState extends State<Education3Widget> {
+  late Education3Model _model;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
     super.initState();
-    _model = createModel(context, () => EducationModel());
+    _model = createModel(context, () => Education3Model());
 
     // On page load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {
-      safeSetState(() =>
-          _model.signifyScreen3Controller = createPageWalkthrough(context));
-      _model.signifyScreen3Controller?.show(context: context);
+      if (dateTimeFormat(
+            "relative",
+            currentUserDocument?.loggedinTime,
+            locale: FFLocalizations.of(context).languageCode,
+          ) ==
+          dateTimeFormat(
+            "relative",
+            getCurrentTimestamp,
+            locale: FFLocalizations.of(context).languageCode,
+          )) {
+        safeSetState(() =>
+            _model.signifyScreen3Controller = createPageWalkthrough(context));
+        _model.signifyScreen3Controller?.show(context: context);
+        return;
+      } else {
+        return;
+      }
     });
 
     _model.textController ??= TextEditingController();
@@ -75,7 +89,7 @@ class _EducationWidgetState extends State<EducationWidget> {
           );
         }
 
-        final educationUsersRecord = snapshot.data!;
+        final education3UsersRecord = snapshot.data!;
 
         return GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
@@ -85,38 +99,20 @@ class _EducationWidgetState extends State<EducationWidget> {
             appBar: AppBar(
               backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
               automaticallyImplyLeading: false,
-              leading: Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Align(
-                    alignment: const AlignmentDirectional(-1.0, 0.0),
-                    child: Text(
-                      FFLocalizations.of(context).getText(
-                        '12k21iui' /* Education */,
-                      ),
-                      style:
-                          FlutterFlowTheme.of(context).headlineMedium.override(
-                                fontFamily: 'Space Grotesk',
-                                letterSpacing: 0.0,
-                                useGoogleFonts: GoogleFonts.asMap()
-                                    .containsKey('Space Grotesk'),
-                              ),
+              title: Text(
+                FFLocalizations.of(context).getText(
+                  '3gmio52t' /* Education */,
+                ),
+                style: FlutterFlowTheme.of(context).headlineMedium.override(
+                      fontFamily: 'Space Grotesk',
+                      letterSpacing: 0.0,
+                      useGoogleFonts:
+                          GoogleFonts.asMap().containsKey('Space Grotesk'),
                     ),
-                  ),
-                  Icon(
-                    Icons.notifications_active,
-                    color: FlutterFlowTheme.of(context).primaryText,
-                    size: 24.0,
-                  ),
-                ]
-                    .divide(const SizedBox(width: 180.0))
-                    .addToStart(const SizedBox(width: 16.0))
-                    .addToEnd(const SizedBox(width: 16.0)),
               ),
               actions: const [],
               centerTitle: false,
+              elevation: 0.0,
             ),
             body: SafeArea(
               top: true,
@@ -135,7 +131,7 @@ class _EducationWidgetState extends State<EducationWidget> {
                           children: [
                             TextSpan(
                               text: FFLocalizations.of(context).getText(
-                                'unfdgmqk' /* Hello  */,
+                                'unfdgmqk' /* Hey  */,
                               ),
                               style: FlutterFlowTheme.of(context)
                                   .headlineSmall
@@ -150,7 +146,7 @@ class _EducationWidgetState extends State<EducationWidget> {
                                   ),
                             ),
                             TextSpan(
-                              text: educationUsersRecord.displayName,
+                              text: education3UsersRecord.displayName,
                               style: FlutterFlowTheme.of(context)
                                   .headlineSmall
                                   .override(
@@ -748,7 +744,8 @@ class _EducationWidgetState extends State<EducationWidget> {
                                     .override(
                                       fontFamily: FlutterFlowTheme.of(context)
                                           .bodyMediumFamily,
-                                      color: FlutterFlowTheme.of(context).info,
+                                      color: FlutterFlowTheme.of(context)
+                                          .customColor5,
                                       letterSpacing: 0.0,
                                       useGoogleFonts: GoogleFonts.asMap()
                                           .containsKey(
@@ -759,7 +756,9 @@ class _EducationWidgetState extends State<EducationWidget> {
                                     FlutterFlowTheme.of(context).customColor5,
                                 iconSize: 18.0,
                                 elevation: 2.0,
-                                borderRadius: BorderRadius.circular(16.0),
+                                borderColor:
+                                    FlutterFlowTheme.of(context).primary,
+                                borderRadius: BorderRadius.circular(24.0),
                               ),
                               unselectedChipStyle: ChipStyle(
                                 backgroundColor:
@@ -777,10 +776,13 @@ class _EducationWidgetState extends State<EducationWidget> {
                                               FlutterFlowTheme.of(context)
                                                   .bodyMediumFamily),
                                     ),
-                                iconColor: const Color(0x00000000),
+                                iconColor:
+                                    FlutterFlowTheme.of(context).customColor5,
                                 iconSize: 18.0,
                                 elevation: 0.0,
-                                borderRadius: BorderRadius.circular(16.0),
+                                borderColor:
+                                    FlutterFlowTheme.of(context).alternate,
+                                borderRadius: BorderRadius.circular(24.0),
                               ),
                               chipSpacing: 8.0,
                               rowSpacing: 12.0,

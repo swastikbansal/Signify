@@ -102,13 +102,9 @@ class _MyAppState extends State<MyApp> {
         Locale('bn'),
         Locale('mr'),
         Locale('te'),
-        Locale('ta'),
         Locale('gu'),
         Locale('pa'),
-        Locale('ur'),
         Locale('kn'),
-        Locale('ml'),
-        Locale('as'),
       ],
       theme: ThemeData(
         brightness: Brightness.light,
@@ -177,7 +173,7 @@ class _NavBarPageState extends State<NavBarPage> {
     final tabs = {
       'voicetosign1': const Voicetosign1Widget(),
       'signtovoice2': const Signtovoice2Widget(),
-      'education': const EducationWidget(),
+      'education3': const Education3Widget(),
       'account4': const Account4Widget(),
     };
     final currentIndex = tabs.keys.toList().indexOf(_currentPageName);

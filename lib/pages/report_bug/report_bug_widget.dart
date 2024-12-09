@@ -832,7 +832,7 @@ class _ReportBugWidgetState extends State<ReportBugWidget> {
                                         fontFamily: FlutterFlowTheme.of(context)
                                             .bodyLargeFamily,
                                         color: FlutterFlowTheme.of(context)
-                                            .primaryText,
+                                            .primaryBackground,
                                         letterSpacing: 0.0,
                                         useGoogleFonts: GoogleFonts.asMap()
                                             .containsKey(
@@ -840,9 +840,9 @@ class _ReportBugWidgetState extends State<ReportBugWidget> {
                                                     .bodyLargeFamily),
                                       ),
                                 ),
-                                duration: const Duration(milliseconds: 4000),
+                                duration: const Duration(milliseconds: 2000),
                                 backgroundColor:
-                                    FlutterFlowTheme.of(context).alternate,
+                                    FlutterFlowTheme.of(context).info,
                               ),
                             );
 

@@ -66,7 +66,7 @@ class _WalkelementCardimagebigWidgetState
               ClipRRect(
                 borderRadius: BorderRadius.circular(8.0),
                 child: Image.network(
-                  'https://images.unsplash.com/photo-1585282263861-f55e341878f8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHw0fHxhcHB8ZW58MHx8fHwxNzMzNjY5MzEzfDA&ixlib=rb-4.0.3&q=80&w=1080',
+                  'https://images.unsplash.com/photo-1556696863-6c5eddae0f5f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxN3x8dGV4dHxlbnwwfHx8fDE3MzM2ODM4NDl8MA&ixlib=rb-4.0.3&q=80&w=1080',
                   width: double.infinity,
                   height: 100.0,
                   fit: BoxFit.cover,

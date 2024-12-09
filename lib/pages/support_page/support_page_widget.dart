@@ -637,15 +637,27 @@ class _SupportPageWidgetState extends State<SupportPageWidget> {
                                     SnackBar(
                                       content: Text(
                                         'Your rating has been submitted successfully.',
-                                        style: TextStyle(
-                                          color: FlutterFlowTheme.of(context)
-                                              .primaryText,
-                                        ),
+                                        style: FlutterFlowTheme.of(context)
+                                            .bodyLarge
+                                            .override(
+                                              fontFamily:
+                                                  FlutterFlowTheme.of(context)
+                                                      .bodyLargeFamily,
+                                              color:
+                                                  FlutterFlowTheme.of(context)
+                                                      .primaryBackground,
+                                              letterSpacing: 0.0,
+                                              useGoogleFonts:
+                                                  GoogleFonts.asMap()
+                                                      .containsKey(
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .bodyLargeFamily),
+                                            ),
                                       ),
-                                      duration: const Duration(milliseconds: 4000),
+                                      duration: const Duration(milliseconds: 2000),
                                       backgroundColor:
-                                          FlutterFlowTheme.of(context)
-                                              .alternate,
+                                          FlutterFlowTheme.of(context).info,
                                     ),
                                   );
 

@@ -1,11 +1,11 @@
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/form_field_controller.dart';
-import 'education_widget.dart' show EducationWidget;
+import 'education3_widget.dart' show Education3Widget;
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart'
     show TutorialCoachMark;
 import 'package:flutter/material.dart';
 
-class EducationModel extends FlutterFlowModel<EducationWidget> {
+class Education3Model extends FlutterFlowModel<Education3Widget> {
   ///  State fields for stateful widgets in this page.
 
   TutorialCoachMark? signifyScreen3Controller;

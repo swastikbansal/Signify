@@ -101,13 +101,13 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
                 ),
         ),
         FFRoute(
-          name: 'education',
-          path: '/education',
+          name: 'education3',
+          path: '/education3',
           builder: (context, params) => params.isEmpty
-              ? const NavBarPage(initialPage: 'education')
+              ? const NavBarPage(initialPage: 'education3')
               : const NavBarPage(
-                  initialPage: 'education',
-                  page: EducationWidget(),
+                  initialPage: 'education3',
+                  page: Education3Widget(),
                 ),
         ),
         FFRoute(

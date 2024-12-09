@@ -1,8 +1,9 @@
-import '/auth/base_auth_user_provider.dart';
+import '/auth/firebase_auth/auth_util.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/walkthroughs/signify_screen_1.dart';
+import 'package:aligned_tooltip/aligned_tooltip.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart'
     show TutorialCoachMark;
 import 'package:flutter/material.dart';
@@ -31,10 +32,22 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget> {
 
     // On page load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {
-      if (loggedIn == true) {
+      if (dateTimeFormat(
+            "relative",
+            currentUserDocument?.loggedinTime,
+            locale: FFLocalizations.of(context).languageCode,
+          ) ==
+          dateTimeFormat(
+            "relative",
+            getCurrentTimestamp,
+            locale: FFLocalizations.of(context).languageCode,
+          )) {
         safeSetState(() =>
             _model.signifyScreen1Controller = createPageWalkthrough(context));
         _model.signifyScreen1Controller?.show(context: context);
+        return;
+      } else {
+        return;
       }
     });
 
@@ -82,42 +95,95 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget> {
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Container(
+                    width: double.infinity,
+                    height: double.infinity,
+                    decoration: BoxDecoration(
+                      color: FlutterFlowTheme.of(context).primaryBackground,
+                      borderRadius: BorderRadius.circular(12.0),
+                      border: Border.all(
+                        color: FlutterFlowTheme.of(context).secondaryBackground,
+                        width: 2.0,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
               Row(
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Expanded(
-                    child: TextFormField(
-                      controller: _model.textController,
-                      focusNode: _model.textFieldFocusNode,
-                      autofocus: false,
-                      textCapitalization: TextCapitalization.sentences,
-                      obscureText: false,
-                      decoration: InputDecoration(
-                        isDense: false,
-                        labelText: FFLocalizations.of(context).getText(
-                          'wz6eakba' /* Your Message */,
+                    child: AlignedTooltip(
+                      content: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          FFLocalizations.of(context).getText(
+                            '2ymxzvnb' /* Enter your words or sentences ... */,
+                          ),
+                          style: FlutterFlowTheme.of(context)
+                              .labelMedium
+                              .override(
+                                fontFamily: FlutterFlowTheme.of(context)
+                                    .labelMediumFamily,
+                                letterSpacing: 0.0,
+                                useGoogleFonts: GoogleFonts.asMap().containsKey(
+                                    FlutterFlowTheme.of(context)
+                                        .labelMediumFamily),
+                              ),
                         ),
-                        labelStyle: FlutterFlowTheme.of(context)
-                            .labelMedium
-                            .override(
-                              fontFamily: FlutterFlowTheme.of(context)
-                                  .labelMediumFamily,
-                              color: FlutterFlowTheme.of(context).secondaryText,
-                              fontSize: 14.0,
-                              letterSpacing: 0.0,
-                              useGoogleFonts: GoogleFonts.asMap().containsKey(
-                                  FlutterFlowTheme.of(context)
-                                      .labelMediumFamily),
-                              lineHeight: 1.0,
+                      ),
+                      offset: 4.0,
+                      preferredDirection: AxisDirection.up,
+                      borderRadius: BorderRadius.circular(12.0),
+                      backgroundColor: FlutterFlowTheme.of(context).alternate,
+                      elevation: 4.0,
+                      tailBaseWidth: 24.0,
+                      tailLength: 24.0,
+                      waitDuration: const Duration(milliseconds: 10),
+                      showDuration: const Duration(milliseconds: 2000),
+                      triggerMode: TooltipTriggerMode.tap,
+                      child: Container(
+                        width: 100.0,
+                        decoration: BoxDecoration(
+                          color: FlutterFlowTheme.of(context).primaryBackground,
+                        ),
+                        child: TextFormField(
+                          controller: _model.textController,
+                          focusNode: _model.textFieldFocusNode,
+                          autofocus: false,
+                          textCapitalization: TextCapitalization.sentences,
+                          obscureText: false,
+                          decoration: InputDecoration(
+                            isDense: false,
+                            labelText: FFLocalizations.of(context).getText(
+                              'wz6eakba' /* Your Message */,
                             ),
-                        alignLabelWithHint: false,
-                        hintText: FFLocalizations.of(context).getText(
-                          'v4uk70of' /* Type to translate... */,
-                        ),
-                        hintStyle:
-                            FlutterFlowTheme.of(context).labelMedium.override(
+                            labelStyle: FlutterFlowTheme.of(context)
+                                .labelMedium
+                                .override(
+                                  fontFamily: FlutterFlowTheme.of(context)
+                                      .labelMediumFamily,
+                                  color: FlutterFlowTheme.of(context)
+                                      .secondaryText,
+                                  fontSize: 14.0,
+                                  letterSpacing: 0.0,
+                                  useGoogleFonts: GoogleFonts.asMap()
+                                      .containsKey(FlutterFlowTheme.of(context)
+                                          .labelMediumFamily),
+                                  lineHeight: 1.0,
+                                ),
+                            alignLabelWithHint: false,
+                            hintText: FFLocalizations.of(context).getText(
+                              'v4uk70of' /* Type to translate... */,
+                            ),
+                            hintStyle: FlutterFlowTheme.of(context)
+                                .labelMedium
+                                .override(
                                   fontFamily: FlutterFlowTheme.of(context)
                                       .labelMediumFamily,
                                   letterSpacing: 0.0,
@@ -126,95 +192,158 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget> {
                                           .labelMediumFamily),
                                   lineHeight: 1.0,
                                 ),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: FlutterFlowTheme.of(context).alternate,
-                            width: 1.0,
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: FlutterFlowTheme.of(context).alternate,
+                                width: 1.0,
+                              ),
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: FlutterFlowTheme.of(context).primary,
+                                width: 1.0,
+                              ),
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: FlutterFlowTheme.of(context).error,
+                                width: 1.0,
+                              ),
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                            focusedErrorBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: FlutterFlowTheme.of(context).error,
+                                width: 1.0,
+                              ),
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                            filled: true,
+                            fillColor:
+                                FlutterFlowTheme.of(context).primaryBackground,
+                            hoverColor:
+                                FlutterFlowTheme.of(context).primaryBackground,
                           ),
-                          borderRadius: BorderRadius.circular(12.0),
+                          style: FlutterFlowTheme.of(context)
+                              .titleSmall
+                              .override(
+                                fontFamily: FlutterFlowTheme.of(context)
+                                    .titleSmallFamily,
+                                letterSpacing: 0.0,
+                                useGoogleFonts: GoogleFonts.asMap().containsKey(
+                                    FlutterFlowTheme.of(context)
+                                        .titleSmallFamily),
+                                lineHeight: 2.0,
+                              ),
+                          textAlign: TextAlign.start,
+                          maxLines: 6,
+                          minLines: 1,
+                          cursorColor: FlutterFlowTheme.of(context).primary,
+                          validator: _model.textControllerValidator
+                              .asValidator(context),
                         ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: FlutterFlowTheme.of(context).primary,
-                            width: 1.0,
-                          ),
-                          borderRadius: BorderRadius.circular(12.0),
-                        ),
-                        errorBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: FlutterFlowTheme.of(context).error,
-                            width: 1.0,
-                          ),
-                          borderRadius: BorderRadius.circular(12.0),
-                        ),
-                        focusedErrorBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: FlutterFlowTheme.of(context).error,
-                            width: 1.0,
-                          ),
-                          borderRadius: BorderRadius.circular(12.0),
-                        ),
-                        filled: true,
-                        fillColor:
-                            FlutterFlowTheme.of(context).primaryBackground,
-                        hoverColor:
-                            FlutterFlowTheme.of(context).primaryBackground,
                       ),
-                      style: FlutterFlowTheme.of(context).titleSmall.override(
-                            fontFamily:
-                                FlutterFlowTheme.of(context).titleSmallFamily,
-                            letterSpacing: 0.0,
-                            useGoogleFonts: GoogleFonts.asMap().containsKey(
-                                FlutterFlowTheme.of(context).titleSmallFamily),
-                            lineHeight: 2.0,
-                          ),
-                      textAlign: TextAlign.start,
-                      maxLines: 6,
-                      minLines: 1,
-                      cursorColor: FlutterFlowTheme.of(context).primary,
-                      validator:
-                          _model.textControllerValidator.asValidator(context),
                     ),
                   ),
-                  FlutterFlowIconButton(
-                    borderRadius: 100.0,
-                    buttonSize: 50.0,
-                    hoverColor: FlutterFlowTheme.of(context).alternate,
-                    hoverIconColor: FlutterFlowTheme.of(context).primary,
-                    icon: FaIcon(
-                      FontAwesomeIcons.microphone,
-                      color: FlutterFlowTheme.of(context).secondaryText,
-                      size: 24.0,
+                  AlignedTooltip(
+                    content: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        FFLocalizations.of(context).getText(
+                          'z013a10e' /* Press the microphone button, s... */,
+                        ),
+                        style:
+                            FlutterFlowTheme.of(context).labelMedium.override(
+                                  fontFamily: FlutterFlowTheme.of(context)
+                                      .labelMediumFamily,
+                                  letterSpacing: 0.0,
+                                  useGoogleFonts: GoogleFonts.asMap()
+                                      .containsKey(FlutterFlowTheme.of(context)
+                                          .labelMediumFamily),
+                                ),
+                      ),
                     ),
-                    onPressed: () {
-                      print('IconButton pressed ...');
-                    },
-                  ).addWalkthrough(
-                    iconButtonIwoicpe5,
-                    _model.signifyScreen1Controller,
-                  ),
-                  Align(
-                    alignment: const AlignmentDirectional(0.0, 0.0),
+                    offset: 4.0,
+                    preferredDirection: AxisDirection.up,
+                    borderRadius: BorderRadius.circular(12.0),
+                    backgroundColor: FlutterFlowTheme.of(context).alternate,
+                    elevation: 4.0,
+                    tailBaseWidth: 24.0,
+                    tailLength: 24.0,
+                    waitDuration: const Duration(milliseconds: 10),
+                    showDuration: const Duration(milliseconds: 2000),
+                    triggerMode: TooltipTriggerMode.longPress,
                     child: FlutterFlowIconButton(
                       borderRadius: 100.0,
                       buttonSize: 50.0,
-                      fillColor:
-                          FlutterFlowTheme.of(context).secondaryBackground,
-                      hoverColor:
-                          FlutterFlowTheme.of(context).primaryBackground,
+                      hoverColor: FlutterFlowTheme.of(context).alternate,
                       hoverIconColor: FlutterFlowTheme.of(context).primary,
-                      icon: Icon(
-                        Icons.send_rounded,
-                        color: FlutterFlowTheme.of(context).primaryText,
-                        size: 30.0,
+                      icon: FaIcon(
+                        FontAwesomeIcons.microphone,
+                        color: FlutterFlowTheme.of(context).secondaryText,
+                        size: 24.0,
                       ),
-                      showLoadingIndicator: true,
                       onPressed: () {
                         print('IconButton pressed ...');
                       },
                     ).addWalkthrough(
-                      iconButtonO625l09g,
+                      iconButtonIwoicpe5,
                       _model.signifyScreen1Controller,
+                    ),
+                  ),
+                  AlignedTooltip(
+                    content: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        FFLocalizations.of(context).getText(
+                          'tizyil5m' /* Press the send button to see t... */,
+                        ),
+                        style:
+                            FlutterFlowTheme.of(context).labelMedium.override(
+                                  fontFamily: FlutterFlowTheme.of(context)
+                                      .labelMediumFamily,
+                                  letterSpacing: 0.0,
+                                  useGoogleFonts: GoogleFonts.asMap()
+                                      .containsKey(FlutterFlowTheme.of(context)
+                                          .labelMediumFamily),
+                                ),
+                      ),
+                    ),
+                    offset: 4.0,
+                    preferredDirection: AxisDirection.up,
+                    borderRadius: BorderRadius.circular(12.0),
+                    backgroundColor: FlutterFlowTheme.of(context).alternate,
+                    elevation: 4.0,
+                    tailBaseWidth: 24.0,
+                    tailLength: 24.0,
+                    waitDuration: const Duration(milliseconds: 10),
+                    showDuration: const Duration(milliseconds: 2000),
+                    triggerMode: TooltipTriggerMode.longPress,
+                    child: Align(
+                      alignment: const AlignmentDirectional(0.0, 0.0),
+                      child: FlutterFlowIconButton(
+                        borderRadius: 100.0,
+                        buttonSize: 56.0,
+                        fillColor:
+                            FlutterFlowTheme.of(context).secondaryBackground,
+                        hoverColor:
+                            FlutterFlowTheme.of(context).primaryBackground,
+                        hoverIconColor: FlutterFlowTheme.of(context).primary,
+                        icon: Icon(
+                          Icons.send_rounded,
+                          color: FlutterFlowTheme.of(context).primaryText,
+                          size: 30.0,
+                        ),
+                        showLoadingIndicator: true,
+                        onPressed: () {
+                          print('IconButton pressed ...');
+                        },
+                      ).addWalkthrough(
+                        iconButtonO625l09g,
+                        _model.signifyScreen1Controller,
+                      ),
                     ),
                   ),
                 ]

@@ -56,15 +56,13 @@ class _SelectlanguageWidgetState extends State<SelectlanguageWidget> {
                 Container(
                   width: 160.0,
                   height: 160.0,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
+                    color: FlutterFlowTheme.of(context).secondaryBackground,
                     shape: BoxShape.circle,
                   ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(0.0),
-                    child: Image.asset(
-                      'assets/images/Signify_Big_Transparent_(1).png',
-                      fit: BoxFit.contain,
-                    ),
+                  child: Image.asset(
+                    'assets/images/Signify_Big_Transparent_(1).png',
+                    fit: BoxFit.cover,
                   ),
                 ),
                 Column(
@@ -242,22 +240,22 @@ class _SelectlanguageWidgetState extends State<SelectlanguageWidget> {
                                 content: Text(
                                   'Changes updated successfully.',
                                   style: FlutterFlowTheme.of(context)
-                                      .bodyMedium
+                                      .bodyLarge
                                       .override(
                                         fontFamily: FlutterFlowTheme.of(context)
-                                            .bodyMediumFamily,
+                                            .bodyLargeFamily,
                                         color: FlutterFlowTheme.of(context)
-                                            .primaryText,
+                                            .primaryBackground,
                                         letterSpacing: 0.0,
                                         useGoogleFonts: GoogleFonts.asMap()
                                             .containsKey(
                                                 FlutterFlowTheme.of(context)
-                                                    .bodyMediumFamily),
+                                                    .bodyLargeFamily),
                                       ),
                                 ),
-                                duration: const Duration(milliseconds: 4000),
+                                duration: const Duration(milliseconds: 2000),
                                 backgroundColor:
-                                    FlutterFlowTheme.of(context).alternate,
+                                    FlutterFlowTheme.of(context).info,
                               ),
                             );
                           } else {
@@ -308,7 +306,7 @@ class _SelectlanguageWidgetState extends State<SelectlanguageWidget> {
                     ),
                     Padding(
                       padding:
-                          const EdgeInsetsDirectional.fromSTEB(0.0, 36.0, 0.0, 8.0),
+                          const EdgeInsetsDirectional.fromSTEB(0.0, 16.0, 0.0, 8.0),
                       child: Text(
                         FFLocalizations.of(context).getText(
                           'v088ak2u' /* Disclaimer: The app translatio... */,
