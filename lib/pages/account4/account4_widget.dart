@@ -744,11 +744,15 @@ class _Account4WidgetState extends State<Account4Widget> {
                                 hoverColor: Colors.transparent,
                                 highlightColor: Colors.transparent,
                                 onTap: () async {
-                                  safeSetState(() =>
-                                      _model.signifyScreen4Controller =
-                                          createPageWalkthrough(context));
-                                  _model.signifyScreen4Controller
-                                      ?.show(context: context);
+                                  context.pushNamed(
+                                    'tutorialPage',
+                                    extra: <String, dynamic>{
+                                      kTransitionInfoKey: const TransitionInfo(
+                                        hasTransition: true,
+                                        transitionType: PageTransitionType.fade,
+                                      ),
+                                    },
+                                  );
                                 },
                                 child: Row(
                                   mainAxisSize: MainAxisSize.max,

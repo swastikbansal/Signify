@@ -174,6 +174,11 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           name: 'authPage',
           path: '/authPage',
           builder: (context, params) => const AuthPageWidget(),
+        ),
+        FFRoute(
+          name: 'tutorialPage',
+          path: '/tutorialPage',
+          builder: (context, params) => const TutorialPageWidget(),
         )
       ].map((r) => r.toRoute(appStateNotifier)).toList(),
     );

@@ -18,3 +18,4 @@ export '/pages/request_feature/request_feature_widget.dart'
 export '/pages/isl_dict/isl_dict_widget.dart' show IslDictWidget;
 export '/pages/isl_community/isl_community_widget.dart' show IslCommunityWidget;
 export '/pages/auth_page/auth_page_widget.dart' show AuthPageWidget;
+export '/pages/tutorial_page/tutorial_page_widget.dart' show TutorialPageWidget;
