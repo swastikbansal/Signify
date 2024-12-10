@@ -417,7 +417,7 @@ class _TutorialPageWidgetState extends State<TutorialPageWidget> {
                                   8.0, 0.0, 8.0, 0.0),
                               child: Text(
                                 FFLocalizations.of(context).getText(
-                                  '4y185xg0' /* Bridge the gap effortlessly! U... */,
+                                  '4y185xg0' /* Bridge the gap effortlessly. U... */,
                                 ),
                                 textAlign: TextAlign.center,
                                 style: FlutterFlowTheme.of(context)
@@ -536,7 +536,7 @@ class _TutorialPageWidgetState extends State<TutorialPageWidget> {
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(8.0),
                                 child: Image.network(
-                                  'https://images.unsplash.com/photo-1556696863-6c5eddae0f5f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwyfHxkaWN0aW9uYXJ5fGVufDB8fHx8MTczMzgzNTYxNHww&ixlib=rb-4.0.3&q=80&w=1080',
+                                  'https://images.unsplash.com/photo-1693278615140-4523982bae77?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxMHx8ZGljdGlvbmFyeXxlbnwwfHx8fDE3MzM4MzU2MTR8MA&ixlib=rb-4.0.3&q=80&w=1080',
                                   width: double.infinity,
                                   height: 500.0,
                                   fit: BoxFit.cover,
@@ -645,7 +645,7 @@ class _TutorialPageWidgetState extends State<TutorialPageWidget> {
                                   8.0, 0.0, 8.0, 0.0),
                               child: Text(
                                 FFLocalizations.of(context).getText(
-                                  '7e858c66' /* Join a growing community of IS... */,
+                                  '7e858c66' /* Join a community of ISL enthus... */,
                                 ),
                                 textAlign: TextAlign.center,
                                 style: FlutterFlowTheme.of(context)
@@ -985,7 +985,7 @@ class _TutorialPageWidgetState extends State<TutorialPageWidget> {
                   ),
                 ),
               ),
-            ].addToStart(const SizedBox(height: 24.0)),
+            ].addToStart(const SizedBox(height: 16.0)),
           ),
         ),
       ),

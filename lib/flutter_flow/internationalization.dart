@@ -3668,7 +3668,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
     },
     '4y185xg0': {
       'en':
-          'Bridge the gap effortlessly! Use the rear camera to capture ISL signs and convert them into text or speech in your preferred language.Communicate seamlessly as gestures come to life through voice or text in real-time.',
+          'Bridge the gap effortlessly. Use the rear camera to capture ISL signs and convert them into text or speech in your preferred language. Communicate seamlessly as gestures come to life through voice or text in real-time.',
       'bn': '',
       'gu': '',
       'hi': '',
@@ -3731,7 +3731,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
     },
     '7e858c66': {
       'en':
-          'Join a growing community of ISL enthusiasts and contributors. Help enrich the ISL database by adding new signs and translations.\nLearn, collaborate, and contribute to making ISL more accessible for everyone.',
+          'Join a community of ISL enthusiasts and contributors. Help enrich the ISL database by adding new signs and translations. Learn, collaborate, and contribute to making ISL more accessible for everyone.',
       'bn': '',
       'gu': '',
       'hi': '',
