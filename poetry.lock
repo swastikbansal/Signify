@@ -606,6 +606,20 @@ docs = ["ipython", "matplotlib", "numpydoc", "sphinx"]
 tests = ["pytest", "pytest-cov", "pytest-xdist"]
 
 [[package]]
+name = "daal"
+version = "2025.0.1"
+description = "Intel® oneAPI Data Analytics Library"
+optional = false
+python-versions = "*"
+files = [
+    {file = "daal-2025.0.1-py2.py3-none-manylinux_2_28_x86_64.whl", hash = "sha256:e80f84ffe09e6f470b96d62861ac07b6922027f3f41cb4def705470a6dba4b87"},
+    {file = "daal-2025.0.1-py2.py3-none-win_amd64.whl", hash = "sha256:20bed6e2e31f1985980b7d4c02c71c61d8017d811d8178b84df703ff0b2a6a46"},
+]
+
+[package.dependencies]
+tbb = "==2022.*"
+
+[[package]]
 name = "debugpy"
 version = "1.8.9"
 description = "An implementation of the Debug Adapter Protocol for Python"
@@ -3626,6 +3640,28 @@ maintenance = ["conda-lock (==2.5.6)"]
 tests = ["black (>=24.3.0)", "matplotlib (>=3.3.4)", "mypy (>=1.9)", "numpydoc (>=1.2.0)", "pandas (>=1.1.5)", "polars (>=0.20.30)", "pooch (>=1.6.0)", "pyamg (>=4.0.0)", "pyarrow (>=12.0.0)", "pytest (>=7.1.2)", "pytest-cov (>=2.9.0)", "ruff (>=0.2.1)", "scikit-image (>=0.17.2)"]
 
 [[package]]
+name = "scikit-learn-intelex"
+version = "2025.0.1"
+description = "Intel(R) Extension for Scikit-learn is a seamless way to speed up your Scikit-learn application."
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "scikit_learn_intelex-2025.0.1-py310-none-manylinux_2_28_x86_64.whl", hash = "sha256:3ef09367cec9b85cfbaf0a95bd25a56670038a3faf53d8375c1ac81c9cbd773b"},
+    {file = "scikit_learn_intelex-2025.0.1-py310-none-win_amd64.whl", hash = "sha256:170cf8a1dfde076e530a23bfeaeee6f2e43e24f5a89601e8d90a83f70e27893d"},
+    {file = "scikit_learn_intelex-2025.0.1-py311-none-manylinux_2_28_x86_64.whl", hash = "sha256:9b5710d434225849fe336c61555300930f61dec7d369b1bbdf9c46f6b013cb9b"},
+    {file = "scikit_learn_intelex-2025.0.1-py311-none-win_amd64.whl", hash = "sha256:682e0fa674f70b19ac5bc61c5a2791aa84bbc93991e67009077b8ec732826d0a"},
+    {file = "scikit_learn_intelex-2025.0.1-py312-none-manylinux_2_28_x86_64.whl", hash = "sha256:9f855cc6225009f7d5e735855a91c3de717314b101642e3e83bad88485c81396"},
+    {file = "scikit_learn_intelex-2025.0.1-py312-none-win_amd64.whl", hash = "sha256:28c60bd424fb3e1c68f3ec4a6d57c31f6795ee17f4249c7b4ea1293e80a40ec2"},
+    {file = "scikit_learn_intelex-2025.0.1-py39-none-manylinux_2_28_x86_64.whl", hash = "sha256:c3753c084bed2a35458e603cf6b56f1b19ad3de3353f24515064ef4854e7d171"},
+    {file = "scikit_learn_intelex-2025.0.1-py39-none-win_amd64.whl", hash = "sha256:2fd583d4cc0cc7ca1c164f56f25c7af0dc5756f78b1d7f5997e94f2f4c19581f"},
+]
+
+[package.dependencies]
+daal = "2025.0.1"
+numpy = ">=1.19"
+scikit-learn = ">=0.22"
+
+[[package]]
 name = "scipy"
 version = "1.14.1"
 description = "Fundamental algorithms for scientific computing in Python"
@@ -3865,6 +3901,31 @@ pure-eval = "*"
 
 [package.extras]
 tests = ["cython", "littleutils", "pygments", "pytest", "typeguard"]
+
+[[package]]
+name = "tbb"
+version = "2022.0.0"
+description = "Intel® oneAPI Threading Building Blocks (oneTBB)"
+optional = false
+python-versions = "*"
+files = [
+    {file = "tbb-2022.0.0-py2.py3-none-manylinux_2_28_x86_64.whl", hash = "sha256:15a15a4e3ea4c3f3198bdb3c55fac75c589e15ed2ad0bbb080900d355c5b017e"},
+    {file = "tbb-2022.0.0-py3-none-win_amd64.whl", hash = "sha256:6a0bae732599ec5c082f46e4aaf14bdbef1621e8cd0c6fcf64d50d347c2ebda4"},
+]
+
+[package.dependencies]
+tcmlib = "==1.*"
+
+[[package]]
+name = "tcmlib"
+version = "1.2.0"
+description = "Thread Composability Manager"
+optional = false
+python-versions = "*"
+files = [
+    {file = "tcmlib-1.2.0-py2.py3-none-manylinux_2_28_x86_64.whl", hash = "sha256:dee9a0665ffa0a74f0ec72844ef7d82e9178ebf6980a76ac65906303d5ed4d03"},
+    {file = "tcmlib-1.2.0-py2.py3-none-win_amd64.whl", hash = "sha256:f751e005fd815ed0efeb87d4523f6a0938c5671e59ac935614f42d8ebb6489c9"},
+]
 
 [[package]]
 name = "tensorboard"
@@ -4358,4 +4419,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "3.10.11"
-content-hash = "a2088de9f5e4bc3c77d8a05b7f2083869d3a86c902e874d9c008ec7e2859a4bb"
+content-hash = "b7973c690b7fba9e95185f2f1d760163b6210735e8cbb636e3cfb5ee40196421"
