@@ -1,0 +1,62 @@
+{
+  "project_info": {
+    "project_number": "608567453337",
+    "project_id": "signify-ddf70",
+    "storage_bucket": "signify-ddf70.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:608567453337:android:987e7524a00c89399dfa08",
+        "android_client_info": {
+          "package_name": "com.philosia.signify"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "608567453337-8h9v39hui0j214u4f004m10bmhvaqg38.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.philosia.signify",
+            "certificate_hash": "9bbb3186b2189ef16d8f272bdab59362c395cbb4"
+          }
+        },
+        {
+          "client_id": "608567453337-brs6hc7dabml523quffcvu23qdcdbqsu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.philosia.signify",
+            "certificate_hash": "13e55182a1049359fb1c5ea95a318e1590a9216b"
+          }
+        },
+        {
+          "client_id": "608567453337-9c38nhsmjpke41tvb94ksi09mcma19bm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDD9QwIvXnRgAx7Pa5wXzSF23t6sFs5NA4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "608567453337-2gsm92e3pma6r94ljgia7psu5j6f94u1.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "608567453337-6o2ih4rmruk7m758r08bjrg47f73ip4l.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.philosia.signify"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
