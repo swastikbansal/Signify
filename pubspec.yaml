@@ -47,7 +47,7 @@ dependencies:
   cloud_firestore: 5.4.4
   cloud_firestore_platform_interface: 6.4.3
   cloud_firestore_web: 4.3.2
-  collection: 1.18.0
+  collection: 1.19.1
   csslib: 0.17.3
   debug_panel_proto:
     git:
@@ -104,7 +104,7 @@ dependencies:
   image_picker_macos: 0.2.1+1
   image_picker_platform_interface: 2.10.0
   image_picker_windows: 0.2.1+1
-  intl: 0.19.0
+  intl: 0.20.2
   json_path: 0.7.2
   lottie: 2.7.0
   mime_type: 1.0.0
@@ -132,7 +132,7 @@ dependencies:
   sqflite: 2.3.3+1
   sqflite_common: 2.5.4+3
   stream_transform: 2.1.0
-  timeago: 3.6.1
+  timeago: ^3.7.1
   tutorial_coach_mark: 1.2.11
   universal_io: 2.2.2
   url_launcher: 6.3.0
@@ -164,14 +164,15 @@ dependency_overrides:
   uuid: ^4.0.0
   web: 1.1.0
   win32: 5.5.1
+  vm_service: 15.0.0
 
 dev_dependencies:
   flutter_launcher_icons: 0.13.1
   flutter_lints: 4.0.0
-  flutterflow_debug_panel:
-    git:
-      url: https://github.com/FlutterFlow/debug_panel_devtool.git
-      ref: v0.2.0
+#  flutterflow_debug_panel:
+#    git:
+#      url: https://github.com/FlutterFlow/debug_panel_devtool.git
+#      ref: v0.2.0
   image: 4.2.0
   lints: 4.0.0
   flutter_test:
