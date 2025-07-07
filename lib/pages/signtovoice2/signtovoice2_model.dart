@@ -5,10 +5,6 @@ import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '/flutter_flow/form_field_controller.dart';
-import '/walkthroughs/signify_screen_2.dart';
-import 'package:aligned_tooltip/aligned_tooltip.dart';
-import 'package:tutorial_coach_mark/tutorial_coach_mark.dart'
-    show TutorialCoachMark;
 import 'signtovoice2_widget.dart' show Signtovoice2Widget;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -85,11 +81,25 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
       if (isCameraOn) {
         // Turn off camera
         await cameraController?.dispose();
+        cameraController = null;
         isCameraOn = false;
         isCameraInitialized = false;
       } else {
-        // Turn on camera
-        if (cameraController != null) {
+        // Turn on camera - create a new controller instance
+        if (cameras.isNotEmpty) {
+          final rearCamera = cameras.firstWhere(
+            (camera) => camera.lensDirection == CameraLensDirection.back,
+            orElse: () => cameras.first,
+          );
+
+          // Create a new controller instance
+          cameraController = CameraController(
+            rearCamera,
+            ResolutionPreset.medium,
+            enableAudio: false,
+          );
+
+          // Initialize the new controller
           await cameraController!.initialize();
           isCameraInitialized = true;
           isCameraOn = true;
@@ -97,6 +107,10 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
       }
     } catch (e) {
       print('Error toggling camera: $e');
+      // Reset states on error
+      isCameraOn = false;
+      isCameraInitialized = false;
+      cameraController = null;
     }
   }
 
