@@ -14,6 +14,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:camera/camera.dart';
 import 'signtovoice2_model.dart';
 export 'signtovoice2_model.dart';
 
@@ -147,6 +148,36 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                         color: FlutterFlowTheme.of(context).secondaryBackground,
                         width: 2.0,
                       ),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12.0),
+                      child: _model.isCameraOn && _model.isCameraInitialized
+                          ? CameraPreview(_model.cameraController!)
+                          : Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.camera_alt,
+                                    size: 80.0,
+                                    color: FlutterFlowTheme.of(context).secondaryText,
+                                  ),
+                                  SizedBox(height: 16.0),
+                                  Text(
+                                    _model.isCameraOn
+                                        ? 'Initializing camera...'
+                                        : 'Press camera button to start',
+                                    style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                      fontFamily: FlutterFlowTheme.of(context).bodyMediumFamily,
+                                      color: FlutterFlowTheme.of(context).secondaryText,
+                                      letterSpacing: 0.0,
+                                      useGoogleFonts: GoogleFonts.asMap()
+                                          .containsKey(FlutterFlowTheme.of(context).bodyMediumFamily),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                     ),
                   ),
                 ),
@@ -304,19 +335,23 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                           child: FlutterFlowIconButton(
                             borderRadius: 50.0,
                             buttonSize: 50.0,
-                            fillColor: FlutterFlowTheme.of(context)
-                                .secondaryBackground,
+                            fillColor: _model.isCameraOn
+                                ? FlutterFlowTheme.of(context).primary
+                                : FlutterFlowTheme.of(context).secondaryBackground,
                             hoverColor:
                                 FlutterFlowTheme.of(context).primaryBackground,
                             hoverIconColor:
                                 FlutterFlowTheme.of(context).primary,
                             icon: Icon(
-                              Icons.camera_alt,
-                              color: FlutterFlowTheme.of(context).primaryText,
+                              _model.isCameraOn ? Icons.videocam : Icons.camera_alt,
+                              color: _model.isCameraOn
+                                  ? FlutterFlowTheme.of(context).primaryBackground
+                                  : FlutterFlowTheme.of(context).primaryText,
                               size: 24.0,
                             ),
-                            onPressed: () {
-                              print('IconButton pressed ...');
+                            onPressed: () async {
+                              await _model.toggleCamera();
+                              safeSetState(() {});
                             },
                           ).addWalkthrough(
                             iconButtonPl161kuq,

@@ -15,11 +15,20 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:camera/camera.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart'
+    show TutorialCoachMark;
 
 class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   ///  State fields for stateful widgets in this page.
 
   TutorialCoachMark? signifyScreen2Controller;
+
+  // Camera related state
+  CameraController? cameraController;
+  bool isCameraInitialized = false;
+  bool isCameraOn = false;
+  List<CameraDescription> cameras = [];
 
   // State field(s) for DropDown widget.
   String? _dropDownValue;
@@ -45,6 +54,50 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   @override
   void initState(BuildContext context) {
     debugLogWidgetClass(this);
+    _initializeCamera();
+  }
+
+  // Camera initialization method
+  Future<void> _initializeCamera() async {
+    try {
+      cameras = await availableCameras();
+      if (cameras.isNotEmpty) {
+        // Use rear camera (usually index 0)
+        final rearCamera = cameras.firstWhere(
+          (camera) => camera.lensDirection == CameraLensDirection.back,
+          orElse: () => cameras.first,
+        );
+
+        cameraController = CameraController(
+          rearCamera,
+          ResolutionPreset.medium,
+          enableAudio: false,
+        );
+      }
+    } catch (e) {
+      print('Error initializing camera: $e');
+    }
+  }
+
+  // Toggle camera on/off
+  Future<void> toggleCamera() async {
+    try {
+      if (isCameraOn) {
+        // Turn off camera
+        await cameraController?.dispose();
+        isCameraOn = false;
+        isCameraInitialized = false;
+      } else {
+        // Turn on camera
+        if (cameraController != null) {
+          await cameraController!.initialize();
+          isCameraInitialized = true;
+          isCameraOn = true;
+        }
+      }
+    } catch (e) {
+      print('Error toggling camera: $e');
+    }
   }
 
   @override
@@ -52,6 +105,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
     signifyScreen2Controller?.finish();
     textFieldFocusNode?.dispose();
     textController?.dispose();
+    cameraController?.dispose();
   }
 
   @override
