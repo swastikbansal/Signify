@@ -1,19 +1,11 @@
-import '/auth/firebase_auth/auth_util.dart';
-import '/flutter_flow/flutter_flow_drop_down.dart';
-import '/flutter_flow/flutter_flow_icon_button.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import '/flutter_flow/flutter_flow_widgets.dart';
 import '/flutter_flow/form_field_controller.dart';
 import 'signtovoice2_widget.dart' show Signtovoice2Widget;
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import 'package:camera/camera.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart'
     show TutorialCoachMark;
+import '/services/sign_language_detector.dart';
 
 class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   ///  State fields for stateful widgets in this page.
@@ -24,7 +16,13 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   CameraController? cameraController;
   bool isCameraInitialized = false;
   bool isCameraOn = false;
+  bool isProcessing = false;
   List<CameraDescription> cameras = [];
+
+  // AI Detection
+  SignLanguageDetector? _signDetector;
+  String currentPrediction = "";
+  bool isDetectionActive = false;
 
   // State field(s) for DropDown widget.
   String? _dropDownValue;
@@ -51,6 +49,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   void initState(BuildContext context) {
     debugLogWidgetClass(this);
     _initializeCamera();
+    _initializeAI();
   }
 
   // Camera initialization method
@@ -75,11 +74,23 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
     }
   }
 
+  // Initialize AI detection
+  Future<void> _initializeAI() async {
+    try {
+      _signDetector = SignLanguageDetector();
+      await _signDetector!.initialize();
+      print('AI Sign Language Detector initialized');
+    } catch (e) {
+      print('Error initializing AI detector: $e');
+    }
+  }
+
   // Toggle camera on/off
   Future<void> toggleCamera() async {
     try {
       if (isCameraOn) {
-        // Turn off camera
+        // Turn off camera and AI detection
+        await _stopDetection();
         await cameraController?.dispose();
         cameraController = null;
         isCameraOn = false;
@@ -103,6 +114,9 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
           await cameraController!.initialize();
           isCameraInitialized = true;
           isCameraOn = true;
+
+          // Start AI detection
+          await _startDetection();
         }
       }
     } catch (e) {
@@ -111,6 +125,51 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
       isCameraOn = false;
       isCameraInitialized = false;
       cameraController = null;
+      isDetectionActive = false;
+    }
+  }
+
+  // Start AI detection
+  Future<void> _startDetection() async {
+    if (_signDetector?.isInitialized == true && cameraController != null) {
+      isDetectionActive = true;
+
+      // Start image stream processing
+      await cameraController!.startImageStream((CameraImage image) async {
+        if (!isProcessing && isDetectionActive) {
+          isProcessing = true;
+
+          try {
+            // Process frame with AI
+            final prediction = await _signDetector!.processFrame(image);
+
+            if (prediction.isNotEmpty && prediction != currentPrediction) {
+              currentPrediction = prediction;
+
+              // Update text field with prediction
+              if (textController != null) {
+                textController!.text = currentPrediction;
+              }
+            }
+          } catch (e) {
+            print('Error processing frame: $e');
+          } finally {
+            isProcessing = false;
+          }
+        }
+      });
+    }
+  }
+
+  // Stop AI detection
+  Future<void> _stopDetection() async {
+    isDetectionActive = false;
+    if (cameraController != null) {
+      try {
+        await cameraController!.stopImageStream();
+      } catch (e) {
+        print('Error stopping image stream: $e');
+      }
     }
   }
 
@@ -120,6 +179,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
     textFieldFocusNode?.dispose();
     textController?.dispose();
     cameraController?.dispose();
+    _signDetector?.dispose();
   }
 
   @override

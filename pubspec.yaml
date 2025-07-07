@@ -3,7 +3,7 @@ description: A new Flutter project.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -29,6 +29,11 @@ dependencies:
     sdk: flutter
   flutter_web_plugins:
     sdk: flutter
+
+  # ML and Computer Vision packages
+  google_mlkit_commons: ^0.6.1
+  google_mlkit_pose_detection: ^0.10.0
+  tflite_flutter: ^0.11.0
 
   model_viewer_plus: ^1.9.0
   app_links: 6.3.2
@@ -165,36 +170,34 @@ dependency_overrides:
   web: 1.1.0
   win32: 5.5.1
   vm_service: 15.0.0
+  image: 3.3.0 # Override to compatible version for tflite_flutter_helper
 
 dev_dependencies:
   flutter_launcher_icons: 0.13.1
   flutter_lints: 4.0.0
-#  flutterflow_debug_panel:
-#    git:
-#      url: https://github.com/FlutterFlow/debug_panel_devtool.git
-#      ref: v0.2.0
+  #  flutterflow_debug_panel:
+  #    git:
+  #      url: https://github.com/FlutterFlow/debug_panel_devtool.git
+  #      ref: v0.2.0
   image: 4.2.0
   lints: 4.0.0
   flutter_test:
     sdk: flutter
 
-
 flutter_launcher_icons:
-  android: 'launcher_icon'
+  android: "launcher_icon"
   ios: true
   web:
     generate: true
-  image_path: 'assets/images/app_launcher_icon.png'
-  adaptive_icon_background: '#fab713'
-  adaptive_icon_foreground: 'assets/images/adaptive_foreground_icon.png'
-
+  image_path: "assets/images/app_launcher_icon.png"
+  adaptive_icon_background: "#fab713"
+  adaptive_icon_foreground: "assets/images/adaptive_foreground_icon.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
@@ -214,8 +217,6 @@ flutter:
     - assets/models/iit.glb
     - assets/models/homicide.glb
     - assets/models/bcom.glb
-
-
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
@@ -242,4 +243,3 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
-

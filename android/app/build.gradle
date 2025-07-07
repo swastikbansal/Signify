@@ -4,7 +4,7 @@ plugins {
    id "dev.flutter.flutter-gradle-plugin"
    id "com.google.gms.google-services"  // Google Services plugin
 
-   
+
 }
 
 def localProperties = new Properties()
@@ -77,6 +77,18 @@ android {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig signingConfigs.debug
+            
+            // Disable minification temporarily to avoid TensorFlow Lite issues
+            minifyEnabled false
+            shrinkResources false
+            // If you want to enable minification later, uncomment below:
+            // minifyEnabled true
+            // shrinkResources true
+            // proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        
+        debug {
+            minifyEnabled false
         }
     }
 }
