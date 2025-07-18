@@ -4,3 +4,7 @@ MP_data
 Avg_MP_data
 test.py
 Downloads
+.venv
+.vscode
+__pycache__
+
