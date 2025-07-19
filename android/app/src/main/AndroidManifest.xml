@@ -8,7 +8,6 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    https://repo.mic.gov.in/sih2024/shobhit-institute-of-engineering-and-technology/philosia_frontend.githttps://repo.mic.gov.in/sih2024/shobhit-institute-of-engineering-and-technology/philosia_frontend.git
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
