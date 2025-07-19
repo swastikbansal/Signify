@@ -31,41 +31,38 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
   final Map<String, String> wordToAnimationMap = {
-    'iit': 'assets/models/iit.glb',
-    'bcom': 'assets/models/bcom.glb',
-    'homicide': 'assets/models/homicide.glb',
     "baby": "assets/models/baby.glb",
-    "cold": "assets/models/cold_default.glb",
+    "cold": "assets/models/cold.glb",
     "book": "assets/models/book.glb",
     "drink": "assets/models/drink.glb",
     "teacher": "assets/models/teacher.glb",
-    "work": "assets/models/work_default.glb",
-    "boy": "assets/models/boy_default.glb",
-    "happy": "assets/models/happy_default.glb",
+    "work": "assets/models/work.glb",
+    "boy": "assets/models/boy.glb",
+    "happy": "assets/models/happy.glb",
   };
 
   final Map<String, int> animationDurations = {
-    'assets/models/iit.glb': 10,
-    'assets/models/homicide.glb': 15,
-    'assets/models/bcom.glb': 16,
-    'assets/models/baby.glb': 3,
-    'assets/models/book.glb': 3,
-    'assets/models/happy_default.glb': 2,
-    'assets/models/teacher.glb': 5,
-    'assets/models/work_default.glb': 4,
-    'assets/models/boy_default.glb': 5,
-    'assets/models/cold_default.glb': 4,
-    'assets/models/drink.glb': 3,
+    'assets/models/baby.glb': 3200,
+    'assets/models/cold.glb': 4000,
+    'assets/models/book.glb': 3800,
+    'assets/models/drink.glb': 3200,
+    'assets/models/teacher.glb': 4600,
+    'assets/models/work.glb': 4000,
+    'assets/models/boy.glb': 4800,
+    'assets/models/happy.glb': 3600,
   };
 
   final String defaultAnimation = 'assets/models/model.glb';
-  final int defaultDuration = 5; // Duration for default animation
+  final int defaultDuration =
+      3500; // Duration for default animation in milliseconds
   List<String> animationQueue = [];
+  List<String> wordQueue = [];
   String? currentAnimation;
   Timer? animationTimer;
   String inputSentence = '';
   late AnimationController _fadeController;
   String? currentWord;
+  bool isPlayingSequence = false;
 
   @override
   void initState() {
@@ -100,13 +97,15 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
     _model.textFieldFocusNode ??= FocusNode();
 
     // Animation initialization
-    animationQueue = [defaultAnimation];
+    animationQueue = [];
+    wordQueue = [];
     currentAnimation = defaultAnimation;
+    isPlayingSequence = false;
     _fadeController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 500), // Smooth fade duration
+      duration: const Duration(
+          milliseconds: 200), // Faster fade duration for seamless transitions
     )..forward();
-    _playNextAnimation();
   }
 
   @override
@@ -123,71 +122,97 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
     if (inputSentence.isEmpty) {
       // Play the default animation if no input
       setState(() {
-        animationQueue = [defaultAnimation];
+        animationQueue = [];
+        wordQueue = [];
+        currentAnimation = defaultAnimation;
         currentWord = null;
+        isPlayingSequence = false;
       });
       debugPrint('No sentence provided. Playing default animation.');
-    } else {
-      // Parse sentence and add matching animations to the queue
-      List<String> matches = wordToAnimationMap.entries
-          .where((entry) =>
-              inputSentence.toLowerCase().contains(entry.key.toLowerCase()))
-          .map((entry) => entry.value)
-          .toList();
-
-      setState(() {
-        animationQueue = matches.isEmpty ? [defaultAnimation] : matches;
-        if (matches.isEmpty) {
-          currentWord = null;
-        } else {
-          currentWord = wordToAnimationMap.entries
-              .firstWhere((entry) => entry.value == matches[0])
-              .key;
-        }
-      });
-
-      debugPrint('Playing animations for matched words: $animationQueue');
+      return;
     }
 
-    _playNextAnimation();
+    // Parse sentence word by word and create animation queue
+    List<String> words =
+        inputSentence.toLowerCase().trim().split(RegExp(r'\s+'));
+    List<String> animations = [];
+    List<String> wordsToShow = [];
+
+    for (String word in words) {
+      // Remove punctuation from word
+      String cleanWord = word.replaceAll(RegExp(r'[^\w]'), '');
+
+      if (wordToAnimationMap.containsKey(cleanWord)) {
+        animations.add(wordToAnimationMap[cleanWord]!);
+        wordsToShow.add(cleanWord);
+        debugPrint('Added animation for word: $cleanWord');
+      } else {
+        debugPrint('No animation found for word: $cleanWord, skipping...');
+      }
+    }
+
+    setState(() {
+      animationQueue = animations;
+      wordQueue = wordsToShow;
+      isPlayingSequence = true;
+    });
+
+    if (animations.isNotEmpty) {
+      debugPrint('Playing animations for words in order: $wordsToShow');
+      // Start immediately without any delay
+      _playNextAnimation();
+    } else {
+      debugPrint(
+          'No animations found for any words. Playing default animation.');
+      setState(() {
+        currentAnimation = defaultAnimation;
+        currentWord = null;
+        isPlayingSequence = false;
+      });
+    }
   }
 
   void _playNextAnimation() {
-    if (animationQueue.isEmpty) {
-      return; // No animations to play
+    if (animationQueue.isEmpty || wordQueue.isEmpty) {
+      // Sequence finished, return to default animation
+      setState(() {
+        currentAnimation = defaultAnimation;
+        currentWord = null;
+        isPlayingSequence = false;
+      });
+      debugPrint(
+          'Animation sequence completed. Returning to default animation.');
+      return;
     }
 
-    // Start fade-out animation
-    _fadeController.reverse().then((_) {
-      setState(() {
-        currentAnimation =
-            animationQueue.removeAt(0); // Get and remove the first animation
-        currentWord = wordToAnimationMap.entries
-            .firstWhere((entry) => entry.value == currentAnimation,
-                orElse: () => MapEntry('', defaultAnimation))
-            .key;
-      });
+    // Get the next animation and word
+    String nextAnimation = animationQueue.removeAt(0);
+    String nextWord = wordQueue.removeAt(0);
 
-      // Get the duration for the current animation
-      int duration = animationDurations[currentAnimation!] ?? defaultDuration;
+    setState(() {
+      currentAnimation = nextAnimation;
+      currentWord = nextWord;
+    });
 
-      // Start fade-in animation
-      _fadeController.forward();
+    // Get the duration for the current animation (in milliseconds)
+    int duration = animationDurations[nextAnimation] ?? defaultDuration;
 
-      // Set a timer to play the next animation
-      animationTimer = Timer(Duration(seconds: duration), () {
-        if (animationQueue.isNotEmpty) {
-          _playNextAnimation();
-        } else {
-          setState(() {
-            currentAnimation =
-                defaultAnimation; // Show default animation when done
-            currentWord = null;
-          });
-        }
-      });
+    debugPrint('Now playing: $nextWord ($nextAnimation) for ${duration}ms');
 
-      debugPrint('Currently playing: $currentAnimation for $duration seconds');
+    // Set a timer to play the next animation with minimal delay for seamless transition
+    animationTimer = Timer(Duration(milliseconds: duration - 20), () {
+      if (animationQueue.isNotEmpty) {
+        _playNextAnimation();
+      } else {
+        // Sequence finished, return to default immediately
+        setState(() {
+          currentAnimation = defaultAnimation;
+          currentWord = null;
+          isPlayingSequence = false;
+        });
+        debugPrint(
+            'Animation sequence completed. Returned to default animation.');
+      }
     });
   }
 
@@ -271,48 +296,25 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
                     ),
                     child: Column(
                       children: [
-                        if (currentWord != null)
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              currentWord!,
-                              style: TextStyle(
-                                color: FlutterFlowTheme.of(context).primaryText,
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
                         Expanded(
-                          child: AnimatedBuilder(
-                            animation: _fadeController,
-                            builder: (context, child) {
-                              return Opacity(
-                                opacity: _fadeController.value,
-                                child: currentAnimation != null
-                                    ? ModelViewer(
-                                        key: ValueKey(currentAnimation),
-                                        src: currentAnimation!,
-                                        autoPlay: true,
-                                        autoRotate: true,
-                                        cameraControls: true,
-                                        backgroundColor: Colors.transparent,
-                                        cameraTarget: '0m 1.5m 0m',
-                                        // Keeps the avatar centered
-                                        cameraOrbit:
-                                            '0deg 75deg 2.5m', // Adjust camera orbit for positioning
-                                      )
-                                    : const Center(
-                                        child: Text(
-                                          'No animation playing',
-                                          style: TextStyle(
-                                              fontSize: 16,
-                                              color: Color(0xFFFAB317)),
-                                        ),
-                                      ),
-                              );
-                            },
-                          ),
+                          child: currentAnimation != null
+                              ? ModelViewer(
+                                  key: ValueKey(currentAnimation),
+                                  src: currentAnimation!,
+                                  autoPlay: true,
+                                  autoRotate: false,
+                                  cameraControls: false,
+                                  backgroundColor: Colors.transparent,
+                                  cameraTarget: '0m 1.5m 0m',
+                                  cameraOrbit: '0deg 75deg 2.5m',
+                                )
+                              : const Center(
+                                  child: Text(
+                                    'No animation playing',
+                                    style: TextStyle(
+                                        fontSize: 16, color: Color(0xFFFAB317)),
+                                  ),
+                                ),
                         )
                       ],
                     ),
@@ -548,7 +550,7 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
                           color: FlutterFlowTheme.of(context).primaryText,
                           size: 30.0,
                         ),
-                        showLoadingIndicator: true,
+                        showLoadingIndicator: false,
                         onPressed: () {
                           _handleSendAction(); // Trigger animation logic
                         },

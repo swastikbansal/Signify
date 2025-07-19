@@ -214,13 +214,14 @@ flutter:
     - assets/jsons/
     - assets/models/
     - assets/models/model.glb
-    - assets/models/iit.glb
-    - assets/models/homicide.glb
-    - assets/models/bcom.glb
+    - assets/models/boy.glb
+    - assets/models/cold.glb
+    - assets/models/happy.glb
     - assets/models/baby.glb
     - assets/models/drink.glb
     - assets/models/teacher.glb
     - assets/models/book.glb
+    - assets/models/work.glb
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
