@@ -1,3 +1,3 @@
-python3 -m vnv .venv
+python3 -m venv .venv
 venv\Scripts\activate
 pip install -r req.txt
