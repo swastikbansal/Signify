@@ -2,17 +2,13 @@ import '/auth/firebase_auth/auth_util.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import '/flutter_flow/flutter_flow_widgets.dart';
 import '/walkthroughs/signify_screen_1.dart';
 import 'package:aligned_tooltip/aligned_tooltip.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart'
     show TutorialCoachMark;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import 'package:model_viewer_plus/model_viewer_plus.dart';
 import 'dart:async';
 import 'voicetosign1_model.dart';
@@ -63,6 +59,7 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
   late AnimationController _fadeController;
   String? currentWord;
   bool isPlayingSequence = false;
+  bool voiceTrigger = false; // Local state for microphone toggle
 
   @override
   void initState() {
@@ -461,50 +458,76 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
                       ),
                     ),
                   ),
-                  AlignedTooltip(
-                    content: Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        FFLocalizations.of(context).getText(
-                          'z013a10e' /* Press the microphone button, s... */,
-                        ),
-                        style:
-                            FlutterFlowTheme.of(context).labelMedium.override(
-                                  fontFamily: FlutterFlowTheme.of(context)
-                                      .labelMediumFamily,
-                                  letterSpacing: 0.0,
-                                  useGoogleFonts: GoogleFonts.asMap()
-                                      .containsKey(FlutterFlowTheme.of(context)
-                                          .labelMediumFamily),
-                                ),
-                      ),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: voiceTrigger
+                          ? FlutterFlowTheme.of(context)
+                              .primary
+                              .withOpacity(0.1)
+                          : FlutterFlowTheme.of(context).primaryBackground,
+                      borderRadius: BorderRadius.circular(28.0),
+                      border: voiceTrigger
+                          ? Border.all(
+                              color: FlutterFlowTheme.of(context).primary,
+                              width: 2.0,
+                            )
+                          : null,
+                      // Add a subtle shadow when active
+                      boxShadow: voiceTrigger
+                          ? [
+                              BoxShadow(
+                                color: FlutterFlowTheme.of(context)
+                                    .primary
+                                    .withOpacity(0.3),
+                                spreadRadius: 1,
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ]
+                          : null,
                     ),
-                    offset: 4.0,
-                    preferredDirection: AxisDirection.up,
-                    borderRadius: BorderRadius.circular(12.0),
-                    backgroundColor: FlutterFlowTheme.of(context).alternate,
-                    elevation: 4.0,
-                    tailBaseWidth: 24.0,
-                    tailLength: 24.0,
-                    waitDuration: Duration(milliseconds: 10),
-                    showDuration: Duration(milliseconds: 2000),
-                    triggerMode: TooltipTriggerMode.longPress,
                     child: FlutterFlowIconButton(
-                      borderRadius: 100.0,
-                      buttonSize: 50.0,
-                      hoverColor: FlutterFlowTheme.of(context).alternate,
-                      hoverIconColor: FlutterFlowTheme.of(context).primary,
-                      icon: FaIcon(
-                        FontAwesomeIcons.microphone,
-                        color: FlutterFlowTheme.of(context).secondaryText,
+                      borderRadius: 28.0,
+                      buttonSize: 56.0,
+                      fillColor: Colors.transparent,
+                      icon: Icon(
+                        voiceTrigger ? Icons.mic : Icons.mic_off,
+                        color: voiceTrigger
+                            ? FlutterFlowTheme.of(context).primary
+                            : FlutterFlowTheme.of(context).secondaryText,
                         size: 24.0,
                       ),
-                      onPressed: () {
-                        print('IconButton pressed ...');
+                      onPressed: () async {
+                        // Toggle voice recognition state
+                        setState(() {
+                          voiceTrigger = !voiceTrigger;
+                        });
+
+                        if (voiceTrigger) {
+                          // Clear previous text when starting fresh (optional)
+                          // Uncomment the next line if you want to clear previous text when starting
+                          // _model.clearSpeechText();
+
+                          // Start speech recognition
+                          _model.startListening((recognizedText) {
+                            // Update the text field with accumulated recognized text
+                            setState(() {
+                              _model.textController!.text = recognizedText;
+                              inputSentence = recognizedText;
+
+                              // Move cursor to the end of text
+                              _model.textController!.selection =
+                                  TextSelection.fromPosition(
+                                TextPosition(
+                                    offset: _model.textController!.text.length),
+                              );
+                            });
+                          });
+                        } else {
+                          // Stop speech recognition
+                          _model.stopListening();
+                        }
                       },
-                    ).addWalkthrough(
-                      iconButtonIwoicpe5,
-                      _model.signifyScreen1Controller,
                     ),
                   ),
                   AlignedTooltip(

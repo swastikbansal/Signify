@@ -1,19 +1,9 @@
-import '/auth/firebase_auth/auth_util.dart';
-import '/flutter_flow/flutter_flow_icon_button.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import '/flutter_flow/flutter_flow_widgets.dart';
-import '/walkthroughs/signify_screen_1.dart';
-import 'package:aligned_tooltip/aligned_tooltip.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart'
     show TutorialCoachMark;
 import 'voicetosign1_widget.dart' show Voicetosign1Widget;
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 class Voicetosign1Model extends FlutterFlowModel<Voicetosign1Widget> {
   ///  Local state fields for this page.
@@ -51,12 +41,22 @@ class Voicetosign1Model extends FlutterFlowModel<Voicetosign1Widget> {
   TextEditingController? textController;
   String? Function(BuildContext, String?)? textControllerValidator;
 
+  // Speech to text variables
+  stt.SpeechToText? speechToText;
+  bool isListening = false;
+  String recognizedText = '';
+  String finalizedText = ''; // Store the finalized/confirmed text
+  String currentPartialText =
+      ''; // Store the current partial text being processed
+
   final Map<String, DebugDataField> debugGeneratorVariables = {};
   final Map<String, DebugDataField> debugBackendQueries = {};
   final Map<String, FlutterFlowModel> widgetBuilderComponents = {};
+
   @override
   void initState(BuildContext context) {
     debugLogWidgetClass(this);
+    speechToText = stt.SpeechToText();
   }
 
   @override
@@ -64,6 +64,145 @@ class Voicetosign1Model extends FlutterFlowModel<Voicetosign1Widget> {
     signifyScreen1Controller?.finish();
     textFieldFocusNode?.dispose();
     textController?.dispose();
+    if (isListening) {
+      speechToText?.stop();
+    }
+    // Clear speech variables
+    clearSpeechText();
+  }
+
+  // Initialize speech recognition
+  Future<bool> initSpeech() async {
+    try {
+      bool available = await speechToText?.initialize(
+            onError: (error) {
+              debugPrint("Speech initialization error: $error");
+            },
+            onStatus: (status) {
+              debugPrint("Speech initialization status: $status");
+            },
+          ) ??
+          false;
+      return available;
+    } catch (e) {
+      debugPrint("Failed to initialize speech: $e");
+      return false;
+    }
+  }
+
+  // Start listening to speech
+  void startListening(Function(String) onResult) async {
+    if (!isListening) {
+      bool available = await initSpeech();
+      if (available) {
+        isListening = true;
+
+        // Start continuous listening
+        _startContinuousListening(onResult);
+      }
+    }
+  }
+
+  // Continuous listening implementation
+  void _startContinuousListening(Function(String) onResult) async {
+    if (!isListening) return;
+
+    try {
+      await speechToText?.listen(
+        onResult: (result) {
+          if (result.finalResult) {
+            // This is a final result - add it to our finalized text
+            if (result.recognizedWords.trim().isNotEmpty) {
+              // Add space before new sentence if there's existing text
+              String newText = result.recognizedWords.trim();
+              if (finalizedText.isNotEmpty && !finalizedText.endsWith(' ')) {
+                finalizedText += ' ';
+              }
+              finalizedText += newText;
+              currentPartialText = ''; // Clear partial text
+
+              // Update the full text
+              recognizedText = finalizedText;
+              onResult(recognizedText);
+            }
+
+            // Don't restart immediately after final result - let the session continue
+            // The speech recognition will naturally keep listening for more input
+            // This eliminates the restart sounds
+          } else {
+            // This is a partial result - update without finalizing
+            currentPartialText = result.recognizedWords;
+
+            // Combine finalized text with current partial text
+            String fullText = finalizedText;
+            if (currentPartialText.isNotEmpty) {
+              if (fullText.isNotEmpty && !fullText.endsWith(' ')) {
+                fullText += ' ';
+              }
+              fullText += currentPartialText;
+            }
+
+            recognizedText = fullText;
+            onResult(recognizedText);
+          }
+        },
+        listenFor:
+            const Duration(hours: 1), // Very long duration to avoid timeouts
+        pauseFor: const Duration(
+            seconds:
+                8), // Much longer pause before stopping - allows natural conversation pace
+        localeId: null,
+        listenOptions: stt.SpeechListenOptions(
+          partialResults: true,
+          cancelOnError: false,
+          listenMode: stt.ListenMode.dictation,
+        ),
+      );
+
+      // Set up status listener to handle only when session truly ends
+      speechToText?.statusListener = (status) {
+        debugPrint("Speech status: $status");
+        if (status == 'done' && isListening) {
+          // Only restart if the session has truly ended and we still want to listen
+          // Use a longer delay to minimize restart frequency
+          Future.delayed(const Duration(seconds: 2), () {
+            if (isListening) {
+              debugPrint("Session ended naturally, restarting quietly...");
+              _startContinuousListening(onResult);
+            }
+          });
+        }
+      };
+    } catch (e) {
+      debugPrint("Speech recognition error: $e");
+      // Only retry after significant errors, with a longer delay to minimize sound interruptions
+      if (isListening) {
+        Future.delayed(const Duration(seconds: 3), () {
+          if (isListening) {
+            debugPrint("Retrying after error...");
+            _startContinuousListening(onResult);
+          }
+        });
+      }
+    }
+  }
+
+  // Stop listening to speech
+  void stopListening() {
+    if (isListening) {
+      speechToText?.stop();
+      isListening = false;
+      // Don't reset the text when stopping - keep what was recognized
+      // finalizedText and recognizedText will keep the accumulated text
+      currentPartialText = ''; // Clear only the partial text
+    }
+  }
+
+  // Method to clear all speech text (useful for starting fresh)
+  void clearSpeechText() {
+    finalizedText = '';
+    currentPartialText = '';
+    recognizedText = '';
   }
 
   @override
