@@ -124,17 +124,18 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
       duration: const Duration(milliseconds: 1500),
     );
 
-    // Moving line animation controller (like Google's loading)
+    // Moving line animation controller (Google-like faster)
     _movingLineController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1000), // 1 second duration
+      duration: const Duration(
+          milliseconds: 1200), // Faster - reduced from 2000ms to 1200ms
     );
     _movingLineAnimation = Tween<double>(
       begin: 0.0,
       end: 1.0,
     ).animate(CurvedAnimation(
       parent: _movingLineController,
-      curve: Curves.easeInOut,
+      curve: Curves.easeInOutQuart, // More Google-like smooth curve
     ));
   }
 
@@ -246,8 +247,8 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
         isLoadingAnimation = false;
       });
 
-      // Trigger animation for the extracted text immediately
-      _handleSendAction();
+      // Don't trigger animation immediately, wait for send button
+      debugPrint('✅ Text extracted and added to text field: $extractedText');
     } else {
       debugPrint('⚠️ No text detected in image');
       setState(() {
@@ -633,56 +634,51 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Expanded(
-                child: Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Container(
-                    width: double.infinity, // Full width
-                    height: double.infinity, // Full height
-                    decoration: BoxDecoration(
-                      color: FlutterFlowTheme.of(context).primaryBackground,
-                      borderRadius: BorderRadius.circular(12.0),
-                      border: Border.all(
-                        color: FlutterFlowTheme.of(context).secondaryBackground,
-                        width: 2.0,
-                      ),
-                    ),
-                    child: Column(
-                      children: [
-                        Expanded(
-                          child: currentAnimation != null
-                              ? ModelViewer(
-                                  key: ValueKey(currentAnimation),
-                                  src: currentAnimation!,
-                                  autoPlay: true,
-                                  autoRotate: false,
-                                  cameraControls: false,
-                                  backgroundColor: Colors.transparent,
-                                  cameraTarget: '0m 1.5m 0m',
-                                  cameraOrbit: '0deg 75deg 2.5m',
-                                )
-                              : const Center(
-                                  child: Text(
-                                    'No animation playing',
-                                    style: TextStyle(
-                                        fontSize: 16, color: Color(0xFFFAB317)),
-                                  ),
+                child: Container(
+                  width: double.infinity, // Full width
+                  height: double.infinity, // Full height
+                  decoration: BoxDecoration(
+                    color: FlutterFlowTheme.of(context).primaryBackground,
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: currentAnimation != null
+                            ? ModelViewer(
+                                key: ValueKey(currentAnimation),
+                                src: currentAnimation!,
+                                autoPlay: true,
+                                autoRotate: false,
+                                cameraControls: false,
+                                backgroundColor: Colors.transparent,
+                                cameraTarget: '0m 1.5m 0m',
+                                cameraOrbit: '0deg 75deg 2.5m',
+                              )
+                            : const Center(
+                                child: Text(
+                                  'No animation playing',
+                                  style: TextStyle(
+                                      fontSize: 16, color: Color(0xFFFAB317)),
                                 ),
-                        )
-                      ],
-                    ),
+                              ),
+                      )
+                    ],
                   ),
                 ),
               ),
               // Modern unified input container with Claude-like design
               Container(
                 margin: const EdgeInsets.symmetric(
-                    horizontal: 16.0, vertical: 4.0), // Reduced vertical margin
+                    horizontal: 8.0,
+                    vertical: 4.0), // Reduced horizontal margin for more space
                 decoration: BoxDecoration(
-                  color: FlutterFlowTheme.of(context).secondaryBackground,
+                  color: FlutterFlowTheme.of(context)
+                      .primaryBackground, // Changed to primary background
                   borderRadius: BorderRadius.circular(24.0),
                   border: Border.all(
                     color: FlutterFlowTheme.of(context)
-                        .secondaryBackground, // Same as container color
+                        .alternate, // Alternate border color
                     width: 1.5,
                   ),
                   boxShadow: [
@@ -889,50 +885,69 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
                           ),
                           child: Row(
                             children: [
-                              // Add image button (+ icon like Claude AI)
+                              // Add image/attachment button (Claude AI style)
                               Container(
                                 margin: const EdgeInsets.only(right: 8.0),
                                 decoration: BoxDecoration(
-                                  color: FlutterFlowTheme.of(context)
-                                      .secondaryText
-                                      .withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(20.0),
+                                  color: isProcessingImage
+                                      ? const Color(
+                                          0xFFFAB317) // Yellow when active
+                                      : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  border: isProcessingImage
+                                      ? null
+                                      : Border.all(
+                                          color: FlutterFlowTheme.of(context)
+                                              .secondaryText
+                                              .withOpacity(0.2),
+                                          width: 1.0,
+                                        ),
                                 ),
                                 child: Material(
                                   color: Colors.transparent,
                                   child: InkWell(
-                                    borderRadius: BorderRadius.circular(20.0),
+                                    borderRadius: BorderRadius.circular(8.0),
                                     onTap: isProcessingImage
                                         ? null
                                         : _showImagePickerBottomSheet,
                                     child: Container(
-                                      width: 40.0,
-                                      height: 40.0,
+                                      width: 32.0,
+                                      height: 32.0,
                                       child: Icon(
-                                        Icons.add,
-                                        color: FlutterFlowTheme.of(context)
-                                            .secondaryText,
-                                        size: 20.0,
+                                        Icons.attach_file,
+                                        color: isProcessingImage
+                                            ? Colors.black
+                                            : FlutterFlowTheme.of(context)
+                                                .secondaryText,
+                                        size: 18.0,
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
-                              // Microphone button
+                              const Spacer(),
+                              // Microphone button (Claude AI style) - moved next to send button
                               Container(
-                                margin: const EdgeInsets.only(right: 8.0),
+                                margin: const EdgeInsets.only(right: 4.0),
                                 decoration: BoxDecoration(
                                   color: voiceTrigger
-                                      ? FlutterFlowTheme.of(context).primary
-                                      : FlutterFlowTheme.of(context)
-                                          .secondaryText
-                                          .withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(20.0),
+                                      ? const Color(
+                                          0xFFFAB317) // Yellow when active
+                                      : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  border: voiceTrigger
+                                      ? null
+                                      : Border.all(
+                                          color: FlutterFlowTheme.of(context)
+                                              .primaryBackground
+                                              .withOpacity(0.2),
+                                          width: 1.0,
+                                        ),
                                 ),
                                 child: Material(
                                   color: Colors.transparent,
                                   child: InkWell(
-                                    borderRadius: BorderRadius.circular(20.0),
+                                    borderRadius: BorderRadius.circular(8.0),
                                     onTap: () async {
                                       setState(() {
                                         voiceTrigger = !voiceTrigger;
@@ -950,37 +965,38 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
                                       }
                                     },
                                     child: Container(
-                                      width: 40.0,
-                                      height: 40.0,
+                                      width: 32.0,
+                                      height: 32.0,
                                       child: Icon(
                                         voiceTrigger
                                             ? Icons.mic
                                             : Icons.mic_none,
                                         color: voiceTrigger
-                                            ? Colors.white
+                                            ? Colors.black
                                             : FlutterFlowTheme.of(context)
                                                 .secondaryText,
-                                        size: 20.0,
+                                        size: 18.0,
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
-                              const Spacer(),
-                              // Send button (right aligned, no bg when disabled)
+                              // Send button (Claude AI style with arrow up)
                               Container(
                                 decoration: BoxDecoration(
                                   color: (inputSentence.trim().isNotEmpty ||
                                           uploadedImagePaths.isNotEmpty)
-                                      ? FlutterFlowTheme.of(context).primary
+                                      ? const Color(
+                                          0xFFFAB317) // Yellow when active
                                       : FlutterFlowTheme.of(context)
-                                          .secondaryBackground, // Same as container bg when disabled
-                                  borderRadius: BorderRadius.circular(20.0),
+                                          .secondaryText
+                                          .withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(8.0),
                                 ),
                                 child: Material(
                                   color: Colors.transparent,
                                   child: InkWell(
-                                    borderRadius: BorderRadius.circular(20.0),
+                                    borderRadius: BorderRadius.circular(8.0),
                                     onTap: (inputSentence.trim().isNotEmpty ||
                                             uploadedImagePaths.isNotEmpty)
                                         ? () {
@@ -988,18 +1004,19 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
                                           }
                                         : null,
                                     child: Container(
-                                      width: 40.0,
-                                      height: 40.0,
+                                      width: 32.0,
+                                      height: 32.0,
                                       child: Icon(
-                                        Icons.send_rounded,
+                                        Icons.arrow_upward_rounded,
                                         color: (inputSentence
                                                     .trim()
                                                     .isNotEmpty ||
                                                 uploadedImagePaths.isNotEmpty)
-                                            ? Colors.white
+                                            ? Colors
+                                                .black // Black icon when active
                                             : FlutterFlowTheme.of(context)
                                                 .secondaryText,
-                                        size: 20.0,
+                                        size: 18.0,
                                       ),
                                     ),
                                   ),
@@ -1046,12 +1063,6 @@ class MovingLinePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = strokeWidth
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
-
     final borderRadius = 24.0;
     final rect = Rect.fromLTWH(0, 0, size.width, size.height);
     final rrect = RRect.fromRectAndRadius(rect, Radius.circular(borderRadius));
@@ -1060,7 +1071,7 @@ class MovingLinePainter extends CustomPainter {
     final path = Path()..addRRect(rrect);
     final totalLength = _calculatePathLength(path);
     final lineLength =
-        totalLength * 0.15; // Length of the moving line (15% of perimeter)
+        totalLength * 0.3; // Increased line length for more visibility
 
     // Calculate current position based on progress
     final currentPosition = totalLength * progress;
@@ -1070,42 +1081,47 @@ class MovingLinePainter extends CustomPainter {
     // Create path metrics to get position along the path
     final pathMetrics = path.computeMetrics().first;
 
+    // Simple solid yellow paint - no gradients
+    final paint = Paint()
+      ..color = const Color(0xFFFAB317) // Simple solid yellow
+      ..strokeWidth = strokeWidth
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+
     if (startPosition >= 0 && endPosition <= totalLength) {
-      // Draw the moving line segment
+      // Draw simple line segment
       final segmentPath = pathMetrics.extractPath(
         startPosition.clamp(0.0, totalLength),
         endPosition.clamp(0.0, totalLength),
       );
       canvas.drawPath(segmentPath, paint);
     } else {
-      // Handle wrapping around the path
+      // Handle wrapping around the path (simplified)
       if (startPosition < 0) {
-        // Draw from wrapped start to end of path
         final segmentPath1 = pathMetrics.extractPath(
           (startPosition + totalLength).clamp(0.0, totalLength),
           totalLength,
         );
-        canvas.drawPath(segmentPath1, paint);
-
-        // Draw from beginning to current end
         final segmentPath2 = pathMetrics.extractPath(
           0.0,
           endPosition.clamp(0.0, totalLength),
         );
+
+        // Draw simple segments
+        canvas.drawPath(segmentPath1, paint);
         canvas.drawPath(segmentPath2, paint);
       } else if (endPosition > totalLength) {
-        // Draw from start to end of path
         final segmentPath1 = pathMetrics.extractPath(
           startPosition.clamp(0.0, totalLength),
           totalLength,
         );
-        canvas.drawPath(segmentPath1, paint);
-
-        // Draw from beginning to wrapped end
         final segmentPath2 = pathMetrics.extractPath(
           0.0,
           (endPosition - totalLength).clamp(0.0, totalLength),
         );
+
+        // Draw simple segments
+        canvas.drawPath(segmentPath1, paint);
         canvas.drawPath(segmentPath2, paint);
       }
     }
