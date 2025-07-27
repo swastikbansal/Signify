@@ -6,6 +6,33 @@ import numpy as np
 class Utils:
     def __init__(self, axes):
         self.axes = axes
+    
+    @staticmethod
+    def coords_to_landmarks(coords_flat):
+        """Convert flat coordinate array to landmark-like objects"""
+        if not coords_flat:
+            return []
+        
+        landmarks = []
+        for i in range(0, len(coords_flat), 3):
+            landmark = type('Landmark', (), {
+                'x': coords_flat[i],
+                'y': coords_flat[i+1], 
+                'z': coords_flat[i+2]
+            })()
+            landmarks.append(landmark)
+        return landmarks
+    
+    @staticmethod
+    def get_coordinates_from_flat(coords_flat, index):
+        """Get coordinates from flat array by index"""
+        try:
+            if not coords_flat or index * 3 + 2 >= len(coords_flat):
+                return np.array([-1, -1, -1])
+            start_idx = index * 3
+            return np.array([coords_flat[start_idx], coords_flat[start_idx + 1], coords_flat[start_idx + 2]])
+        except (IndexError, TypeError):
+            return np.array([-1, -1, -1])
         
     def calculate_angle1(self, vec1, vec2):
         dot_product = np.dot(vec1, vec2)
@@ -14,12 +41,31 @@ class Utils:
         self.cosine_angle = dot_product / (norm_vec1 * norm_vec2)
         return self.cosine_angle  
 
-    def get_coordinates_safe(self, landmark, index):
+    def get_coordinates_safe(self, landmarks, index):
         try:
-            return np.array([landmark[index].x, landmark[index].y, landmark[index].z])
-        except IndexError:
-            return np.array([-1, -1, -1])  
-
+            if not landmarks or index >= len(landmarks):
+                return np.array([-1, -1, -1])
+            
+            landmark = landmarks[index]
+            
+            # Check if it's a landmark object with x, y, z attributes
+            if hasattr(landmark, 'x'):
+                return np.array([landmark.x, landmark.y, landmark.z])
+            # Check if it's a flat coordinate array
+            elif isinstance(landmarks, list) and isinstance(landmark, (int, float)):
+                # This means landmarks is a flat array
+                start_idx = index * 3
+                if start_idx + 2 < len(landmarks):
+                    return np.array([landmarks[start_idx], landmarks[start_idx + 1], landmarks[start_idx + 2]])
+                else:
+                    return np.array([-1, -1, -1])
+            # Check if it's already a coordinate array
+            elif isinstance(landmark, (list, np.ndarray)) and len(landmark) >= 3:
+                return np.array([landmark[0], landmark[1], landmark[2]])
+            else:
+                return np.array([-1, -1, -1])
+        except (IndexError, AttributeError, TypeError):
+            return np.array([-1, -1, -1])
 
     def angle_between_vectors(self, v1, v2):
         dot_product = np.dot(v1, v2)
@@ -40,6 +86,13 @@ class Utils:
 
     # Function to extract hand features (angles between vectors and axes)
     def extract_features(self, hand_landmarks, pose_landmarks=None):
+        # Convert flat arrays to landmark objects if needed
+        if isinstance(hand_landmarks, list) and not hasattr(hand_landmarks[0] if hand_landmarks else None, 'x'):
+            hand_landmarks = self.coords_to_landmarks(hand_landmarks)
+        
+        if isinstance(pose_landmarks, list) and pose_landmarks and not hasattr(pose_landmarks[0] if pose_landmarks else None, 'x'):
+            pose_landmarks = self.coords_to_landmarks(pose_landmarks)
+        
         hand_pairs = [
             (1 , 3) ,  # Thumb
             (6 , 8 ),  # Index finger
@@ -51,31 +104,42 @@ class Utils:
         
         self.features = []
         for pair in hand_pairs:
-            landmark1 = hand_landmarks[pair[0]]
-            landmark2 = hand_landmarks[pair[1]]
+            if len(hand_landmarks) > max(pair):
+                landmark1 = hand_landmarks[pair[0]]
+                landmark2 = hand_landmarks[pair[1]]
+                
+                vector = np.array([landmark2.x - landmark1.x, landmark2.y - landmark1.y, landmark2.z - landmark1.z])
+                x_axis = np.array([1, 0, 0])
+                y_axis = np.array([0, 1, 0])
+                z_axis = np.array([0, 0, 1])
+                
+                angle_x = self.calculate_angle1(vector, x_axis)
+                angle_y = self.calculate_angle1(vector, y_axis)
+                angle_z = self.calculate_angle1(vector, z_axis)
+                
+                self.features.extend([angle_x, angle_y, angle_z])
+            else:
+                # Add default values if landmarks are missing
+                self.features.extend([-1, -1, -1])
+        
+        # Safe access to landmarks for 0, 5, and 17
+        if len(hand_landmarks) > 17:
+            vector_0_to_5 = self.get_coordinates_safe(hand_landmarks, 5) - self.get_coordinates_safe(hand_landmarks, 0)
+            vector_0_to_17 = self.get_coordinates_safe(hand_landmarks, 17) - self.get_coordinates_safe(hand_landmarks, 0)
             
-            vector = np.array([landmark2.x - landmark1.x, landmark2.y - landmark1.y, landmark2.z - landmark1.z])
+            normal_vector = np.cross(vector_0_to_5, vector_0_to_17)
+            
             x_axis = np.array([1, 0, 0])
             y_axis = np.array([0, 1, 0])
             z_axis = np.array([0, 0, 1])
             
-            angle_x = self.calculate_angle1(vector, x_axis)
-            angle_y = self.calculate_angle1(vector, y_axis)
-            angle_z = self.calculate_angle1(vector, z_axis)
+            normal_angle_x = self.calculate_angle1(normal_vector, x_axis)
+            normal_angle_y = self.calculate_angle1(normal_vector, y_axis)
+            normal_angle_z = self.calculate_angle1(normal_vector, z_axis)
             
-            self.features.extend([angle_x, angle_y, angle_z])
-        
-        # Safe access to landmarks for 0, 5, and 17
-        vector_0_to_5 = self.get_coordinates_safe(hand_landmarks, 5) - self.get_coordinates_safe(hand_landmarks, 0)
-        vector_0_to_17 = self.get_coordinates_safe(hand_landmarks, 17) - self.get_coordinates_safe(hand_landmarks, 0)
-        
-        normal_vector = np.cross(vector_0_to_5, vector_0_to_17)
-        
-        normal_angle_x = self.calculate_angle1(normal_vector, x_axis)
-        normal_angle_y = self.calculate_angle1(normal_vector, y_axis)
-        normal_angle_z = self.calculate_angle1(normal_vector, z_axis)
-        
-        self.features.extend([normal_angle_x, normal_angle_y, normal_angle_z])
+            self.features.extend([normal_angle_x, normal_angle_y, normal_angle_z])
+        else:
+            self.features.extend([-1, -1, -1])
         
         # If pose landmarks are available, calculate the distance between nose and wrist
         
@@ -140,7 +204,11 @@ class Utils:
         return self.x_distance, self.y_distance
 
     # Function to extract the pose features
-    def extract_pose_features(self,image, landmarks):
+    def extract_pose_features(self, landmarks):
+        # Convert flat arrays to landmark objects if needed
+        if isinstance(landmarks, list) and not hasattr(landmarks[0] if landmarks else None, 'x'):
+            landmarks = self.coords_to_landmarks(landmarks)
+        
         # Define the landmark indices for the required sets of points (using Pose landmark indices)
         points_sets = {
             "angle_11_12_14": (self.get_coordinates_safe(landmarks, 11), self.get_coordinates_safe(landmarks, 12), self.get_coordinates_safe(landmarks, 14)),  # Left shoulder, right shoulder, right elbow
@@ -176,16 +244,3 @@ class Utils:
         self.angles.extend([x_distance, y_distance])  # Append x and y distance to the feature list
         
         return self.angles
-
-    def calulating_percentage(self, avg , all_classes):
-        individual_threshold = {
-        'clean':0.3, 'happy':0.32, 'high': 0.55, 'loud': 0.90, 'quiet':0.9,
-        'sad':0.6, 'deep':0.5, 'soft':0.5, 'weak':0.6, 'flat': 0.27,
-    'expensive':0.27,  'poot':0.35,  'slow':0.5,  'thick':0.7
-        }
-        self.threshold_pecentage = []
-        for i,j in zip(avg,all_classes):
-            value=individual_threshold[j.lower()]
-            self.threshold_pecentage.append(i*100/value)
-        return self.threshold_pecentage
-
