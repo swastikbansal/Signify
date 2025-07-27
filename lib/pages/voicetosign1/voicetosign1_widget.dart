@@ -667,6 +667,7 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
                   ),
                 ),
               ),
+
               // Modern unified input container with Claude-like design
               Container(
                 margin: const EdgeInsets.symmetric(
@@ -679,7 +680,7 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
                   border: Border.all(
                     color: FlutterFlowTheme.of(context)
                         .alternate, // Alternate border color
-                    width: 1.5,
+                    width: 1.0,
                   ),
                   boxShadow: [
                     BoxShadow(
