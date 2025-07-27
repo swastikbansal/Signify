@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'auth/firebase_auth/firebase_user_provider.dart';
 import 'auth/firebase_auth/auth_util.dart';
 
@@ -96,6 +97,12 @@ Stack trace: ${filteredStackTrace.join("\n")}''';
     EasyDebounce.fire('508f3c74205c87928b71f49040062e732f9c20b0');
     EasyDebounce.cancel('508f3c74205c87928b71f49040062e732f9c20b0');
   });
+
+   // Initialize Supabase
+  await Supabase.initialize(
+    url: 'https://qqyqwtoxjhgashwxyidg.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFxeXF3dG94amhnYXNod3h5aWRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM2MjE5NjIsImV4cCI6MjA2OTE5Nzk2Mn0.IOB5ocrqZPKU6luezwhmLGXUkKgks9w0AM7X2-onI-c',
+  );
 
   runApp(MyApp());
 }

@@ -24,7 +24,7 @@ dependencies:
   flutter:
     sdk: flutter
   camera: ^0.10.5+9
-  supabase_flutter: ^2.8.1
+  supabase_flutter: ^2.9.1
   flutter_localizations:
     sdk: flutter
   flutter_web_plugins:
@@ -212,14 +212,6 @@ flutter:
     - assets/jsons/
     - assets/models/
     - assets/models/model.glb
-    - assets/models/boy.glb
-    - assets/models/cold.glb
-    - assets/models/happy.glb
-    - assets/models/baby.glb
-    - assets/models/drink.glb
-    - assets/models/teacher.glb
-    - assets/models/book.glb
-    - assets/models/work.glb
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

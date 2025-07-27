@@ -2,6 +2,7 @@ import '/auth/firebase_auth/auth_util.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/walkthroughs/signify_screen_1.dart';
+import '/services/supabase_animation_service.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart'
     show TutorialCoachMark;
 import 'package:flutter/material.dart';
@@ -27,33 +28,11 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
   late Voicetosign1Model _model;
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
-  final Map<String, String> wordToAnimationMap = {
-    "baby": "assets/models/baby.glb",
-    "cold": "assets/models/cold.glb",
-    "book": "assets/models/book.glb",
-    "drink": "assets/models/drink.glb",
-    "teacher": "assets/models/teacher.glb",
-    "work": "assets/models/work.glb",
-    "boy": "assets/models/boy.glb",
-    "happy": "assets/models/happy.glb",
-  };
-
-  final Map<String, int> animationDurations = {
-    'assets/models/baby.glb': 3200,
-    'assets/models/cold.glb': 4000,
-    'assets/models/book.glb': 3800,
-    'assets/models/drink.glb': 3200,
-    'assets/models/teacher.glb': 4600,
-    'assets/models/work.glb': 4000,
-    'assets/models/boy.glb': 4800,
-    'assets/models/happy.glb': 3600,
-  };
+  // API-based animation system
+  final List<AnimationData> _animationQueue = [];
+  final List<String> _wordQueue = [];
 
   final String defaultAnimation = 'assets/models/model.glb';
-  final int defaultDuration =
-      3500; // Duration for default animation in milliseconds
-  List<String> animationQueue = [];
-  List<String> wordQueue = [];
   String? currentAnimation;
   Timer? animationTimer;
   String inputSentence = '';
@@ -64,6 +43,7 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
   String? currentWord;
   bool isPlayingSequence = false;
   bool voiceTrigger = false; // Local state for microphone toggle
+  bool isLoadingAnimations = false; // New loading state for API calls
 
   // Image handling variables
   List<String> uploadedImagePaths = [];
@@ -109,10 +89,15 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
     _model.textFieldFocusNode ??= FocusNode();
 
     // Animation initialization
-    animationQueue = [];
-    wordQueue = [];
     currentAnimation = defaultAnimation;
     isPlayingSequence = false;
+
+    // Preload core vocabulary in background for instant access
+    SupabaseAnimationService.preloadCoreVocabulary();
+
+    // Optionally log dynamic vocabulary info for debugging
+    _logVocabularyInfo();
+
     _fadeController = AnimationController(
       vsync: this,
       duration: const Duration(
@@ -148,6 +133,47 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
     _movingLineController.dispose();
     _textRecognizer.close();
     super.dispose();
+  }
+
+  // Dynamic vocabulary info logging - showcases API capabilities
+  Future<void> _logVocabularyInfo() async {
+    try {
+      final totalWords = await SupabaseAnimationService.getTotalWordCount();
+      final categories =
+          await SupabaseAnimationService.getAvailableCategories();
+      final popularWords =
+          await SupabaseAnimationService.getPopularWords(limit: 5);
+
+      debugPrint('📊 Dynamic Vocabulary Info:');
+      debugPrint('  Total words available: $totalWords');
+      debugPrint('  Categories: ${categories.join(", ")}');
+      debugPrint('  Popular words: ${popularWords.join(", ")}');
+      debugPrint(
+          '🚀 Fully scalable - add words via Supabase without code changes!');
+    } catch (e) {
+      debugPrint('⚠️ Could not fetch vocabulary info: $e');
+    }
+  }
+
+  // Dynamic word suggestions for unknown words - showcases search capabilities
+  Future<void> _suggestSimilarWords(String unknownWord) async {
+    try {
+      // Search for partial matches
+      final suggestions =
+          await SupabaseAnimationService.searchWords(unknownWord, limit: 3);
+
+      if (suggestions.isNotEmpty) {
+        debugPrint(
+            '💡 Suggestions for "$unknownWord": ${suggestions.join(", ")}');
+      } else {
+        // If no partial matches, suggest popular words
+        final popular =
+            await SupabaseAnimationService.getPopularWords(limit: 3);
+        debugPrint('💡 Try these popular words instead: ${popular.join(", ")}');
+      }
+    } catch (e) {
+      debugPrint('⚠️ Could not fetch suggestions for $unknownWord: $e');
+    }
   }
 
   // Image handling methods
@@ -433,13 +459,31 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
     _loadingController.reset();
   }
 
-  void _handleSendAction() {
+  void _handleSendAction() async {
+    if (inputSentence.isEmpty) {
+      // Stop loading animation
+      _stopLoadingAnimation();
+
+      // Play the default animation if no input
+      setState(() {
+        _animationQueue.clear();
+        _wordQueue.clear();
+        currentAnimation = defaultAnimation;
+        currentWord = null;
+        isPlayingSequence = false;
+      });
+      debugPrint('No sentence provided. Playing default animation.');
+      return;
+    }
+
     animationTimer?.cancel(); // Cancel any ongoing animation sequence
 
     // Start moving line animation first (like Google's)
     setState(() {
       isMovingLineActive = true;
+      isLoadingAnimations = true; // Show API loading state
     });
+
     _movingLineController.forward().then((_) {
       // After moving line animation, start loading animation
       _startLoadingAnimation();
@@ -455,57 +499,67 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
     debugPrint('📝 Current text: ${inputSentence.trim()}');
     debugPrint('🖼️ Images to clear: ${uploadedImagePaths.length}');
 
-    if (inputSentence.isEmpty) {
-      // Stop loading animation
-      _stopLoadingAnimation();
+    try {
+      // Parse sentence word by word for API processing
+      List<String> words = inputSentence
+          .toLowerCase()
+          .trim()
+          .split(RegExp(r'\s+'))
+          .map((word) => word.replaceAll(RegExp(r'[^\w]'), ''))
+          .where((word) => word.isNotEmpty)
+          .toList();
 
-      // Play the default animation if no input
-      setState(() {
-        animationQueue = [];
-        wordQueue = [];
-        currentAnimation = defaultAnimation;
-        currentWord = null;
-        isPlayingSequence = false;
-      });
-      debugPrint('No sentence provided. Playing default animation.');
-      return;
-    }
+      debugPrint('🔍 Processing words: $words');
 
-    // Parse sentence word by word and create animation queue
-    List<String> words =
-        inputSentence.toLowerCase().trim().split(RegExp(r'\s+'));
-    List<String> animations = [];
-    List<String> wordsToShow = [];
+      // Fetch animations from Supabase API with metadata
+      final animationsData =
+          await SupabaseAnimationService.getBatchAnimationsWithMetadata(words);
 
-    for (String word in words) {
-      // Remove punctuation from word
-      String cleanWord = word.replaceAll(RegExp(r'[^\w]'), '');
+      // Filter successful animations and prepare queue
+      _animationQueue.clear();
+      _wordQueue.clear();
 
-      if (wordToAnimationMap.containsKey(cleanWord)) {
-        animations.add(wordToAnimationMap[cleanWord]!);
-        wordsToShow.add(cleanWord);
-        debugPrint('Added animation for word: $cleanWord');
-      } else {
-        debugPrint('No animation found for word: $cleanWord, skipping...');
+      for (int i = 0; i < words.length; i++) {
+        if (i < animationsData.length && animationsData[i].url != null) {
+          _animationQueue.add(animationsData[i]);
+          _wordQueue.add(words[i]);
+          debugPrint(
+              '✅ Found animation for: ${words[i]} (${animationsData[i].metadata.duration}ms)');
+        } else {
+          debugPrint('❌ No animation for: ${words[i]}');
+          // Dynamic word suggestions for missing words
+          _suggestSimilarWords(words[i]);
+        }
       }
-    }
 
-    setState(() {
-      animationQueue = animations;
-      wordQueue = wordsToShow;
-      isPlayingSequence = true;
-    });
-
-    if (animations.isNotEmpty) {
-      debugPrint('Playing animations for words in order: $wordsToShow');
-      // Start immediately without any delay
-      _playNextAnimation();
-    } else {
-      debugPrint(
-          'No animations found for any words. Playing default animation.');
       setState(() {
+        isPlayingSequence = true;
+        isLoadingAnimations = false;
+      });
+
+      if (_animationQueue.isNotEmpty) {
+        // Start predictive loading for better performance
+        if (_animationQueue.isNotEmpty) {
+          SupabaseAnimationService.preloadRelatedWords(
+              _animationQueue.first.metadata.word);
+        }
+
+        debugPrint('Playing animations for words in order: $_wordQueue');
+        _playNextAnimationFromAPI();
+      } else {
+        debugPrint(
+            'No animations found for any words. Playing default animation.');
+        setState(() {
+          currentAnimation = defaultAnimation;
+          currentWord = null;
+          isPlayingSequence = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('❌ Error loading animations from API: $e');
+      setState(() {
+        isLoadingAnimations = false;
         currentAnimation = defaultAnimation;
-        currentWord = null;
         isPlayingSequence = false;
       });
     }
@@ -525,8 +579,8 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
     });
   }
 
-  void _playNextAnimation() {
-    if (animationQueue.isEmpty || wordQueue.isEmpty) {
+  void _playNextAnimationFromAPI() {
+    if (_animationQueue.isEmpty || _wordQueue.isEmpty) {
       // Sequence finished, return to default animation
       setState(() {
         currentAnimation = defaultAnimation;
@@ -538,24 +592,32 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
       return;
     }
 
-    // Get the next animation and word
-    String nextAnimation = animationQueue.removeAt(0);
-    String nextWord = wordQueue.removeAt(0);
+    // Get the next animation data and word
+    AnimationData nextAnimationData = _animationQueue.removeAt(0);
+    String nextWord = _wordQueue.removeAt(0);
 
     setState(() {
-      currentAnimation = nextAnimation;
+      currentAnimation = nextAnimationData.url; // Use URL from API
       currentWord = nextWord;
     });
 
-    // Get the duration for the current animation (in milliseconds)
-    int duration = animationDurations[nextAnimation] ?? defaultDuration;
+    // Use precise duration from API metadata for HandTalk-level timing
+    int duration = nextAnimationData.metadata.duration;
 
-    debugPrint('Now playing: $nextWord ($nextAnimation) for ${duration}ms');
+    debugPrint(
+        'Now playing: $nextWord (${nextAnimationData.url}) for ${duration}ms');
 
-    // Set a timer to play the next animation with minimal delay for seamless transition
-    animationTimer = Timer(Duration(milliseconds: duration - 20), () {
-      if (animationQueue.isNotEmpty) {
-        _playNextAnimation();
+    // Preload next animation for seamless transition
+    if (_animationQueue.isNotEmpty) {
+      // The next animation URL is already cached, so ModelViewer will load it instantly
+      debugPrint('🚀 Next animation preloaded for seamless transition');
+    }
+
+    // Set a timer to play the next animation with optimized timing for smooth transitions
+    animationTimer = Timer(Duration(milliseconds: duration - 10), () {
+      // Reduced overlap for smoother transition
+      if (_animationQueue.isNotEmpty) {
+        _playNextAnimationFromAPI();
       } else {
         // Sequence finished, return to default immediately
         setState(() {
@@ -644,24 +706,66 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
                   child: Column(
                     children: [
                       Expanded(
-                        child: currentAnimation != null
-                            ? ModelViewer(
-                                key: ValueKey(currentAnimation),
-                                src: currentAnimation!,
-                                autoPlay: true,
-                                autoRotate: false,
-                                cameraControls: false,
-                                backgroundColor: Colors.transparent,
-                                cameraTarget: '0m 1.5m 0m',
-                                cameraOrbit: '0deg 75deg 2.5m',
-                              )
-                            : const Center(
-                                child: Text(
-                                  'No animation playing',
-                                  style: TextStyle(
-                                      fontSize: 16, color: Color(0xFFFAB317)),
+                        child: Stack(
+                          children: [
+                            // Main animation viewer
+                            currentAnimation != null
+                                ? ModelViewer(
+                                    key: ValueKey(currentAnimation),
+                                    src: currentAnimation!,
+                                    autoPlay: true,
+                                    autoRotate: false,
+                                    cameraControls: false,
+                                    backgroundColor: Colors.transparent,
+                                    cameraTarget: '0m 1.5m 0m',
+                                    cameraOrbit: '0deg 75deg 2.5m',
+                                  )
+                                : const Center(
+                                    child: Text(
+                                      'No animation playing',
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          color: Color(0xFFFAB317)),
+                                    ),
+                                  ),
+
+                            // API Loading overlay (HandTalk-style)
+                            if (isLoadingAnimations)
+                              Positioned.fill(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withOpacity(0.3),
+                                    borderRadius: BorderRadius.circular(12.0),
+                                  ),
+                                  child: const Center(
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        CircularProgressIndicator(
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                            Color(0xFFFAB317),
+                                          ),
+                                          strokeWidth: 3.0,
+                                        ),
+                                        SizedBox(height: 12.0),
+                                        Text(
+                                          'Loading animations...',
+                                          style: TextStyle(
+                                            color: Color(0xFFFAB317),
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ),
                               ),
+
+                            // Word tag overlay removed as requested by user
+                          ],
+                        ),
                       )
                     ],
                   ),
@@ -675,8 +779,8 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
                     vertical: 4.0), // Reduced horizontal margin for more space
                 decoration: BoxDecoration(
                   color: FlutterFlowTheme.of(context)
-                      .primaryBackground, // Changed to primary background
-                  borderRadius: BorderRadius.circular(24.0),
+                      .secondaryBackground, // Changed to secondary background
+                  borderRadius: BorderRadius.circular(16.0),
                   border: Border.all(
                     color: FlutterFlowTheme.of(context)
                         .alternate, // Alternate border color
