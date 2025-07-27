@@ -1,0 +1,57 @@
+{
+  "manifest_version": 3,
+  "name": "Signify - ISL Translator",
+  "version": "1.0.1",
+  "description": "Indian Sign Language translator for YouTube videos with 3D animated avatar",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "scripting",
+    "tabs"
+  ],
+  "host_permissions": [
+    "*://www.youtube.com/*",
+    "*://youtube.com/*",
+    "*://uqryplglrhgpoqvczezt.supabase.co/*" 
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://www.youtube.com/*", "*://youtube.com/*"],
+      "js": ["content.js"],
+      "css": ["styles.css"],
+      "run_at": "document_end"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "popup.html",
+        "popup.js",
+        "three.min.js",
+        "GLTFLoader.js",
+        "OrbitControls.js",
+        "models/*.glb",
+        "animation/*.glb",
+        "assets/*"
+      ],
+      "matches": ["*://www.youtube.com/*", "*://youtube.com/*"]
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Signify ISL Translator",
+    "default_icon": {
+      "16": "icons/signify-logo_16.png",
+      "48": "icons/signify-logo_48.png",
+      "128": "icons/signify-logo_128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/signify-logo_16.png",
+    "48": "icons/signify-logo_48.png",
+    "128": "icons/signify-logo_128.png"
+  }
+}

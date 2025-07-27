@@ -1,5 +1,0 @@
-NSCameraUsageDescription = "Allow camera to capture ISL Signs. ";
-NSPhotoLibraryUsageDescription = "In order to upload data, this app requires permission to access the photo library.";
-NSLocationWhenInUseUsageDescription = "In order to get best translation and regional data, this app requires access to your current location.";
-NSMicrophoneUsageDescription = "Allow microphone access to use Speech Recognition.";
-PermissionGroupNotification = "Allow notifications to get notified about recent updates.";
