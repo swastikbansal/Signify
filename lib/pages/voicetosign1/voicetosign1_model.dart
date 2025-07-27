@@ -10,6 +10,7 @@ class Voicetosign1Model extends FlutterFlowModel<Voicetosign1Widget> {
 
   String _imgpath =
       'https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Nnx8c2hvZXN8ZW58MHx8MHx8&auto=format&fit=crop&w=800&q=60';
+
   set imgpath(String value) {
     _imgpath = value;
     debugLogWidgetClass(this);
@@ -18,6 +19,7 @@ class Voicetosign1Model extends FlutterFlowModel<Voicetosign1Widget> {
   String get imgpath => _imgpath;
 
   String _title = 'Element Title';
+
   set title(String value) {
     _title = value;
     debugLogWidgetClass(this);
@@ -26,6 +28,7 @@ class Voicetosign1Model extends FlutterFlowModel<Voicetosign1Widget> {
   String get title => _title;
 
   String _description = 'Element Description';
+
   set description(String value) {
     _description = value;
     debugLogWidgetClass(this);
@@ -36,6 +39,7 @@ class Voicetosign1Model extends FlutterFlowModel<Voicetosign1Widget> {
   ///  State fields for stateful widgets in this page.
 
   TutorialCoachMark? signifyScreen1Controller;
+
   // State field(s) for TextField widget.
   FocusNode? textFieldFocusNode;
   TextEditingController? textController;
@@ -146,11 +150,10 @@ class Voicetosign1Model extends FlutterFlowModel<Voicetosign1Widget> {
             onResult(recognizedText);
           }
         },
-        listenFor:
-            const Duration(hours: 1), // Very long duration to avoid timeouts
-        pauseFor: const Duration(
-            seconds:
-                8), // Much longer pause before stopping - allows natural conversation pace
+        listenFor: const Duration(hours: 1),
+        // Very long duration to avoid timeouts
+        pauseFor: const Duration(seconds: 8),
+        // Much longer pause before stopping - allows natural conversation pace
         localeId: null,
         listenOptions: stt.SpeechListenOptions(
           partialResults: true,

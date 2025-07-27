@@ -2,6 +2,10 @@
     package="com.philosia.signify"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Camera permissions -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -12,12 +16,22 @@
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+    <!-- Camera features -->
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.autofocus"
+        android:required="false" />
+
     <application
         android:label="Signify"
         tools:replace="android:label"
         android:icon="@mipmap/launcher_icon"
+        android:extractNativeLibs="true"
+        android:hardwareAccelerated="true"
         android:requestLegacyExternalStorage="true"
-        android:usesCleartextTraffic="true">>
+        android:usesCleartextTraffic="true">
 
         <activity
             android:name=".MainActivity"

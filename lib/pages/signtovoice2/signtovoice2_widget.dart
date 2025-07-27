@@ -5,6 +5,8 @@ import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/form_field_controller.dart';
 import '/walkthroughs/signify_screen_2.dart';
+import 'signtovoice2_model.dart';
+export 'signtovoice2_model.dart';
 import 'package:aligned_tooltip/aligned_tooltip.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart'
     show TutorialCoachMark;
@@ -12,8 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:camera/camera.dart';
-import 'signtovoice2_model.dart';
-export 'signtovoice2_model.dart';
+import 'package:flutter/services.dart';
 
 class Signtovoice2Widget extends StatefulWidget {
   const Signtovoice2Widget({super.key});
@@ -33,32 +34,51 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
     super.initState();
     _model = createModel(context, () => Signtovoice2Model());
 
-    // On page load action.
-    SchedulerBinding.instance.addPostFrameCallback((_) async {
-      if (dateTimeFormat(
-            "relative",
-            currentUserDocument?.loggedinTime,
-            locale: FFLocalizations.of(context).languageCode,
-          ) ==
-          dateTimeFormat(
-            "relative",
-            getCurrentTimestamp,
-            locale: FFLocalizations.of(context).languageCode,
-          )) {
-        safeSetState(() =>
-            _model.signifyScreen2Controller = createPageWalkthrough(context));
-        _model.signifyScreen2Controller?.show(context: context);
-        return;
-      } else {
-        return;
+    // Set up state change callback for MediaPipe updates with error handling
+    _model.setStateChangeCallback(() {
+      try {
+        if (mounted) {
+          safeSetState(() {});
+        }
+      } catch (e) {
+        print('Error updating UI state: $e');
       }
     });
 
-    _model.textController ??= TextEditingController()
-      ..addListener(() {
-        debugLogWidgetClass(_model);
-      });
-    _model.textFieldFocusNode ??= FocusNode();
+    // On page load action with error handling
+    SchedulerBinding.instance.addPostFrameCallback((_) async {
+      try {
+        if (dateTimeFormat(
+              "relative",
+              currentUserDocument?.loggedinTime,
+              locale: FFLocalizations.of(context).languageCode,
+            ) ==
+            dateTimeFormat(
+              "relative",
+              getCurrentTimestamp,
+              locale: FFLocalizations.of(context).languageCode,
+            )) {
+          safeSetState(() =>
+              _model.signifyScreen2Controller = createPageWalkthrough(context));
+          _model.signifyScreen2Controller?.show(context: context);
+          return;
+        } else {
+          return;
+        }
+      } catch (e) {
+        print('Error in page load action: $e');
+      }
+    });
+
+    try {
+      _model.textController ??= TextEditingController()
+        ..addListener(() {
+          debugLogWidgetClass(_model);
+        });
+      _model.textFieldFocusNode ??= FocusNode();
+    } catch (e) {
+      print('Error initializing text controller: $e');
+    }
   }
 
   @override
@@ -148,8 +168,8 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(12.0),
-                      child: _model.isCameraOn && _model.isCameraInitialized
-                          ? CameraPreview(_model.cameraController!)
+                      child: _model.isDetecting
+                          ? _buildMediaPipeDisplay()
                           : Center(
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -157,20 +177,27 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                                   Icon(
                                     Icons.camera_alt,
                                     size: 80.0,
-                                    color: FlutterFlowTheme.of(context).secondaryText,
+                                    color: FlutterFlowTheme.of(context)
+                                        .secondaryText,
                                   ),
                                   SizedBox(height: 16.0),
                                   Text(
-                                    _model.isCameraOn
-                                        ? 'Initializing camera...'
-                                        : 'Press camera button to start',
-                                    style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                      fontFamily: FlutterFlowTheme.of(context).bodyMediumFamily,
-                                      color: FlutterFlowTheme.of(context).secondaryText,
-                                      letterSpacing: 0.0,
-                                      useGoogleFonts: GoogleFonts.asMap()
-                                          .containsKey(FlutterFlowTheme.of(context).bodyMediumFamily),
-                                    ),
+                                    'Press camera button to start MediaPipe detection',
+                                    textAlign: TextAlign.center,
+                                    style: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .override(
+                                          fontFamily:
+                                              FlutterFlowTheme.of(context)
+                                                  .bodyMediumFamily,
+                                          color: FlutterFlowTheme.of(context)
+                                              .secondaryText,
+                                          letterSpacing: 0.0,
+                                          useGoogleFonts: GoogleFonts.asMap()
+                                              .containsKey(
+                                                  FlutterFlowTheme.of(context)
+                                                      .bodyMediumFamily),
+                                        ),
                                   ),
                                 ],
                               ),
@@ -302,9 +329,7 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                           content: Padding(
                             padding: EdgeInsets.all(8.0),
                             child: Text(
-                              FFLocalizations.of(context).getText(
-                                'tug9n0b1' /* Press the camera button to rec... */,
-                              ),
+                              'Press to toggle MediaPipe detection',
                               style: FlutterFlowTheme.of(context)
                                   .labelMedium
                                   .override(
@@ -332,22 +357,26 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                           child: FlutterFlowIconButton(
                             borderRadius: 50.0,
                             buttonSize: 50.0,
-                            fillColor: _model.isCameraOn
+                            fillColor: _model.isDetecting
                                 ? FlutterFlowTheme.of(context).primary
-                                : FlutterFlowTheme.of(context).secondaryBackground,
+                                : FlutterFlowTheme.of(context)
+                                    .secondaryBackground,
                             hoverColor:
                                 FlutterFlowTheme.of(context).primaryBackground,
                             hoverIconColor:
                                 FlutterFlowTheme.of(context).primary,
                             icon: Icon(
-                              _model.isCameraOn ? Icons.videocam : Icons.camera_alt,
-                              color: _model.isCameraOn
-                                  ? FlutterFlowTheme.of(context).primaryBackground
+                              _model.isDetecting
+                                  ? Icons.stop
+                                  : Icons.camera_alt,
+                              color: _model.isDetecting
+                                  ? FlutterFlowTheme.of(context)
+                                      .primaryBackground
                                   : FlutterFlowTheme.of(context).primaryText,
                               size: 24.0,
                             ),
                             onPressed: () async {
-                              await _model.toggleCamera();
+                              await _model.toggleDetection();
                               safeSetState(() {});
                             },
                           ).addWalkthrough(
@@ -564,6 +593,143 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
             ].divide(SizedBox(height: 16.0)),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildMediaPipeDisplay() {
+    return Container(
+      color: Colors.black,
+      child: Column(
+        children: [
+          // Minimal status indicator
+          Container(
+            padding: EdgeInsets.all(4.0),
+            color: _model.isDetecting
+                ? Colors.green.withOpacity(0.8)
+                : Colors.orange.withOpacity(0.8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  _model.isDetecting
+                      ? Icons.fiber_manual_record
+                      : Icons.pause_circle_outline,
+                  color: Colors.white,
+                  size: 12,
+                ),
+                SizedBox(width: 4),
+                Text(
+                  _model.isDetecting ? 'LIVE' : 'PAUSED',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 10,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Live camera feed area with Flutter CameraPreview
+          Expanded(
+            child: Container(
+              width: double.infinity,
+              color: Colors.black,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(0.0),
+                child: _model.isCameraOn && _model.isCameraInitialized
+                    ? Stack(
+                        children: [
+                          // Flutter Camera Preview
+                          Container(
+                            width: double.infinity,
+                            height: double.infinity,
+                            child: CameraPreview(_model.cameraController!),
+                          ),
+                          // MediaPipe landmarks overlay (minimal)
+                          if (_model.isDetecting)
+                            Positioned(
+                              bottom: 8,
+                              right: 8,
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: Colors.black54,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  'H:${_model.handLandmarks.length} P:${_model.poseLandmarks.length}',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          // Landmarks printing indicator
+                          if (_model.isDetecting)
+                            Positioned(
+                              top: 8,
+                              left: 8,
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: Colors.green.withOpacity(0.7),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  'Printing to Console',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 8,
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      )
+                    : Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.camera_alt,
+                              size: 80.0,
+                              color: Colors.white70,
+                            ),
+                            SizedBox(height: 16.0),
+                            Text(
+                              _model.isCameraOn
+                                  ? 'Initializing camera...'
+                                  : 'Press camera button to start',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            if (_model.errorMessage.isNotEmpty) ...[
+                              SizedBox(height: 8),
+                              Text(
+                                'Error: ${_model.errorMessage}',
+                                style: TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 12,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
