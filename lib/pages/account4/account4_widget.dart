@@ -4,6 +4,7 @@ import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '/walkthroughs/signify_screen_4.dart';
+import '/pages/customs_signs/custom_signs_widget.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart'
     show TutorialCoachMark;
 import 'package:flutter/material.dart';
@@ -14,6 +15,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'account4_model.dart';
 export 'account4_model.dart';
+
+  // adjust path based on your folder structure
 
 class Account4Widget extends StatefulWidget {
   const Account4Widget({super.key});
@@ -114,7 +117,8 @@ class _Account4WidgetState extends State<Account4Widget> with RouteAware {
               ),
             ),
           );
-        }
+        };
+
 
         final account4UsersRecord = snapshot.data!;
         _model.debugBackendQueries['account4UsersRecord_Scaffold_1o3oa7a6'] =
@@ -328,7 +332,7 @@ class _Account4WidgetState extends State<Account4Widget> with RouteAware {
                       ),
                       Container(
                         width: double.infinity,
-                        height: 410.0,
+                        height: 480.0,
                         decoration: BoxDecoration(
                           color: FlutterFlowTheme.of(context).primaryBackground,
                           borderRadius: BorderRadius.circular(12.0),
@@ -619,43 +623,29 @@ class _Account4WidgetState extends State<Account4Widget> with RouteAware {
                                 },
                                 child: Row(
                                   mainAxisSize: MainAxisSize.max,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     Row(
                                       mainAxisSize: MainAxisSize.max,
                                       children: [
                                         Icon(
                                           Icons.lock_outline,
-                                          color: FlutterFlowTheme.of(context)
-                                              .primary,
+                                          color: FlutterFlowTheme.of(context).primary,
                                           size: 24.0,
-                                        ),
-                                        Text(
-                                          FFLocalizations.of(context).getText(
-                                            'ft1vecre' /* Change Password */,
-                                          ),
-                                          style: FlutterFlowTheme.of(context)
-                                              .bodyLarge
-                                              .override(
-                                                fontFamily:
-                                                    FlutterFlowTheme.of(context)
-                                                        .bodyLargeFamily,
-                                                letterSpacing: 0.0,
-                                                useGoogleFonts: GoogleFonts
-                                                        .asMap()
-                                                    .containsKey(
-                                                        FlutterFlowTheme.of(
-                                                                context)
-                                                            .bodyLargeFamily),
-                                              ),
-                                        ),
-                                      ].divide(SizedBox(width: 12.0)),
+                                        ),                        Text(
+                          'Change Password',
+                          style: FlutterFlowTheme.of(context).bodyLarge.override(
+                            fontFamily: FlutterFlowTheme.of(context).bodyLargeFamily,
+                            letterSpacing: 0.0,
+                            useGoogleFonts: GoogleFonts.asMap().containsKey(
+                                FlutterFlowTheme.of(context).bodyLargeFamily),
+                          ),
+                        ),
+                                      ].divide(const SizedBox(width: 12.0)),
                                     ),
                                     Icon(
                                       Icons.chevron_right,
-                                      color: FlutterFlowTheme.of(context)
-                                          .secondaryText,
+                                      color: FlutterFlowTheme.of(context).secondaryText,
                                       size: 24.0,
                                     ),
                                   ],
@@ -665,6 +655,55 @@ class _Account4WidgetState extends State<Account4Widget> with RouteAware {
                                 thickness: 1.0,
                                 color: FlutterFlowTheme.of(context).alternate,
                               ),
+                              InkWell(
+                                splashColor: Colors.transparent,
+                                focusColor: Colors.transparent,
+                                hoverColor: Colors.transparent,
+                                highlightColor: Colors.transparent,
+                                onTap: () async {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const CustomSignsPage(),
+                                    ),
+                                  );
+                                },
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      mainAxisSize: MainAxisSize.max,
+                                      children: [
+                                        Icon(
+                                          Icons.gesture,
+                                          color: FlutterFlowTheme.of(context).primary,
+                                          size: 24.0,
+                                        ),
+                                        Text(
+                                          'Custom Signs',
+                                          style: FlutterFlowTheme.of(context).bodyLarge.override(
+                                            fontFamily: FlutterFlowTheme.of(context).bodyLargeFamily,
+                                            letterSpacing: 0.0,
+                                            useGoogleFonts: GoogleFonts.asMap().containsKey(
+                                                FlutterFlowTheme.of(context).bodyLargeFamily),
+                                          ),
+                                        ),
+                                      ].divide(const SizedBox(width: 12.0)),
+                                    ),
+                                    Icon(
+                                      Icons.chevron_right,
+                                      color: FlutterFlowTheme.of(context).secondaryText,
+                                      size: 24.0,
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              Divider(
+                                thickness: 1.0,
+                                color: FlutterFlowTheme.of(context).alternate,
+                               ),
                               InkWell(
                                 splashColor: Colors.transparent,
                                 focusColor: Colors.transparent,

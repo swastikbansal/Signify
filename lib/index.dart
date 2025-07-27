@@ -19,3 +19,5 @@ export '/pages/isl_dict/isl_dict_widget.dart' show IslDictWidget;
 export '/pages/isl_community/isl_community_widget.dart' show IslCommunityWidget;
 export '/pages/auth_page/auth_page_widget.dart' show AuthPageWidget;
 export '/pages/tutorial_page/tutorial_page_widget.dart' show TutorialPageWidget;
+export '/pages/customs_signs/custom_signs_widget.dart'
+    show CustomSignsPage;
