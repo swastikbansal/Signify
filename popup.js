@@ -1,4 +1,4 @@
-// Signify ISL Translator - Popup Script
+// Signify ISL Translator - Popup Script (Clean Version)
 
 document.addEventListener('DOMContentLoaded', initializePopup);
 
@@ -52,12 +52,15 @@ async function checkCurrentTab() {
     try {
         const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
         
-        if (tab.url.includes('youtube.com')) {
-            updateStatus('Ready to translate', 'YouTube detected - Click the Signify button on videos');
-            checkModelStatus();
+        if (tab.url.includes('youtube.com/watch')) {
+            updateStatus('YouTube Video Detected', 'Ready to translate sign language');
+            updateModelStatus('active', 'Avatar model ready');
+        } else if (tab.url.includes('youtube.com')) {
+            updateStatus('On YouTube', 'Navigate to a video to start translation');
+            updateModelStatus('inactive', 'Waiting for video...');
         } else {
-            updateStatus('Not on YouTube', 'Navigate to YouTube to use Signify');
-            updateModelStatus('inactive', 'Model inactive');
+            updateStatus('Not on YouTube', 'Please navigate to YouTube to use Signify');
+            updateModelStatus('inactive', 'YouTube required');
         }
     } catch (error) {
         console.error('Error checking current tab:', error);
@@ -101,37 +104,6 @@ function updateModelStatus(status, text) {
     statusText.textContent = text;
 }
 
-// Check model loading status
-async function checkModelStatus() {
-    try {
-        // Check if avatar model is cached
-        const modelData = await chrome.storage.local.get('model_avatar');
-        
-        if (modelData.model_avatar) {
-            updateModelStatus('active', 'Avatar model ready');
-        } else {
-            updateModelStatus('inactive', 'Downloading avatar model...');
-            showProgress(0);
-            
-            // Simulate model download progress
-            let progress = 0;
-            const progressInterval = setInterval(() => {
-                progress += Math.random() * 15;
-                if (progress >= 100) {
-                    progress = 100;
-                    clearInterval(progressInterval);
-                    hideProgress();
-                    updateModelStatus('active', 'Avatar model ready');
-                }
-                showProgress(progress);
-            }, 200);
-        }
-    } catch (error) {
-        console.error('Error checking model status:', error);
-        updateModelStatus('inactive', 'Model loading failed');
-    }
-}
-
 // Show/hide progress bar
 function showProgress(percentage) {
     const progressBar = document.getElementById('progressBar');
@@ -142,59 +114,50 @@ function showProgress(percentage) {
 }
 
 function hideProgress() {
-    document.getElementById('progressBar').classList.add('hidden');
+    const progressBar = document.getElementById('progressBar');
+    progressBar.classList.add('hidden');
 }
 
 // Update toggle state
 function updateToggle(toggleId, isActive) {
     const toggle = document.getElementById(toggleId);
-    if (isActive) {
-        toggle.classList.add('active');
-    } else {
-        toggle.classList.remove('active');
+    if (toggle) {
+        if (isActive) {
+            toggle.classList.add('active');
+        } else {
+            toggle.classList.remove('active');
+        }
     }
 }
 
 // Toggle setting and save
 async function toggleSetting(toggleId, settingKey) {
     const toggle = document.getElementById(toggleId);
-    const isActive = !toggle.classList.contains('active');
+    const isActive = toggle.classList.contains('active');
     
-    updateToggle(toggleId, isActive);
+    // Update UI
+    if (isActive) {
+        toggle.classList.remove('active');
+    } else {
+        toggle.classList.add('active');
+    }
     
-    // Save setting
+    // Save to storage
     try {
-        await chrome.storage.sync.set({ [settingKey]: isActive });
-        
-        // Send message to content script if on YouTube
-        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-        if (tab.url.includes('youtube.com')) {
-            chrome.tabs.sendMessage(tab.id, {
-                action: 'settingChanged',
-                setting: settingKey,
-                value: isActive
-            }).catch(() => {
-                // Content script might not be loaded, ignore error
-            });
-        }
+        await chrome.storage.sync.set({ [settingKey]: !isActive });
+        console.log(`Setting ${settingKey} updated to:`, !isActive);
     } catch (error) {
-        console.error('Error saving setting:', error);
-        // Revert toggle state on error
-        updateToggle(toggleId, !isActive);
+        console.error(`Error updating ${settingKey}:`, error);
     }
 }
 
-// Open YouTube in new tab
-async function openYouTube() {
-    try {
-        await chrome.tabs.create({ url: 'https://www.youtube.com/' });
-        window.close();
-    } catch (error) {
-        console.error('Error opening YouTube:', error);
-    }
+// Open YouTube
+function openYouTube() {
+    chrome.tabs.create({ url: 'https://www.youtube.com' });
+    window.close();
 }
 
-// Toggle settings panel
+// Toggle settings display
 function toggleSettings() {
     const settingsSection = document.getElementById('settingsSection');
     const statsSection = document.getElementById('statsSection');
@@ -259,6 +222,5 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 // Handle popup close
 window.addEventListener('beforeunload', () => {
-    // Save any pending changes
     console.log('Popup closing');
 });

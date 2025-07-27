@@ -144,13 +144,11 @@ async function extractTranscriptAndStart() {
     }
     
     console.log("Signify: Starting transcript extraction process...");
-    updateFloatingStatus("1/3: Initializing...");
     
     // First, let's check if transcript is even available
     const hasTranscriptButton = document.querySelector('button[aria-label*="transcript"], button[aria-label*="Transcript"]');
     if (!hasTranscriptButton) {
         console.log("Signify: No transcript button found. Video may not have captions.");
-        updateFloatingStatus("No captions available");
         generateBasicTranscription();
         startTranslation();
         return;
@@ -162,7 +160,6 @@ async function extractTranscriptAndStart() {
 
 async function extractTranscript() {
     console.log("Signify: Starting transcript extraction...");
-    updateFloatingStatus("2/3: Clicking 'Show transcript'...");
     transcriptData = [];
 
     try {
@@ -171,8 +168,7 @@ async function extractTranscript() {
         transcriptButton.click();
 
         // Step 2: Wait for transcript segments and extract text (exact same as reference)
-        console.log("Signify: 3/3: Reading transcript...");
-        updateFloatingStatus("3/3: Reading transcript...");
+        console.log("Signify: Reading transcript...");
         await waitForElement('ytd-transcript-segment-renderer');
         
         // Extract segments with REAL timestamps for proper sync
@@ -248,7 +244,6 @@ async function extractTranscript() {
         
         if (transcriptData.length > 0) {
             console.log(`Signify: Successfully converted to ${transcriptData.length} words.`);
-            updateFloatingStatus(`Transcript loaded (${transcriptData.length} words)`);
             
             // Step 3: Close transcript panel (cleanup)
             try {
@@ -269,12 +264,10 @@ async function extractTranscript() {
         generateBasicTranscription();
         
         if (transcriptData.length > 0) {
-            updateFloatingStatus("Limited Mode: Using video title.");
             return true;
         }
         
         console.error("Signify: Could not find any transcript or video details.");
-        updateFloatingStatus("Error: No transcript available.");
         return false;
     }
 }
@@ -330,12 +323,11 @@ function generateBasicTranscription() {
 function startTranslation() {
     const video = document.querySelector('video');
     if (!video || transcriptData.length === 0) {
-        updateFloatingStatus("No transcript available.");
+        console.log("Signify: No video or transcript available");
         return;
     }
     
     translationActive = true;
-    updateFloatingStatus("Translating...");
     console.log("Signify: Starting translation sync.");
     
     // Debug: Show current video time and some transcript samples
@@ -354,7 +346,6 @@ function startTranslation() {
 function pauseTranslation() {
     translationActive = false;
     // Don't clear the interval immediately - let it handle the pause state
-    updateFloatingStatus('Paused - Click play to resume');
     console.log(`Signify: Translation paused at word index ${currentWordIndex}`);
     
     // Return to default animation when paused
@@ -368,7 +359,6 @@ function resumeTranslation() {
         const video = document.querySelector('video');
         if (video && !video.paused) {
             translationActive = true;
-            updateFloatingStatus("Translating...");
             console.log(`Signify: Resuming translation sync at ${video.currentTime.toFixed(2)}s`);
             
             lastSyncedWord = ''; 
@@ -405,8 +395,7 @@ function resetTranslation() {
     }
     
     // Reset avatar to default idle animation
-    updateFloatingStatus('Ready');
-    updateFloatingCurrentWord('');
+    updateFloatingCurrentWord('Ready');
     if (window.signifyFloatingAvatar && window.signifyFloatingAvatar.setIdlePose) {
         window.signifyFloatingAvatar.setIdlePose();
         console.log("Signify: Reset to default.glb animation");
@@ -486,6 +475,10 @@ function syncWithVideo(video) {
             if (currentTime > lastWord.endTime + 1.0) { // 1 second buffer after last word
                 lastSyncedWord = '';
                 updateFloatingCurrentWord('...');
+                // Return to default animation when no words are found
+                if (window.signifyFloatingAvatar && window.signifyFloatingAvatar.setIdlePose) {
+                    window.signifyFloatingAvatar.setIdlePose();
+                }
                 console.log(`Signify: [${currentTime.toFixed(2)}s] Past all transcript words`);
             }
         }
@@ -589,6 +582,35 @@ function showFloatingAvatar() {
                 position: relative !important;
             }
             
+            .floating-avatar-canvas {
+                width: 100% !important;
+                height: 100% !important;
+                border-radius: 8px !important;
+            }
+            
+            /* Resize handle styles */
+            .signify-resize-handle {
+                position: absolute !important;
+                bottom: 0 !important;
+                right: 0 !important;
+                width: 20px !important;
+                height: 20px !important;
+                background: linear-gradient(135deg, transparent 0%, transparent 30%, #FFD700 30%, #FFD700 70%, transparent 70%) !important;
+                cursor: nw-resize !important;
+                z-index: 1000 !important;
+                border-radius: 0 0 10px 0 !important;
+            }
+            
+            .signify-resize-handle::after {
+                content: '⋰' !important;
+                position: absolute !important;
+                bottom: 2px !important;
+                right: 2px !important;
+                color: #FFD700 !important;
+                font-size: 12px !important;
+                line-height: 1 !important;
+            }
+            
             .avatar-loading {
                 color: #FFD700 !important;
                 font-size: 12px !important;
@@ -609,23 +631,11 @@ function showFloatingAvatar() {
                 font-size: 14px !important;
                 font-weight: bold !important;
                 color: #FFD700 !important;
-                margin-bottom: 8px !important;
+                margin-bottom: 0px !important;
                 min-height: 20px !important;
                 display: flex !important;
                 align-items: center !important;
                 justify-content: center !important;
-            }
-            
-            .avatar-status-bar {
-                background: rgba(0, 0, 0, 0.3) !important;
-                border-radius: 4px !important;
-                padding: 4px 8px !important;
-            }
-            
-            .floating-status {
-                color: #ccc !important;
-                font-size: 11px !important;
-                text-align: center !important;
             }
             
             @keyframes pulse {
@@ -653,64 +663,29 @@ function showFloatingAvatar() {
         <div id="floating-avatar-container" class="floating-avatar-display"><div class="avatar-loading">Loading Avatar...</div></div>
         <div class="avatar-info">
           <div id="floating-current-word" class="floating-current-word">Ready</div>
-          <div class="avatar-status-bar"><div id="floating-status" class="floating-status">Initializing...</div></div>
         </div>
-      </div>`;
+      </div>
+      <div class="signify-resize-handle" id="signifyResizeHandle"></div>`;
     document.body.appendChild(floatingAvatar);
     
     document.getElementById('avatar-close').addEventListener('click', hideFloatingAvatar);
     document.getElementById('avatar-minimize').addEventListener('click', toggleFloatingAvatar);
     makeAvatarDraggable(floatingAvatar);
+    makeAvatarResizable(floatingAvatar);
     initializeFloatingAvatar();
     isSignifyActive = true;
     
     console.log("Signify: Floating avatar window created and styled");
-
-    
-    floatingAvatar.id = 'signify-floating-avatar';
-    floatingAvatar.innerHTML = `
-      <div class="floating-avatar-header">
-        <div class="avatar-title"><span>Signify ISL</span></div>
-        <div class="avatar-controls">
-            <button id="avatar-minimize" class="avatar-control-btn" title="Minimize">−</button>
-            <button id="avatar-close" class="avatar-control-btn" title="Close">✕</button>
-        </div>
-      </div>
-      <div class="floating-avatar-content" id="floatingAvatarContent">
-        <div id="floating-avatar-container" class="floating-avatar-display">
-            <div class="avatar-loading">Loading Avatar...</div>
-        </div>
-        <div class="avatar-info">
-          <div id="floating-current-word" class="floating-current-word">Ready</div>
-          <div class="avatar-status-bar">
-            <div id="floating-status" class="floating-status">Initializing...</div>
-          </div>
-        </div>
-      </div>
-      <!-- ADD THIS NEW ELEMENT FOR RESIZING -->
-      <div id="signify-resize-handle"></div>`;
-      
-    document.body.appendChild(floatingAvatar);
-    
-    document.getElementById('avatar-close').addEventListener('click', hideFloatingAvatar);
-    document.getElementById('avatar-minimize').addEventListener('click', toggleFloatingAvatar);
-    
-    makeAvatarDraggable(floatingAvatar);
-    makeAvatarResizable(floatingAvatar); // Call the new resize function
-    
-    initializeFloatingAvatar();
-    isSignifyActive = true;
-    
-    console.log("Signify: Floating avatar created.");
 }
 
 function makeAvatarResizable(element) {
-    const resizeHandle = element.querySelector('#signify-resize-handle');
+    const resizeHandle = element.querySelector('#signifyResizeHandle');
     let isResizing = false;
     let originalWidth = 0, originalHeight = 0, originalMouseX = 0, originalMouseY = 0;
 
     resizeHandle.addEventListener('mousedown', (e) => {
         e.preventDefault();
+        e.stopPropagation(); // Prevent dragging when resizing
         isResizing = true;
 
         const rect = element.getBoundingClientRect();
@@ -721,19 +696,47 @@ function makeAvatarResizable(element) {
 
         document.addEventListener('mousemove', handleMouseMove);
         document.addEventListener('mouseup', handleMouseUp);
+        
+        // Add visual feedback
+        element.style.userSelect = 'none';
+        document.body.style.cursor = 'nw-resize';
     });
 
     function handleMouseMove(e) {
         if (!isResizing) return;
-        const newWidth = originalWidth + (e.clientX - originalMouseX);
-        const newHeight = originalHeight + (e.clientY - originalMouseY);
+        
+        const deltaX = e.clientX - originalMouseX;
+        const deltaY = e.clientY - originalMouseY;
+        
+        const newWidth = Math.max(250, originalWidth + deltaX); // Minimum 250px width
+        const newHeight = Math.max(200, originalHeight + deltaY); // Minimum 200px height
 
-        // Set minimum dimensions
-        if (newWidth > 200) {
-            element.style.width = newWidth + 'px';
+        element.style.width = newWidth + 'px';
+        element.style.height = newHeight + 'px';
+        
+        // Update the avatar display size proportionally
+        const avatarDisplay = element.querySelector('.floating-avatar-display');
+        if (avatarDisplay) {
+            const contentPadding = 24; // 12px padding on each side
+            const headerHeight = 40; // Approximate header height
+            const wordDisplayHeight = 40; // Height of current word display
+            const availableWidth = newWidth - contentPadding;
+            const availableHeight = newHeight - headerHeight - wordDisplayHeight - contentPadding;
+            
+            avatarDisplay.style.width = Math.max(180, availableWidth) + 'px';
+            avatarDisplay.style.height = Math.max(120, availableHeight) + 'px';
         }
-        if (newHeight > 250) {
-            element.style.height = newHeight + 'px';
+        
+        // Update Three.js renderer if it exists
+        if (window.signifyFloatingAvatar && window.signifyFloatingAvatar.renderer) {
+            const newDisplayWidth = parseInt(avatarDisplay.style.width);
+            const newDisplayHeight = parseInt(avatarDisplay.style.height);
+            
+            window.signifyFloatingAvatar.renderer.setSize(newDisplayWidth, newDisplayHeight);
+            if (window.signifyFloatingAvatar.camera) {
+                window.signifyFloatingAvatar.camera.aspect = newDisplayWidth / newDisplayHeight;
+                window.signifyFloatingAvatar.camera.updateProjectionMatrix();
+            }
         }
     }
 
@@ -741,6 +744,10 @@ function makeAvatarResizable(element) {
         isResizing = false;
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
+        
+        // Remove visual feedback
+        element.style.userSelect = '';
+        document.body.style.cursor = '';
     }
 }
 
@@ -858,250 +865,273 @@ function initializeFloatingAvatar() {
 
 function createFloatingAvatar(container) {
     container.innerHTML = '';
+    
+    // Create Three.js scene
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(45, 200 / 150, 0.1, 1000);
+    scene.background = new THREE.Color(0x1a1a2e);
+    
+    // Create camera
+    const camera = new THREE.PerspectiveCamera(75, 200 / 150, 0.1, 1000);
+    camera.position.set(0, 1, 3);
+    
+    // Create renderer
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(200, 150);
-    renderer.setClearColor(0x000000, 0);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.domElement.className = 'floating-avatar-canvas';
     container.appendChild(renderer.domElement);
-    const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
-    scene.add(ambientLight);
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-    directionalLight.position.set(0.5, 1, 1.5);
-    scene.add(directionalLight);
-    camera.position.set(0, 0.8, 2.5);
-    camera.lookAt(0, 0.6, 0);
     
-    const loader = new THREE.GLTFLoader();
-    window.signifyGltfLoader = loader;
-    let avatarMixer = null;
-    let avatarAnimations = [];
+    // Add lights
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    scene.add(ambientLight);
+    
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    directionalLight.position.set(5, 10, 5);
+    directionalLight.castShadow = true;
+    scene.add(directionalLight);
+    
+    // Animation variables
+    let mixer = null;
+    let model = null;
     let defaultAnimation = null;
+    let currentAction = null;
+    let isPlaying = false;
+    const clock = new THREE.Clock();
     
     // Animation loop
-    const clock = new THREE.Clock();
     function animate() {
         requestAnimationFrame(animate);
-        if (avatarMixer) {
-            avatarMixer.update(clock.getDelta());
+        
+        if (mixer) {
+            mixer.update(clock.getDelta());
         }
+        
+        // Rotate model slowly for better viewing
+        if (model) {
+            model.rotation.y += 0.005;
+        }
+        
         renderer.render(scene, camera);
     }
     animate();
     
-    // Load the main avatar model first
-    loader.load(chrome.runtime.getURL('models/avatar.glb'), (gltf) => {
-        const avatar = gltf.scene;
-        avatar.scale.set(1.1, 1.1, 1.1);
-        avatar.position.y = -1.0;
-        scene.add(avatar);
-        
-        avatarMixer = new THREE.AnimationMixer(avatar);
-        avatarAnimations = gltf.animations;
-        
-        console.log(`Signify: Avatar loaded with ${avatarAnimations.length} animations`);
-        
-        // Try to load default animation, but don't block if it fails
-        loader.load(chrome.runtime.getURL('animation/default.glb'), (defaultGltf) => {
-            console.log(`Signify: Default.glb loaded with ${defaultGltf.animations.length} animations`);
+    // Load the default animation model
+    const loader = new THREE.GLTFLoader();
+    const defaultModelPath = chrome.runtime.getURL('animation/default.glb');
+    
+    console.log("Signify: Loading default animation from:", defaultModelPath);
+    console.log("Signify: THREE.js version:", THREE.REVISION);
+    console.log("Signify: GLTFLoader available:", !!THREE.GLTFLoader);
+    
+    loader.load(
+        defaultModelPath,
+        (gltf) => {
+            console.log("Signify: Default animation model loaded successfully");
+            console.log("Signify: GLTF object:", gltf);
+            console.log("Signify: Animations found:", gltf.animations?.length || 0);
             
-            if (defaultGltf.animations && defaultGltf.animations.length > 0) {
-                defaultAnimation = defaultGltf.animations[0];
-                console.log("Signify: Default animation available with", defaultAnimation.tracks.length, "tracks");
+            model = gltf.scene;
+            scene.add(model);
+            
+            // Center and scale the model
+            const box = new THREE.Box3().setFromObject(model);
+            const center = box.getCenter(new THREE.Vector3());
+            model.position.sub(center);
+            
+            const size = box.getSize(new THREE.Vector3());
+            const maxSize = Math.max(size.x, size.y, size.z);
+            console.log("Signify: Model size:", size, "Max:", maxSize);
+            
+            if (maxSize > 2) {
+                const scale = 2 / maxSize;
+                model.scale.multiplyScalar(scale);
+                console.log("Signify: Model scaled by:", scale);
             }
             
-            setupAvatarControls();
+            // Setup animations
+            if (gltf.animations && gltf.animations.length > 0) {
+                mixer = new THREE.AnimationMixer(model);
+                defaultAnimation = gltf.animations[0];
+                
+                console.log(`Signify: Found ${gltf.animations.length} animations in default.glb`);
+                console.log("Signify: Default animation duration:", defaultAnimation.duration);
+                console.log("Signify: Default animation tracks:", defaultAnimation.tracks.length);
+                
+                // Create default action
+                currentAction = mixer.clipAction(defaultAnimation);
+                currentAction.loop = THREE.LoopRepeat;
+                currentAction.play();
+                isPlaying = true;
+                
+                console.log("Signify: Default animation started successfully");
+            } else {
+                console.warn("Signify: No animations found in default.glb");
+            }
             
-        }, undefined, (error) => {
-            console.warn('Signify: Could not load default.glb, using avatar animations:', error);
+            // Setup avatar control interface
             setupAvatarControls();
-        });
-        
-        function setupAvatarControls() {
-            // Find a good idle animation from avatar or default
-            let idleAnimation = null;
-            let idleAction = null;
+        },
+        (progress) => {
+            const percentage = (progress.loaded / progress.total) * 100;
+            console.log(`Signify: Loading progress: ${Math.round(percentage)}%`);
+        },
+        (error) => {
+            console.error('Signify: Error loading default animation:', error);
+            console.error('Signify: Error details:', {
+                message: error.message,
+                stack: error.stack,
+                modelPath: defaultModelPath
+            });
+            container.innerHTML = '<div class="avatar-loading" style="color: #ff6b6b;">❌ Animation failed to load<br><small>Check browser console for details</small></div>';
+        }
+    );
+    
+    function setupAvatarControls() {
+        // Global avatar interface
+        window.signifyFloatingAvatar = {
+            mixer: mixer,
+            model: model,
+            defaultAnimation: defaultAnimation,
+            currentAction: currentAction,
+            isPlaying: isPlaying,
+            renderer: renderer,  // Add renderer reference
+            camera: camera,      // Add camera reference
+            scene: scene,        // Add scene reference
             
-            // Prefer default animation if available
-            if (defaultAnimation) {
-                idleAnimation = defaultAnimation;
+            // Set to default/idle animation
+            setIdlePose: () => {
+                console.log("Signify: Setting idle pose - playing default animation");
+                
+                if (!mixer || !defaultAnimation) {
+                    console.warn("Signify: No mixer or default animation available");
+                    return;
+                }
+                
                 try {
-                    idleAction = avatarMixer.clipAction(idleAnimation);
-                    idleAction.setLoop(THREE.LoopRepeat);
-                    console.log("Signify: Using default.glb for idle animation");
+                    // Stop all current actions
+                    mixer.stopAllAction();
+                    
+                    // Reset and play default animation
+                    currentAction = mixer.clipAction(defaultAnimation);
+                    currentAction.reset();
+                    currentAction.setLoop(THREE.LoopRepeat);
+                    currentAction.setEffectiveWeight(1.0);
+                    currentAction.play();
+                    
+                    isPlaying = true;
+                    window.signifyFloatingAvatar.currentAction = currentAction;
+                    window.signifyFloatingAvatar.isPlaying = isPlaying;
+                    
+                    console.log("Signify: Default animation playing");
                 } catch (error) {
-                    console.warn("Signify: Error setting up default animation:", error);
-                    idleAnimation = null;
-                    idleAction = null;
+                    console.error("Signify: Error playing default animation:", error);
+                }
+            },
+            
+            // Play animation for a specific word
+            playWordAnimation: async (word) => {
+                const cleanWord = word.toLowerCase().replace(/[^\w]/g, '');
+                if (!cleanWord) {
+                    window.signifyFloatingAvatar.setIdlePose();
+                    return;
+                }
+                
+                console.log(`Signify: Attempting to play animation for word: "${cleanWord}"`);
+                
+                // Check cache first
+                if (animationCache.has(cleanWord)) {
+                    const cachedClip = animationCache.get(cleanWord);
+                    if (cachedClip) {
+                        console.log(`Signify: Playing cached animation for "${cleanWord}"`);
+                        playAnimationClip(cachedClip);
+                    } else {
+                        console.log(`Signify: No animation cached for "${cleanWord}", using default`);
+                        window.signifyFloatingAvatar.setIdlePose();
+                    }
+                    return;
+                }
+                
+                // Try to load word-specific animation
+                try {
+                    const wordModelPath = chrome.runtime.getURL(`animation/${cleanWord}.glb`);
+                    const gltf = await loader.loadAsync(wordModelPath);
+                    
+                    if (gltf.animations && gltf.animations.length > 0) {
+                        const wordClip = gltf.animations[0];
+                        animationCache.set(cleanWord, wordClip);
+                        console.log(`Signify: Loaded and playing animation for "${cleanWord}"`);
+                        playAnimationClip(wordClip);
+                    } else {
+                        console.log(`Signify: No animations in ${cleanWord}.glb, using default`);
+                        animationCache.set(cleanWord, null);
+                        window.signifyFloatingAvatar.setIdlePose();
+                    }
+                } catch (error) {
+                    console.log(`Signify: Could not load animation for "${cleanWord}", using default`);
+                    animationCache.set(cleanWord, null);
+                    window.signifyFloatingAvatar.setIdlePose();
                 }
             }
+        };
+        
+        // Function to play a specific animation clip
+        function playAnimationClip(clip) {
+            if (!mixer || !clip) return;
             
-            // Fallback to avatar's animations if default failed
-            if (!idleAction) {
-                idleAnimation = avatarAnimations.find(a => 
-                    a.name.toLowerCase().includes('idle') || 
-                    a.name.toLowerCase().includes('default') ||
-                    a.name.toLowerCase().includes('rest') ||
-                    a.name.toLowerCase().includes('t-pose')
-                ) || avatarAnimations[0];
+            try {
+                // Stop current actions
+                mixer.stopAllAction();
                 
-                if (idleAnimation) {
-                    try {
-                        idleAction = avatarMixer.clipAction(idleAnimation);
-                        idleAction.setLoop(THREE.LoopRepeat);
-                        console.log("Signify: Using avatar animation for idle:", idleAnimation.name);
-                    } catch (error) {
-                        console.warn("Signify: Error setting up avatar animation:", error);
-                    }
-                }
+                // Play the word animation
+                const action = mixer.clipAction(clip);
+                action.reset();
+                action.setLoop(THREE.LoopOnce, 1);
+                action.clampWhenFinished = true;
+                action.play();
+                
+                currentAction = action;
+                isPlaying = true;
+                
+                // Return to default animation when finished
+                mixer.removeEventListener('finished', returnToDefault);
+                mixer.addEventListener('finished', returnToDefault);
+                
+            } catch (error) {
+                console.error("Signify: Error playing animation clip:", error);
+                window.signifyFloatingAvatar.setIdlePose();
             }
-            
-            window.signifyFloatingAvatar = {
-                mixer: avatarMixer,
-                idleAction: idleAction,
-                avatar: avatar,
-                isPlaying: false,
-                currentAction: null,
-                
-                setIdlePose: () => {
-                    console.log("Signify: Setting idle pose");
-                    
-                    try {
-                        // Stop all current actions
-                        avatarMixer.stopAllAction();
-                        
-                        if (idleAction) {
-                            // Reset and configure the idle action
-                            idleAction.reset();
-                            idleAction.setLoop(THREE.LoopRepeat);
-                            idleAction.setEffectiveWeight(1.0);
-                            idleAction.setEffectiveTimeScale(1.0);
-                            idleAction.enabled = true;
-                            
-                            // Start playing
-                            idleAction.play();
-                            
-                            window.signifyFloatingAvatar.isPlaying = true;
-                            window.signifyFloatingAvatar.currentAction = idleAction;
-                            
-                            console.log("Signify: Idle animation started successfully");
-                            console.log("Signify: Animation duration:", idleAction.getClip().duration);
-                            console.log("Signify: Animation playing:", idleAction.isRunning());
-                            
-                        } else {
-                            console.warn("Signify: No idle animation available");
-                            updateFloatingStatus('Avatar ready (no animation)');
-                        }
-                    } catch (error) {
-                        console.error("Signify: Error starting idle animation:", error);
-                        updateFloatingStatus('Avatar animation error');
-                    }
-                },
-                
-                playWordAnimation: async (word) => {
-                    const cleanWord = word.toLowerCase().replace(/[^\w]/g, '');
-                    if (!cleanWord) {
-                        window.signifyFloatingAvatar.setIdlePose();
-                        return;
-                    }
-
-                    const playClip = (clip) => {
-                        try {
-                            avatarMixer.stopAllAction();
-                            const action = avatarMixer.clipAction(clip);
-                            action.reset();
-                            action.setLoop(THREE.LoopOnce, 1);
-                            action.clampWhenFinished = true;
-                            action.play();
-
-                            avatarMixer.removeEventListener('finished', window.signifyFloatingAvatar.returnToIdle);
-                            avatarMixer.addEventListener('finished', window.signifyFloatingAvatar.returnToIdle);
-
-                        } catch (error) {
-                            console.error(`Signify: Error playing animation for "${word}":`, error);
-                            window.signifyFloatingAvatar.setIdlePose();
-                        }
-                    };
-
-                    // Check cache first
-                    if (animationCache.has(cleanWord)) {
-                        const cachedClip = animationCache.get(cleanWord);
-                        if (cachedClip) {
-                            console.log(`Signify: Playing cached animation for "${cleanWord}"`);
-                            playClip(cachedClip);
-                        } else {
-                            // Null in cache means we know it doesn't exist, so play idle
-                            window.signifyFloatingAvatar.setIdlePose();
-                        }
-                        return;
-                    }
-                    
-                    // Fetch animation URL from API
-                    try {
-                        console.log(`Signify: Requesting animation for "${cleanWord}" from API`);
-                        const response = await fetch(`${API_BASE_URL}/animation/${encodeURIComponent(cleanWord)}`, {
-                            method: 'GET',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            }
-                        });
-
-                        if (!response.ok) {
-                            throw new Error(`API responded with status: ${response.status}`);
-                        }
-
-                        const data = await response.json();
-                        
-                        if (data.success && data.animationUrl) {
-                            console.log(`Signify: API returned animation URL for "${cleanWord}": ${data.animationUrl}`);
-                            
-                            // Load the GLB file from the URL provided by API
-                            const gltf = await loader.loadAsync(data.animationUrl);
-                            if (gltf.animations && gltf.animations.length > 0) {
-                                const clip = gltf.animations[0];
-                                animationCache.set(cleanWord, clip);
-                                console.log(`Signify: Successfully loaded and cached animation for "${cleanWord}"`);
-                                playClip(clip);
-                            } else {
-                                throw new Error("No animations found in the loaded GLB.");
-                            }
-                        } else {
-                            throw new Error(data.message || "Animation not found");
-                        }
-                    } catch (error) {
-                        console.log(`Signify: No animation found for "${cleanWord}" via API. Playing idle.`, error.message);
-                        animationCache.set(cleanWord, null); // Cache the failure to avoid re-fetching
-                        window.signifyFloatingAvatar.setIdlePose();
-                    }
-                },
-
-                returnToIdle: () => {
-                    console.log("Signify: Animation finished, returning to idle.");
-                    if (window.signifyFloatingAvatar) {
-                        window.signifyFloatingAvatar.setIdlePose();
-                    }
-                }
-            };
-            
-            // Start idle animation immediately with a delay to ensure everything is loaded
-            console.log("Signify: Starting initial idle animation");
+        }
+        
+        // Return to default animation when word animation finishes
+        function returnToDefault() {
+            console.log("Signify: Word animation finished, returning to default");
             setTimeout(() => {
                 if (window.signifyFloatingAvatar) {
                     window.signifyFloatingAvatar.setIdlePose();
                 }
-            }, 500);
-            updateFloatingStatus('Avatar ready');
+            }, 100);
         }
         
-    }, undefined, (error) => {
-        console.error('Signify: Avatar loading error:', error);
-        updateFloatingStatus('Avatar load failed');
+        console.log("Signify: Avatar controls setup completed");
+        
+        // Start with default animation
+        setTimeout(() => {
+            if (window.signifyFloatingAvatar) {
+                window.signifyFloatingAvatar.setIdlePose();
+            }
+        }, 500);
+    }
+    
+    // Handle window resize
+    window.addEventListener('resize', () => {
+        if (camera && renderer) {
+            camera.aspect = 200 / 150;
+            camera.updateProjectionMatrix();
+            renderer.setSize(200, 150);
+        }
     });
-}
-
-function updateFloatingStatus(message) {
-    const el = document.getElementById('floating-status');
-    if (el) el.textContent = message;
 }
 
 function playWordAnimation(word) {
@@ -1125,17 +1155,40 @@ function updateFloatingCurrentWord(word) {
 
 function loadThreeJS() {
     return new Promise((resolve) => {
-        if (window.THREE) {
-            if (!window.THREE.GLTFLoader) {
-                 loadScript('GLTFLoader.js').then(resolve);
-            } else {
-                resolve();
-            }
+        if (window.THREE && window.THREE.GLTFLoader) {
+            resolve();
             return;
         }
+        
+        if (window.THREE) {
+            // THREE.js is loaded, now load GLTFLoader
+            loadScript('GLTFLoader.js').then(() => {
+                // Ensure GLTFLoader is properly attached to THREE
+                if (!window.THREE.GLTFLoader && window.GLTFLoader) {
+                    window.THREE.GLTFLoader = window.GLTFLoader;
+                }
+                resolve();
+            });
+            return;
+        }
+        
+        // Load THREE.js first
         const script = document.createElement('script');
         script.src = chrome.runtime.getURL('three.min.js');
-        script.onload = () => loadScript('GLTFLoader.js').then(resolve);
+        script.onload = () => {
+            // Then load GLTFLoader
+            loadScript('GLTFLoader.js').then(() => {
+                // Ensure GLTFLoader is properly attached to THREE
+                if (!window.THREE.GLTFLoader && window.GLTFLoader) {
+                    window.THREE.GLTFLoader = window.GLTFLoader;
+                }
+                resolve();
+            });
+        };
+        script.onerror = () => {
+            console.error('Signify: Failed to load THREE.js');
+            resolve(); // Resolve anyway to prevent hanging
+        };
         document.head.appendChild(script);
     });
 }
