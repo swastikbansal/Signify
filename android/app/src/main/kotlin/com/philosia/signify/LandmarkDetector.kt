@@ -1,15 +1,12 @@
 package com.philosia.signify
 
 import android.app.Activity
+import android.content.Context
 import android.util.Log
-import android.util.Size
-import androidx.camera.core.*
-import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.core.content.ContextCompat
-import androidx.lifecycle.LifecycleOwner
 import com.google.mediapipe.framework.image.BitmapImageBuilder
 import com.google.mediapipe.framework.image.MPImage
 import com.google.mediapipe.tasks.core.BaseOptions
+import com.google.mediapipe.tasks.core.Delegate
 import com.google.mediapipe.tasks.vision.core.RunningMode
 import com.google.mediapipe.tasks.vision.handlandmarker.HandLandmarker
 import com.google.mediapipe.tasks.vision.handlandmarker.HandLandmarkerResult
@@ -19,7 +16,39 @@ import io.flutter.plugin.common.MethodChannel
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-class LandmarkDetector(private val activity: Activity, private val channel: MethodChannel) {
+class LandmarkDetector(
+    private val activity: Activity,
+    private val channel: MethodChannel,
+    var minHandDetectionConfidence: Float = DEFAULT_HAND_DETECTION_CONFIDENCE,
+    var minHandTrackingConfidence: Float = DEFAULT_HAND_TRACKING_CONFIDENCE,
+    var minHandPresenceConfidence: Float = DEFAULT_HAND_PRESENCE_CONFIDENCE,
+    var maxNumHands: Int = DEFAULT_NUM_HANDS,
+    var minPoseDetectionConfidence: Float = DEFAULT_POSE_DETECTION_CONFIDENCE,
+    var minPoseTrackingConfidence: Float = DEFAULT_POSE_TRACKING_CONFIDENCE,
+    var minPosePresenceConfidence: Float = DEFAULT_POSE_PRESENCE_CONFIDENCE,
+    var currentDelegate: Int = DELEGATE_GPU,
+    var runningMode: RunningMode = RunningMode.IMAGE,
+    val context: Context,
+    val LandmarkerHelperListener: LandmarkerListener? = null
+) {
+
+    companion object {
+        const val DELEGATE_CPU = 0
+        const val DELEGATE_GPU = 1
+        // Lowered detection confidence for better second hand detection
+        const val DEFAULT_HAND_DETECTION_CONFIDENCE = 0.3F
+        // Reduced tracking confidence to maintain detection of weaker hands
+        const val DEFAULT_HAND_TRACKING_CONFIDENCE = 0.3F
+        // Lowered presence confidence for better multi-hand scenarios
+        const val DEFAULT_HAND_PRESENCE_CONFIDENCE = 0.3F
+        const val DEFAULT_NUM_HANDS = 2
+        const val DEFAULT_POSE_DETECTION_CONFIDENCE = 0.5F
+        const val DEFAULT_POSE_TRACKING_CONFIDENCE = 0.5F
+        const val DEFAULT_POSE_PRESENCE_CONFIDENCE = 0.5F
+        const val TAG = "LandmarkDetector"
+        const val OTHER_ERROR = 0
+        const val GPU_ERROR = 1
+    }
 
     private var handLandmarker: HandLandmarker? = null
     private var poseLandmarker: PoseLandmarker? = null
@@ -28,6 +57,35 @@ class LandmarkDetector(private val activity: Activity, private val channel: Meth
 
     fun initialize() {
         backgroundExecutor = Executors.newSingleThreadExecutor()
+        setupMediaPipe()
+    }
+
+    fun clearHandLandmarker() {
+        handLandmarker?.close()
+        poseLandmarker?.close()
+        handLandmarker = null
+        poseLandmarker = null
+    }
+
+    // Return running status of HandLandmarkerHelper
+    fun isClose(): Boolean {
+        return handLandmarker == null && poseLandmarker == null 
+    }
+
+    // Method to update hand detection parameters for better multi-hand detection
+    fun updateHandDetectionParams(
+        detectionConfidence: Float = 0.3f,
+        trackingConfidence: Float = 0.3f,
+        presenceConfidence: Float = 0.3f
+    ) {
+        minHandDetectionConfidence = detectionConfidence
+        minHandTrackingConfidence = trackingConfidence
+        minHandPresenceConfidence = presenceConfidence
+        
+        Log.d(TAG, "Updated hand detection params - Detection: $detectionConfidence, Tracking: $trackingConfidence, Presence: $presenceConfidence")
+        
+        // Reinitialize with new parameters
+        clearHandLandmarker()
         setupMediaPipe()
     }
 
@@ -41,34 +99,76 @@ class LandmarkDetector(private val activity: Activity, private val channel: Meth
     private fun setupMediaPipe() {
         try {
             // Hand Landmarker setup
-            val handBaseOptions = BaseOptions.builder()
-                .setModelAssetPath("hand_landmarker.task")
-                .build()
+            val handBaseOptionBuilder = BaseOptions.builder()
+                
+            when (currentDelegate) {
+                DELEGATE_CPU -> {
+                    handBaseOptionBuilder.setDelegate(Delegate.CPU)
+                }
+                DELEGATE_GPU -> {
+                    handBaseOptionBuilder.setDelegate(Delegate.GPU)
+                }
+            }
 
-            val handOptions = HandLandmarker.HandLandmarkerOptions.builder()
+            handBaseOptionBuilder.setModelAssetPath("hand_landmarker.task")
+            val handBaseOptions = handBaseOptionBuilder.build()
+
+            if (runningMode == RunningMode.LIVE_STREAM && LandmarkerHelperListener == null) {
+                throw IllegalStateException(
+                    "LandmarkerHelperListener must be set when runningMode is LIVE_STREAM."
+                )
+            }
+
+            val handOptionsBuilder = HandLandmarker.HandLandmarkerOptions.builder()
                 .setBaseOptions(handBaseOptions)
-                .setMinHandDetectionConfidence(0.5f)
-                .setMinTrackingConfidence(0.5f)
-                .setMinHandPresenceConfidence(0.5f)
-                .setNumHands(2)
-                .setRunningMode(RunningMode.IMAGE)
-                .build()
+                .setMinHandDetectionConfidence(minHandDetectionConfidence)
+                .setMinTrackingConfidence(minHandTrackingConfidence)
+                .setMinHandPresenceConfidence(minHandPresenceConfidence)
+                .setNumHands(maxNumHands)
+                .setRunningMode(runningMode)
 
+            // Add logging to verify configuration
+            Log.d(TAG, "Hand detection config - Detection: $minHandDetectionConfidence, Tracking: $minHandTrackingConfidence, Presence: $minHandPresenceConfidence, MaxHands: $maxNumHands")
+
+            if (runningMode == RunningMode.LIVE_STREAM) {
+                handOptionsBuilder
+                    .setResultListener(this::returnLivestreamHandResult)
+                    .setErrorListener(this::returnLivestreamHandError)
+            }
+            
+            val handOptions = handOptionsBuilder.build()
             handLandmarker = HandLandmarker.createFromOptions(activity, handOptions)
 
+
             // Pose Landmarker setup
-            val poseBaseOptions = BaseOptions.builder()
-                .setModelAssetPath("pose_landmarker.task")
-                .build()
+            val poseBaseOptionBuilder = BaseOptions.builder()
+                
+            when (currentDelegate) {
+                DELEGATE_CPU -> {
+                    poseBaseOptionBuilder.setDelegate(Delegate.CPU)
+                }
+                DELEGATE_GPU -> {
+                    poseBaseOptionBuilder.setDelegate(Delegate.GPU)
+                }
+            }
 
-            val poseOptions = PoseLandmarker.PoseLandmarkerOptions.builder()
+            poseBaseOptionBuilder.setModelAssetPath("pose_landmarker.task")
+            val poseBaseOptions = poseBaseOptionBuilder.build()
+
+            val poseOptionsBuilder = PoseLandmarker.PoseLandmarkerOptions.builder()
                 .setBaseOptions(poseBaseOptions)
-                .setMinPoseDetectionConfidence(0.5f)
-                .setMinTrackingConfidence(0.5f)
-                .setMinPosePresenceConfidence(0.5f)
-                .setRunningMode(RunningMode.IMAGE)
-                .build()
+                .setMinPoseDetectionConfidence(minPoseDetectionConfidence)
+                .setMinTrackingConfidence(minPoseTrackingConfidence)
+                .setMinPosePresenceConfidence(minPosePresenceConfidence)
+                .setRunningMode(runningMode)
 
+            if (runningMode == RunningMode.LIVE_STREAM) {
+                poseOptionsBuilder
+                    .setResultListener(this::returnLivestreamPoseResult)
+                    .setErrorListener(this::returnLivestreamPoseError)
+            }
+
+            val poseOptions = poseOptionsBuilder.build()
             poseLandmarker = PoseLandmarker.createFromOptions(activity, poseOptions)
 
             activity.runOnUiThread {
@@ -77,7 +177,7 @@ class LandmarkDetector(private val activity: Activity, private val channel: Meth
 
         } catch (e: Exception) {
             val error = "Error setting up MediaPipe: ${e.message}"
-            Log.e("MediaPipe", error)
+            Log.e(TAG, error)
             activity.runOnUiThread {
                 channel.invokeMethod("onError", mapOf("error" to error))
             }
@@ -100,22 +200,41 @@ class LandmarkDetector(private val activity: Activity, private val channel: Meth
                 val yPixelStride = (yPlane["bytesPerPixel"] as Int?) ?: 1
                 val yRowStride = (yPlane["bytesPerRow"] as Int?) ?: width
 
-                // Create bitmap from camera image data
+                // Create bitmap from camera image data with better error handling
                 val bitmap = createBitmapFromYuv420(yBytes, width, height, yPixelStride, yRowStride)
+                
+                // Verify bitmap was created successfully
+                if (bitmap.isRecycled) {
+                    Log.w(TAG, "Created bitmap is recycled, skipping frame")
+                    return@execute
+                }
 
                 val mpImage = BitmapImageBuilder(bitmap).build()
                 val frameTime = System.currentTimeMillis()
 
-                // Process with MediaPipe
+                // Process with MediaPipe - hand detection first as it's more critical
                 val handResult = handLandmarker?.detect(mpImage)
                 val poseResult = poseLandmarker?.detect(mpImage)
 
-                // Send results
-                handResult?.let { sendHandLandmarks(it, frameTime) }
+                // Send results with better error handling
+                handResult?.let { 
+                    sendHandLandmarks(it, frameTime) 
+                } ?: run {
+                    // Log occasional warnings when hand detection fails
+                    if (frameTime % 5000 < 100) { // ~every 5 seconds
+                        Log.w(TAG, "Hand detection returned null result")
+                    }
+                }
+                
                 poseResult?.let { sendPoseLandmarks(it, frameTime) }
 
+                // Clean up bitmap to prevent memory leaks
+                if (!bitmap.isRecycled) {
+                    bitmap.recycle()
+                }
+
             } catch (e: Exception) {
-                Log.e("LandmarkDetector", "Error processing Flutter image: ${e.message}", e)
+                Log.e(TAG, "Error processing Flutter image: ${e.message}", e)
             }
         }
     }
@@ -145,8 +264,12 @@ class LandmarkDetector(private val activity: Activity, private val channel: Meth
                     // Ensure we don't exceed array bounds
                     if (yPlaneIndex < yPlane.size) {
                         val yValue = yPlane[yPlaneIndex].toInt() and 0xFF
-                        // Create grayscale pixel
-                        val pixel = android.graphics.Color.rgb(yValue, yValue, yValue)
+                        
+                        // Apply contrast enhancement for better hand detection
+                        val enhancedY = enhanceContrast(yValue)
+                        
+                        // Create grayscale pixel with enhanced contrast
+                        val pixel = android.graphics.Color.rgb(enhancedY, enhancedY, enhancedY)
                         pixels[yIndex] = pixel
                     } else {
                         // Use black pixel if we're out of bounds
@@ -160,7 +283,7 @@ class LandmarkDetector(private val activity: Activity, private val channel: Meth
             return bitmap
 
         } catch (e: Exception) {
-            Log.e("LandmarkDetector", "Error creating bitmap from YUV: ${e.message}", e)
+            Log.e(TAG, "Error creating bitmap from YUV: ${e.message}", e)
             // Return a simple black bitmap as fallback
             return android.graphics.Bitmap.createBitmap(
                 width,
@@ -170,16 +293,54 @@ class LandmarkDetector(private val activity: Activity, private val channel: Meth
         }
     }
 
+    // Helper method to enhance contrast for better hand detection
+    private fun enhanceContrast(yValue: Int): Int {
+        // Apply simple contrast enhancement
+        // This helps MediaPipe better distinguish hand features
+        val contrast = 1.2f // Increase contrast by 20%
+        val enhanced = ((yValue - 128) * contrast + 128).toInt()
+        
+        // Clamp to valid range
+        return when {
+            enhanced < 0 -> 0
+            enhanced > 255 -> 255
+            else -> enhanced
+        }
+    }
+
     private fun sendHandLandmarks(result: HandLandmarkerResult, timestamp: Long) {
-        if (result.landmarks().isNotEmpty()) {
-            // Print all hand landmarks to console
-            result.landmarks().forEachIndexed { handIndex, hand ->
-                Log.d("HandLandmarks", "=== Hand $handIndex (${hand.size} landmarks) ===")
-                hand.forEachIndexed { landmarkIndex, landmark ->
-                    Log.d(
-                        "HandLandmarks",
-                        "Landmark $landmarkIndex: x=${landmark.x()}, y=${landmark.y()}, z=${landmark.z()}"
-                    )
+        val numHands = result.landmarks().size
+        
+        // Enhanced logging for multi-hand detection debugging
+        if (numHands > 0) {
+            Log.d(TAG, "Detected $numHands hand(s) at timestamp $timestamp")
+            
+            // Log hand confidence scores if available
+            if (result.handednesses().isNotEmpty()) {
+                result.handednesses().forEachIndexed { handIndex, handedness ->
+                    if (handedness.isNotEmpty()) {
+                        val confidence = handedness[0].score()
+                        val label = handedness[0].categoryName()
+                        Log.d(TAG, "Hand $handIndex: $label (confidence: $confidence)")
+                    }
+                }
+            }
+            
+            // Detailed landmark logging (reduced frequency to avoid spam)
+            if (timestamp % 1000 < 100) { // Log detailed info ~every second
+                result.landmarks().forEachIndexed { handIndex, hand ->
+                    Log.d("HandLandmarks", "=== Hand $handIndex (${hand.size} landmarks) ===")
+                    // Log only key landmarks (wrist, thumb tip, index tip, middle tip, ring tip, pinky tip)
+                    val keyLandmarks = listOf(0, 4, 8, 12, 16, 20)
+                    keyLandmarks.forEach { landmarkIndex ->
+                        if (landmarkIndex < hand.size) {
+                            val landmark = hand[landmarkIndex]
+                            Log.d(
+                                "HandLandmarks",
+                                "Key Landmark $landmarkIndex: x=${landmark.x()}, y=${landmark.y()}, z=${landmark.z()}"
+                            )
+                        }
+                    }
                 }
             }
 
@@ -188,25 +349,59 @@ class LandmarkDetector(private val activity: Activity, private val channel: Meth
                     mapOf("x" to landmark.x(), "y" to landmark.y(), "z" to landmark.z())
                 }
             }
+            
+            // Include handedness information in the result
+            val handednessData = if (result.handednesses().isNotEmpty()) {
+                result.handednesses().map { handedness ->
+                    if (handedness.isNotEmpty()) {
+                        mapOf(
+                            "label" to handedness[0].categoryName(),
+                            "confidence" to handedness[0].score()
+                        )
+                    } else {
+                        mapOf("label" to "Unknown", "confidence" to 0.0f)
+                    }
+                }
+            } else {
+                emptyList()
+            }
+            
             activity.runOnUiThread {
                 channel.invokeMethod(
                     "onHandLandmarks",
-                    mapOf("hands" to handsData, "timestamp" to timestamp)
+                    mapOf(
+                        "hands" to handsData, 
+                        "handedness" to handednessData,
+                        "timestamp" to timestamp,
+                        "numHands" to numHands
+                    )
                 )
+            }
+        } else {
+            // Log when no hands are detected (but less frequently)
+            if (timestamp % 2000 < 100) { // Log ~every 2 seconds
+                Log.d(TAG, "No hands detected at timestamp $timestamp")
             }
         }
     }
 
     private fun sendPoseLandmarks(result: PoseLandmarkerResult, timestamp: Long) {
         if (result.landmarks().isNotEmpty()) {
-            // Print all pose landmarks to console
+            // Log pose landmark count for debugging skeleton overlay issues
             result.landmarks().forEachIndexed { poseIndex, pose ->
                 Log.d("PoseLandmarks", "=== Pose $poseIndex (${pose.size} landmarks) ===")
-                pose.forEachIndexed { landmarkIndex, landmark ->
-                    Log.d(
-                        "PoseLandmarks",
-                        "Landmark $landmarkIndex: x=${landmark.x()}, y=${landmark.y()}, z=${landmark.z()}"
-                    )
+                // Log key landmarks for skeleton positioning debugging
+                if (timestamp % 2000 < 100) { // Log ~every 2 seconds
+                    val keyLandmarks = listOf(0, 11, 12, 23, 24) // nose, shoulders, hips
+                    keyLandmarks.forEach { landmarkIndex ->
+                        if (landmarkIndex < pose.size) {
+                            val landmark = pose[landmarkIndex]
+                            Log.d(
+                                "PoseLandmarks",
+                                "Key Landmark $landmarkIndex: x=${landmark.x()}, y=${landmark.y()}, z=${landmark.z()}"
+                            )
+                        }
+                    }
                 }
             }
 
@@ -215,13 +410,43 @@ class LandmarkDetector(private val activity: Activity, private val channel: Meth
                     mapOf("x" to landmark.x(), "y" to landmark.y(), "z" to landmark.z())
                 }
             }
+            
             activity.runOnUiThread {
                 channel.invokeMethod(
                     "onPoseLandmarks",
-                    mapOf("poses" to posesData, "timestamp" to timestamp)
+                    mapOf(
+                        "poses" to posesData, 
+                        "timestamp" to timestamp,
+                        "numPoses" to result.landmarks().size
+                    )
                 )
             }
+        } else {
+            // Log when no poses are detected
+            if (timestamp % 3000 < 100) { // Log ~every 3 seconds
+                Log.d(TAG, "No poses detected at timestamp $timestamp")
+            }
         }
+    }
+
+    private fun returnLivestreamHandResult(result: HandLandmarkerResult, input: MPImage) {
+        val finishTimeMs = System.currentTimeMillis()
+        val inferenceTime = finishTimeMs - result.timestampMs()
+        LandmarkerHelperListener?.onHandResults(result, inferenceTime, input.height, input.width)
+    }
+
+    private fun returnLivestreamHandError(error: RuntimeException) {
+        LandmarkerHelperListener?.onError(error.message ?: "Hand detection error", OTHER_ERROR)
+    }
+
+    private fun returnLivestreamPoseResult(result: PoseLandmarkerResult, input: MPImage) {
+        val finishTimeMs = System.currentTimeMillis()
+        val inferenceTime = finishTimeMs - result.timestampMs()
+        LandmarkerHelperListener?.onPoseResults(result, inferenceTime, input.height, input.width)
+    }
+
+    private fun returnLivestreamPoseError(error: RuntimeException) {
+        LandmarkerHelperListener?.onError(error.message ?: "Pose detection error", OTHER_ERROR)
     }
 
     fun stopDetection() {
@@ -231,5 +456,11 @@ class LandmarkDetector(private val activity: Activity, private val channel: Meth
         if (::backgroundExecutor.isInitialized) {
             backgroundExecutor.shutdown()
         }
+    }
+
+    interface LandmarkerListener {
+        fun onError(error: String, errorCode: Int = OTHER_ERROR)
+        fun onHandResults(result: HandLandmarkerResult, inferenceTime: Long, height: Int, width: Int)
+        fun onPoseResults(result: PoseLandmarkerResult, inferenceTime: Long, height: Int, width: Int)
     }
 }

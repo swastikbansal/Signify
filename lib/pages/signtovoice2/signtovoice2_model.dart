@@ -78,6 +78,25 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   List<double>? _poseCoords;
   List<String>? _handLabels; // To store hand labels (Left/Right)
 
+  // Prediction history for debug
+  List<String> _predictionHistory = [];
+
+  // Sentence building state
+  List<String> _currentSentence = [];
+  String _lastPrediction = "";
+  int _lastPredictionTime = 0;
+  static const int _wordCooldownMs =
+      2000; // 2 seconds cooldown between same words
+
+  List<String> get predictionHistory => _predictionHistory;
+
+  String get latestPrediction =>
+      _predictionHistory.isNotEmpty ? _predictionHistory.last : "";
+
+  String get currentSentence => _currentSentence.join(' ');
+
+  List<String> get sentenceWords => List.from(_currentSentence);
+
   // API related state
   String _apiUrl =
       'http://192.168.29.42:5000/predict'; // Replace with your actual API endpoint
@@ -91,13 +110,21 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   bool _useCoordinateTransformation = true;
 
   List<List<Map<String, dynamic>>> get handLandmarks => _handLandmarks;
+
   List<List<Map<String, dynamic>>> get poseLandmarks => _poseLandmarks;
+
   String get lastUpdateTime => _lastUpdateTime;
+
   List<double>? get leftHandCoords => _leftHandCoords;
+
   List<double>? get rightHandCoords => _rightHandCoords;
+
   List<double>? get poseCoords => _poseCoords;
+
   List<String>? get handLabels => _handLabels;
+
   bool get isSkeletonOverlayEnabled => _isSkeletonOverlayEnabled;
+
   bool get useCoordinateTransformation => _useCoordinateTransformation;
 
   void resetState() {
@@ -106,6 +133,51 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
     _isDetecting = false;
     _isCameraReady = false;
     _notifyStateChange();
+  }
+
+  // Sentence management methods
+  void _addWordToSentence(String word) {
+    if (word.trim().isEmpty) return;
+
+    String cleanWord = word.trim().toLowerCase();
+    int currentTime = DateTime.now().millisecondsSinceEpoch;
+
+    // Avoid duplicate words within cooldown period
+    if (_lastPrediction == cleanWord &&
+        currentTime - _lastPredictionTime < _wordCooldownMs) {
+      return;
+    }
+
+    _currentSentence.add(word.trim());
+    _lastPrediction = cleanWord;
+    _lastPredictionTime = currentTime;
+
+    // Update text field with current sentence
+    if (textController != null) {
+      textController!.text = _currentSentence.join(' ');
+    }
+
+    print('Added word to sentence: "$word" -> "${_currentSentence.join(' ')}"');
+  }
+
+  void clearSentence() {
+    _currentSentence.clear();
+    if (textController != null) {
+      textController!.text = '';
+    }
+    print('Sentence cleared');
+    _notifyStateChange();
+  }
+
+  void removeLastWord() {
+    if (_currentSentence.isNotEmpty) {
+      String removedWord = _currentSentence.removeLast();
+      if (textController != null) {
+        textController!.text = _currentSentence.join(' ');
+      }
+      print('Removed word: "$removedWord" -> "${_currentSentence.join(' ')}"');
+      _notifyStateChange();
+    }
   }
 
   // State field(s) for DropDown widget.
@@ -159,26 +231,18 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
                 _extractAndProcessCoordinates();
 
                 // Print all hand landmarks to console for debugging
-                _handLandmarks.asMap().forEach((handIndex, hand) {
-                  String handLabel =
-                      _handLabels != null && handIndex < _handLabels!.length
-                          ? _handLabels![handIndex]
-                          : 'Unknown';
-                  print(
-                      '=== Hand $handIndex ($handLabel) - ${hand.length} landmarks ===');
-                  hand.asMap().forEach((landmarkIndex, landmark) {
-                    print(
-                        'Landmark $landmarkIndex: x=${landmark['x']}, y=${landmark['y']}, z=${landmark['z']}');
-                  });
-                });
-
-                // Update text field with detected gesture
-                if (_handLandmarks.isNotEmpty && textController != null) {
-                  String detectedGesture = _analyzeGesture(_handLandmarks);
-                  if (detectedGesture.isNotEmpty) {
-                    textController!.text = detectedGesture;
-                  }
-                }
+                // _handLandmarks.asMap().forEach((handIndex, hand) {
+                //   String handLabel =
+                //       _handLabels != null && handIndex < _handLabels!.length
+                //           ? _handLabels![handIndex]
+                //           : 'Unknown';
+                //   print(
+                //       '=== Hand $handIndex ($handLabel) - ${hand.length} landmarks ===');
+                //   hand.asMap().forEach((landmarkIndex, landmark) {
+                //     print(
+                //         'Landmark $landmarkIndex: x=${landmark['x']}, y=${landmark['y']}, z=${landmark['z']}');
+                //   });
+                // });
 
                 _notifyStateChange();
                 print(
@@ -215,13 +279,13 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
                 _extractAndProcessCoordinates();
 
                 // Print all pose landmarks to console for debugging
-                _poseLandmarks.asMap().forEach((poseIndex, pose) {
-                  print('=== Pose $poseIndex (${pose.length} landmarks) ===');
-                  pose.asMap().forEach((landmarkIndex, landmark) {
-                    print(
-                        'Landmark $landmarkIndex: x=${landmark['x']}, y=${landmark['y']}, z=${landmark['z']}');
-                  });
-                });
+                // _poseLandmarks.asMap().forEach((poseIndex, pose) {
+                //   print('=== Pose $poseIndex (${pose.length} landmarks) ===');
+                //   pose.asMap().forEach((landmarkIndex, landmark) {
+                //     print(
+                //         'Landmark $landmarkIndex: x=${landmark['x']}, y=${landmark['y']}, z=${landmark['z']}');
+                //   });
+                // });
 
                 _notifyStateChange();
                 print(
@@ -232,6 +296,24 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
                   print(
                       'Pose coordinates extracted: ${_poseCoords!.length} values');
                 }
+              }
+              break;
+
+            case 'onPrediction':
+              // Receive prediction from native side
+              final prediction =
+                  call.arguments?['prediction']?.toString() ?? "";
+
+              print('Received prediction: $prediction');
+
+              if (prediction.isNotEmpty) {
+                _predictionHistory.add(prediction);
+                print('Prediction history: $_predictionHistory');
+
+                // Add word to sentence instead of replacing
+                _addWordToSentence(prediction);
+
+                _notifyStateChange();
               }
               break;
 
@@ -268,16 +350,17 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
     }
   }
 
-  String _analyzeGesture(List<List<Map<String, dynamic>>> hands) {
-    try {
-      if (hands.isNotEmpty) {
-        return "Gesture detected - ${hands.length} hand(s)";
-      }
-    } catch (e) {
-      print('Error analyzing gesture: $e');
-    }
-    return "";
-  }
+  // Deprecated: replaced by prediction from native
+  // String _analyzeGesture(List<List<Map<String, dynamic>>> hands) {
+  //   try {
+  //     if (hands.isNotEmpty) {
+  //       return "Gesture detected - ${hands.length} hand(s)";
+  //     }
+  //   } catch (e) {
+  //     print('Error analyzing gesture: $e');
+  //   }
+  //   return "";
+  // }
 
   // Enhanced coordinate extraction method similar to Python implementation
   void _extractAndProcessCoordinates() {
@@ -409,7 +492,38 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
 
       if (response.statusCode == 200) {
         print('API call successful: ${response.body}');
-        // Handle successful response if needed
+
+        // Parse the JSON response
+        try {
+          final responseData =
+              json.decode(response.body) as Map<String, dynamic>;
+          final status = responseData['status'] as String?;
+
+          if (status == 'success') {
+            // Extract prediction from successful response
+            final prediction = responseData['prediction'] as String?;
+            if (prediction != null && prediction.isNotEmpty) {
+              print('Received prediction from API: $prediction');
+
+              // Update prediction history
+              _predictionHistory.add(prediction);
+
+              // Add word to sentence instead of replacing
+              _addWordToSentence(prediction);
+
+              // Notify UI to update
+              _notifyStateChange();
+            }
+          } else if (status == 'collecting') {
+            // Still collecting frames, log progress
+            final message = responseData['message'] as String?;
+            final frameCount = responseData['frame_count'] as int?;
+            print('API collecting frames: $message (frames: $frameCount)');
+          }
+        } catch (parseError) {
+          print('Error parsing API response: $parseError');
+          print('Raw response: ${response.body}');
+        }
       } else {
         print('API call failed with status: ${response.statusCode}');
         print('Response: ${response.body}');
@@ -452,6 +566,24 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   void resetApiTimer() {
     _lastApiCallTime = 0;
   }
+
+  // Sentence management public methods
+  void clearCurrentSentence() {
+    clearSentence();
+  }
+
+  void undoLastWord() {
+    removeLastWord();
+  }
+
+  void setSentenceCooldown(int milliseconds) {
+    // Allow dynamic adjustment of cooldown if needed
+    // _wordCooldownMs = milliseconds; // Would need to make it non-const
+  }
+
+  int get sentenceWordCount => _currentSentence.length;
+
+  bool get hasSentence => _currentSentence.isNotEmpty;
 
   // Enhanced method for better hand detection configuration
   Future<void> configureHandDetection({
@@ -622,6 +754,9 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
         _rightHandCoords = null;
         _poseCoords = null;
         _handLabels = null;
+
+        // Optionally clear current sentence when stopping detection
+        // clearSentence(); // Uncomment if you want to clear sentence on stop
 
         // Dispose camera
         await _disposeCamera();

@@ -43,7 +43,7 @@ class MainActivity : FlutterActivity(), MethodCallHandler {
         when (call.method) {
             "initialize" -> {
                 try {
-                    landmarkDetector = LandmarkDetector(this, channel)
+                    landmarkDetector = LandmarkDetector(this, channel, context = applicationContext)
                     landmarkDetector?.initialize()
                     result.success(true)
                 } catch (e: Exception) {
@@ -75,6 +75,24 @@ class MainActivity : FlutterActivity(), MethodCallHandler {
                     result.success("Image processed")
                 } catch (e: Exception) {
                     result.error("PROCESS_ERROR", "Failed to process image: ${e.message}", null)
+                }
+            }
+
+            "updateHandDetectionParams" -> {
+                try {
+                    val args = call.arguments as Map<String, Any>
+                    val detectionConfidence = (args["detectionConfidence"] as? Double)?.toFloat() ?: 0.3f
+                    val trackingConfidence = (args["trackingConfidence"] as? Double)?.toFloat() ?: 0.3f
+                    val presenceConfidence = (args["presenceConfidence"] as? Double)?.toFloat() ?: 0.3f
+                    
+                    landmarkDetector?.updateHandDetectionParams(
+                        detectionConfidence,
+                        trackingConfidence,
+                        presenceConfidence
+                    )
+                    result.success("Hand detection parameters updated")
+                } catch (e: Exception) {
+                    result.error("UPDATE_PARAMS_ERROR", "Failed to update parameters: ${e.message}", null)
                 }
             }
 
