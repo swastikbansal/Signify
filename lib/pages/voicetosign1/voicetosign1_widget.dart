@@ -671,24 +671,6 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
       child: Scaffold(
         key: scaffoldKey,
         backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
-        appBar: AppBar(
-          backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
-          automaticallyImplyLeading: false,
-          title: Text(
-            FFLocalizations.of(context).getText(
-              'iriw5ix1' /* Voice to Sign */,
-            ),
-            style: FlutterFlowTheme.of(context).headlineMedium.override(
-                  fontFamily: 'Space Grotesk',
-                  letterSpacing: 0.0,
-                  useGoogleFonts:
-                      GoogleFonts.asMap().containsKey('Space Grotesk'),
-                ),
-          ),
-          actions: [],
-          centerTitle: false,
-          elevation: 0.0,
-        ),
         body: SafeArea(
           top: true,
           child: Column(
@@ -804,7 +786,7 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
                           builder: (context, child) {
                             return Container(
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(24.0),
+                                borderRadius: BorderRadius.circular(16.0),
                                 border: Border.all(
                                   color: Colors.transparent,
                                   width: 2.0,

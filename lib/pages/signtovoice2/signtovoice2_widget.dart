@@ -129,24 +129,6 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
       child: Scaffold(
         key: scaffoldKey,
         backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
-        appBar: AppBar(
-          backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
-          automaticallyImplyLeading: false,
-          title: Text(
-            FFLocalizations.of(context).getText(
-              'helpdw8b' /* Sign to Voice */,
-            ),
-            style: FlutterFlowTheme.of(context).headlineMedium.override(
-                  fontFamily: 'Space Grotesk',
-                  letterSpacing: 0.0,
-                  useGoogleFonts:
-                      GoogleFonts.asMap().containsKey('Space Grotesk'),
-                ),
-          ),
-          actions: [],
-          centerTitle: false,
-          elevation: 0.0,
-        ),
         body: SafeArea(
           top: true,
           child: Column(
