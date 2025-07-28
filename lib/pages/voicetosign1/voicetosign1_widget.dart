@@ -1162,67 +1162,84 @@ class MovingLinePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final borderRadius = 24.0;
+    final borderRadius = 16.0; // Match sign to voice page border radius
     final rect = Rect.fromLTWH(0, 0, size.width, size.height);
     final rrect = RRect.fromRectAndRadius(rect, Radius.circular(borderRadius));
 
     // Calculate the total perimeter path
     final path = Path()..addRRect(rrect);
     final totalLength = _calculatePathLength(path);
-    final lineLength =
-        totalLength * 0.3; // Increased line length for more visibility
-
-    // Calculate current position based on progress
-    final currentPosition = totalLength * progress;
-    final startPosition = currentPosition - lineLength * 0.5;
-    final endPosition = currentPosition + lineLength * 0.5;
 
     // Create path metrics to get position along the path
     final pathMetrics = path.computeMetrics().first;
 
-    // Simple solid yellow paint - no gradients
-    final paint = Paint()
-      ..color = const Color(0xFFFAB317) // Simple solid yellow
-      ..strokeWidth = strokeWidth
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
+    // Single line animation that travels around the complete perimeter with completion effect
+    if (progress < 0.85) {
+      // Moving phase: single solid line travels around the perimeter
+      final lineLength = totalLength *
+          0.2; // Line covers 20% of perimeter for better visibility
+      final currentPosition = (progress / 0.85) *
+          totalLength; // Travel full perimeter in first 85% of animation
+      final startPosition = currentPosition - lineLength * 0.5;
+      final endPosition = currentPosition + lineLength * 0.5;
 
-    if (startPosition >= 0 && endPosition <= totalLength) {
-      // Draw simple line segment
-      final segmentPath = pathMetrics.extractPath(
-        startPosition.clamp(0.0, totalLength),
-        endPosition.clamp(0.0, totalLength),
-      );
-      canvas.drawPath(segmentPath, paint);
-    } else {
-      // Handle wrapping around the path (simplified)
-      if (startPosition < 0) {
-        final segmentPath1 = pathMetrics.extractPath(
-          (startPosition + totalLength).clamp(0.0, totalLength),
-          totalLength,
-        );
-        final segmentPath2 = pathMetrics.extractPath(
-          0.0,
+      // Simple solid yellow paint - no gradients
+      final paint = Paint()
+        ..color = color
+        ..strokeWidth = strokeWidth
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round;
+
+      if (startPosition >= 0 && endPosition <= totalLength) {
+        // Draw simple line segment
+        final segmentPath = pathMetrics.extractPath(
+          startPosition.clamp(0.0, totalLength),
           endPosition.clamp(0.0, totalLength),
         );
+        canvas.drawPath(segmentPath, paint);
+      } else {
+        // Handle wrapping around the path (simplified)
+        if (startPosition < 0) {
+          final segmentPath1 = pathMetrics.extractPath(
+            (startPosition + totalLength).clamp(0.0, totalLength),
+            totalLength,
+          );
+          final segmentPath2 = pathMetrics.extractPath(
+            0.0,
+            endPosition.clamp(0.0, totalLength),
+          );
 
-        // Draw simple segments
-        canvas.drawPath(segmentPath1, paint);
-        canvas.drawPath(segmentPath2, paint);
-      } else if (endPosition > totalLength) {
-        final segmentPath1 = pathMetrics.extractPath(
-          startPosition.clamp(0.0, totalLength),
-          totalLength,
-        );
-        final segmentPath2 = pathMetrics.extractPath(
-          0.0,
-          (endPosition - totalLength).clamp(0.0, totalLength),
-        );
+          // Draw simple segments
+          canvas.drawPath(segmentPath1, paint);
+          canvas.drawPath(segmentPath2, paint);
+        } else if (endPosition > totalLength) {
+          final segmentPath1 = pathMetrics.extractPath(
+            startPosition.clamp(0.0, totalLength),
+            totalLength,
+          );
+          final segmentPath2 = pathMetrics.extractPath(
+            0.0,
+            (endPosition - totalLength).clamp(0.0, totalLength),
+          );
 
-        // Draw simple segments
-        canvas.drawPath(segmentPath1, paint);
-        canvas.drawPath(segmentPath2, paint);
+          // Draw simple segments
+          canvas.drawPath(segmentPath1, paint);
+          canvas.drawPath(segmentPath2, paint);
+        }
       }
+    } else {
+      // Completion glow phase: full perimeter glows out with solid color
+      final glowProgress = (progress - 0.85) / 0.15; // Last 15% of animation
+      final glowIntensity = 1.0 - glowProgress; // Fade out the glow
+
+      // Draw the complete path with solid color fading
+      final completionPaint = Paint()
+        ..color = color.withOpacity(glowIntensity)
+        ..strokeWidth = strokeWidth * 1.5
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round;
+
+      canvas.drawPath(path, completionPaint);
     }
   }
 
