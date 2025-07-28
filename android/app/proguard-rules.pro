@@ -111,3 +111,20 @@
 -keep class com.google.auto.** { *; }
 -dontwarn com.google.auto.**
 
+# Add rules for your specific platform.
+-dontwarn com.google.mediapipe.**
+-keep class com.google.mediapipe.** { *; }
+-keepclassmembers class com.google.mediapipe.** { *; }
+
+# Keep MediaPipe native methods
+-keepclasseswithmembernames class * {
+    native <methods>;
+}
+
+# Keep TensorFlow Lite classes
+-keep class org.tensorflow.lite.** { *; }
+-keepclassmembers class org.tensorflow.lite.** { *; }
+
+# Keep camera related classes
+-keep class androidx.camera.** { *; }
+

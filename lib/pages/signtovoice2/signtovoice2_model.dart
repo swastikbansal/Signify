@@ -6,6 +6,8 @@ import 'package:flutter/services.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart'
     show TutorialCoachMark;
 import 'package:camera/camera.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   ///  State fields for stateful widgets in this page.
@@ -55,16 +57,48 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
 
   String get errorMessage => _errorMessage;
 
+  // Camera information getters for skeleton overlay
+  bool get isFrontCamera {
+    return _cameraController?.description.lensDirection ==
+        CameraLensDirection.front;
+  }
+
+  double? get cameraAspectRatio {
+    return _cameraController?.value.aspectRatio;
+  }
+
   // Store coordinate data
   List<List<Map<String, dynamic>>> _handLandmarks = [];
   List<List<Map<String, dynamic>>> _poseLandmarks = [];
   String _lastUpdateTime = '';
 
+  // Enhanced coordinate storage for API
+  List<double>? _leftHandCoords;
+  List<double>? _rightHandCoords;
+  List<double>? _poseCoords;
+  List<String>? _handLabels; // To store hand labels (Left/Right)
+
+  // API related state
+  String _apiUrl =
+      'http://192.168.29.42:5000/predict'; // Replace with your actual API endpoint
+  bool _isApiEnabled = true;
+  int _lastApiCallTime = 0;
+  static const int _apiCallInterval =
+      100; // Minimum interval between API calls (ms)
+
+  // Skeleton overlay state
+  bool _isSkeletonOverlayEnabled = true;
+  bool _useCoordinateTransformation = true;
+
   List<List<Map<String, dynamic>>> get handLandmarks => _handLandmarks;
-
   List<List<Map<String, dynamic>>> get poseLandmarks => _poseLandmarks;
-
   String get lastUpdateTime => _lastUpdateTime;
+  List<double>? get leftHandCoords => _leftHandCoords;
+  List<double>? get rightHandCoords => _rightHandCoords;
+  List<double>? get poseCoords => _poseCoords;
+  List<String>? get handLabels => _handLabels;
+  bool get isSkeletonOverlayEnabled => _isSkeletonOverlayEnabled;
+  bool get useCoordinateTransformation => _useCoordinateTransformation;
 
   void resetState() {
     _errorMessage = '';
@@ -121,9 +155,17 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
                         call.arguments['timestamp'] ?? 0)
                     .toString();
 
-                // Print all hand landmarks to console
+                // Extract coordinates and send to API
+                _extractAndProcessCoordinates();
+
+                // Print all hand landmarks to console for debugging
                 _handLandmarks.asMap().forEach((handIndex, hand) {
-                  print('=== Hand $handIndex (${hand.length} landmarks) ===');
+                  String handLabel =
+                      _handLabels != null && handIndex < _handLabels!.length
+                          ? _handLabels![handIndex]
+                          : 'Unknown';
+                  print(
+                      '=== Hand $handIndex ($handLabel) - ${hand.length} landmarks ===');
                   hand.asMap().forEach((landmarkIndex, landmark) {
                     print(
                         'Landmark $landmarkIndex: x=${landmark['x']}, y=${landmark['y']}, z=${landmark['z']}');
@@ -141,6 +183,16 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
                 _notifyStateChange();
                 print(
                     'Received hand landmarks: ${_handLandmarks.length} hands detected');
+
+                // Log coordinate extraction results
+                if (_leftHandCoords != null) {
+                  print(
+                      'Left hand coordinates extracted: ${_leftHandCoords!.length} values');
+                }
+                if (_rightHandCoords != null) {
+                  print(
+                      'Right hand coordinates extracted: ${_rightHandCoords!.length} values');
+                }
               }
               break;
 
@@ -159,7 +211,10 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
                         call.arguments['timestamp'] ?? 0)
                     .toString();
 
-                // Print all pose landmarks to console
+                // Extract coordinates and send to API
+                _extractAndProcessCoordinates();
+
+                // Print all pose landmarks to console for debugging
                 _poseLandmarks.asMap().forEach((poseIndex, pose) {
                   print('=== Pose $poseIndex (${pose.length} landmarks) ===');
                   pose.asMap().forEach((landmarkIndex, landmark) {
@@ -171,6 +226,12 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
                 _notifyStateChange();
                 print(
                     'Received pose landmarks: ${_poseLandmarks.length} poses detected');
+
+                // Log pose coordinate extraction results
+                if (_poseCoords != null) {
+                  print(
+                      'Pose coordinates extracted: ${_poseCoords!.length} values');
+                }
               }
               break;
 
@@ -216,6 +277,242 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
       print('Error analyzing gesture: $e');
     }
     return "";
+  }
+
+  // Enhanced coordinate extraction method similar to Python implementation
+  void _extractAndProcessCoordinates() {
+    try {
+      // Reset coordinate data
+      _leftHandCoords = null;
+      _rightHandCoords = null;
+      _poseCoords = null;
+      _handLabels = null;
+
+      // Extract hand coordinates more efficiently
+      if (_handLandmarks.isNotEmpty) {
+        List<String> labels = [];
+
+        for (int i = 0; i < _handLandmarks.length; i++) {
+          List<Map<String, dynamic>> hand = _handLandmarks[i];
+
+          // Extract coordinates as flat list [x1, y1, z1, x2, y2, z2, ...]
+          List<double> coords = [];
+          for (var landmark in hand) {
+            coords.add((landmark['x'] as num).toDouble());
+            coords.add((landmark['y'] as num).toDouble());
+            coords.add((landmark['z'] as num).toDouble());
+          }
+
+          // Determine hand label based on position or use index-based labeling
+          // For better hand detection, we can use landmark positions to determine left/right
+          String handLabel = _determineHandLabel(hand, i);
+          labels.add(handLabel);
+
+          if (handLabel == "Left") {
+            _leftHandCoords = coords;
+          } else {
+            _rightHandCoords = coords;
+          }
+        }
+        _handLabels = labels;
+      }
+
+      // Extract pose coordinates
+      if (_poseLandmarks.isNotEmpty && _poseLandmarks[0].isNotEmpty) {
+        List<double> coords = [];
+        for (var landmark in _poseLandmarks[0]) {
+          coords.add((landmark['x'] as num).toDouble());
+          coords.add((landmark['y'] as num).toDouble());
+          coords.add((landmark['z'] as num).toDouble());
+        }
+        _poseCoords = coords;
+      }
+
+      // Send to API if enabled and coordinates are available
+      if (_isApiEnabled &&
+          (_leftHandCoords != null ||
+              _rightHandCoords != null ||
+              _poseCoords != null)) {
+        _sendCoordinatesToApi();
+      }
+    } catch (e) {
+      print('Error extracting coordinates: $e');
+    }
+  }
+
+  // Improved hand label determination
+  String _determineHandLabel(List<Map<String, dynamic>> hand, int handIndex) {
+    try {
+      // Use landmark positions to determine left/right hand
+      // Landmark 0 is wrist, landmark 9 is middle finger MCP
+      if (hand.length > 9) {
+        double wristX = (hand[0]['x'] as num).toDouble();
+        double middleFingerX = (hand[9]['x'] as num).toDouble();
+
+        // If middle finger is to the right of wrist, it's likely a right hand
+        // This is a simplified heuristic and may need adjustment based on camera orientation
+        if (middleFingerX > wristX) {
+          return "Right";
+        } else {
+          return "Left";
+        }
+      }
+    } catch (e) {
+      print('Error determining hand label: $e');
+    }
+
+    // Fallback to index-based labeling
+    return handIndex == 0 ? "Left" : "Right";
+  }
+
+  // Send coordinates to API
+  Future<void> _sendCoordinatesToApi() async {
+    try {
+      // Throttle API calls to prevent overwhelming the server
+      int currentTime = DateTime.now().millisecondsSinceEpoch;
+      if (currentTime - _lastApiCallTime < _apiCallInterval) {
+        return;
+      }
+      _lastApiCallTime = currentTime;
+
+      // Prepare API data
+      Map<String, dynamic> apiData = {
+        'timestamp': currentTime,
+        'left_hand': _leftHandCoords,
+        'right_hand': _rightHandCoords,
+        'pose': _poseCoords,
+      };
+
+      // Remove null values
+      apiData.removeWhere((key, value) => value == null);
+
+      // Only send if we have actual data
+      if (apiData.length > 1) {
+        // More than just timestamp
+        await _makeApiCall(apiData);
+      }
+    } catch (e) {
+      print('Error sending coordinates to API: $e');
+    }
+  }
+
+  // Make the actual API call
+  Future<void> _makeApiCall(Map<String, dynamic> data) async {
+    try {
+      final response = await http.post(
+        Uri.parse(_apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: json.encode(data),
+      );
+
+      if (response.statusCode == 200) {
+        print('API call successful: ${response.body}');
+        // Handle successful response if needed
+      } else {
+        print('API call failed with status: ${response.statusCode}');
+        print('Response: ${response.body}');
+      }
+    } catch (e) {
+      print('Error making API call: $e');
+      // Don't disable API on network errors, just log them
+    }
+  }
+
+  // Method to update API URL
+  void setApiUrl(String url) {
+    _apiUrl = url;
+  }
+
+  // Method to toggle API calls
+  void setApiEnabled(bool enabled) {
+    _isApiEnabled = enabled;
+  }
+
+  // Method to toggle skeleton overlay
+  void setSkeletonOverlayEnabled(bool enabled) {
+    _isSkeletonOverlayEnabled = enabled;
+    _notifyStateChange();
+  }
+
+  // Method to toggle coordinate transformation
+  void setUseCoordinateTransformation(bool enabled) {
+    _useCoordinateTransformation = enabled;
+    _notifyStateChange();
+  }
+
+  // Method to get API status
+  bool get isApiEnabled => _isApiEnabled;
+
+  // Method to get current API URL
+  String get apiUrl => _apiUrl;
+
+  // Method to reset API call timer (useful for immediate API calls)
+  void resetApiTimer() {
+    _lastApiCallTime = 0;
+  }
+
+  // Enhanced method for better hand detection configuration
+  Future<void> configureHandDetection({
+    double minDetectionConfidence = 0.7, // Increase for better detection
+    double minTrackingConfidence = 0.5,
+    int maxNumHands = 2,
+  }) async {
+    try {
+      await platform.invokeMethod('configureHandDetection', {
+        'minDetectionConfidence': minDetectionConfidence,
+        'minTrackingConfidence': minTrackingConfidence,
+        'maxNumHands': maxNumHands,
+      });
+      print('Hand detection configured with improved settings');
+    } catch (e) {
+      print('Error configuring hand detection: $e');
+    }
+  }
+
+  // Method to force coordinate extraction (useful for testing)
+  void forceCoordinateExtraction() {
+    _extractAndProcessCoordinates();
+  }
+
+  // Method to get coordinate extraction status
+  Map<String, dynamic> getCoordinateStatus() {
+    return {
+      'hasLeftHand': _leftHandCoords != null,
+      'hasRightHand': _rightHandCoords != null,
+      'hasPose': _poseCoords != null,
+      'leftHandPoints': _leftHandCoords?.length ?? 0,
+      'rightHandPoints': _rightHandCoords?.length ?? 0,
+      'posePoints': _poseCoords?.length ?? 0,
+      'handLabels': _handLabels,
+      'lastUpdate': _lastUpdateTime,
+    };
+  }
+
+  // Debug method to print coordinate alignment information
+  void debugCoordinateAlignment() {
+    print('=== Coordinate Alignment Debug ===');
+    print('Camera Type: ${isFrontCamera ? "Front" : "Back"}');
+    print(
+        'Camera Aspect Ratio: ${cameraAspectRatio?.toStringAsFixed(3) ?? "Unknown"}');
+    print('Use Coordinate Transformation: $_useCoordinateTransformation');
+    print('Skeleton Overlay Enabled: $_isSkeletonOverlayEnabled');
+
+    if (_handLandmarks.isNotEmpty) {
+      final firstHand = _handLandmarks[0];
+      if (firstHand.isNotEmpty) {
+        final wrist = firstHand[0];
+        print(
+            'Sample Wrist Coordinate: x=${wrist['x']}, y=${wrist['y']}, z=${wrist['z']}');
+      }
+    }
+
+    if (_cameraController != null) {
+      print('Camera Resolution: ${_cameraController!.value.previewSize}');
+      print('Camera Description: ${_cameraController!.description}');
+    }
+    print('================================');
   }
 
   Future<void> _initializeCamera() async {
@@ -320,6 +617,12 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
         _lastUpdateTime = '';
         _errorMessage = '';
 
+        // Clear coordinate data
+        _leftHandCoords = null;
+        _rightHandCoords = null;
+        _poseCoords = null;
+        _handLabels = null;
+
         // Dispose camera
         await _disposeCamera();
 
@@ -336,6 +639,14 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
               _notifyStateChange();
               return;
             }
+
+            // Configure hand detection for better second hand recognition
+            await configureHandDetection(
+              minDetectionConfidence:
+                  0.6, // Lower threshold for better detection
+              minTrackingConfidence: 0.4,
+              maxNumHands: 2,
+            );
           } catch (e) {
             _errorMessage = 'Initialization error: $e';
             _isInitialized = false;
@@ -374,6 +685,12 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
       _handLandmarks.clear();
       _poseLandmarks.clear();
       _lastUpdateTime = '';
+
+      // Clear coordinate data
+      _leftHandCoords = null;
+      _rightHandCoords = null;
+      _poseCoords = null;
+      _handLabels = null;
       await _disposeCamera();
       _notifyStateChange();
     }

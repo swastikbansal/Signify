@@ -7,6 +7,7 @@ import '/flutter_flow/form_field_controller.dart';
 import '/walkthroughs/signify_screen_2.dart';
 import 'signtovoice2_model.dart';
 export 'signtovoice2_model.dart';
+import 'skeleton_overlay.dart'; // Import our skeleton overlay
 import 'package:aligned_tooltip/aligned_tooltip.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart'
     show TutorialCoachMark;
@@ -437,6 +438,64 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                             _model.signifyScreen2Controller,
                           ),
                         ),
+                        // Skeleton overlay toggle button
+                        AlignedTooltip(
+                          content: Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text(
+                              'Toggle skeleton overlay visualization',
+                              style: FlutterFlowTheme.of(context)
+                                  .labelMedium
+                                  .override(
+                                    fontFamily: FlutterFlowTheme.of(context)
+                                        .labelMediumFamily,
+                                    letterSpacing: 0.0,
+                                    useGoogleFonts: GoogleFonts.asMap()
+                                        .containsKey(
+                                            FlutterFlowTheme.of(context)
+                                                .labelMediumFamily),
+                                  ),
+                            ),
+                          ),
+                          offset: 4.0,
+                          preferredDirection: AxisDirection.up,
+                          borderRadius: BorderRadius.circular(12.0),
+                          backgroundColor:
+                              FlutterFlowTheme.of(context).alternate,
+                          elevation: 4.0,
+                          tailBaseWidth: 24.0,
+                          tailLength: 24.0,
+                          waitDuration: Duration(milliseconds: 10),
+                          showDuration: Duration(milliseconds: 2000),
+                          triggerMode: TooltipTriggerMode.longPress,
+                          child: FlutterFlowIconButton(
+                            borderRadius: 50.0,
+                            buttonSize: 50.0,
+                            fillColor: _model.isSkeletonOverlayEnabled
+                                ? FlutterFlowTheme.of(context).primary
+                                : FlutterFlowTheme.of(context)
+                                    .secondaryBackground,
+                            hoverColor:
+                                FlutterFlowTheme.of(context).primaryBackground,
+                            hoverIconColor:
+                                FlutterFlowTheme.of(context).primary,
+                            icon: Icon(
+                              _model.isSkeletonOverlayEnabled
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                              color: _model.isSkeletonOverlayEnabled
+                                  ? FlutterFlowTheme.of(context)
+                                      .primaryBackground
+                                  : FlutterFlowTheme.of(context).primaryText,
+                              size: 24.0,
+                            ),
+                            onPressed: () {
+                              _model.setSkeletonOverlayEnabled(
+                                  !_model.isSkeletonOverlayEnabled);
+                              safeSetState(() {});
+                            },
+                          ),
+                        ),
                       ],
                     ),
                     Expanded(
@@ -647,6 +706,29 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                             height: double.infinity,
                             child: CameraPreview(_model.cameraController!),
                           ),
+                          // MediaPipe Skeleton Overlay
+                          if (_model.isDetecting &&
+                              _model.isSkeletonOverlayEnabled &&
+                              (_model.handLandmarks.isNotEmpty ||
+                                  _model.poseLandmarks.isNotEmpty))
+                            Positioned.fill(
+                              child: SkeletonOverlay(
+                                handLandmarks: _model.handLandmarks,
+                                poseLandmarks: _model.poseLandmarks,
+                                handLabels: _model.handLabels,
+                                cameraAspectRatio: _model.cameraAspectRatio,
+                                isFrontCamera: _model.isFrontCamera,
+                                useCoordinateTransformation:
+                                    _model.useCoordinateTransformation,
+                                onDebugTap: () {
+                                  _model.debugCoordinateAlignment();
+                                  _model.setUseCoordinateTransformation(
+                                      !_model.useCoordinateTransformation);
+                                  print(
+                                      'Coordinate transformation toggled: ${_model.useCoordinateTransformation}');
+                                },
+                              ),
+                            ),
                           // MediaPipe landmarks overlay (minimal)
                           if (_model.isDetecting)
                             Positioned(
@@ -681,7 +763,9 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
-                                  'Printing to Console',
+                                  _model.isSkeletonOverlayEnabled
+                                      ? 'Skeleton Overlay Active'
+                                      : 'Tracking Active',
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 8,
