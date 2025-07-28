@@ -54,7 +54,9 @@ const debugRouteLinkMap = {
   '/authPage':
       'https://app.flutterflow.io/project/signify-hq88od?tab=uiBuilder&page=authPage',
   '/tutorialPage':
-      'https://app.flutterflow.io/project/signify-hq88od?tab=uiBuilder&page=tutorialPage'
+      'https://app.flutterflow.io/project/signify-hq88od?tab=uiBuilder&page=tutorialPage',
+  '/customSigns':
+      'https://app.flutterflow.io/project/signify-hq88od?tab=uiBuilder&page=customSigns'
 };
 
 class AppStateNotifier extends ChangeNotifier {
@@ -222,6 +224,11 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           name: 'tutorialPage',
           path: '/tutorialPage',
           builder: (context, params) => TutorialPageWidget(),
+        ),
+        FFRoute(
+          name: 'customSigns',
+          path: '/customSigns',
+          builder: (context, params) => CustomSignsPage(),
         )
       ].map((r) => r.toRoute(appStateNotifier)).toList(),
       observers: [routeObserver],

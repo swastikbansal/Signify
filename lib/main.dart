@@ -279,7 +279,7 @@ class _NavBarPageState extends State<NavBarPage> {
     final tabs = {
       'voicetosign1': Voicetosign1Widget(),
       'signtovoice2': Signtovoice2Widget(),
-      'education3': Education3Widget(),
+      'islDict': IslDictWidget(),
       'account4': Account4Widget(),
     };
     final currentIndex = tabs.keys.toList().indexOf(_currentPageName);
@@ -329,16 +329,14 @@ class _NavBarPageState extends State<NavBarPage> {
           ),
           BottomNavigationBarItem(
             icon: Icon(
-              Icons.menu_book_rounded,
+              Icons.book_outlined,
               size: 30.0,
             ),
-            activeIcon: FaIcon(
-              FontAwesomeIcons.bookReader,
+            activeIcon: Icon(
+              Icons.book,
               size: 30.0,
             ),
-            label: FFLocalizations.of(context).getText(
-              'rdorkg51' /* Education */,
-            ),
+            label: 'Dictionary',
             tooltip: '',
           ),
           BottomNavigationBarItem(
