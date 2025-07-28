@@ -76,29 +76,29 @@ class _CustomSignsPageState extends State<CustomSignsPage> {
             GestureDetector(
               onTap: () async {
                 if (_model.isUploading) return; // Prevent multiple uploads
-                
+
                 // Step 1: Select file from local storage
                 await _model.selectFile();
-                
+
                 if (_model.selectedFile != null) {
                   // Step 2: Show rename dialog
                   final shouldProceed = await _showRenameDialog();
-                  
+
                   if (shouldProceed) {
                     // Step 3: Upload the selected file
                     safeSetState(() {}); // Update UI to show loading state
-                    
+
                     final success = await _model.uploadFile();
-                    
+
                     if (mounted) {
                       safeSetState(() {}); // Update UI after upload
-                      
+
                       // Step 4: Show result to user
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text(success 
-                            ? 'File uploaded successfully!' 
-                            : 'File upload failed. Please try again.'),
+                          content: Text(success
+                              ? 'File uploaded successfully!'
+                              : 'File upload failed. Please try again.'),
                           backgroundColor: success ? Colors.green : Colors.red,
                           duration: const Duration(seconds: 3),
                           action: success ? SnackBarAction(
@@ -130,9 +130,9 @@ class _CustomSignsPageState extends State<CustomSignsPage> {
                   borderRadius: BorderRadius.circular(12),
                   color: FlutterFlowTheme.of(context).secondaryBackground,
                   border: Border.all(
-                    color: _model.isUploading 
-                      ? FlutterFlowTheme.of(context).primary
-                      : FlutterFlowTheme.of(context).alternate,
+                    color: _model.isUploading
+                        ? FlutterFlowTheme.of(context).primary
+                        : FlutterFlowTheme.of(context).alternate,
                     width: _model.isUploading ? 2.0 : 1.0,
                   ),
                 ),
@@ -140,24 +140,24 @@ class _CustomSignsPageState extends State<CustomSignsPage> {
                   children: [
                     // Show loading animation or upload icon
                     _model.isUploading
-                      ? SizedBox(
-                          width: 40,
-                          height: 40,
-                          child: CircularProgressIndicator(
-                            color: FlutterFlowTheme.of(context).primary,
-                            strokeWidth: 3.0,
-                          ),
-                        )
-                      : Icon(
-                          Icons.upload_rounded,
-                          color: FlutterFlowTheme.of(context).primary,
-                          size: 40,
-                        ),
+                        ? SizedBox(
+                      width: 40,
+                      height: 40,
+                      child: CircularProgressIndicator(
+                        color: FlutterFlowTheme.of(context).primary,
+                        strokeWidth: 3.0,
+                      ),
+                    )
+                        : Icon(
+                      Icons.upload_rounded,
+                      color: FlutterFlowTheme.of(context).primary,
+                      size: 40,
+                    ),
                     const SizedBox(height: 8),
                     Text(
-                      _model.isUploading 
-                        ? "Uploading..." 
-                        : "Upload Custom Signs",
+                      _model.isUploading
+                          ? "Uploading..."
+                          : "Upload Custom Signs",
                       style: TextStyle(
                         color: FlutterFlowTheme.of(context).primary,
                         fontSize: 16,
@@ -167,8 +167,8 @@ class _CustomSignsPageState extends State<CustomSignsPage> {
                     const SizedBox(height: 4),
                     Text(
                       _model.isUploading
-                        ? "Please wait while your file is being processed"
-                        : "Supported formats: .jpg, .jpeg",
+                          ? "Please wait while your file is being processed"
+                          : "Supported formats: .jpg, .jpeg",
                       style: TextStyle(
                         color: FlutterFlowTheme.of(context).secondaryText,
                         fontSize: 12,
@@ -196,9 +196,9 @@ class _CustomSignsPageState extends State<CustomSignsPage> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Icon(
-                            file['status'] == 'processing' 
-                              ? Icons.hourglass_empty 
-                              : Icons.image,
+                            file['status'] == 'processing'
+                                ? Icons.hourglass_empty
+                                : Icons.image,
                             color: _model.getStatusColor(file['status'], context),
                             size: 20,
                           ),
@@ -290,7 +290,7 @@ class _CustomSignsPageState extends State<CustomSignsPage> {
     final TextEditingController nameController = TextEditingController();
     final originalName = _model.selectedFile?.files.single.name ?? '';
     final nameWithoutExtension = originalName.split('.').first;
-    
+
     nameController.text = nameWithoutExtension;
 
     return await showDialog<bool>(

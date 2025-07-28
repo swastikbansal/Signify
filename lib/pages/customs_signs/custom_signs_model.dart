@@ -12,7 +12,7 @@ class CustomSignsModel extends FlutterFlowModel<CustomSignsPage> {
   FilePickerResult? selectedFile;
   bool isUploading = false;
   String? customFileName; // Store custom file name
-  
+
   // List of uploaded files (you can replace this with actual backend data)
   List<Map<String, dynamic>> uploadedFiles = [
     {
@@ -52,7 +52,7 @@ class CustomSignsModel extends FlutterFlowModel<CustomSignsPage> {
         allowMultiple: false,
         allowCompression: true,
       );
-      
+
       if (result != null && result.files.isNotEmpty) {
         selectedFile = result;
         customFileName = null; // Reset custom name
@@ -74,17 +74,17 @@ class CustomSignsModel extends FlutterFlowModel<CustomSignsPage> {
   /// Get the final file name (custom or original)
   String getFinalFileName() {
     if (selectedFile == null) return '';
-    
+
     if (customFileName != null && customFileName!.isNotEmpty) {
       // Add extension if not present
       final extension = selectedFile!.files.single.extension ?? 'jpg';
-      if (!customFileName!.toLowerCase().endsWith('.jpg') && 
+      if (!customFileName!.toLowerCase().endsWith('.jpg') &&
           !customFileName!.toLowerCase().endsWith('.jpeg')) {
         return '$customFileName.$extension';
       }
       return customFileName!;
     }
-    
+
     return selectedFile!.files.single.name;
   }
 
@@ -145,19 +145,19 @@ class CustomSignsModel extends FlutterFlowModel<CustomSignsPage> {
 
   @override
   WidgetClassDebugData toWidgetClassDebugData() => WidgetClassDebugData(
-        generatorVariables: debugGeneratorVariables,
-        backendQueries: debugBackendQueries,
-        componentStates: {
-          ...widgetBuilderComponents.map(
+    generatorVariables: debugGeneratorVariables,
+    backendQueries: debugBackendQueries,
+    componentStates: {
+      ...widgetBuilderComponents.map(
             (key, value) => MapEntry(
-              key,
-              value.toWidgetClassDebugData(),
-            ),
-          ),
-        }.withoutNulls,
-        link:
-            'https://app.flutterflow.io/project/signify-hq88od/tab=uiBuilder&page=customSigns',
-        searchReference: 'reference=OghjdXN0b21TaWducw==',
-        widgetClassName: 'customSigns',
-      );
+          key,
+          value.toWidgetClassDebugData(),
+        ),
+      ),
+    }.withoutNulls,
+    link:
+    'https://app.flutterflow.io/project/signify-hq88od/tab=uiBuilder&page=customSigns',
+    searchReference: 'reference=OghjdXN0b21TaWducw==',
+    widgetClassName: 'customSigns',
+  );
 }
