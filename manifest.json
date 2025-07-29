@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Signify - ISL Translator",
-  "version": "1.0.1",
-  "description": "Indian Sign Language translator for YouTube videos with 3D animated avatar",
+  "version": "1.0.2",
+  "description": "Indian Sign Language translator for YouTube videos with 3D animated avatar powered by Supabase",
   "permissions": [
     "activeTab",
     "storage",
@@ -12,7 +12,9 @@
   "host_permissions": [
     "*://www.youtube.com/*",
     "*://youtube.com/*",
-    "*://uqryplglrhgpoqvczezt.supabase.co/*" 
+    "*://qqyqwtoxjhgashwxyidg.supabase.co/*",
+    "*://cdn.jsdelivr.net/*",
+    "*://*.supabase.co/*"
   ],
   "background": {
     "service_worker": "background.js"
@@ -22,7 +24,8 @@
       "matches": ["*://www.youtube.com/*", "*://youtube.com/*"],
       "js": ["content.js"],
       "css": ["styles.css"],
-      "run_at": "document_end"
+      "run_at": "document_end",
+      "all_frames": false
     }
   ],
   "web_accessible_resources": [
@@ -33,9 +36,10 @@
         "three.min.js",
         "GLTFLoader.js",
         "OrbitControls.js",
-        "models/*.glb",
-        "animation/*.glb",
-        "assets/*"
+        "supabase.js",
+        "simple-test.js",
+        "fallback-avatar.js",
+        "animation/*.glb"
       ],
       "matches": ["*://www.youtube.com/*", "*://youtube.com/*"]
     }
@@ -53,5 +57,8 @@
     "16": "icons/signify-logo_16.png",
     "48": "icons/signify-logo_48.png",
     "128": "icons/signify-logo_128.png"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
   }
 }
