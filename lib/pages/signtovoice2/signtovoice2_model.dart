@@ -8,6 +8,8 @@ import 'package:tutorial_coach_mark/tutorial_coach_mark.dart'
 import 'package:camera/camera.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:flutter_tts/flutter_tts.dart';
+import 'package:translator/translator.dart';
 
 class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   ///  State fields for stateful widgets in this page.
@@ -99,7 +101,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
 
   // API related state
   String _apiUrl =
-      'http://192.168.29.42:5000/predict'; // Replace with your actual API endpoint
+      'http://192.168.137.235:5000/predict'; // Replace with your actual API endpoint
   bool _isApiEnabled = true;
   int _lastApiCallTime = 0;
   static const int _apiCallInterval =
@@ -108,6 +110,57 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   // Skeleton overlay state
   bool _isSkeletonOverlayEnabled = true;
   bool _useCoordinateTransformation = true;
+
+  // Text-to-Speech state
+  FlutterTts? _flutterTts;
+  bool _isTtsInitialized = false;
+  bool _isSpeaking = false;
+  String _selectedLanguage = 'en-US'; // Default language
+  double _speechRate = 0.5;
+  double _speechVolume = 0.8;
+  double _speechPitch = 1.0;
+  bool _autoSpeakEnabled = false; // Auto-speak new words when added
+
+  // Translation state
+  final GoogleTranslator _translator = GoogleTranslator();
+  bool _translationEnabled = true; // Enable translation by default
+  bool _isTranslating = false;
+
+  // Available languages for TTS
+  final Map<String, String> _availableLanguages = {
+    'en-US': 'English (US)',
+    'en-GB': 'English (UK)',
+    'hi-IN': 'Hindi',
+    'bn-IN': 'Bengali',
+    'mr-IN': 'Marathi',
+    'te-IN': 'Telugu',
+    'gu-IN': 'Gujarati',
+    'pa-IN': 'Punjabi',
+    'kn-IN': 'Kannada',
+    'ta-IN': 'Tamil',
+    'ml-IN': 'Malayalam',
+    'or-IN': 'Odia',
+    'as-IN': 'Assamese',
+    'ur-IN': 'Urdu',
+  };
+
+  // Mapping from TTS language codes to Google Translate language codes
+  final Map<String, String> _languageCodeMapping = {
+    'en-US': 'en',
+    'en-GB': 'en',
+    'hi-IN': 'hi',
+    'bn-IN': 'bn',
+    'mr-IN': 'mr',
+    'te-IN': 'te',
+    'gu-IN': 'gu',
+    'pa-IN': 'pa',
+    'kn-IN': 'kn',
+    'ta-IN': 'ta',
+    'ml-IN': 'ml',
+    'or-IN': 'or',
+    'as-IN': 'as',
+    'ur-IN': 'ur',
+  };
 
   List<List<Map<String, dynamic>>> get handLandmarks => _handLandmarks;
 
@@ -127,6 +180,20 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
 
   bool get useCoordinateTransformation => _useCoordinateTransformation;
 
+  // TTS getters
+  bool get isTtsInitialized => _isTtsInitialized;
+  bool get isSpeaking => _isSpeaking;
+  String get selectedLanguage => _selectedLanguage;
+  Map<String, String> get availableLanguages => Map.from(_availableLanguages);
+  double get speechRate => _speechRate;
+  double get speechVolume => _speechVolume;
+  double get speechPitch => _speechPitch;
+  bool get autoSpeakEnabled => _autoSpeakEnabled;
+
+  // Translation getters
+  bool get translationEnabled => _translationEnabled;
+  bool get isTranslating => _isTranslating;
+
   void resetState() {
     _errorMessage = '';
     _isInitialized = false;
@@ -135,8 +202,252 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
     _notifyStateChange();
   }
 
+  // Text-to-Speech functionality
+  Future<void> initializeTts() async {
+    try {
+      _flutterTts = FlutterTts();
+
+      // Set up TTS handlers
+      _flutterTts!.setStartHandler(() {
+        _isSpeaking = true;
+        _notifyStateChange();
+        print("TTS: Speech started");
+      });
+
+      _flutterTts!.setCompletionHandler(() {
+        _isSpeaking = false;
+        _notifyStateChange();
+        print("TTS: Speech completed");
+      });
+
+      _flutterTts!.setErrorHandler((msg) {
+        _isSpeaking = false;
+        _notifyStateChange();
+        print("TTS Error: $msg");
+      });
+
+      _flutterTts!.setCancelHandler(() {
+        _isSpeaking = false;
+        _notifyStateChange();
+        print("TTS: Speech cancelled");
+      });
+
+      // Set default TTS settings
+      await _flutterTts!.setSpeechRate(_speechRate);
+      await _flutterTts!.setVolume(_speechVolume);
+      await _flutterTts!.setPitch(_speechPitch);
+      await _flutterTts!.setLanguage(_selectedLanguage);
+
+      _isTtsInitialized = true;
+      print("TTS initialized successfully with language: $_selectedLanguage");
+    } catch (e) {
+      print("Error initializing TTS: $e");
+      _isTtsInitialized = false;
+    }
+  }
+
+  Future<void> speakText(String text) async {
+    if (!_isTtsInitialized) {
+      await initializeTts();
+    }
+
+    if (text.trim().isEmpty) {
+      print("No text to speak");
+      return;
+    }
+
+    try {
+      // Stop any ongoing speech
+      await stopSpeaking();
+
+      // Set the language before speaking
+      await _flutterTts!.setLanguage(_selectedLanguage);
+
+      print("Speaking text: '$text' in language: $_selectedLanguage");
+      await _flutterTts!.speak(text);
+    } catch (e) {
+      print("Error speaking text: $e");
+      _isSpeaking = false;
+      _notifyStateChange();
+    }
+  }
+
+  Future<void> stopSpeaking() async {
+    if (_flutterTts != null && _isSpeaking) {
+      try {
+        await _flutterTts!.stop();
+        _isSpeaking = false;
+        _notifyStateChange();
+        print("TTS: Speech stopped");
+      } catch (e) {
+        print("Error stopping TTS: $e");
+      }
+    }
+  }
+
+  Future<void> setTtsLanguage(String languageCode) async {
+    _selectedLanguage = languageCode;
+
+    if (_flutterTts != null) {
+      try {
+        await _flutterTts!.setLanguage(_selectedLanguage);
+        print("TTS language changed to: $_selectedLanguage");
+        _notifyStateChange();
+
+        // Retranslate current sentence when language changes
+        if (_translationEnabled && _currentSentence.isNotEmpty) {
+          await translateCurrentSentence();
+        }
+      } catch (e) {
+        print("Error setting TTS language: $e");
+      }
+    }
+  }
+
+  Future<void> setSpeechRate(double rate) async {
+    _speechRate = rate.clamp(0.0, 1.0);
+
+    if (_flutterTts != null) {
+      try {
+        await _flutterTts!.setSpeechRate(_speechRate);
+        print("TTS speech rate changed to: $_speechRate");
+      } catch (e) {
+        print("Error setting speech rate: $e");
+      }
+    }
+  }
+
+  Future<void> setSpeechVolume(double volume) async {
+    _speechVolume = volume.clamp(0.0, 1.0);
+
+    if (_flutterTts != null) {
+      try {
+        await _flutterTts!.setVolume(_speechVolume);
+        print("TTS volume changed to: $_speechVolume");
+      } catch (e) {
+        print("Error setting speech volume: $e");
+      }
+    }
+  }
+
+  Future<void> setSpeechPitch(double pitch) async {
+    _speechPitch = pitch.clamp(0.5, 2.0);
+
+    if (_flutterTts != null) {
+      try {
+        await _flutterTts!.setPitch(_speechPitch);
+        print("TTS pitch changed to: $_speechPitch");
+      } catch (e) {
+        print("Error setting speech pitch: $e");
+      }
+    }
+  }
+
+  // Method to speak current sentence
+  Future<void> speakCurrentSentence() async {
+    final text = textController?.text ?? '';
+    if (text.isNotEmpty) {
+      await speakText(text);
+    } else {
+      print("No text in the text field to speak");
+    }
+  }
+
+  // Toggle TTS on/off
+  Future<void> toggleTts() async {
+    if (_isSpeaking) {
+      await stopSpeaking();
+    } else {
+      await speakCurrentSentence();
+    }
+  }
+
+  // Toggle auto-speak mode
+  void toggleAutoSpeak() {
+    _autoSpeakEnabled = !_autoSpeakEnabled;
+    print("Auto-speak ${_autoSpeakEnabled ? 'enabled' : 'disabled'}");
+    _notifyStateChange();
+  }
+
+  // Set auto-speak mode
+  void setAutoSpeak(bool enabled) {
+    _autoSpeakEnabled = enabled;
+    print("Auto-speak ${_autoSpeakEnabled ? 'enabled' : 'disabled'}");
+    _notifyStateChange();
+  }
+
+  // Translation functionality
+  Future<String> translateText(String text, String targetLanguage) async {
+    if (!_translationEnabled || text.trim().isEmpty) {
+      return text;
+    }
+
+    // If already in the target language (English), no need to translate
+    if (targetLanguage == 'en' || targetLanguage == 'en-US') {
+      return text;
+    }
+
+    try {
+      _isTranslating = true;
+      _notifyStateChange();
+
+      // Get the Google Translate language code
+      String translateLangCode =
+          _languageCodeMapping[targetLanguage] ?? targetLanguage;
+      if (translateLangCode.contains('-')) {
+        translateLangCode =
+            translateLangCode.split('-')[0]; // Extract base language code
+      }
+
+      print("Translating '$text' to language: $translateLangCode");
+
+      var translation =
+          await _translator.translate(text, from: 'en', to: translateLangCode);
+
+      String translatedText = translation.text;
+      print("Translation result: '$translatedText'");
+
+      _isTranslating = false;
+      _notifyStateChange();
+
+      return translatedText;
+    } catch (e) {
+      print("Translation error: $e");
+      _isTranslating = false;
+      _notifyStateChange();
+      return text; // Return original text on error
+    }
+  }
+
+  // Method to enable/disable translation
+  void setTranslationEnabled(bool enabled) {
+    _translationEnabled = enabled;
+    print("Translation ${_translationEnabled ? 'enabled' : 'disabled'}");
+    _notifyStateChange();
+  }
+
+  // Method to translate and update current sentence
+  Future<void> translateCurrentSentence() async {
+    if (!_translationEnabled || _currentSentence.isEmpty) {
+      return;
+    }
+
+    try {
+      String currentText = _currentSentence.join(' ');
+      String translatedText =
+          await translateText(currentText, _selectedLanguage);
+
+      if (translatedText != currentText && textController != null) {
+        textController!.text = translatedText;
+        print("Updated text field with translated text: '$translatedText'");
+      }
+    } catch (e) {
+      print("Error translating current sentence: $e");
+    }
+  }
+
   // Sentence management methods
-  void _addWordToSentence(String word) {
+  void _addWordToSentence(String word) async {
     if (word.trim().isEmpty) return;
 
     String cleanWord = word.trim().toLowerCase();
@@ -152,12 +463,33 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
     _lastPrediction = cleanWord;
     _lastPredictionTime = currentTime;
 
-    // Update text field with current sentence
-    if (textController != null) {
-      textController!.text = _currentSentence.join(' ');
+    print('Added word to sentence: "$word" -> "${_currentSentence.join(' ')}"');
+
+    // Translate the complete sentence to the selected language
+    String currentSentenceText = _currentSentence.join(' ');
+    String translatedText = currentSentenceText;
+
+    if (_translationEnabled &&
+        _selectedLanguage != 'en-US' &&
+        _selectedLanguage != 'en-GB') {
+      try {
+        translatedText =
+            await translateText(currentSentenceText, _selectedLanguage);
+      } catch (e) {
+        print('Translation error: $e');
+        translatedText = currentSentenceText; // Fall back to original text
+      }
     }
 
-    print('Added word to sentence: "$word" -> "${_currentSentence.join(' ')}"');
+    // Update text field with translated sentence
+    if (textController != null) {
+      textController!.text = translatedText;
+    }
+
+    // Auto-speak the translated text if enabled
+    if (_autoSpeakEnabled && _isTtsInitialized) {
+      speakText(translatedText);
+    }
   }
 
   void clearSentence() {
@@ -169,11 +501,29 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
     _notifyStateChange();
   }
 
-  void removeLastWord() {
+  void removeLastWord() async {
     if (_currentSentence.isNotEmpty) {
       String removedWord = _currentSentence.removeLast();
+
+      // Retranslate the remaining sentence
+      String currentSentenceText = _currentSentence.join(' ');
+      String translatedText = currentSentenceText;
+
+      if (_translationEnabled &&
+          _selectedLanguage != 'en-US' &&
+          _selectedLanguage != 'en-GB' &&
+          currentSentenceText.isNotEmpty) {
+        try {
+          translatedText =
+              await translateText(currentSentenceText, _selectedLanguage);
+        } catch (e) {
+          print('Translation error: $e');
+          translatedText = currentSentenceText; // Fall back to original text
+        }
+      }
+
       if (textController != null) {
-        textController!.text = _currentSentence.join(' ');
+        textController!.text = translatedText;
       }
       print('Removed word: "$removedWord" -> "${_currentSentence.join(' ')}"');
       _notifyStateChange();
@@ -205,6 +555,9 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   void initState(BuildContext context) {
     debugLogWidgetClass(this);
     _setupMethodChannelListener();
+
+    // Initialize TTS
+    initializeTts();
   }
 
   void _setupMethodChannelListener() {
@@ -839,6 +1192,12 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
         platform.invokeMethod('stopDetection').catchError((e) {
           print('Error stopping detection during dispose: $e');
         });
+      }
+
+      // Stop and dispose TTS
+      if (_flutterTts != null) {
+        _flutterTts!.stop();
+        _flutterTts = null;
       }
 
       // Dispose camera

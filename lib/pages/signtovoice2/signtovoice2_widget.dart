@@ -240,7 +240,7 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
             // Floating control panel positioned above bottom nav - Claude AI style
             Positioned(
               bottom:
-                  12.0, // Position just above bottom nav bar (optimal spacing)
+                  16.0, // Position just above bottom nav bar (optimal spacing)
               left: 8.0,
               right: 8.0,
               child: Container(
@@ -305,14 +305,18 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                             textCapitalization: TextCapitalization.sentences,
                             obscureText: false,
                             decoration: InputDecoration(
-                              hintText: 'Translated Text Appear Here',
+                              hintText: _model.isTranslating
+                                  ? 'Translating...'
+                                  : 'Translated Text Appear Here',
                               hintStyle: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .override(
                                     fontFamily: FlutterFlowTheme.of(context)
                                         .bodyMediumFamily,
-                                    color: FlutterFlowTheme.of(context)
-                                        .secondaryText,
+                                    color: _model.isTranslating
+                                        ? const Color(0xFFFAB317)
+                                        : FlutterFlowTheme.of(context)
+                                            .secondaryText,
                                     fontSize: 16.0,
                                     letterSpacing: 0.0,
                                     useGoogleFonts: GoogleFonts.asMap()
@@ -360,34 +364,30 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                               Container(
                                 margin: const EdgeInsets.only(right: 12.0),
                                 child: ModernDropDown(
-                                  value: _model.dropDownValue ?? 'English',
-                                  options: [
-                                    FFLocalizations.of(context)
-                                        .getText('rpno13ax' /* English */),
-                                    FFLocalizations.of(context)
-                                        .getText('poexbjj4' /* Hindi */),
-                                    FFLocalizations.of(context)
-                                        .getText('qtkvhy1f' /* Bengali */),
-                                    FFLocalizations.of(context)
-                                        .getText('u9ln63gu' /* Marathi */),
-                                    FFLocalizations.of(context)
-                                        .getText('b33de32b' /* Telugu */),
-                                    FFLocalizations.of(context)
-                                        .getText('fpa9yid6' /* Tamil */),
-                                    FFLocalizations.of(context)
-                                        .getText('hann7xcl' /* Gujarati */),
-                                    FFLocalizations.of(context)
-                                        .getText('qshr5rcb' /* Punjabi */),
-                                    FFLocalizations.of(context)
-                                        .getText('zw3yahpp' /* Urdu */),
-                                    FFLocalizations.of(context)
-                                        .getText('f1lmzpqr' /* Kannada */),
-                                    FFLocalizations.of(context)
-                                        .getText('o714o7gt' /* Malayalam */),
-                                  ],
-                                  onChanged: (val) => safeSetState(
-                                      () => _model.dropDownValue = val),
-                                  width: 90.0,
+                                  value: _model.availableLanguages[
+                                          _model.selectedLanguage] ??
+                                      'English (US)',
+                                  options:
+                                      _model.availableLanguages.values.toList(),
+                                  onChanged: (val) async {
+                                    // Find the language code for the selected language name
+                                    String? selectedCode;
+                                    _model.availableLanguages
+                                        .forEach((code, name) {
+                                      if (name == val) {
+                                        selectedCode = code;
+                                      }
+                                    });
+
+                                    if (selectedCode != null) {
+                                      await _model
+                                          .setTtsLanguage(selectedCode!);
+                                      safeSetState(() {});
+                                      print(
+                                          'TTS Language changed to: $selectedCode ($val)');
+                                    }
+                                  },
+                                  width: 110.0,
                                   height: 36.0,
                                 ).addWalkthrough(
                                   dropDownB9wm9jo8,
@@ -395,28 +395,25 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                                 ),
                               ),
 
-                              // Speaker toggle button with state
+                              // Speaker toggle button with TTS state
                               Container(
                                 margin: const EdgeInsets.only(right: 8.0),
                                 child: Material(
                                   color: Colors.transparent,
                                   child: InkWell(
                                     borderRadius: BorderRadius.circular(8.0),
-                                    onTap: () {
-                                      setState(() {
-                                        isSpeakerOn = !isSpeakerOn;
-                                      });
-                                      print(
-                                          'Speaker toggle: ${isSpeakerOn ? "ON" : "OFF"}');
+                                    onTap: () async {
+                                      await _model.toggleTts();
+                                      safeSetState(() {});
                                     },
                                     child: Container(
                                       width: 42.0,
                                       height: 42.0,
                                       child: Icon(
-                                        isSpeakerOn
+                                        _model.isSpeaking
                                             ? Icons.volume_up_rounded
                                             : Icons.volume_off_rounded,
-                                        color: isSpeakerOn
+                                        color: _model.isSpeaking
                                             ? const Color(0xFFFAB317)
                                             : FlutterFlowTheme.of(context)
                                                 .secondaryText,
