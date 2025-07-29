@@ -101,7 +101,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
 
   // API related state
   String _apiUrl =
-      'http://192.168.137.235:5000/predict'; // Replace with your actual API endpoint
+      'http://192.168.29.168:5000/predict'; // Replace with your actual API endpoint
   bool _isApiEnabled = true;
   int _lastApiCallTime = 0;
   static const int _apiCallInterval =
@@ -120,6 +120,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   double _speechVolume = 0.8;
   double _speechPitch = 1.0;
   bool _autoSpeakEnabled = false; // Auto-speak new words when added
+  bool _ttsToggleState = false; // Track if TTS is manually toggled ON/OFF
 
   // Translation state
   final GoogleTranslator _translator = GoogleTranslator();
@@ -189,11 +190,11 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   double get speechVolume => _speechVolume;
   double get speechPitch => _speechPitch;
   bool get autoSpeakEnabled => _autoSpeakEnabled;
+  bool get ttsToggleState => _ttsToggleState;
 
   // Translation getters
   bool get translationEnabled => _translationEnabled;
   bool get isTranslating => _isTranslating;
-
   void resetState() {
     _errorMessage = '';
     _isInitialized = false;
@@ -216,8 +217,10 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
 
       _flutterTts!.setCompletionHandler(() {
         _isSpeaking = false;
+        // Don't change the toggle state - keep TTS enabled if it was enabled
         _notifyStateChange();
-        print("TTS: Speech completed");
+        print(
+            "TTS: Speech completed - TTS remains ${_ttsToggleState ? 'ON' : 'OFF'}");
       });
 
       _flutterTts!.setErrorHandler((msg) {
@@ -353,13 +356,20 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
     }
   }
 
-  // Toggle TTS on/off
+  // Toggle TTS on/off with new behavior
   Future<void> toggleTts() async {
-    if (_isSpeaking) {
+    if (_ttsToggleState) {
+      // Currently ON - turn OFF
+      _ttsToggleState = false;
       await stopSpeaking();
+      print("TTS toggled OFF");
     } else {
+      // Currently OFF - turn ON and speak entire sentence
+      _ttsToggleState = true;
       await speakCurrentSentence();
+      print("TTS toggled ON - speaking entire sentence");
     }
+    _notifyStateChange();
   }
 
   // Toggle auto-speak mode
@@ -373,6 +383,16 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   void setAutoSpeak(bool enabled) {
     _autoSpeakEnabled = enabled;
     print("Auto-speak ${_autoSpeakEnabled ? 'enabled' : 'disabled'}");
+    _notifyStateChange();
+  }
+
+  // Set TTS toggle state directly
+  void setTtsToggleState(bool enabled) {
+    _ttsToggleState = enabled;
+    if (!enabled) {
+      stopSpeaking(); // Stop any ongoing speech when turning off
+    }
+    print("TTS toggle set to: ${_ttsToggleState ? 'ON' : 'OFF'}");
     _notifyStateChange();
   }
 
@@ -486,9 +506,24 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
       textController!.text = translatedText;
     }
 
-    // Auto-speak the translated text if enabled
-    if (_autoSpeakEnabled && _isTtsInitialized) {
-      speakText(translatedText);
+    // Auto-speak only the new word if TTS is toggled ON
+    if (_ttsToggleState && _isTtsInitialized) {
+      // Translate just the new word for speaking
+      String wordToSpeak = word.trim();
+      if (_translationEnabled &&
+          _selectedLanguage != 'en-US' &&
+          _selectedLanguage != 'en-GB') {
+        try {
+          wordToSpeak = await translateText(word.trim(), _selectedLanguage);
+        } catch (e) {
+          print('Translation error for new word: $e');
+          wordToSpeak = word.trim(); // Fall back to original word
+        }
+      }
+
+      // Speak only the new word
+      await speakText(wordToSpeak);
+      print("Speaking new word: '$wordToSpeak' (TTS is ON)");
     }
   }
 
@@ -497,7 +532,9 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
     if (textController != null) {
       textController!.text = '';
     }
-    print('Sentence cleared');
+    // Reset TTS toggle state when sentence is cleared
+    _ttsToggleState = false;
+    print('Sentence cleared - TTS toggle reset to OFF');
     _notifyStateChange();
   }
 

@@ -410,10 +410,10 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                                       width: 42.0,
                                       height: 42.0,
                                       child: Icon(
-                                        _model.isSpeaking
+                                        _model.ttsToggleState
                                             ? Icons.volume_up_rounded
                                             : Icons.volume_off_rounded,
-                                        color: _model.isSpeaking
+                                        color: _model.ttsToggleState
                                             ? const Color(0xFFFAB317)
                                             : FlutterFlowTheme.of(context)
                                                 .secondaryText,
