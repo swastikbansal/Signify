@@ -9,9 +9,10 @@ class CustomSignsModel extends FlutterFlowModel<CustomSignsPage> {
   ///  State fields for stateful widgets in this page.
 
   // File picker state
-  FilePickerResult? selectedFile;
+  FilePickerResult? selectedFiles;
   bool isUploading = false;
-  String? customFileName; // Store custom file name
+  Map<String, String> customFileNames = {}; // Store custom file names by original file name
+  String? customBatchName; // Store custom batch name
 
   // List of uploaded files (you can replace this with actual backend data)
   List<Map<String, dynamic>> uploadedFiles = [
@@ -19,13 +20,19 @@ class CustomSignsModel extends FlutterFlowModel<CustomSignsPage> {
       'fileName': 'custom_data_1.jpg',
       'uploadDate': 'Apr 20, 2024',
       'fileSize': '2.3 MB',
-      'status': 'processed'
+      'status': 'processed',
+      'fileCount': 1,
+      'fileList': ['custom_data_1.jpg'],
+      'isBatch': false,
     },
     {
-      'fileName': 'custom_signs.jpeg',
+      'fileName': 'Traffic Signs Collection',
       'uploadDate': 'Apr 10, 2024',
-      'fileSize': '1.8 MB',
-      'status': 'processed'
+      'fileSize': '5.2 MB',
+      'status': 'processed',
+      'fileCount': 3,
+      'fileList': ['custom_signs_1.jpeg', 'custom_signs_2.jpeg', 'custom_signs_3.jpeg'],
+      'isBatch': true,
     },
   ];
 
@@ -44,71 +51,99 @@ class CustomSignsModel extends FlutterFlowModel<CustomSignsPage> {
   }
 
   /// Method to handle file selection
-  Future<void> selectFile() async {
+  Future<void> selectFiles() async {
     try {
       final result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['jpg', 'jpeg'],
-        allowMultiple: false,
+        allowMultiple: true, // Enable multiple file selection
         allowCompression: true,
       );
 
       if (result != null && result.files.isNotEmpty) {
-        selectedFile = result;
-        customFileName = null; // Reset custom name
-        debugPrint('File selected: ${result.files.single.name}');
+        selectedFiles = result;
+        customFileNames.clear(); // Reset custom names
+        debugPrint('Files selected: ${result.files.length} files');
+        for (var file in result.files) {
+          debugPrint('File: ${file.name}');
+        }
         // Note: State updates will be handled in the widget using safeSetState()
       } else {
-        debugPrint('No file selected or picker was cancelled');
+        debugPrint('No files selected or picker was cancelled');
       }
     } catch (e) {
-      debugPrint('Error selecting file: $e');
+      debugPrint('Error selecting files: $e');
     }
   }
 
-  /// Method to set custom file name
-  void setCustomFileName(String newName) {
-    customFileName = newName;
+  /// Method to set custom file name for a specific file
+  void setCustomFileName(String originalName, String newName) {
+    customFileNames[originalName] = newName;
   }
 
-  /// Get the final file name (custom or original)
-  String getFinalFileName() {
-    if (selectedFile == null) return '';
+  /// Method to set custom batch name
+  void setCustomBatchName(String batchName) {
+    customBatchName = batchName;
+  }
 
-    if (customFileName != null && customFileName!.isNotEmpty) {
+  /// Get the final file name for a specific file (custom or original)
+  String getFinalFileName(String originalName, String? extension) {
+    if (customFileNames.containsKey(originalName) && 
+        customFileNames[originalName]!.isNotEmpty) {
+      final customName = customFileNames[originalName]!;
+      final ext = extension ?? 'jpg';
+      
       // Add extension if not present
-      final extension = selectedFile!.files.single.extension ?? 'jpg';
-      if (!customFileName!.toLowerCase().endsWith('.jpg') &&
-          !customFileName!.toLowerCase().endsWith('.jpeg')) {
-        return '$customFileName.$extension';
+      if (!customName.toLowerCase().endsWith('.jpg') &&
+          !customName.toLowerCase().endsWith('.jpeg')) {
+        return '$customName.$ext';
       }
-      return customFileName!;
+      return customName;
     }
 
-    return selectedFile!.files.single.name;
+    return originalName;
   }
 
-  /// Method to upload file (replace with actual backend implementation)
-  Future<bool> uploadFile() async {
-    if (selectedFile == null) return false;
+  /// Method to upload files (replace with actual backend implementation)
+  Future<bool> uploadFiles() async {
+    if (selectedFiles == null || selectedFiles!.files.isEmpty) return false;
 
     try {
       isUploading = true;
       // Note: UI state updates will be handled in the widget using safeSetState()
 
       // Simulate upload delay
-      await Future.delayed(const Duration(seconds: 2));
+      await Future.delayed(const Duration(seconds: 3));
 
-      // Add to uploaded files list (replace with actual backend call)
+      // Calculate total size of all files
+      double totalSize = 0;
+      for (var file in selectedFiles!.files) {
+        totalSize += file.size / (1024 * 1024); // Convert to MB
+      }
+
+      // Create a single batch entry for all uploaded files
+      final fileCount = selectedFiles!.files.length;
+      final batchLabel = fileCount == 1 
+          ? getFinalFileName(selectedFiles!.files.first.name, selectedFiles!.files.first.extension)
+          : (customBatchName?.isNotEmpty == true ? customBatchName! : 'Custom Signs Upload - $fileCount files');
+
+      // Create file list for details
+      final fileList = selectedFiles!.files.map((file) => 
+          getFinalFileName(file.name, file.extension)).toList();
+
       uploadedFiles.insert(0, {
-        'fileName': getFinalFileName(),
+        'fileName': batchLabel,
         'uploadDate': dateTimeFormat("MMM d, y", getCurrentTimestamp),
-        'fileSize': '${(selectedFile!.files.single.size / (1024 * 1024)).toStringAsFixed(1)} MB',
-        'status': 'processing'
+        'fileSize': '${totalSize.toStringAsFixed(1)} MB',
+        'status': 'processing',
+        'fileCount': fileCount,
+        'fileList': fileList, // Store individual file names for details
+        'isBatch': fileCount > 1, // Flag to identify batch uploads
       });
 
-      selectedFile = null;
-      customFileName = null; // Reset custom name
+      selectedFiles = null;
+      customFileNames.clear(); // Reset custom names
+      customBatchName = null; // Reset custom batch name
       isUploading = false;
       // Note: UI state updates will be handled in the widget using safeSetState()
 
@@ -116,7 +151,7 @@ class CustomSignsModel extends FlutterFlowModel<CustomSignsPage> {
     } catch (e) {
       isUploading = false;
       // Note: UI state updates will be handled in the widget using safeSetState()
-      debugPrint('Error uploading file: $e');
+      debugPrint('Error uploading files: $e');
       return false;
     }
   }

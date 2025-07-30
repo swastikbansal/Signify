@@ -1,12 +1,12 @@
 import '/auth/firebase_auth/auth_util.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import '/walkthroughs/signify_screen_2.dart';
+// import '/walkthroughs/signify_screen_2.dart'; // Commented out to disable walkthrough
 import 'signtovoice2_model.dart';
 export 'signtovoice2_model.dart';
 import 'skeleton_overlay.dart'; // Import our skeleton overlay
-import 'package:tutorial_coach_mark/tutorial_coach_mark.dart'
-    show TutorialCoachMark;
+// import 'package:tutorial_coach_mark/tutorial_coach_mark.dart'
+//     show TutorialCoachMark; // Commented out to disable walkthrough
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -42,6 +42,8 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
     // On page load action with error handling
     SchedulerBinding.instance.addPostFrameCallback((_) async {
       try {
+        // Commented out walkthrough trigger to disable tutorial
+        /*
         if (dateTimeFormat(
               "relative",
               currentUserDocument?.loggedinTime,
@@ -59,6 +61,7 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
         } else {
           return;
         }
+        */
       } catch (e) {
         print('Error in page load action: $e');
       }
@@ -240,7 +243,7 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
             // Floating control panel positioned above bottom nav - Claude AI style
             Positioned(
               bottom:
-                  12.0, // Position just above bottom nav bar (optimal spacing)
+                  16.0, // Position just above bottom nav bar (optimal spacing)
               left: 8.0,
               right: 8.0,
               child: Container(
@@ -305,14 +308,18 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                             textCapitalization: TextCapitalization.sentences,
                             obscureText: false,
                             decoration: InputDecoration(
-                              hintText: 'Translated Text Appear Here',
+                              hintText: _model.isTranslating
+                                  ? 'Translating...'
+                                  : 'Translated Text Appear Here',
                               hintStyle: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .override(
                                     fontFamily: FlutterFlowTheme.of(context)
                                         .bodyMediumFamily,
-                                    color: FlutterFlowTheme.of(context)
-                                        .secondaryText,
+                                    color: _model.isTranslating
+                                        ? const Color(0xFFFAB317)
+                                        : FlutterFlowTheme.of(context)
+                                            .secondaryText,
                                     fontSize: 16.0,
                                     letterSpacing: 0.0,
                                     useGoogleFonts: GoogleFonts.asMap()
@@ -359,68 +366,111 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                               // Modern Android-style scrollable language dropdown
                               Container(
                                 margin: const EdgeInsets.only(right: 12.0),
-                                child: ModernDropDown(
-                                  value: _model.dropDownValue ?? 'English',
-                                  options: [
-                                    FFLocalizations.of(context)
-                                        .getText('rpno13ax' /* English */),
-                                    FFLocalizations.of(context)
-                                        .getText('poexbjj4' /* Hindi */),
-                                    FFLocalizations.of(context)
-                                        .getText('qtkvhy1f' /* Bengali */),
-                                    FFLocalizations.of(context)
-                                        .getText('u9ln63gu' /* Marathi */),
-                                    FFLocalizations.of(context)
-                                        .getText('b33de32b' /* Telugu */),
-                                    FFLocalizations.of(context)
-                                        .getText('fpa9yid6' /* Tamil */),
-                                    FFLocalizations.of(context)
-                                        .getText('hann7xcl' /* Gujarati */),
-                                    FFLocalizations.of(context)
-                                        .getText('qshr5rcb' /* Punjabi */),
-                                    FFLocalizations.of(context)
-                                        .getText('zw3yahpp' /* Urdu */),
-                                    FFLocalizations.of(context)
-                                        .getText('f1lmzpqr' /* Kannada */),
-                                    FFLocalizations.of(context)
-                                        .getText('o714o7gt' /* Malayalam */),
-                                  ],
-                                  onChanged: (val) => safeSetState(
-                                      () => _model.dropDownValue = val),
-                                  width: 90.0,
-                                  height: 36.0,
-                                ).addWalkthrough(
-                                  dropDownB9wm9jo8,
-                                  _model.signifyScreen2Controller,
-                                ),
+                                child: Tooltip(
+                                  message:
+                                      'Select language for text-to-speech output',
+                                  decoration: BoxDecoration(
+                                    color: FlutterFlowTheme.of(context)
+                                        .alternate,
+                                    borderRadius: BorderRadius.circular(8.0),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.1),
+                                        blurRadius: 4.0,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  textStyle: TextStyle(
+                                    color: FlutterFlowTheme.of(context)
+                                        .primaryText,
+                                    fontSize: 12.0,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  preferBelow: false,
+                                  showDuration: const Duration(seconds: 2),
+                                  child: ModernDropDown(
+                                    value: _model.availableLanguages[
+                                            _model.selectedLanguage] ??
+                                        'English (US)',
+                                    options: _model.availableLanguages.values
+                                        .toList(),
+                                    onChanged: (val) async {
+                                      // Find the language code for the selected language name
+                                      String? selectedCode;
+                                      _model.availableLanguages
+                                          .forEach((code, name) {
+                                        if (name == val) {
+                                          selectedCode = code;
+                                        }
+                                      });
+
+                                      if (selectedCode != null) {
+                                        await _model
+                                            .setTtsLanguage(selectedCode!);
+                                        safeSetState(() {});
+                                        print(
+                                            'TTS Language changed to: $selectedCode ($val)');
+                                      }
+                                    },
+                                    width: 110.0,
+                                    height: 36.0,
+                                  ),
+                                ), // Removed walkthrough functionality
+                                // .addWalkthrough(
+                                //   dropDownB9wm9jo8,
+                                //   _model.signifyScreen2Controller,
+                                // ),
                               ),
 
-                              // Speaker toggle button with state
+                              // Speaker toggle button with TTS state
                               Container(
                                 margin: const EdgeInsets.only(right: 8.0),
-                                child: Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
+                                child: Tooltip(
+                                  message: _model.ttsToggleState
+                                      ? 'Turn off text-to-speech'
+                                      : 'Turn on text-to-speech',
+                                  decoration: BoxDecoration(
+                                    color: FlutterFlowTheme.of(context)
+                                        .alternate,
                                     borderRadius: BorderRadius.circular(8.0),
-                                    onTap: () {
-                                      setState(() {
-                                        isSpeakerOn = !isSpeakerOn;
-                                      });
-                                      print(
-                                          'Speaker toggle: ${isSpeakerOn ? "ON" : "OFF"}');
-                                    },
-                                    child: Container(
-                                      width: 42.0,
-                                      height: 42.0,
-                                      child: Icon(
-                                        isSpeakerOn
-                                            ? Icons.volume_up_rounded
-                                            : Icons.volume_off_rounded,
-                                        color: isSpeakerOn
-                                            ? const Color(0xFFFAB317)
-                                            : FlutterFlowTheme.of(context)
-                                                .secondaryText,
-                                        size: 24.0,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.1),
+                                        blurRadius: 4.0,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  textStyle: TextStyle(
+                                    color: FlutterFlowTheme.of(context)
+                                        .primaryText,
+                                    fontSize: 12.0,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  preferBelow: false,
+                                  showDuration: const Duration(seconds: 2),
+                                  child: Material(
+                                    color: Colors.transparent,
+                                    child: InkWell(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      onTap: () async {
+                                        await _model.toggleTts();
+                                        safeSetState(() {});
+                                      },
+                                      child: Container(
+                                        width: 42.0,
+                                        height: 42.0,
+                                        child: Icon(
+                                          _model.ttsToggleState
+                                              ? Icons.volume_up_rounded
+                                              : Icons.volume_off_rounded,
+                                          color: _model.ttsToggleState
+                                              ? const Color(0xFFFAB317)
+                                              : FlutterFlowTheme.of(context)
+                                                  .secondaryText,
+                                          size: 24.0,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -432,58 +482,109 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                               // Camera toggle button (no border)
                               Container(
                                 margin: const EdgeInsets.only(right: 8.0),
-                                child: Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
+                                child: Tooltip(
+                                  message: _model.isDetecting
+                                      ? 'Stop sign detection'
+                                      : 'Start sign detection',
+                                  decoration: BoxDecoration(
+                                    color: FlutterFlowTheme.of(context)
+                                        .alternate,
                                     borderRadius: BorderRadius.circular(8.0),
-                                    onTap: () async {
-                                      await _model.toggleDetection();
-                                      safeSetState(() {});
-                                    },
-                                    child: Container(
-                                      width: 42.0,
-                                      height: 42.0,
-                                      child: Icon(
-                                        _model.isDetecting
-                                            ? Icons.stop_rounded
-                                            : Icons.camera_alt_rounded,
-                                        color: _model.isDetecting
-                                            ? const Color(0xFFFAB317)
-                                            : FlutterFlowTheme.of(context)
-                                                .secondaryText,
-                                        size: 24.0,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.1),
+                                        blurRadius: 4.0,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  textStyle: TextStyle(
+                                    color: FlutterFlowTheme.of(context)
+                                        .primaryText,
+                                    fontSize: 12.0,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  preferBelow: false,
+                                  showDuration: const Duration(seconds: 2),
+                                  child: Material(
+                                    color: Colors.transparent,
+                                    child: InkWell(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      onTap: () async {
+                                        await _model.toggleDetection();
+                                        safeSetState(() {});
+                                      },
+                                      child: Container(
+                                        width: 42.0,
+                                        height: 42.0,
+                                        child: Icon(
+                                          _model.isDetecting
+                                              ? Icons.stop_rounded
+                                              : Icons.camera_alt_rounded,
+                                          color: _model.isDetecting
+                                              ? const Color(0xFFFAB317)
+                                              : FlutterFlowTheme.of(context)
+                                                  .secondaryText,
+                                          size: 24.0,
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
-                              ).addWalkthrough(
-                                iconButtonPl161kuq,
-                                _model.signifyScreen2Controller,
-                              ),
+                              ), // Removed walkthrough functionality
+                              // .addWalkthrough(
+                              //   iconButtonPl161kuq,
+                              //   _model.signifyScreen2Controller,
+                              // ),
 
                               // Pose overlay toggle button (no border)
                               Container(
-                                child: Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
+                                child: Tooltip(
+                                  message: _model.isSkeletonOverlayEnabled
+                                      ? 'Hide hand tracking overlay'
+                                      : 'Show hand tracking overlay',
+                                  decoration: BoxDecoration(
+                                    color: FlutterFlowTheme.of(context)
+                                        .alternate,
                                     borderRadius: BorderRadius.circular(8.0),
-                                    onTap: () {
-                                      _model.setSkeletonOverlayEnabled(
-                                          !_model.isSkeletonOverlayEnabled);
-                                      safeSetState(() {});
-                                    },
-                                    child: Container(
-                                      width: 42.0,
-                                      height: 42.0,
-                                      child: Icon(
-                                        _model.isSkeletonOverlayEnabled
-                                            ? Icons.visibility_rounded
-                                            : Icons.visibility_off_rounded,
-                                        color: _model.isSkeletonOverlayEnabled
-                                            ? const Color(0xFFFAB317)
-                                            : FlutterFlowTheme.of(context)
-                                                .secondaryText,
-                                        size: 24.0,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.1),
+                                        blurRadius: 4.0,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  textStyle: TextStyle(
+                                    color: FlutterFlowTheme.of(context)
+                                        .primaryText,
+                                    fontSize: 12.0,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  preferBelow: false,
+                                  showDuration: const Duration(seconds: 2),
+                                  child: Material(
+                                    color: Colors.transparent,
+                                    child: InkWell(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      onTap: () {
+                                        _model.setSkeletonOverlayEnabled(
+                                            !_model.isSkeletonOverlayEnabled);
+                                        safeSetState(() {});
+                                      },
+                                      child: Container(
+                                        width: 42.0,
+                                        height: 42.0,
+                                        child: Icon(
+                                          _model.isSkeletonOverlayEnabled
+                                              ? Icons.visibility_rounded
+                                              : Icons.visibility_off_rounded,
+                                          color: _model.isSkeletonOverlayEnabled
+                                              ? const Color(0xFFFAB317)
+                                              : FlutterFlowTheme.of(context)
+                                                  .secondaryText,
+                                          size: 24.0,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -673,6 +774,8 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
     );
   }
 
+  // Commented out walkthrough functionality to disable tutorial
+  /*
   TutorialCoachMark createPageWalkthrough(BuildContext context) =>
       TutorialCoachMark(
         targets: createWalkthroughTargets(context),
@@ -683,6 +786,7 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
           return true;
         },
       );
+  */
 }
 
 // Custom painter for moving line animation (Google Assistant/Gemini style)

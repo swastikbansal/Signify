@@ -98,7 +98,7 @@ Stack trace: ${filteredStackTrace.join("\n")}''';
     EasyDebounce.cancel('508f3c74205c87928b71f49040062e732f9c20b0');
   });
 
-   // Initialize Supabase
+   // Initialize Supabase for loading 3D ISL Animations
   await Supabase.initialize(
     url: 'https://qqyqwtoxjhgashwxyidg.supabase.co',
     anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFxeXF3dG94amhnYXNod3h5aWRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM2MjE5NjIsImV4cCI6MjA2OTE5Nzk2Mn0.IOB5ocrqZPKU6luezwhmLGXUkKgks9w0AM7X2-onI-c',
