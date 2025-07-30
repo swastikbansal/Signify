@@ -213,38 +213,29 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
         try {
           switch (call.method) {
             case 'onHandLandmarks':
-              if (call.arguments != null && call.arguments['hands'] != null) {
-                final handsRaw = call.arguments['hands'] as List<dynamic>;
-                _handLandmarks =
-                    handsRaw.map<List<Map<String, dynamic>>>((hand) {
-                  final handRaw = hand as List<dynamic>;
-                  return handRaw.map<Map<String, dynamic>>((landmark) {
-                    return Map<String, dynamic>.from(
-                        landmark as Map<dynamic, dynamic>);
-                  }).toList();
+              // Always process hand landmarks, even if empty (for clearing overlay)
+              final handsRaw = call.arguments?['hands'] as List<dynamic>? ?? [];
+              _handLandmarks = handsRaw.map<List<Map<String, dynamic>>>((hand) {
+                final handRaw = hand as List<dynamic>;
+                return handRaw.map<Map<String, dynamic>>((landmark) {
+                  return Map<String, dynamic>.from(
+                      landmark as Map<dynamic, dynamic>);
                 }).toList();
-                _lastUpdateTime = DateTime.fromMillisecondsSinceEpoch(
-                        call.arguments['timestamp'] ?? 0)
-                    .toString();
+              }).toList();
 
+              _lastUpdateTime = DateTime.fromMillisecondsSinceEpoch(
+                      call.arguments?['timestamp'] ?? 0)
+                  .toString();
+
+              // Clear hand coordinates if no hands detected
+              if (_handLandmarks.isEmpty) {
+                _leftHandCoords = null;
+                _rightHandCoords = null;
+                _handLabels = null;
+                print('Hand detection cleared - no hands detected');
+              } else {
                 // Extract coordinates and send to API
                 _extractAndProcessCoordinates();
-
-                // Print all hand landmarks to console for debugging
-                // _handLandmarks.asMap().forEach((handIndex, hand) {
-                //   String handLabel =
-                //       _handLabels != null && handIndex < _handLabels!.length
-                //           ? _handLabels![handIndex]
-                //           : 'Unknown';
-                //   print(
-                //       '=== Hand $handIndex ($handLabel) - ${hand.length} landmarks ===');
-                //   hand.asMap().forEach((landmarkIndex, landmark) {
-                //     print(
-                //         'Landmark $landmarkIndex: x=${landmark['x']}, y=${landmark['y']}, z=${landmark['z']}');
-                //   });
-                // });
-
-                _notifyStateChange();
                 print(
                     'Received hand landmarks: ${_handLandmarks.length} hands detected');
 
@@ -258,36 +249,32 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
                       'Right hand coordinates extracted: ${_rightHandCoords!.length} values');
                 }
               }
+
+              _notifyStateChange();
               break;
 
             case 'onPoseLandmarks':
-              if (call.arguments != null && call.arguments['poses'] != null) {
-                final posesRaw = call.arguments['poses'] as List<dynamic>;
-                _poseLandmarks =
-                    posesRaw.map<List<Map<String, dynamic>>>((pose) {
-                  final poseRaw = pose as List<dynamic>;
-                  return poseRaw.map<Map<String, dynamic>>((landmark) {
-                    return Map<String, dynamic>.from(
-                        landmark as Map<dynamic, dynamic>);
-                  }).toList();
+              // Always process pose landmarks, even if empty (for clearing overlay)
+              final posesRaw = call.arguments?['poses'] as List<dynamic>? ?? [];
+              _poseLandmarks = posesRaw.map<List<Map<String, dynamic>>>((pose) {
+                final poseRaw = pose as List<dynamic>;
+                return poseRaw.map<Map<String, dynamic>>((landmark) {
+                  return Map<String, dynamic>.from(
+                      landmark as Map<dynamic, dynamic>);
                 }).toList();
-                _lastUpdateTime = DateTime.fromMillisecondsSinceEpoch(
-                        call.arguments['timestamp'] ?? 0)
-                    .toString();
+              }).toList();
 
+              _lastUpdateTime = DateTime.fromMillisecondsSinceEpoch(
+                      call.arguments?['timestamp'] ?? 0)
+                  .toString();
+
+              // Clear pose coordinates if no poses detected
+              if (_poseLandmarks.isEmpty) {
+                _poseCoords = null;
+                print('Pose detection cleared - no poses detected');
+              } else {
                 // Extract coordinates and send to API
                 _extractAndProcessCoordinates();
-
-                // Print all pose landmarks to console for debugging
-                // _poseLandmarks.asMap().forEach((poseIndex, pose) {
-                //   print('=== Pose $poseIndex (${pose.length} landmarks) ===');
-                //   pose.asMap().forEach((landmarkIndex, landmark) {
-                //     print(
-                //         'Landmark $landmarkIndex: x=${landmark['x']}, y=${landmark['y']}, z=${landmark['z']}');
-                //   });
-                // });
-
-                _notifyStateChange();
                 print(
                     'Received pose landmarks: ${_poseLandmarks.length} poses detected');
 
@@ -297,6 +284,8 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
                       'Pose coordinates extracted: ${_poseCoords!.length} values');
                 }
               }
+
+              _notifyStateChange();
               break;
 
             case 'onPrediction':
@@ -651,9 +640,10 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
     try {
       final cameras = await availableCameras();
       if (cameras.isNotEmpty) {
-        // Use back camera if available, otherwise use first camera
+        // Use FRONT camera for sign language (so user sees themselves like a mirror)
         final camera = cameras.firstWhere(
-          (camera) => camera.lensDirection == CameraLensDirection.back,
+          // (camera) => camera.lensDirection == CameraLensDirection.back,
+          (camera) => camera.lensDirection == CameraLensDirection.front,
           orElse: () => cameras.first,
         );
 
@@ -661,7 +651,8 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
           camera,
           ResolutionPreset.medium,
           enableAudio: false,
-          imageFormatGroup: ImageFormatGroup.yuv420, // Explicitly set format
+          imageFormatGroup: ImageFormatGroup
+              .bgra8888, // Use BGRA8888 for better compatibility with MediaPipe
         );
 
         await _cameraController!.initialize();
@@ -676,7 +667,10 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
         _isCameraInitialized = true;
         _notifyStateChange();
         print(
-            'Back camera initialized successfully with format: ${_cameraController!.description.name}');
+            'Front camera initialized successfully: ${_cameraController!.description.name}');
+        print('Camera is front: ${isFrontCamera}');
+        print(
+            'Camera aspect ratio: ${cameraAspectRatio?.toStringAsFixed(3) ?? "Unknown"}');
       }
     } catch (e) {
       print('Error initializing camera: $e');
@@ -686,32 +680,60 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
     }
   }
 
-  void _processCameraImage(CameraImage image) {
-    if (_isDetecting && _isInitialized) {
-      try {
-        // Only process every 3rd frame to avoid overwhelming the system
-        if (DateTime.now().millisecondsSinceEpoch % 3 != 0) return;
+  // Add frame throttling variables
+  int _lastProcessedFrame = 0;
+  static const int FRAME_SKIP_COUNT = 2; // Process every 2nd frame (was 3)
+  bool _isProcessingFrame = false;
 
-        // Convert CameraImage to format suitable for MediaPipe
+  void _processCameraImage(CameraImage image) {
+    if (_isDetecting && _isInitialized && !_isProcessingFrame) {
+      try {
+        // Frame throttling - only process every 3rd frame to prevent memory issues
+        _lastProcessedFrame++;
+        if (_lastProcessedFrame % FRAME_SKIP_COUNT != 0) {
+          return;
+        }
+
+        _isProcessingFrame = true;
+
+        // Debug logging (only occasionally to avoid spam)
+        if (DateTime.now().millisecondsSinceEpoch % 1000 < 100) {
+          print(
+              'Processing camera image: ${image.width}x${image.height}, format: ${image.format.group.name}, planes: ${image.planes.length}');
+        }
+
+        // Send raw image data directly to MediaPipe
         final imageData = {
           'width': image.width,
           'height': image.height,
           'format': image.format.group.name,
+          'isFrontCamera': isFrontCamera, // Add camera type for mirroring
           'planes': image.planes
               .map((plane) => {
                     'bytes': plane.bytes,
-                    'bytesPerPixel': plane.bytesPerPixel ?? 1,
+                    'bytesPerPixel':
+                        plane.bytesPerPixel ?? 4, // Default to 4 for BGRA8888
                     'bytesPerRow': plane.bytesPerRow,
                   })
               .toList(),
         };
 
         // Send image data to native MediaPipe (non-blocking)
-        platform.invokeMethod('processImage', imageData).catchError((e) {
+        platform.invokeMethod('processImage', imageData).then((_) {
+          _isProcessingFrame = false; // Reset flag when processing completes
+        }).catchError((e) {
           print('Error processing image: $e');
+          _isProcessingFrame = false; // Reset flag on error too
         });
       } catch (e) {
         print('Error in image processing: $e');
+        _isProcessingFrame = false;
+      }
+    } else {
+      // Debug why processing is not happening
+      if (DateTime.now().millisecondsSinceEpoch % 2000 < 100) {
+        print(
+            'Not processing image - isDetecting: $_isDetecting, isInitialized: $_isInitialized, isProcessing: $_isProcessingFrame');
       }
     }
   }
@@ -727,8 +749,10 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
       }
       _isCameraInitialized = false;
       _isCameraOn = false;
+      _isProcessingFrame = false; // Reset processing flag
+      _lastProcessedFrame = 0; // Reset frame counter
       _notifyStateChange();
-      print('Camera disposed');
+      print('Camera disposed and memory cleaned up');
     } catch (e) {
       print('Error disposing camera: $e');
     }

@@ -96,6 +96,17 @@ class MainActivity : FlutterActivity(), MethodCallHandler {
                 }
             }
 
+            "configureImageFormat" -> {
+                try {
+                    val args = call.arguments as Map<String, Any>
+                    val format = args["format"] as? String ?: "bgra8888"
+                    Log.d("MainActivity", "Image format configured: $format")
+                    result.success("Image format configured: $format")
+                } catch (e: Exception) {
+                    result.error("CONFIG_FORMAT_ERROR", "Failed to configure format: ${e.message}", null)
+                }
+            }
+
             else -> result.notImplemented()
         }
     }

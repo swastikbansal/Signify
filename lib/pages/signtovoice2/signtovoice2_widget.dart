@@ -81,7 +81,7 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
     );
 
     _movingLineController = AnimationController(
-      duration: const Duration(milliseconds: 1200), // Slightly faster animation
+      duration: const Duration(milliseconds: 1200),
       vsync: this,
     );
 
@@ -548,11 +548,18 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                 child: _model.isCameraOn && _model.isCameraInitialized
                     ? Stack(
                         children: [
-                          // Flutter Camera Preview
+                          // Flutter Camera Preview with mirroring for front camera
                           Container(
                             width: double.infinity,
                             height: double.infinity,
-                            child: CameraPreview(_model.cameraController!),
+                            child: Transform(
+                              alignment: Alignment.center,
+                              transform: _model.isFrontCamera
+                                  ? Matrix4.rotationY(
+                                      3.14159) // Mirror horizontally for front camera
+                                  : Matrix4.identity(),
+                              child: CameraPreview(_model.cameraController!),
+                            ),
                           ),
                           // MediaPipe Skeleton Overlay
                           if (_model.isDetecting &&

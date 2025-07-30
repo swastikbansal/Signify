@@ -54,6 +54,11 @@ class LandmarkDetector(
     private var poseLandmarker: PoseLandmarker? = null
     private lateinit var backgroundExecutor: ExecutorService
     private var isDetectionActive = false
+    
+    // Memory management variables
+    private var lastProcessTime = 0L
+    private val MIN_PROCESS_INTERVAL = 66L // Minimum 66ms between frames (~15fps)
+    private var isProcessing = false
 
     fun initialize() {
         backgroundExecutor = Executors.newSingleThreadExecutor()
@@ -185,247 +190,243 @@ class LandmarkDetector(
     }
 
     fun processImageFromFlutter(imageData: Map<String, Any>) {
-        if (!isDetectionActive) return
+        if (!isDetectionActive) {
+            Log.w(TAG, "Detection not active, skipping frame")
+            return
+        }
+
+        // Memory protection: Skip if already processing or too frequent
+        val currentTime = System.currentTimeMillis()
+        if (isProcessing || (currentTime - lastProcessTime) < MIN_PROCESS_INTERVAL) {
+            return
+        }
+
+        isProcessing = true
+        lastProcessTime = currentTime
 
         backgroundExecutor.execute {
             try {
-                // Convert Flutter camera image to MediaPipe format
                 val width = imageData["width"] as Int
                 val height = imageData["height"] as Int
+                val format = imageData["format"] as String
+                val isFrontCamera = imageData["isFrontCamera"] as? Boolean ?: false
                 val planes = imageData["planes"] as List<Map<String, Any>>
 
-                // Get the Y plane (luminance) from the camera image
-                val yPlane = planes[0]
-                val yBytes = yPlane["bytes"] as ByteArray
-                val yPixelStride = (yPlane["bytesPerPixel"] as Int?) ?: 1
-                val yRowStride = (yPlane["bytesPerRow"] as Int?) ?: width
+                Log.d(TAG, "Processing image: ${width}x${height}, format: $format, frontCamera: $isFrontCamera")
 
-                // Create bitmap from camera image data with better error handling
-                val bitmap = createBitmapFromYuv420(yBytes, width, height, yPixelStride, yRowStride)
+                // Create bitmap with original size but optimized format
+                val bitmap = createSimpleBitmap(planes[0], width, height)
                 
-                // Verify bitmap was created successfully
+                if (bitmap == null) {
+                    Log.e(TAG, "Failed to create bitmap - bitmap is null")
+                    return@execute
+                }
+                
                 if (bitmap.isRecycled) {
-                    Log.w(TAG, "Created bitmap is recycled, skipping frame")
+                    Log.e(TAG, "Failed to create bitmap - bitmap is recycled")
                     return@execute
                 }
 
-                val mpImage = BitmapImageBuilder(bitmap).build()
+                Log.d(TAG, "Bitmap created successfully: ${bitmap.width}x${bitmap.height}")
+
+                // Mirror the bitmap if using front camera (for correct left/right hand detection)
+                val processedBitmap = if (isFrontCamera) {
+                    Log.d(TAG, "Mirroring bitmap for front camera")
+                    mirrorBitmap(bitmap)
+                } else {
+                    bitmap
+                }
+
+                // Create MediaPipe image and process
+                val mpImage = BitmapImageBuilder(processedBitmap).build()
                 val frameTime = System.currentTimeMillis()
 
-                // Process with MediaPipe - hand detection first as it's more critical
+                Log.d(TAG, "Processing with MediaPipe...")
+
+                // Process with MediaPipe
                 val handResult = handLandmarker?.detect(mpImage)
                 val poseResult = poseLandmarker?.detect(mpImage)
 
-                // Send results with better error handling
-                handResult?.let { 
-                    sendHandLandmarks(it, frameTime) 
-                } ?: run {
-                    // Log occasional warnings when hand detection fails
-                    if (frameTime % 5000 < 100) { // ~every 5 seconds
-                        Log.w(TAG, "Hand detection returned null result")
-                    }
-                }
-                
+                Log.d(TAG, "MediaPipe results - Hands: ${handResult?.landmarks()?.size ?: 0}, Poses: ${poseResult?.landmarks()?.size ?: 0}")
+
+                // Send all results (not just when landmarks exist)
+                handResult?.let { sendHandLandmarks(it, frameTime) }
                 poseResult?.let { sendPoseLandmarks(it, frameTime) }
 
-                // Clean up bitmap to prevent memory leaks
-                if (!bitmap.isRecycled) {
-                    bitmap.recycle()
+                // Clean up immediately
+                bitmap.recycle()
+                if (processedBitmap != bitmap) {
+                    processedBitmap.recycle()
+                }
+
+                // Force garbage collection periodically
+                if (frameTime % 5000 < MIN_PROCESS_INTERVAL) {
+                    System.gc()
                 }
 
             } catch (e: Exception) {
                 Log.e(TAG, "Error processing Flutter image: ${e.message}", e)
+            } finally {
+                isProcessing = false
             }
         }
     }
 
-    private fun createBitmapFromYuv420(
-        yPlane: ByteArray,
+    // Simple bitmap creation that works reliably
+    private fun createSimpleBitmap(
+        planeData: Map<String, Any>,
         width: Int,
-        height: Int,
-        pixelStride: Int,
-        rowStride: Int
-    ): android.graphics.Bitmap {
-        try {
+        height: Int
+    ): android.graphics.Bitmap? {
+        return try {
+            val bytes = planeData["bytes"] as ByteArray
+            val bytesPerPixel = (planeData["bytesPerPixel"] as? Int) ?: 4
+            val bytesPerRow = (planeData["bytesPerRow"] as? Int) ?: (width * bytesPerPixel)
+            
+            Log.d(TAG, "Creating bitmap: ${width}x${height}, bytes: ${bytes.size}, bpp: $bytesPerPixel, bpr: $bytesPerRow")
+            
+            // Create bitmap with ARGB_8888 (MediaPipe compatible)
             val bitmap = android.graphics.Bitmap.createBitmap(
                 width,
                 height,
                 android.graphics.Bitmap.Config.ARGB_8888
             )
-
+            
+            // Convert BGRA to ARGB format (simple, reliable approach)
             val pixels = IntArray(width * height)
-            var yIndex = 0
-
+            var pixelIndex = 0
+            
             for (y in 0 until height) {
+                val rowStart = y * bytesPerRow
                 for (x in 0 until width) {
-                    // Calculate the correct index in the Y plane
-                    val yPlaneIndex = y * rowStride + x * pixelStride
-
-                    // Ensure we don't exceed array bounds
-                    if (yPlaneIndex < yPlane.size) {
-                        val yValue = yPlane[yPlaneIndex].toInt() and 0xFF
+                    val byteIndex = rowStart + (x * bytesPerPixel)
+                    
+                    if (byteIndex + 3 < bytes.size) {
+                        // BGRA8888 format: Blue, Green, Red, Alpha
+                        val b = bytes[byteIndex].toInt() and 0xFF
+                        val g = bytes[byteIndex + 1].toInt() and 0xFF
+                        val r = bytes[byteIndex + 2].toInt() and 0xFF
+                        val a = bytes[byteIndex + 3].toInt() and 0xFF
                         
-                        // Apply contrast enhancement for better hand detection
-                        val enhancedY = enhanceContrast(yValue)
-                        
-                        // Create grayscale pixel with enhanced contrast
-                        val pixel = android.graphics.Color.rgb(enhancedY, enhancedY, enhancedY)
-                        pixels[yIndex] = pixel
+                        // Create ARGB pixel
+                        pixels[pixelIndex] = (a shl 24) or (r shl 16) or (g shl 8) or b
                     } else {
-                        // Use black pixel if we're out of bounds
-                        pixels[yIndex] = android.graphics.Color.BLACK
+                        pixels[pixelIndex] = android.graphics.Color.BLACK
                     }
-                    yIndex++
+                    pixelIndex++
                 }
             }
-
+            
             bitmap.setPixels(pixels, 0, width, 0, 0, width, height)
-            return bitmap
-
+            Log.d(TAG, "Bitmap created successfully: ${bitmap.width}x${bitmap.height}")
+            bitmap
+            
         } catch (e: Exception) {
-            Log.e(TAG, "Error creating bitmap from YUV: ${e.message}", e)
-            // Return a simple black bitmap as fallback
-            return android.graphics.Bitmap.createBitmap(
-                width,
-                height,
-                android.graphics.Bitmap.Config.ARGB_8888
-            )
+            Log.e(TAG, "Error creating bitmap: ${e.message}")
+            null
         }
     }
 
-    // Helper method to enhance contrast for better hand detection
-    private fun enhanceContrast(yValue: Int): Int {
-        // Apply simple contrast enhancement
-        // This helps MediaPipe better distinguish hand features
-        val contrast = 1.2f // Increase contrast by 20%
-        val enhanced = ((yValue - 128) * contrast + 128).toInt()
-        
-        // Clamp to valid range
-        return when {
-            enhanced < 0 -> 0
-            enhanced > 255 -> 255
-            else -> enhanced
+    // Mirror bitmap horizontally for front camera (so left hand appears on left side)
+    private fun mirrorBitmap(original: android.graphics.Bitmap): android.graphics.Bitmap {
+        return try {
+            val matrix = android.graphics.Matrix().apply {
+                preScale(-1.0f, 1.0f) // Flip horizontally
+            }
+            
+            android.graphics.Bitmap.createBitmap(
+                original,
+                0,
+                0,
+                original.width,
+                original.height,
+                matrix,
+                false
+            )
+        } catch (e: Exception) {
+            Log.e(TAG, "Error mirroring bitmap: ${e.message}")
+            original // Return original if mirroring fails
         }
     }
+
+
 
     private fun sendHandLandmarks(result: HandLandmarkerResult, timestamp: Long) {
         val numHands = result.landmarks().size
         
-        // Enhanced logging for multi-hand detection debugging
-        if (numHands > 0) {
-            Log.d(TAG, "Detected $numHands hand(s) at timestamp $timestamp")
-            
-            // Log hand confidence scores if available
-            if (result.handednesses().isNotEmpty()) {
-                result.handednesses().forEachIndexed { handIndex, handedness ->
-                    if (handedness.isNotEmpty()) {
-                        val confidence = handedness[0].score()
-                        val label = handedness[0].categoryName()
-                        Log.d(TAG, "Hand $handIndex: $label (confidence: $confidence)")
-                    }
-                }
-            }
-            
-            // Detailed landmark logging (reduced frequency to avoid spam)
-            if (timestamp % 1000 < 100) { // Log detailed info ~every second
-                result.landmarks().forEachIndexed { handIndex, hand ->
-                    Log.d("HandLandmarks", "=== Hand $handIndex (${hand.size} landmarks) ===")
-                    // Log only key landmarks (wrist, thumb tip, index tip, middle tip, ring tip, pinky tip)
-                    val keyLandmarks = listOf(0, 4, 8, 12, 16, 20)
-                    keyLandmarks.forEach { landmarkIndex ->
-                        if (landmarkIndex < hand.size) {
-                            val landmark = hand[landmarkIndex]
-                            Log.d(
-                                "HandLandmarks",
-                                "Key Landmark $landmarkIndex: x=${landmark.x()}, y=${landmark.y()}, z=${landmark.z()}"
-                            )
-                        }
-                    }
-                }
-            }
+        // Always log detection status for debugging
+        if (timestamp % 2000 < MIN_PROCESS_INTERVAL) { // Log every ~2 seconds
+            Log.d(TAG, "Hand detection: $numHands hand(s) detected")
+        }
 
-            val handsData = result.landmarks().map { hand ->
+        // Always send results, even when no hands detected (for clearing overlay)
+        val handsData = if (numHands > 0) {
+            result.landmarks().map { hand ->
                 hand.map { landmark ->
                     mapOf("x" to landmark.x(), "y" to landmark.y(), "z" to landmark.z())
                 }
             }
-            
-            // Include handedness information in the result
-            val handednessData = if (result.handednesses().isNotEmpty()) {
-                result.handednesses().map { handedness ->
-                    if (handedness.isNotEmpty()) {
-                        mapOf(
-                            "label" to handedness[0].categoryName(),
-                            "confidence" to handedness[0].score()
-                        )
-                    } else {
-                        mapOf("label" to "Unknown", "confidence" to 0.0f)
-                    }
-                }
-            } else {
-                emptyList()
-            }
-            
-            activity.runOnUiThread {
-                channel.invokeMethod(
-                    "onHandLandmarks",
+        } else {
+            emptyList() // Empty list clears the overlay
+        }
+        
+        // Include handedness information in the result
+        val handednessData = if (result.handednesses().isNotEmpty()) {
+            result.handednesses().map { handedness ->
+                if (handedness.isNotEmpty()) {
                     mapOf(
-                        "hands" to handsData, 
-                        "handedness" to handednessData,
-                        "timestamp" to timestamp,
-                        "numHands" to numHands
+                        "label" to handedness[0].categoryName(),
+                        "confidence" to handedness[0].score()
                     )
-                )
+                } else {
+                    mapOf("label" to "Unknown", "confidence" to 0.0f)
+                }
             }
         } else {
-            // Log when no hands are detected (but less frequently)
-            if (timestamp % 2000 < 100) { // Log ~every 2 seconds
-                Log.d(TAG, "No hands detected at timestamp $timestamp")
-            }
+            emptyList()
+        }
+        
+        activity.runOnUiThread {
+            channel.invokeMethod(
+                "onHandLandmarks",
+                mapOf(
+                    "hands" to handsData, 
+                    "handedness" to handednessData,
+                    "timestamp" to timestamp,
+                    "numHands" to numHands
+                )
+            )
         }
     }
 
     private fun sendPoseLandmarks(result: PoseLandmarkerResult, timestamp: Long) {
-        if (result.landmarks().isNotEmpty()) {
-            // Log pose landmark count for debugging skeleton overlay issues
-            result.landmarks().forEachIndexed { poseIndex, pose ->
-                Log.d("PoseLandmarks", "=== Pose $poseIndex (${pose.size} landmarks) ===")
-                // Log key landmarks for skeleton positioning debugging
-                if (timestamp % 2000 < 100) { // Log ~every 2 seconds
-                    val keyLandmarks = listOf(0, 11, 12, 23, 24) // nose, shoulders, hips
-                    keyLandmarks.forEach { landmarkIndex ->
-                        if (landmarkIndex < pose.size) {
-                            val landmark = pose[landmarkIndex]
-                            Log.d(
-                                "PoseLandmarks",
-                                "Key Landmark $landmarkIndex: x=${landmark.x()}, y=${landmark.y()}, z=${landmark.z()}"
-                            )
-                        }
-                    }
-                }
-            }
+        val numPoses = result.landmarks().size
+        
+        // Always log detection status for debugging
+        if (timestamp % 3000 < MIN_PROCESS_INTERVAL) { // Log every ~3 seconds
+            Log.d(TAG, "Pose detection: $numPoses pose(s) detected")
+        }
 
-            val posesData = result.landmarks().map { pose ->
+        // Always send results, even when no poses detected (for clearing overlay)
+        val posesData = if (numPoses > 0) {
+            result.landmarks().map { pose ->
                 pose.map { landmark ->
                     mapOf("x" to landmark.x(), "y" to landmark.y(), "z" to landmark.z())
                 }
             }
-            
-            activity.runOnUiThread {
-                channel.invokeMethod(
-                    "onPoseLandmarks",
-                    mapOf(
-                        "poses" to posesData, 
-                        "timestamp" to timestamp,
-                        "numPoses" to result.landmarks().size
-                    )
-                )
-            }
         } else {
-            // Log when no poses are detected
-            if (timestamp % 3000 < 100) { // Log ~every 3 seconds
-                Log.d(TAG, "No poses detected at timestamp $timestamp")
-            }
+            emptyList() // Empty list clears the overlay
+        }
+        
+        activity.runOnUiThread {
+            channel.invokeMethod(
+                "onPoseLandmarks",
+                mapOf(
+                    "poses" to posesData, 
+                    "timestamp" to timestamp,
+                    "numPoses" to numPoses
+                )
+            )
         }
     }
 
@@ -451,11 +452,19 @@ class LandmarkDetector(
 
     fun stopDetection() {
         isDetectionActive = false
+        isProcessing = false
+        
         handLandmarker?.close()
         poseLandmarker?.close()
+        
         if (::backgroundExecutor.isInitialized) {
             backgroundExecutor.shutdown()
         }
+        
+        // Force garbage collection on stop
+        System.gc()
+        
+        Log.d(TAG, "Detection stopped and memory cleaned up")
     }
 
     interface LandmarkerListener {
