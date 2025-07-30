@@ -5,3 +5,7 @@ node_modules/
 Thumbs.db
 *.tmp
 *.temp
+.idea
+.vscode/
+# Build output
+dist/

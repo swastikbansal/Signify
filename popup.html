@@ -1,332 +1,350 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Signify - ISL Translator</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-        body {
-            width: 360px;
-            height: 500px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-            color: #fff;
-            overflow: hidden;
-        }
+      body {
+        width: 320px;
+        height: 480px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        background: #1c1c1c;
+        color: #ffffff;
+        overflow: hidden;
+        border-radius: 12px;
+        border: 1px solid #333333;
+      }
 
-        .header {
-            background: linear-gradient(90deg, #FFD700 0%, #FFA500 100%);
-            padding: 20px;
-            text-align: center;
-            color: #000;
-        }
+      .header {
+        padding: 24px 20px 16px 20px;
+        text-align: center;
+        border-bottom: 1px solid #2a2a2a;
+      }
 
-        .logo {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 8px;
-        }
+      .logo {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        margin-bottom: 8px;
+      }
 
-        .title {
-            font-size: 24px;
-            font-weight: bold;
-            letter-spacing: 0.5px;
-        }
+      .title {
+        font-size: 22px;
+        font-weight: 600;
+        color: #ffbf00;
+        letter-spacing: -0.5px;
+      }
 
-        .subtitle {
-            font-size: 14px;
-            opacity: 0.8;
-            margin-top: 4px;
-        }
+      .content {
+        padding: 20px;
+        height: calc(100% - 100px);
+        overflow-y: auto;
+      }
 
-        .content {
-            padding: 24px;
-            height: calc(100% - 120px);
-            overflow-y: auto;
-        }
+      .section {
+        margin-bottom: 20px;
+      }
 
-        .section {
-            margin-bottom: 24px;
-        }
+      .section-title {
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 12px;
+        color: #b0b0b0;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
 
-        .section-title {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 12px;
-            color: #FFD700;
-        }
+      .favorite-sites {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+        margin-bottom: 24px;
+      }
 
-        .status-card {
-            background: #333;
-            border-radius: 12px;
-            padding: 16px;
-            border-left: 4px solid #FFD700;
-            margin-bottom: 16px;
-        }
+      .site-btn {
+        width: 44px;
+        height: 44px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        transition: all 0.2s ease;
+        background: #2a2a2a;
+      }
 
-        .status-text {
-            font-size: 14px;
-            margin-bottom: 8px;
-        }
+      .site-btn.youtube {
+        background: #ff0000;
+      }
 
-        .status-detail {
-            font-size: 12px;
-            opacity: 0.7;
-        }
+      .site-btn.add {
+        background: #2a2a2a;
+        color: #666;
+        font-size: 20px;
+      }
 
-        .button-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
+      .site-btn:hover {
+        transform: scale(1.05);
+        opacity: 0.8;
+      }
 
-        .btn {
-            padding: 12px 16px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-        }
+      .setting-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid #2a2a2a;
+      }
 
-        .btn-primary {
-            background: linear-gradient(90deg, #FFD700 0%, #FFA500 100%);
-            color: #000;
-        }
+      .setting-item:last-child {
+        border-bottom: none;
+      }
 
-        .btn-secondary {
-            background: #444;
-            color: #fff;
-            border: 1px solid #555;
-        }
+      .setting-label {
+        font-size: 14px;
+        font-weight: 400;
+        color: #ffffff;
+      }
 
-        .btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        }
+      .toggle {
+        position: relative;
+        width: 44px;
+        height: 24px;
+        background: #333;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+      }
 
-        .btn-primary:hover {
-            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
-        }
+      .toggle.active {
+        background: #ffbf00;
+      }
 
-        .setting-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid #333;
-        }
+      .toggle::after {
+        content: "";
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        background: #fff;
+        border-radius: 50%;
+        top: 2px;
+        left: 2px;
+        transition: transform 0.2s ease;
+      }
 
-        .setting-item:last-child {
-            border-bottom: none;
-        }
+      .toggle.active::after {
+        transform: translateX(20px);
+      }
 
-        .setting-label {
-            font-size: 14px;
-            font-weight: 500;
-        }
+      .help-btn {
+        width: 100%;
+        padding: 12px;
+        background: #2a2a2a;
+        border: 1px solid #333;
+        border-radius: 8px;
+        color: #ffffff;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        margin-top: 20px;
+      }
 
-        .toggle {
-            position: relative;
-            width: 48px;
-            height: 24px;
-            background: #555;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
+      .help-btn:hover {
+        background: #333;
+        border-color: #ffbf00;
+      }
 
-        .toggle.active {
-            background: #FFD700;
-        }
+      .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      }
 
-        .toggle::after {
-            content: '';
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background: #fff;
-            border-radius: 50%;
-            top: 2px;
-            left: 2px;
-            transition: transform 0.3s ease;
-        }
+      .modal-content {
+        background: #2a2a2a;
+        padding: 24px;
+        border-radius: 12px;
+        width: 280px;
+        border: 1px solid #333;
+      }
 
-        .toggle.active::after {
-            transform: translateX(24px);
-        }
+      .modal-title {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 16px;
+        color: #ffbf00;
+      }
 
-        .footer {
-            padding: 16px 24px;
-            text-align: center;
-            border-top: 1px solid #333;
-            background: #222;
-        }
+      .form-group {
+        margin-bottom: 16px;
+      }
 
-        .footer-text {
-            font-size: 12px;
-            opacity: 0.6;
-        }
+      .form-label {
+        display: block;
+        font-size: 12px;
+        color: #b0b0b0;
+        margin-bottom: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
 
-        .model-status {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 8px;
-        }
+      .form-input {
+        width: 100%;
+        padding: 8px 12px;
+        background: #1c1c1c;
+        border: 1px solid #333;
+        border-radius: 6px;
+        color: #ffffff;
+        font-size: 14px;
+      }
 
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #ff6b6b;
-        }
+      .form-input:focus {
+        outline: none;
+        border-color: #ffbf00;
+      }
 
-        .status-dot.active {
-            background: #4CAF50;
-        }
+      .modal-buttons {
+        display: flex;
+        gap: 8px;
+      }
 
-        .progress-bar {
-            width: 100%;
-            height: 4px;
-            background: #333;
-            border-radius: 2px;
-            margin-top: 8px;
-            overflow: hidden;
-        }
+      .btn-cancel {
+        flex: 1;
+        padding: 8px 16px;
+        background: #333;
+        border: 1px solid #444;
+        border-radius: 6px;
+        color: #ffffff;
+        cursor: pointer;
+        font-size: 14px;
+      }
 
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #FFD700 0%, #FFA500 100%);
-            width: 0%;
-            transition: width 0.3s ease;
-        }
+      .btn-ok {
+        flex: 1;
+        padding: 8px 16px;
+        background: #ffbf00;
+        border: none;
+        border-radius: 6px;
+        color: #1c1c1c;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+      }
 
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-top: 12px;
-        }
-
-        .stat-card {
-            background: #333;
-            padding: 12px;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 18px;
-            font-weight: bold;
-            color: #FFD700;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            opacity: 0.7;
-            margin-top: 4px;
-        }
-
-        .hidden {
-            display: none;
-        }
+      .hidden {
+        display: none;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="header">
-        <div class="logo">
-            <img src="icons/signify-logo_48.png" width="40" height="40" alt="Signify Logo" style="filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));">
-            <div>
-                <div class="title">Signify</div>
-                <div class="subtitle">ISL Translator</div>
-            </div>
-        </div>
+      <div class="logo">
+        <img
+          src="icons/signify.svg"
+          width="32"
+          height="32"
+          alt="Signify Logo"
+        />
+        <div class="title">Signify</div>
+      </div>
     </div>
 
     <div class="content">
-        <div class="section">
-            <div class="status-card" id="statusCard">
-                <div class="status-text" id="statusText">Ready to translate</div>
-                <div class="status-detail" id="statusDetail">Click the Signify button on YouTube videos. The 3D avatar will appear in a floating window.</div>
-                <div class="model-status">
-                    <div class="status-dot" id="modelStatusDot"></div>
-                    <span id="modelStatusText">Avatar model ready</span>
-                </div>
-                <div class="progress-bar hidden" id="progressBar">
-                    <div class="progress-fill" id="progressFill"></div>
-                </div>
-            </div>
+      <div class="section">
+        <div class="section-title">Favourite sites</div>
+        <div class="favorite-sites" id="favoriteSites">
+          <button
+            class="site-btn youtube"
+            onclick="openSite('https://www.youtube.com')"
+            title="YouTube"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+              <path
+                d="M23.498 6.186a2.999 2.999 0 0 0-2.108-2.125C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.39.516A2.999 2.999 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a2.999 2.999 0 0 0 2.108 2.125C4.495 20.455 12 20.455 12 20.455s7.505 0 9.39-.516a2.999 2.999 0 0 0 2.108-2.125C24 15.93 24 12 24 12s0-3.93-.502-5.814ZM9.545 15.568V8.432L15.818 12l-6.273 3.568Z"
+              />
+            </svg>
+          </button>
+          <button class="site-btn add" onclick="addSite()" title="Add new site">
+            +
+          </button>
         </div>
+      </div>
 
-        <div class="section">
-            <div class="section-title">Quick Actions</div>
-            <div class="button-group">
-                <button class="btn btn-primary" id="openYouTubeBtn">
-                    🎥 Open YouTube
-                </button>
-                <button class="btn btn-secondary" id="settingsBtn">
-                    ⚙️ Settings
-                </button>
-                <button class="btn btn-secondary" id="helpBtn">
-                    ❓ Help & Tutorial
-                </button>
-            </div>
+      <div class="section">
+        <div class="section-title">Settings</div>
+        <div class="setting-item">
+          <div class="setting-label">Auto-start on video play</div>
+          <div
+            class="toggle"
+            id="autoStartToggle"
+            onclick="toggleSetting('autoStart')"
+          ></div>
         </div>
+        <div class="setting-item">
+          <div class="setting-label">Show floating avatar</div>
+          <div
+            class="toggle"
+            id="showAvatarToggle"
+            onclick="toggleSetting('showAvatar')"
+          ></div>
+        </div>
+      </div>
 
-        <div class="section hidden" id="settingsSection">
-            <div class="section-title">Settings</div>
-            <div class="setting-item">
-                <div class="setting-label">Auto-start on video play</div>
-                <div class="toggle active" id="autoStartToggle"></div>
-            </div>
-            <div class="setting-item">
-                <div class="setting-label">Show floating avatar</div>
-                <div class="toggle active" id="showAvatarToggle"></div>
-            </div>
-            <div class="setting-item">
-                <div class="setting-label">High quality animations</div>
-                <div class="toggle active" id="highQualityToggle"></div>
-            </div>
-            <div class="setting-item">
-                <div class="setting-label">Auto-hide in fullscreen</div>  
-                <div class="toggle active" id="autoHideToggle"></div>
-            </div>
-        </div>
-
-        <div class="section hidden" id="statsSection">
-            <div class="section-title">Usage Statistics</div>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-value" id="videosTranslated">0</div>
-                    <div class="stat-label">Videos Translated</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="wordsTranslated">0</div>
-                    <div class="stat-label">Words Translated</div>
-                </div>
-            </div>
-        </div>
+      <button class="help-btn" onclick="openHelp()">
+        Help & Tutorial Button
+      </button>
     </div>
 
-    <div class="footer">
-        <div class="footer-text">
-            Made with ❤️ by Philosia
+    <!-- Add Site Modal -->
+    <div class="modal hidden" id="addSiteModal">
+      <div class="modal-content">
+        <div class="modal-title">Add New Site</div>
+        <div class="form-group">
+          <label class="form-label">Site Name</label>
+          <input
+            type="text"
+            class="form-input"
+            id="siteName"
+            placeholder="e.g., GitHub"
+          />
         </div>
+        <div class="form-group">
+          <label class="form-label">Site URL</label>
+          <input
+            type="url"
+            class="form-input"
+            id="siteUrl"
+            placeholder="https://example.com"
+          />
+        </div>
+        <div class="modal-buttons">
+          <button class="btn-cancel" onclick="hideAddSiteModal()">
+            Cancel
+          </button>
+          <button class="btn-ok" onclick="addNewSite()">Add Site</button>
+        </div>
+      </div>
     </div>
 
     <script src="popup.js"></script>
-</body>
+  </body>
 </html>

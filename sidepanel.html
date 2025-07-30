@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Signify - ISL Translator Side Panel</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        background: #1c1c1c;
+        color: #ffffff;
+        height: 100vh;
+        overflow-x: hidden;
+        border-radius: 12px;
+        border: 1px solid #333333;
+      }
+
+      .header {
+        padding: 20px;
+        text-align: center;
+        border-bottom: 1px solid #2a2a2a;
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        margin-bottom: 8px;
+      }
+
+      .title {
+        font-size: 20px;
+        font-weight: 600;
+        color: #ffbf00;
+        letter-spacing: -0.5px;
+      }
+
+      .subtitle {
+        font-size: 12px;
+        color: #b0b0b0;
+        margin-top: 4px;
+      }
+
+      .content {
+        padding: 20px;
+        height: calc(100vh - 80px);
+        overflow-y: auto;
+      }
+
+      .status-card {
+        background: #2a2a2a;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 20px;
+        border-left: 3px solid #ffbf00;
+      }
+
+      .status-text {
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 8px;
+      }
+
+      .status-detail {
+        font-size: 12px;
+        color: #b0b0b0;
+        line-height: 1.4;
+      }
+
+      .avatar-container {
+        background: #2a2a2a;
+        border-radius: 8px;
+        min-height: 300px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+        border: 1px solid #333;
+      }
+
+      .avatar-placeholder {
+        text-align: center;
+        color: #666;
+      }
+
+      .controls {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 20px;
+      }
+
+      .control-btn {
+        flex: 1;
+        padding: 10px;
+        background: #2a2a2a;
+        border: 1px solid #333;
+        border-radius: 6px;
+        color: #ffffff;
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .control-btn:hover {
+        background: #333;
+        border-color: #ffbf00;
+      }
+
+      .control-btn.active {
+        background: #ffbf00;
+        color: #1c1c1c;
+        border-color: #ffbf00;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      .loading {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        color: #ffbf00;
+      }
+
+      .spinner {
+        width: 16px;
+        height: 16px;
+        border: 2px solid #333;
+        border-top: 2px solid #ffbf00;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <div class="logo">
+        <img
+          src="icons/signify.svg"
+          width="28"
+          height="28"
+          alt="Signify Logo"
+        />
+        <div>
+          <div class="title">Signify</div>
+          <div class="subtitle">ISL Translator</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="status-card" id="statusCard">
+        <div class="status-text" id="statusText">Ready to translate</div>
+        <div class="status-detail" id="statusDetail">
+          Navigate to a YouTube video and the avatar will appear here
+          automatically.
+        </div>
+      </div>
+
+      <div class="avatar-container" id="avatarContainer">
+        <div class="avatar-placeholder" id="avatarPlaceholder">
+          <div>🤖</div>
+          <div style="margin-top: 8px; font-size: 14px">
+            3D Avatar will appear here
+          </div>
+          <div style="margin-top: 4px; font-size: 12px; color: #666">
+            Open a YouTube video to start
+          </div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="control-btn" id="playBtn" onclick="togglePlay()">
+          ▶️ Play
+        </button>
+        <button class="control-btn" id="pauseBtn" onclick="togglePause()">
+          ⏸️ Pause
+        </button>
+        <button class="control-btn" id="resetBtn" onclick="resetAvatar()">
+          🔄 Reset
+        </button>
+      </div>
+
+      <div class="loading hidden" id="loadingIndicator">
+        <div class="spinner"></div>
+        <span>Loading avatar...</span>
+      </div>
+    </div>
+
+    <script src="sidepanel.js"></script>
+  </body>
+</html>

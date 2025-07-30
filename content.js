@@ -1832,5 +1832,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 playWordAnimation(request.text);
             }
             break;
+            
+        case 'updateAutoStart':
+            chrome.storage.sync.set({ autoStart: request.autoStart });
+            console.log('Signify: Auto-start setting updated:', request.autoStart);
+            break;
     }
 });

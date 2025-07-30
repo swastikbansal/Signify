@@ -11,7 +11,8 @@ chrome.runtime.onInstalled.addListener((details) => {
       animationSpeed: 1.0,
       autoStart: false,
       avatarSize: 'medium',
-      theme: 'dark'
+      theme: 'dark',
+      showAvatar: true
     });
     
     // Open welcome page
@@ -25,17 +26,23 @@ chrome.runtime.onInstalled.addListener((details) => {
 
 // Handle extension icon click
 chrome.action.onClicked.addListener((tab) => {
-  // Check if we're on YouTube
-  if (tab.url.includes('youtube.com')) {
-    // Toggle Signify panel
-    chrome.tabs.sendMessage(tab.id, {
-      action: 'toggleSignify'
-    });
-  } else {
-    // Redirect to YouTube
-    chrome.tabs.update(tab.id, {
-      url: 'https://www.youtube.com/'
-    });
+  // For Manifest V3, we use the default popup
+  // This function might not be called if default_popup is set
+  console.log('Extension icon clicked');
+});
+
+// Enable side panel on YouTube
+chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+  if (changeInfo.status === 'complete' && tab.url && tab.url.includes('youtube.com')) {
+    try {
+      await chrome.sidePanel.setOptions({
+        tabId,
+        path: 'sidepanel.html',
+        enabled: true
+      });
+    } catch (error) {
+      console.log('Side panel not supported or error:', error);
+    }
   }
 });
 

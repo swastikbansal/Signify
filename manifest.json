@@ -7,14 +7,16 @@
     "activeTab",
     "storage",
     "scripting",
-    "tabs"
+    "tabs",
+    "sidePanel"
   ],
   "host_permissions": [
     "*://www.youtube.com/*",
     "*://youtube.com/*",
     "*://qqyqwtoxjhgashwxyidg.supabase.co/*",
     "*://cdn.jsdelivr.net/*",
-    "*://*.supabase.co/*"
+    "*://*.supabase.co/*",
+    "*://*/*"
   ],
   "background": {
     "service_worker": "background.js"
@@ -33,17 +35,24 @@
       "resources": [
         "popup.html",
         "popup.js",
+        "sidepanel.html",
+        "sidepanel.js",
+        "help.html",
         "three.min.js",
         "GLTFLoader.js",
         "OrbitControls.js",
         "supabase.js",
         "simple-test.js",
         "fallback-avatar.js",
-        "animation/*.glb"
+        "animation/*.glb",
+        "icons/signify.svg"
       ],
       "matches": ["*://www.youtube.com/*", "*://youtube.com/*"]
     }
   ],
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
   "action": {
     "default_popup": "popup.html",
     "default_title": "Signify ISL Translator",

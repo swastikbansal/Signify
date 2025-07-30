@@ -1,13 +1,17 @@
-// Signify ISL Translator - Popup Script (Clean Version)
+// Signify ISL Translator - Popup Script
 
 document.addEventListener('DOMContentLoaded', initializePopup);
 
 async function initializePopup() {
-    await loadSettings();
-    await loadStats();
-    checkCurrentTab();
-    setupEventListeners();
-    startStatusUpdates();
+    console.log('Popup initializing...');
+    try {
+        await loadSettings();
+        await loadFavoriteSites();
+        setupEventListeners();
+        console.log('Popup initialized successfully');
+    } catch (error) {
+        console.error('Error initializing popup:', error);
+    }
 }
 
 // Load user settings
@@ -15,110 +19,104 @@ async function loadSettings() {
     try {
         const settings = await chrome.storage.sync.get([
             'autoStart',
-            'showAvatar',
-            'highQuality',
-            'signifyEnabled'
+            'showAvatar'
         ]);
 
-        // Update toggle states
-        updateToggle('autoStartToggle', settings.autoStart || false);
+        // Update toggle states - default to true if not set
+        updateToggle('autoStartToggle', settings.autoStart !== false);
         updateToggle('showAvatarToggle', settings.showAvatar !== false);
-        updateToggle('highQualityToggle', settings.highQuality !== false);
+        
+        console.log('Loaded settings:', settings);
         
     } catch (error) {
         console.error('Error loading settings:', error);
     }
 }
 
-// Load usage statistics
-async function loadStats() {
+// Load favorite sites
+async function loadFavoriteSites() {
     try {
-        const stats = await chrome.storage.local.get([
-            'videosTranslated',
-            'wordsTranslated',
-            'totalUsageTime'
-        ]);
-
-        document.getElementById('videosTranslated').textContent = stats.videosTranslated || 0;
-        document.getElementById('wordsTranslated').textContent = stats.wordsTranslated || 0;
+        const data = await chrome.storage.sync.get(['favoriteSites']);
+        const sites = data.favoriteSites || [];
+        
+        const container = document.getElementById('favoriteSites');
+        
+        // Only clear the saved sites, keep YouTube and Add button from HTML
+        const existingButtons = container.querySelectorAll('.site-btn:not(.youtube):not(.add)');
+        existingButtons.forEach(btn => btn.remove());
+        
+        // Add saved sites before the add button
+        const addButton = container.querySelector('.add');
+        sites.forEach(site => {
+            addSiteButton(site.name, site.url, site.icon);
+        });
         
     } catch (error) {
-        console.error('Error loading stats:', error);
+        console.error('Error loading favorite sites:', error);
     }
 }
 
-// Check current tab and update status
-async function checkCurrentTab() {
-    try {
-        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-        
-        if (tab.url.includes('youtube.com/watch')) {
-            updateStatus('YouTube Video Detected', 'Ready to translate sign language');
-            updateModelStatus('active', 'Avatar model ready');
-        } else if (tab.url.includes('youtube.com')) {
-            updateStatus('On YouTube', 'Navigate to a video to start translation');
-            updateModelStatus('inactive', 'Waiting for video...');
-        } else {
-            updateStatus('Not on YouTube', 'Please navigate to YouTube to use Signify');
-            updateModelStatus('inactive', 'YouTube required');
-        }
-    } catch (error) {
-        console.error('Error checking current tab:', error);
-        updateStatus('Error', 'Could not check current page');
+// Add site button to the UI
+function addSiteButton(name, url, iconUrl = null) {
+    const container = document.getElementById('favoriteSites');
+    const addButton = container.querySelector('.add');
+    
+    const siteBtn = document.createElement('button');
+    siteBtn.className = 'site-btn';
+    siteBtn.title = name;
+    siteBtn.onclick = () => openSite(url);
+    
+    if (iconUrl) {
+        const img = document.createElement('img');
+        img.src = iconUrl;
+        img.width = 24;
+        img.height = 24;
+        img.style.borderRadius = '4px';
+        img.onerror = () => {
+            // Fallback if image fails to load
+            img.style.display = 'none';
+            siteBtn.textContent = name.charAt(0).toUpperCase();
+            siteBtn.style.fontSize = '14px';
+            siteBtn.style.fontWeight = '600';
+            siteBtn.style.background = '#666';
+        };
+        siteBtn.appendChild(img);
+    } else {
+        // Use first letter of site name as fallback
+        siteBtn.textContent = name.charAt(0).toUpperCase();
+        siteBtn.style.fontSize = '14px';
+        siteBtn.style.fontWeight = '600';
+        siteBtn.style.background = '#666';
+    }
+    
+    // Insert before add button
+    if (addButton) {
+        container.insertBefore(siteBtn, addButton);
+    } else {
+        container.appendChild(siteBtn);
     }
 }
 
 // Setup event listeners
 function setupEventListeners() {
-    // Quick action buttons
-    document.getElementById('openYouTubeBtn').addEventListener('click', openYouTube);
-    document.getElementById('settingsBtn').addEventListener('click', toggleSettings);
-    document.getElementById('helpBtn').addEventListener('click', openHelp);
-    
-    // Setting toggles
-    document.getElementById('autoStartToggle').addEventListener('click', () => {
-        toggleSetting('autoStartToggle', 'autoStart');
+    // Close modal when clicking outside
+    document.getElementById('addSiteModal').addEventListener('click', (e) => {
+        if (e.target.classList.contains('modal')) {
+            hideAddSiteModal();
+        }
     });
     
-    document.getElementById('showAvatarToggle').addEventListener('click', () => {
-        toggleSetting('showAvatarToggle', 'showAvatar');
+    // Handle Enter key in modal inputs
+    document.getElementById('siteName').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') addNewSite();
     });
     
-    document.getElementById('highQualityToggle').addEventListener('click', () => {
-        toggleSetting('highQualityToggle', 'highQuality');
+    document.getElementById('siteUrl').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') addNewSite();
     });
 }
 
-// Update status display
-function updateStatus(status, detail) {
-    document.getElementById('statusText').textContent = status;
-    document.getElementById('statusDetail').textContent = detail;
-}
-
-// Update model status
-function updateModelStatus(status, text) {
-    const dot = document.getElementById('modelStatusDot');
-    const statusText = document.getElementById('modelStatusText');
-    
-    dot.className = status === 'active' ? 'status-dot active' : 'status-dot';
-    statusText.textContent = text;
-}
-
-// Show/hide progress bar
-function showProgress(percentage) {
-    const progressBar = document.getElementById('progressBar');
-    const progressFill = document.getElementById('progressFill');
-    
-    progressBar.classList.remove('hidden');
-    progressFill.style.width = percentage + '%';
-}
-
-function hideProgress() {
-    const progressBar = document.getElementById('progressBar');
-    progressBar.classList.add('hidden');
-}
-
-// Update toggle state
+// Update toggle appearance
 function updateToggle(toggleId, isActive) {
     const toggle = document.getElementById(toggleId);
     if (toggle) {
@@ -127,100 +125,177 @@ function updateToggle(toggleId, isActive) {
         } else {
             toggle.classList.remove('active');
         }
+        console.log(`Toggle ${toggleId} set to ${isActive ? 'active' : 'inactive'}`);
     }
 }
 
-// Toggle setting and save
-async function toggleSetting(toggleId, settingKey) {
-    const toggle = document.getElementById(toggleId);
-    const isActive = toggle.classList.contains('active');
+// Toggle setting function called from HTML
+async function toggleSetting(setting) {
+    console.log('Toggling setting:', setting);
+    const toggleElement = document.getElementById(setting + 'Toggle');
+    const wasActive = toggleElement.classList.contains('active');
+    const isActive = !wasActive;
     
-    // Update UI
-    if (isActive) {
-        toggle.classList.remove('active');
-    } else {
-        toggle.classList.add('active');
+    console.log('Was active:', wasActive, 'Now active:', isActive);
+    
+    toggleElement.classList.toggle('active', isActive);
+    
+    // Save setting
+    const settings = {};
+    settings[setting] = isActive;
+    await chrome.storage.sync.set(settings);
+    
+    console.log('Saved setting:', settings);
+    
+    // Send message to content script if needed for autoStart
+    if (setting === 'autoStart') {
+        try {
+            const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+            if (tabs[0] && (tabs[0].url.includes('youtube.com'))) {
+                chrome.tabs.sendMessage(tabs[0].id, {
+                    action: 'updateAutoStart',
+                    autoStart: isActive
+                });
+            }
+        } catch (error) {
+            console.log('Content script not available or not on YouTube');
+        }
+    }
+}
+
+// Open site function
+function openSite(url) {
+    chrome.tabs.create({ url: url });
+    window.close();
+}
+
+// Add site functionality
+function addSite() {
+    showAddSiteModal();
+}
+
+// Show add site modal
+function showAddSiteModal() {
+    console.log('Showing add site modal...');
+    document.getElementById('addSiteModal').classList.remove('hidden');
+    document.getElementById('siteName').focus();
+}
+
+// Hide add site modal
+function hideAddSiteModal() {
+    console.log('Hiding add site modal...');
+    document.getElementById('addSiteModal').classList.add('hidden');
+    document.getElementById('siteName').value = '';
+    document.getElementById('siteUrl').value = '';
+}
+
+// Add new site
+async function addNewSite() {
+    console.log('Adding new site...');
+    const nameInput = document.getElementById('siteName');
+    const urlInput = document.getElementById('siteUrl');
+    
+    if (!nameInput || !urlInput) {
+        console.error('Input elements not found');
+        return;
+    }
+    
+    const name = nameInput.value.trim();
+    let url = urlInput.value.trim();
+    
+    console.log('Site name:', name, 'URL:', url);
+    
+    if (!name || !url) {
+        alert('Please enter both site name and URL');
+        return;
+    }
+    
+    // Add https:// if no protocol is specified
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        url = 'https://' + url;
+    }
+    
+    // Validate URL
+    try {
+        new URL(url);
+    } catch (error) {
+        alert('Please enter a valid URL');
+        return;
+    }
+    
+    console.log('URL validation passed, fetching favicon...');
+    
+    // Try to fetch favicon (with shorter timeout to prevent hanging)
+    let iconUrl = null;
+    try {
+        iconUrl = await getFavicon(url);
+        console.log('Favicon URL:', iconUrl);
+    } catch (error) {
+        console.log('Favicon fetch failed, continuing without icon:', error);
     }
     
     // Save to storage
     try {
-        await chrome.storage.sync.set({ [settingKey]: !isActive });
-        console.log(`Setting ${settingKey} updated to:`, !isActive);
+        const data = await chrome.storage.sync.get(['favoriteSites']);
+        const sites = data.favoriteSites || [];
+        
+        const newSite = { name, url, icon: iconUrl };
+        sites.push(newSite);
+        await chrome.storage.sync.set({ favoriteSites: sites });
+        
+        console.log('Site saved to storage:', newSite);
+        
+        // Add to UI
+        addSiteButton(name, url, iconUrl);
+        console.log('Site button added to UI');
+        
+        // Close modal
+        hideAddSiteModal();
+        
     } catch (error) {
-        console.error(`Error updating ${settingKey}:`, error);
+        console.error('Error saving site:', error);
+        alert('Error saving site. Please try again.');
     }
 }
 
-// Open YouTube
-function openYouTube() {
-    chrome.tabs.create({ url: 'https://www.youtube.com' });
-    window.close();
-}
-
-// Toggle settings display
-function toggleSettings() {
-    const settingsSection = document.getElementById('settingsSection');
-    const statsSection = document.getElementById('statsSection');
+// Get favicon for a URL
+async function getFavicon(url) {
+    try {
+        const domain = new URL(url).origin;
+        const faviconUrl = `${domain}/favicon.ico`;
+        
+        // Test if favicon exists with a shorter timeout
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 1500); // 1.5 second timeout
+        
+        const response = await fetch(faviconUrl, { 
+            method: 'HEAD',
+            signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
+        
+        if (response.ok) {
+            return faviconUrl;
+        }
+    } catch (error) {
+        console.log('Could not fetch favicon:', error);
+    }
     
-    if (settingsSection.classList.contains('hidden')) {
-        settingsSection.classList.remove('hidden');
-        statsSection.classList.add('hidden');
-        document.getElementById('settingsBtn').textContent = '📊 Statistics';
-    } else {
-        settingsSection.classList.add('hidden');
-        statsSection.classList.remove('hidden');
-        document.getElementById('settingsBtn').textContent = '⚙️ Settings';
-    }
+    return null;
 }
 
 // Open help page
 function openHelp() {
-    chrome.tabs.create({ 
-        url: 'https://github.com/your-repo/signify-help' 
-    });
-    window.close();
-}
-
-// Start periodic status updates
-function startStatusUpdates() {
-    // Update status every 5 seconds
-    setInterval(async () => {
-        await checkCurrentTab();
-        await loadStats();
-    }, 5000);
-}
-
-// Listen for messages from content script
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    switch (request.action) {
-        case 'updateStatus':
-            updateStatus(request.status, request.detail);
-            break;
-            
-        case 'updateModelStatus':
-            updateModelStatus(request.status, request.text);
-            break;
-            
-        case 'updateProgress':
-            showProgress(request.percentage);
-            break;
-            
-        case 'hideProgress':
-            hideProgress();
-            break;
-            
-        case 'updateStats':
-            if (request.videosTranslated !== undefined) {
-                document.getElementById('videosTranslated').textContent = request.videosTranslated;
-            }
-            if (request.wordsTranslated !== undefined) {
-                document.getElementById('wordsTranslated').textContent = request.wordsTranslated;
-            }
-            break;
+    console.log('Opening help page...');
+    try {
+        const helpUrl = chrome.runtime.getURL('help.html');
+        console.log('Help URL:', helpUrl);
+        chrome.tabs.create({ url: helpUrl });
+        window.close();
+    } catch (error) {
+        console.error('Error opening help page:', error);
+        // Fallback: try to open in same tab
+        window.open('help.html', '_blank');
     }
-});
-
-// Handle popup close
-window.addEventListener('beforeunload', () => {
-    console.log('Popup closing');
-});
+}

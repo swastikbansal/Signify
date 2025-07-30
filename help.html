@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Signify - Help & Tutorial</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        background: #1c1c1c;
+        color: #ffffff;
+        line-height: 1.6;
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 40px 20px;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 60px;
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        margin-bottom: 20px;
+      }
+
+      .title {
+        font-size: 36px;
+        font-weight: 700;
+        color: #ffbf00;
+        letter-spacing: -1px;
+      }
+
+      .subtitle {
+        font-size: 18px;
+        color: #b0b0b0;
+        margin-top: 8px;
+      }
+
+      .section {
+        margin-bottom: 50px;
+      }
+
+      .section-title {
+        font-size: 24px;
+        font-weight: 600;
+        color: #ffbf00;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #333;
+        padding-bottom: 10px;
+      }
+
+      .section-content {
+        font-size: 16px;
+        color: #e0e0e0;
+        margin-bottom: 20px;
+      }
+
+      .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        margin: 30px 0;
+      }
+
+      .feature-card {
+        background: #2a2a2a;
+        border-radius: 12px;
+        padding: 24px;
+        border: 1px solid #333;
+        transition: all 0.3s ease;
+      }
+
+      .feature-card:hover {
+        border-color: #ffbf00;
+        transform: translateY(-2px);
+      }
+
+      .feature-icon {
+        font-size: 32px;
+        margin-bottom: 16px;
+      }
+
+      .feature-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #ffbf00;
+        margin-bottom: 12px;
+      }
+
+      .feature-description {
+        color: #b0b0b0;
+        font-size: 14px;
+      }
+
+      .steps {
+        counter-reset: step-counter;
+      }
+
+      .step {
+        counter-increment: step-counter;
+        background: #2a2a2a;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 16px;
+        border-left: 4px solid #ffbf00;
+        position: relative;
+      }
+
+      .step::before {
+        content: counter(step-counter);
+        position: absolute;
+        left: -12px;
+        top: 20px;
+        background: #ffbf00;
+        color: #1c1c1c;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 12px;
+      }
+
+      .step-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #ffffff;
+        margin-bottom: 8px;
+      }
+
+      .step-description {
+        color: #b0b0b0;
+        font-size: 14px;
+      }
+
+      .highlight {
+        background: linear-gradient(90deg, #ffbf00, #ffd700);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 600;
+      }
+
+      .back-btn {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #ffbf00;
+        color: #1c1c1c;
+        border: none;
+        border-radius: 8px;
+        padding: 12px 20px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .back-btn:hover {
+        background: #e6ac00;
+        transform: translateY(-1px);
+      }
+
+      .info-box {
+        background: #2a2a2a;
+        border: 1px solid #ffbf00;
+        border-radius: 8px;
+        padding: 16px;
+        margin: 20px 0;
+      }
+
+      .info-box-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #ffbf00;
+        margin-bottom: 8px;
+      }
+
+      .info-box-content {
+        font-size: 14px;
+        color: #b0b0b0;
+      }
+
+      .footer {
+        text-align: center;
+        margin-top: 60px;
+        padding-top: 30px;
+        border-top: 1px solid #333;
+        color: #666;
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          padding: 20px 15px;
+        }
+
+        .title {
+          font-size: 28px;
+        }
+
+        .section-title {
+          font-size: 20px;
+        }
+
+        .feature-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <button class="back-btn" onclick="window.close()">✕ Close</button>
+
+    <div class="container">
+      <div class="header">
+        <div class="logo">
+          <img
+            src="icons/signify.svg"
+            width="48"
+            height="48"
+            alt="Signify Logo"
+          />
+          <div>
+            <h1 class="title">Signify</h1>
+            <p class="subtitle">Indian Sign Language Translator</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2 class="section-title">🎯 What is Signify?</h2>
+        <div class="section-content">
+          Signify is a powerful browser extension that brings
+          <span class="highlight">Indian Sign Language (ISL)</span> translation
+          directly to your YouTube viewing experience. Using advanced 3D
+          animation technology, Signify transforms video content into visual
+          sign language, making it accessible to the deaf and hard-of-hearing
+          community.
+        </div>
+      </div>
+
+      <div class="section">
+        <h2 class="section-title">✨ Key Features</h2>
+        <div class="feature-grid">
+          <div class="feature-card">
+            <div class="feature-icon">🤖</div>
+            <div class="feature-title">3D Avatar Translation</div>
+            <div class="feature-description">
+              Real-time 3D animated avatar that translates spoken content into
+              Indian Sign Language with smooth, natural movements.
+            </div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🎥</div>
+            <div class="feature-title">YouTube Integration</div>
+            <div class="feature-description">
+              Seamlessly integrates with YouTube, automatically detecting videos
+              and providing sign language translation overlay.
+            </div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <div class="feature-title">Auto-Start Feature</div>
+            <div class="feature-description">
+              Automatically begins translation when a video starts playing,
+              ensuring you never miss important content.
+            </div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">📱</div>
+            <div class="feature-title">Side Panel Support</div>
+            <div class="feature-description">
+              View the sign language avatar in a dedicated side panel for better
+              visibility and control.
+            </div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🎨</div>
+            <div class="feature-title">Customizable Settings</div>
+            <div class="feature-description">
+              Adjust avatar size, animation speed, and display preferences to
+              match your viewing needs.
+            </div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🌐</div>
+            <div class="feature-title">Favorite Sites</div>
+            <div class="feature-description">
+              Quick access to your favorite websites with custom site management
+              and favicon support.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2 class="section-title">🚀 How to Use Signify</h2>
+        <div class="steps">
+          <div class="step">
+            <div class="step-title">Install the Extension</div>
+            <div class="step-description">
+              Add Signify to your browser and grant necessary permissions for
+              YouTube access.
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-title">Navigate to YouTube</div>
+            <div class="step-description">
+              Go to YouTube.com and find any video you want to watch with sign
+              language translation.
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-title">Activate Signify</div>
+            <div class="step-description">
+              Click the Signify button that appears on the video player, or use
+              the extension popup to configure settings.
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-title">Choose Display Mode</div>
+            <div class="step-description">
+              Select between floating avatar overlay or side panel view based on
+              your preference.
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-title">Enjoy Accessible Content</div>
+            <div class="step-description">
+              Watch as the 3D avatar translates the video content into Indian
+              Sign Language in real-time.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2 class="section-title">⚙️ Settings Guide</h2>
+        <div class="info-box">
+          <div class="info-box-title">Auto-start on video play</div>
+          <div class="info-box-content">
+            When enabled, Signify will automatically begin translation as soon
+            as a YouTube video starts playing. This ensures seamless
+            accessibility without manual intervention.
+          </div>
+        </div>
+        <div class="info-box">
+          <div class="info-box-title">Show floating avatar</div>
+          <div class="info-box-content">
+            Controls whether the sign language avatar appears as a floating
+            overlay on the video or in the dedicated side panel. Enable for
+            overlay mode, disable for side panel only.
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2 class="section-title">🛠️ Troubleshooting</h2>
+        <div class="section-content">
+          <strong>Avatar not appearing?</strong><br />
+          • Ensure you're on a YouTube video page<br />
+          • Check that the extension has necessary permissions<br />
+          • Try refreshing the page<br /><br />
+
+          <strong>Side panel not working?</strong><br />
+          • Make sure your browser supports side panels<br />
+          • Check if side panel is enabled in browser settings<br />
+          • Try reloading the extension<br /><br />
+
+          <strong>Translation quality issues?</strong><br />
+          • Ensure stable internet connection<br />
+          • Try adjusting video quality settings<br />
+          • Report issues through our support channels
+        </div>
+      </div>
+
+      <div class="section">
+        <h2 class="section-title">🎓 About Indian Sign Language</h2>
+        <div class="section-content">
+          Indian Sign Language (ISL) is the primary sign language used by the
+          deaf community in India. Signify aims to bridge the communication gap
+          by providing accurate, culturally appropriate ISL translations for
+          digital content. Our 3D avatar system uses motion capture technology
+          and linguistic expertise to ensure authentic sign language
+          representation.
+        </div>
+      </div>
+
+      <div class="footer">
+        <p>Made with ❤️ by Philosia • Signify v1.0.2</p>
+        <p>Empowering accessibility through technology</p>
+      </div>
+    </div>
+  </body>
+</html>
