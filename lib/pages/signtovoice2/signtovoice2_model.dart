@@ -3,10 +3,13 @@ import '/flutter_flow/form_field_controller.dart';
 import 'signtovoice2_widget.dart' show Signtovoice2Widget;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image/image.dart' as img;
+import 'package:http_parser/http_parser.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart'
     show TutorialCoachMark;
 import 'package:camera/camera.dart';
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:translator/translator.dart';
@@ -17,7 +20,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   TutorialCoachMark? signifyScreen2Controller;
 
   // MediaPipe related state
-  static const platform = MethodChannel('mediapipe_plugin');
+  // static const platform = MethodChannel('mediapipe_plugin');
   bool _isDetecting = false;
   bool _isInitialized = false;
   bool _isCameraReady = false;
@@ -101,7 +104,8 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
 
   // API related state
   String _apiUrl =
-      'http://192.168.29.168:5000/predict'; // Replace with your actual API endpoint
+      // 'http://192.168.29.42:5000/predict';
+      'http://192.168.29.42:5000/process_frame';
   bool _isApiEnabled = true;
   int _lastApiCallTime = 0;
   static const int _apiCallInterval =
@@ -598,6 +602,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   }
 
   void _setupMethodChannelListener() {
+    /*
     try {
       platform.setMethodCallHandler((call) async {
         try {
@@ -679,20 +684,25 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
               break;
 
             case 'onPrediction':
-              // Receive prediction from native side
-              final prediction =
-                  call.arguments?['prediction']?.toString() ?? "";
+              // Ignore predictions from native MediaPipe when using API-based prediction
+              if (!_isApiEnabled) {
+                // Only use native predictions if API is disabled
+                final prediction =
+                    call.arguments?['prediction']?.toString() ?? "";
 
-              print('Received prediction: $prediction');
+                print('Received prediction from native: $prediction');
 
-              if (prediction.isNotEmpty) {
-                _predictionHistory.add(prediction);
-                print('Prediction history: $_predictionHistory');
+                if (prediction.isNotEmpty) {
+                  _predictionHistory.add(prediction);
+                  print('Prediction history: $_predictionHistory');
 
-                // Add word to sentence instead of replacing
-                _addWordToSentence(prediction);
+                  // Add word to sentence instead of replacing
+                  _addWordToSentence(prediction);
 
-                _notifyStateChange();
+                  _notifyStateChange();
+                }
+              } else {
+                print('Ignoring native prediction (API mode enabled)');
               }
               break;
 
@@ -727,6 +737,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
       print('Error setting up method channel listener: $e');
       _errorMessage = 'Setup error: $e';
     }
+    */
   }
 
   // Deprecated: replaced by prediction from native
@@ -790,13 +801,8 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
         _poseCoords = coords;
       }
 
-      // Send to API if enabled and coordinates are available
-      if (_isApiEnabled &&
-          (_leftHandCoords != null ||
-              _rightHandCoords != null ||
-              _poseCoords != null)) {
-        _sendCoordinatesToApi();
-      }
+      // Coordinates are extracted for local overlay only
+      // Video frames are now sent to API instead of coordinates
     } catch (e) {
       print('Error extracting coordinates: $e');
     }
@@ -827,8 +833,75 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
     return handIndex == 0 ? "Left" : "Right";
   }
 
-  // Send coordinates to API
-  Future<void> _sendCoordinatesToApi() async {
+  // Convert CameraImage to JPEG bytes for API transmission
+  Future<Uint8List?> _convertCameraImageToJpeg(CameraImage image) async {
+    try {
+      late img.Image convertedImage;
+
+      if (image.format.group == ImageFormatGroup.yuv420) {
+        // Handle YUV420 format (most common on Android)
+        convertedImage = _convertYUV420toImage(image);
+      } else if (image.format.group == ImageFormatGroup.bgra8888) {
+        // Handle BGRA8888 format (common on iOS)
+        convertedImage = img.Image.fromBytes(
+          image.width,
+          image.height,
+          image.planes[0].bytes,
+        );
+      } else {
+        print('Unsupported image format: ${image.format.group}');
+        return null;
+      }
+
+      // Encode to JPEG with compression
+      final jpegBytes = img.encodeJpg(convertedImage, quality: 85);
+      return Uint8List.fromList(jpegBytes);
+    } catch (e) {
+      print('Error converting camera image to JPEG: $e');
+      return null;
+    }
+  }
+
+  // Convert YUV420 to RGB Image
+  img.Image _convertYUV420toImage(CameraImage image) {
+    final int width = image.width;
+    final int height = image.height;
+
+    final int uvRowStride = image.planes[1].bytesPerRow;
+    final int uvPixelStride = image.planes[1].bytesPerPixel!;
+
+    final yPlane = image.planes[0];
+    final uPlane = image.planes[1];
+    final vPlane = image.planes[2];
+
+    final convertedImage = img.Image(width, height);
+
+    for (int y = 0; y < height; y++) {
+      for (int x = 0; x < width; x++) {
+        final int yIndex = y * yPlane.bytesPerRow + x;
+        final int uvIndex = (y ~/ 2) * uvRowStride + (x ~/ 2) * uvPixelStride;
+
+        final int yValue = yPlane.bytes[yIndex];
+        final int uValue = uPlane.bytes[uvIndex];
+        final int vValue = vPlane.bytes[uvIndex];
+
+        // YUV to RGB conversion
+        final int r = (yValue + 1.402 * (vValue - 128)).round().clamp(0, 255);
+        final int g =
+            (yValue - 0.344136 * (uValue - 128) - 0.714136 * (vValue - 128))
+                .round()
+                .clamp(0, 255);
+        final int b = (yValue + 1.772 * (uValue - 128)).round().clamp(0, 255);
+
+        convertedImage.setPixel(x, y, img.getColor(r, g, b));
+      }
+    }
+
+    return convertedImage;
+  }
+
+  // Send camera frame to API for prediction
+  Future<void> _sendFrameToApi(CameraImage image) async {
     try {
       // Throttle API calls to prevent overwhelming the server
       int currentTime = DateTime.now().millisecondsSinceEpoch;
@@ -837,57 +910,57 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
       }
       _lastApiCallTime = currentTime;
 
-      // Prepare API data
-      Map<String, dynamic> apiData = {
-        'timestamp': currentTime,
-        'left_hand': _leftHandCoords,
-        'right_hand': _rightHandCoords,
-        'pose': _poseCoords,
-      };
-
-      // Remove null values
-      apiData.removeWhere((key, value) => value == null);
-
-      // Only send if we have actual data
-      if (apiData.length > 1) {
-        // More than just timestamp
-        await _makeApiCall(apiData);
+      // Convert camera image to JPEG
+      final jpegBytes = await _convertCameraImageToJpeg(image);
+      if (jpegBytes == null) {
+        print('Failed to convert camera image to JPEG');
+        return;
       }
-    } catch (e) {
-      print('Error sending coordinates to API: $e');
-    }
-  }
 
-  // Make the actual API call
-  Future<void> _makeApiCall(Map<String, dynamic> data) async {
-    try {
-      final response = await http.post(
-        Uri.parse(_apiUrl),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: json.encode(data),
+      // Create multipart request
+      var request = http.MultipartRequest('POST', Uri.parse(_apiUrl));
+
+      // Add the image file
+      request.files.add(
+        http.MultipartFile.fromBytes(
+          'frame',
+          jpegBytes,
+          filename: 'frame_${currentTime}.jpg',
+          contentType: MediaType('image', 'jpeg'),
+        ),
       );
 
+      // Add additional metadata if needed
+      request.fields['timestamp'] = currentTime.toString();
+      request.fields['camera_type'] = isFrontCamera ? 'front' : 'back';
+      request.fields['width'] = image.width.toString();
+      request.fields['height'] = image.height.toString();
+
+      print('Sending frame to API: ${jpegBytes.length} bytes');
+
+      // Send the request
+      final response = await request.send();
+      final responseString = await response.stream.bytesToString();
+
       if (response.statusCode == 200) {
-        print('API call successful: ${response.body}');
+        print('Frame API call successful: $responseString');
 
         // Parse the JSON response
         try {
           final responseData =
-              json.decode(response.body) as Map<String, dynamic>;
+              json.decode(responseString) as Map<String, dynamic>;
           final status = responseData['status'] as String?;
 
           if (status == 'success') {
             // Extract prediction from successful response
             final prediction = responseData['prediction'] as String?;
             if (prediction != null && prediction.isNotEmpty) {
-              print('Received prediction from API: $prediction');
+              print('Received prediction from frame API: $prediction');
 
               // Update prediction history
               _predictionHistory.add(prediction);
 
-              // Add word to sentence instead of replacing
+              // Add word to sentence
               _addWordToSentence(prediction);
 
               // Notify UI to update
@@ -900,16 +973,15 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
             print('API collecting frames: $message (frames: $frameCount)');
           }
         } catch (parseError) {
-          print('Error parsing API response: $parseError');
-          print('Raw response: ${response.body}');
+          print('Error parsing frame API response: $parseError');
+          print('Raw response: $responseString');
         }
       } else {
-        print('API call failed with status: ${response.statusCode}');
-        print('Response: ${response.body}');
+        print('Frame API call failed with status: ${response.statusCode}');
+        print('Response: $responseString');
       }
     } catch (e) {
-      print('Error making API call: $e');
-      // Don't disable API on network errors, just log them
+      print('Error sending frame to API: $e');
     }
   }
 
@@ -921,6 +993,16 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   // Method to toggle API calls
   void setApiEnabled(bool enabled) {
     _isApiEnabled = enabled;
+    print(
+        'API prediction ${enabled ? 'enabled' : 'disabled'} - using ${enabled ? 'remote' : 'local'} prediction');
+  }
+
+  // Method to toggle between API-based and local prediction
+  void togglePredictionMode() {
+    _isApiEnabled = !_isApiEnabled;
+    print(
+        'Switched to ${_isApiEnabled ? 'API-based' : 'local MediaPipe'} prediction mode');
+    _notifyStateChange();
   }
 
   // Method to toggle skeleton overlay
@@ -970,6 +1052,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
     double minTrackingConfidence = 0.5,
     int maxNumHands = 2,
   }) async {
+    /*
     try {
       await platform.invokeMethod('configureHandDetection', {
         'minDetectionConfidence': minDetectionConfidence,
@@ -980,6 +1063,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
     } catch (e) {
       print('Error configuring hand detection: $e');
     }
+    */
   }
 
   // Method to force coordinate extraction (useful for testing)
@@ -1032,8 +1116,8 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
       if (cameras.isNotEmpty) {
         // Use FRONT camera for sign language (so user sees themselves like a mirror)
         final camera = cameras.firstWhere(
-          // (camera) => camera.lensDirection == CameraLensDirection.back,
-          (camera) => camera.lensDirection == CameraLensDirection.front,
+          (camera) => camera.lensDirection == CameraLensDirection.back,
+          // (camera) => camera.lensDirection == CameraLensDirection.front,
           orElse: () => cameras.first,
         );
 
@@ -1072,13 +1156,13 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
 
   // Add frame throttling variables
   int _lastProcessedFrame = 0;
-  static const int FRAME_SKIP_COUNT = 2; // Process every 2nd frame (was 3)
+  static const int FRAME_SKIP_COUNT = 3; // Process every 2nd frame (was 3)
   bool _isProcessingFrame = false;
 
   void _processCameraImage(CameraImage image) {
     if (_isDetecting && _isInitialized && !_isProcessingFrame) {
       try {
-        // Frame throttling - only process every 3rd frame to prevent memory issues
+        // Frame throttling - only process every 2nd frame to prevent memory issues
         _lastProcessedFrame++;
         if (_lastProcessedFrame % FRAME_SKIP_COUNT != 0) {
           return;
@@ -1092,29 +1176,41 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
               'Processing camera image: ${image.width}x${image.height}, format: ${image.format.group.name}, planes: ${image.planes.length}');
         }
 
-        // Send raw image data directly to MediaPipe
-        final imageData = {
-          'width': image.width,
-          'height': image.height,
-          'format': image.format.group.name,
-          'isFrontCamera': isFrontCamera, // Add camera type for mirroring
-          'planes': image.planes
-              .map((plane) => {
-                    'bytes': plane.bytes,
-                    'bytesPerPixel':
-                        plane.bytesPerPixel ?? 4, // Default to 4 for BGRA8888
-                    'bytesPerRow': plane.bytesPerRow,
-                  })
-              .toList(),
-        };
+        // Send frame to API for prediction instead of local MediaPipe processing
+        if (_isApiEnabled) {
+          _sendFrameToApi(image).then((_) {
+            _isProcessingFrame = false; // Reset flag when processing completes
+          }).catchError((e) {
+            print('Error sending frame to API: $e');
+            _isProcessingFrame = false; // Reset flag on error too
+          });
+        } else {
+          // If API is disabled, still process locally with MediaPipe for skeleton overlay
+          /*
+          final imageData = {
+            'width': image.width,
+            'height': image.height,
+            'format': image.format.group.name,
+            'isFrontCamera': isFrontCamera, // Add camera type for mirroring
+            'planes': image.planes
+                .map((plane) => {
+                      'bytes': plane.bytes,
+                      'bytesPerPixel':
+                          plane.bytesPerPixel ?? 4, // Default to 4 for BGRA8888
+                      'bytesPerRow': plane.bytesPerRow,
+                    })
+                .toList(),
+          };
 
-        // Send image data to native MediaPipe (non-blocking)
-        platform.invokeMethod('processImage', imageData).then((_) {
-          _isProcessingFrame = false; // Reset flag when processing completes
-        }).catchError((e) {
-          print('Error processing image: $e');
-          _isProcessingFrame = false; // Reset flag on error too
-        });
+          // Send image data to native MediaPipe (non-blocking) for skeleton overlay only
+          platform.invokeMethod('processImage', imageData).then((_) {
+            _isProcessingFrame = false; // Reset flag when processing completes
+          }).catchError((e) {
+            print('Error processing image: $e');
+            _isProcessingFrame = false; // Reset flag on error too
+          });
+          */
+        }
       } catch (e) {
         print('Error in image processing: $e');
         _isProcessingFrame = false;
@@ -1153,7 +1249,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
       if (_isDetecting) {
         // Stop detection
         try {
-          await platform.invokeMethod('stopDetection');
+          // await platform.invokeMethod('stopDetection');
         } catch (e) {
           print('Error stopping detection: $e');
         }
@@ -1181,8 +1277,9 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
         if (!_isInitialized) {
           try {
             // Try to initialize MediaPipe first
-            final result = await platform.invokeMethod('initialize');
-            _isInitialized = result == true;
+            // final result = await platform.invokeMethod('initialize');
+            // _isInitialized = result == true;
+            _isInitialized = true; // Assume initialized
             if (!_isInitialized) {
               _errorMessage = 'Failed to initialize MediaPipe';
               _notifyStateChange();
@@ -1215,7 +1312,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
 
         // Start MediaPipe detection
         try {
-          await platform.invokeMethod('startDetection');
+          // await platform.invokeMethod('startDetection');
           _errorMessage = '';
           print(
               'MediaPipe detection started - landmarks will be printed to console');
@@ -1250,9 +1347,11 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
     try {
       // Stop MediaPipe detection
       if (_isDetecting) {
+        /*
         platform.invokeMethod('stopDetection').catchError((e) {
           print('Error stopping detection during dispose: $e');
         });
+        */
       }
 
       // Stop and dispose TTS
