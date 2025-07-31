@@ -234,8 +234,6 @@ def process_video_frame():
         # Process the image to get a prediction
         result, annotated_img = process_image(img)
         
-        frame_queue.put(annotated_img)
-
         if result.get("prediction"):
             # Clear the queue as we have a final prediction
             while not frame_queue.empty():
@@ -243,11 +241,20 @@ def process_video_frame():
                     frame_queue.get_nowait()
                 except Queue.Empty:
                     break
+            
+            text = f"Prediction: {result['prediction']}"
+            cv2.putText(annotated_img, text, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+            frame_queue.put(annotated_img)
+
             return jsonify({
                 "status": "success",
                 "prediction": result["prediction"]
             }), 200
         else:
+            text = f"{result.get('message', 'Processing')} ({result.get('frame_count', 0)}/5)"
+            cv2.putText(annotated_img, text, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+            frame_queue.put(annotated_img)
+
             return jsonify({
                 "status": "collecting",
                 "message": result.get("message", "Processing frames"),
