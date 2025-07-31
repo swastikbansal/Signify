@@ -4,7 +4,7 @@ import '/flutter_flow/flutter_flow_util.dart';
 // import '/walkthroughs/signify_screen_2.dart'; // Commented out to disable walkthrough
 import 'signtovoice2_model.dart';
 export 'signtovoice2_model.dart';
-import 'skeleton_overlay.dart'; // Import our skeleton overlay
+// import 'skeleton_overlay.dart'; // Import our skeleton overlay
 // import 'package:tutorial_coach_mark/tutorial_coach_mark.dart'
 //     show TutorialCoachMark; // Commented out to disable walkthrough
 import 'package:flutter/material.dart';
@@ -108,6 +108,7 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
     _model.setStateChangeCallback(() {
       try {
         if (mounted) {
+          /*
           // Calculate current landmark count
           int currentLandmarkCount =
               _model.handLandmarks.length + _model.poseLandmarks.length;
@@ -120,6 +121,7 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
             _triggerGlowAnimation();
             _lastLandmarkCount = currentLandmarkCount;
           }
+          */
 
           // Also trigger when text changes
           final currentText = _model.textController?.text ?? '';
@@ -532,64 +534,7 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                                   ),
                                 ),
                               ), // Removed walkthrough functionality
-                              // .addWalkthrough(
-                              //   iconButtonPl161kuq,
-                              //   _model.signifyScreen2Controller,
-                              // ),
-
-                              // Pose overlay toggle button (no border)
-                              Container(
-                                child: Tooltip(
-                                  message: _model.isSkeletonOverlayEnabled
-                                      ? 'Hide hand tracking overlay'
-                                      : 'Show hand tracking overlay',
-                                  decoration: BoxDecoration(
-                                    color: FlutterFlowTheme.of(context)
-                                        .alternate,
-                                    borderRadius: BorderRadius.circular(8.0),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.1),
-                                        blurRadius: 4.0,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ],
-                                  ),
-                                  textStyle: TextStyle(
-                                    color: FlutterFlowTheme.of(context)
-                                        .primaryText,
-                                    fontSize: 12.0,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                  preferBelow: false,
-                                  showDuration: const Duration(seconds: 2),
-                                  child: Material(
-                                    color: Colors.transparent,
-                                    child: InkWell(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                      onTap: () {
-                                        _model.setSkeletonOverlayEnabled(
-                                            !_model.isSkeletonOverlayEnabled);
-                                        safeSetState(() {});
-                                      },
-                                      child: Container(
-                                        width: 42.0,
-                                        height: 42.0,
-                                        child: Icon(
-                                          _model.isSkeletonOverlayEnabled
-                                              ? Icons.visibility_rounded
-                                              : Icons.visibility_off_rounded,
-                                          color: _model.isSkeletonOverlayEnabled
-                                              ? const Color(0xFFFAB317)
-                                              : FlutterFlowTheme.of(context)
-                                                  .secondaryText,
-                                          size: 24.0,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
+                              
                             ],
                           ),
                         ),
@@ -662,29 +607,7 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                               child: CameraPreview(_model.cameraController!),
                             ),
                           ),
-                          // MediaPipe Skeleton Overlay
-                          if (_model.isDetecting &&
-                              _model.isSkeletonOverlayEnabled &&
-                              (_model.handLandmarks.isNotEmpty ||
-                                  _model.poseLandmarks.isNotEmpty))
-                            Positioned.fill(
-                              child: SkeletonOverlay(
-                                handLandmarks: _model.handLandmarks,
-                                poseLandmarks: _model.poseLandmarks,
-                                handLabels: _model.handLabels,
-                                cameraAspectRatio: _model.cameraAspectRatio,
-                                isFrontCamera: _model.isFrontCamera,
-                                useCoordinateTransformation:
-                                    _model.useCoordinateTransformation,
-                                onDebugTap: () {
-                                  _model.debugCoordinateAlignment();
-                                  _model.setUseCoordinateTransformation(
-                                      !_model.useCoordinateTransformation);
-                                  print(
-                                      'Coordinate transformation toggled: ${_model.useCoordinateTransformation}');
-                                },
-                              ),
-                            ),
+                          
                           // MediaPipe landmarks overlay (minimal)
                           if (_model.isDetecting)
                             Positioned(
@@ -773,20 +696,6 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
       ),
     );
   }
-
-  // Commented out walkthrough functionality to disable tutorial
-  /*
-  TutorialCoachMark createPageWalkthrough(BuildContext context) =>
-      TutorialCoachMark(
-        targets: createWalkthroughTargets(context),
-        onFinish: () async {
-          safeSetState(() => _model.signifyScreen2Controller = null);
-        },
-        onSkip: () {
-          return true;
-        },
-      );
-  */
 }
 
 // Custom painter for moving line animation (Google Assistant/Gemini style)
@@ -1029,8 +938,8 @@ class _ModernDropDownState extends State<ModernDropDown>
             ),
           ),
         ),
-      ),
-    );
+      )
+      );
 
     Overlay.of(context).insert(_overlayEntry!);
     _animationController.forward();

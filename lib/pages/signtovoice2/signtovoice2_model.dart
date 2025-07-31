@@ -20,7 +20,6 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   TutorialCoachMark? signifyScreen2Controller;
 
   // MediaPipe related state
-  // static const platform = MethodChannel('mediapipe_plugin');
   bool _isDetecting = false;
   bool _isInitialized = false;
   bool _isCameraReady = false;
@@ -595,162 +594,10 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   @override
   void initState(BuildContext context) {
     debugLogWidgetClass(this);
-    _setupMethodChannelListener();
 
     // Initialize TTS
     initializeTts();
   }
-
-  void _setupMethodChannelListener() {
-    /*
-    try {
-      platform.setMethodCallHandler((call) async {
-        try {
-          switch (call.method) {
-            case 'onHandLandmarks':
-              // Always process hand landmarks, even if empty (for clearing overlay)
-              final handsRaw = call.arguments?['hands'] as List<dynamic>? ?? [];
-              _handLandmarks = handsRaw.map<List<Map<String, dynamic>>>((hand) {
-                final handRaw = hand as List<dynamic>;
-                return handRaw.map<Map<String, dynamic>>((landmark) {
-                  return Map<String, dynamic>.from(
-                      landmark as Map<dynamic, dynamic>);
-                }).toList();
-              }).toList();
-
-              _lastUpdateTime = DateTime.fromMillisecondsSinceEpoch(
-                      call.arguments?['timestamp'] ?? 0)
-                  .toString();
-
-              // Clear hand coordinates if no hands detected
-              if (_handLandmarks.isEmpty) {
-                _leftHandCoords = null;
-                _rightHandCoords = null;
-                _handLabels = null;
-                print('Hand detection cleared - no hands detected');
-              } else {
-                // Extract coordinates and send to API
-                _extractAndProcessCoordinates();
-                print(
-                    'Received hand landmarks: ${_handLandmarks.length} hands detected');
-
-                // Log coordinate extraction results
-                if (_leftHandCoords != null) {
-                  print(
-                      'Left hand coordinates extracted: ${_leftHandCoords!.length} values');
-                }
-                if (_rightHandCoords != null) {
-                  print(
-                      'Right hand coordinates extracted: ${_rightHandCoords!.length} values');
-                }
-              }
-
-              _notifyStateChange();
-              break;
-
-            case 'onPoseLandmarks':
-              // Always process pose landmarks, even if empty (for clearing overlay)
-              final posesRaw = call.arguments?['poses'] as List<dynamic>? ?? [];
-              _poseLandmarks = posesRaw.map<List<Map<String, dynamic>>>((pose) {
-                final poseRaw = pose as List<dynamic>;
-                return poseRaw.map<Map<String, dynamic>>((landmark) {
-                  return Map<String, dynamic>.from(
-                      landmark as Map<dynamic, dynamic>);
-                }).toList();
-              }).toList();
-
-              _lastUpdateTime = DateTime.fromMillisecondsSinceEpoch(
-                      call.arguments?['timestamp'] ?? 0)
-                  .toString();
-
-              // Clear pose coordinates if no poses detected
-              if (_poseLandmarks.isEmpty) {
-                _poseCoords = null;
-                print('Pose detection cleared - no poses detected');
-              } else {
-                // Extract coordinates and send to API
-                _extractAndProcessCoordinates();
-                print(
-                    'Received pose landmarks: ${_poseLandmarks.length} poses detected');
-
-                // Log pose coordinate extraction results
-                if (_poseCoords != null) {
-                  print(
-                      'Pose coordinates extracted: ${_poseCoords!.length} values');
-                }
-              }
-
-              _notifyStateChange();
-              break;
-
-            case 'onPrediction':
-              // Ignore predictions from native MediaPipe when using API-based prediction
-              if (!_isApiEnabled) {
-                // Only use native predictions if API is disabled
-                final prediction =
-                    call.arguments?['prediction']?.toString() ?? "";
-
-                print('Received prediction from native: $prediction');
-
-                if (prediction.isNotEmpty) {
-                  _predictionHistory.add(prediction);
-                  print('Prediction history: $_predictionHistory');
-
-                  // Add word to sentence instead of replacing
-                  _addWordToSentence(prediction);
-
-                  _notifyStateChange();
-                }
-              } else {
-                print('Ignoring native prediction (API mode enabled)');
-              }
-              break;
-
-            case 'onError':
-              _errorMessage = call.arguments?['error'] ?? 'Unknown error';
-              _isDetecting = false;
-              _isInitialized = false;
-              _notifyStateChange();
-              print('MediaPipe error: $_errorMessage');
-              break;
-
-            case 'onInitialized':
-              _isInitialized = call.arguments?['success'] ?? false;
-              _errorMessage = _isInitialized ? '' : 'Initialization failed';
-              _notifyStateChange();
-              print('MediaPipe initialized: $_isInitialized');
-              break;
-
-            case 'onCameraReady':
-              _isCameraReady = call.arguments?['success'] ?? false;
-              _notifyStateChange();
-              print('Camera ready: $_isCameraReady');
-              break;
-          }
-        } catch (e) {
-          print('Error handling method channel call: $e');
-          _errorMessage = 'Method channel error: $e';
-          _notifyStateChange();
-        }
-      });
-    } catch (e) {
-      print('Error setting up method channel listener: $e');
-      _errorMessage = 'Setup error: $e';
-    }
-    */
-  }
-
-  // Deprecated: replaced by prediction from native
-  // String _analyzeGesture(List<List<Map<String, dynamic>>> hands) {
-  //   try {
-  //     if (hands.isNotEmpty) {
-  //       return "Gesture detected - ${hands.length} hand(s)";
-  //     }
-  //   } catch (e) {
-  //     print('Error analyzing gesture: $e');
-  //   }
-  //   return "";
-  // }
 
   // Enhanced coordinate extraction method similar to Python implementation
   void _extractAndProcessCoordinates() {
@@ -1046,26 +893,6 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
 
   bool get hasSentence => _currentSentence.isNotEmpty;
 
-  // Enhanced method for better hand detection configuration
-  Future<void> configureHandDetection({
-    double minDetectionConfidence = 0.7, // Increase for better detection
-    double minTrackingConfidence = 0.5,
-    int maxNumHands = 2,
-  }) async {
-    /*
-    try {
-      await platform.invokeMethod('configureHandDetection', {
-        'minDetectionConfidence': minDetectionConfidence,
-        'minTrackingConfidence': minTrackingConfidence,
-        'maxNumHands': maxNumHands,
-      });
-      print('Hand detection configured with improved settings');
-    } catch (e) {
-      print('Error configuring hand detection: $e');
-    }
-    */
-  }
-
   // Method to force coordinate extraction (useful for testing)
   void forceCoordinateExtraction() {
     _extractAndProcessCoordinates();
@@ -1125,8 +952,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
           camera,
           ResolutionPreset.medium,
           enableAudio: false,
-          imageFormatGroup: ImageFormatGroup
-              .bgra8888, // Use BGRA8888 for better compatibility with MediaPipe
+          imageFormatGroup: ImageFormatGroup.bgra8888,
         );
 
         await _cameraController!.initialize();
@@ -1184,32 +1010,6 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
             print('Error sending frame to API: $e');
             _isProcessingFrame = false; // Reset flag on error too
           });
-        } else {
-          // If API is disabled, still process locally with MediaPipe for skeleton overlay
-          /*
-          final imageData = {
-            'width': image.width,
-            'height': image.height,
-            'format': image.format.group.name,
-            'isFrontCamera': isFrontCamera, // Add camera type for mirroring
-            'planes': image.planes
-                .map((plane) => {
-                      'bytes': plane.bytes,
-                      'bytesPerPixel':
-                          plane.bytesPerPixel ?? 4, // Default to 4 for BGRA8888
-                      'bytesPerRow': plane.bytesPerRow,
-                    })
-                .toList(),
-          };
-
-          // Send image data to native MediaPipe (non-blocking) for skeleton overlay only
-          platform.invokeMethod('processImage', imageData).then((_) {
-            _isProcessingFrame = false; // Reset flag when processing completes
-          }).catchError((e) {
-            print('Error processing image: $e');
-            _isProcessingFrame = false; // Reset flag on error too
-          });
-          */
         }
       } catch (e) {
         print('Error in image processing: $e');
@@ -1247,61 +1047,14 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   Future<void> toggleDetection() async {
     try {
       if (_isDetecting) {
-        // Stop detection
-        try {
-          // await platform.invokeMethod('stopDetection');
-        } catch (e) {
-          print('Error stopping detection: $e');
-        }
         _isDetecting = false;
-        _handLandmarks.clear();
-        _poseLandmarks.clear();
+        _isInitialized = false; // Add this line
         _lastUpdateTime = '';
         _errorMessage = '';
 
-        // Clear coordinate data
-        _leftHandCoords = null;
-        _rightHandCoords = null;
-        _poseCoords = null;
-        _handLabels = null;
-
-        // Optionally clear current sentence when stopping detection
-        // clearSentence(); // Uncomment if you want to clear sentence on stop
-
         // Dispose camera
         await _disposeCamera();
-
-        print('MediaPipe detection stopped');
       } else {
-        // Check if initialized first
-        if (!_isInitialized) {
-          try {
-            // Try to initialize MediaPipe first
-            // final result = await platform.invokeMethod('initialize');
-            // _isInitialized = result == true;
-            _isInitialized = true; // Assume initialized
-            if (!_isInitialized) {
-              _errorMessage = 'Failed to initialize MediaPipe';
-              _notifyStateChange();
-              return;
-            }
-
-            // Configure hand detection for better second hand recognition
-            await configureHandDetection(
-              minDetectionConfidence:
-                  0.6, // Lower threshold for better detection
-              minTrackingConfidence: 0.4,
-              maxNumHands: 2,
-            );
-          } catch (e) {
-            _errorMessage = 'Initialization error: $e';
-            _isInitialized = false;
-            _notifyStateChange();
-            print('MediaPipe initialization error: $e');
-            return;
-          }
-        }
-
         // Set detection flag first
         _isDetecting = true;
         _isCameraOn = true;
@@ -1312,13 +1065,16 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
 
         // Start MediaPipe detection
         try {
-          // await platform.invokeMethod('startDetection');
           _errorMessage = '';
+          _isInitialized = true; // Add this line to set initialized to true
           print(
               'MediaPipe detection started - landmarks will be printed to console');
+          print(
+              'Detection initialized: $_isInitialized, detecting: $_isDetecting');
         } catch (e) {
           _errorMessage = 'Start detection error: $e';
           _isDetecting = false;
+          _isInitialized = false; // Add this line
           await _disposeCamera();
           print('Error starting detection: $e');
         }
@@ -1327,16 +1083,10 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
     } catch (e) {
       print('Error toggling detection: $e');
       _isDetecting = false;
+      _isInitialized = false; // Add this line
       _errorMessage = 'Toggle error: $e';
-      _handLandmarks.clear();
-      _poseLandmarks.clear();
       _lastUpdateTime = '';
 
-      // Clear coordinate data
-      _leftHandCoords = null;
-      _rightHandCoords = null;
-      _poseCoords = null;
-      _handLabels = null;
       await _disposeCamera();
       _notifyStateChange();
     }
@@ -1345,15 +1095,6 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   @override
   void dispose() {
     try {
-      // Stop MediaPipe detection
-      if (_isDetecting) {
-        /*
-        platform.invokeMethod('stopDetection').catchError((e) {
-          print('Error stopping detection during dispose: $e');
-        });
-        */
-      }
-
       // Stop and dispose TTS
       if (_flutterTts != null) {
         _flutterTts!.stop();

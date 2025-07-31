@@ -18,7 +18,6 @@ import io.flutter.plugin.common.MethodChannel.Result
 class MainActivity : FlutterActivity(), MethodCallHandler {
 
     private lateinit var channel: MethodChannel
-    private var landmarkDetector: LandmarkDetector? = null
 
     companion object {
         private const val REQUEST_CODE_PERMISSIONS = 10
@@ -40,80 +39,11 @@ class MainActivity : FlutterActivity(), MethodCallHandler {
     }
 
     override fun onMethodCall(call: MethodCall, result: Result) {
-        when (call.method) {
-            "initialize" -> {
-                try {
-                    landmarkDetector = LandmarkDetector(this, channel, context = applicationContext)
-                    landmarkDetector?.initialize()
-                    result.success(true)
-                } catch (e: Exception) {
-                    result.error("INIT_ERROR", "Failed to initialize: ${e.message}", null)
-                }
-            }
-
-            "startDetection" -> {
-                try {
-                    landmarkDetector?.startDetection()
-                    result.success("Detection started")
-                } catch (e: Exception) {
-                    result.error("START_ERROR", "Failed to start detection: ${e.message}", null)
-                }
-            }
-
-            "stopDetection" -> {
-                try {
-                    landmarkDetector?.stopDetection()
-                    result.success("Detection stopped")
-                } catch (e: Exception) {
-                    result.error("STOP_ERROR", "Failed to stop detection: ${e.message}", null)
-                }
-            }
-
-            "processImage" -> {
-                try {
-                    landmarkDetector?.processImageFromFlutter(call.arguments as Map<String, Any>)
-                    result.success("Image processed")
-                } catch (e: Exception) {
-                    result.error("PROCESS_ERROR", "Failed to process image: ${e.message}", null)
-                }
-            }
-
-            "updateHandDetectionParams" -> {
-                try {
-                    val args = call.arguments as Map<String, Any>
-                    val detectionConfidence = (args["detectionConfidence"] as? Double)?.toFloat() ?: 0.3f
-                    val trackingConfidence = (args["trackingConfidence"] as? Double)?.toFloat() ?: 0.3f
-                    val presenceConfidence = (args["presenceConfidence"] as? Double)?.toFloat() ?: 0.3f
-                    
-                    landmarkDetector?.updateHandDetectionParams(
-                        detectionConfidence,
-                        trackingConfidence,
-                        presenceConfidence
-                    )
-                    result.success("Hand detection parameters updated")
-                } catch (e: Exception) {
-                    result.error("UPDATE_PARAMS_ERROR", "Failed to update parameters: ${e.message}", null)
-                }
-            }
-
-            "configureImageFormat" -> {
-                try {
-                    val args = call.arguments as Map<String, Any>
-                    val format = args["format"] as? String ?: "bgra8888"
-                    Log.d("MainActivity", "Image format configured: $format")
-                    result.success("Image format configured: $format")
-                } catch (e: Exception) {
-                    result.error("CONFIG_FORMAT_ERROR", "Failed to configure format: ${e.message}", null)
-                }
-            }
-
-            else -> result.notImplemented()
-        }
+        result.notImplemented()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        landmarkDetector?.stopDetection()
     }
 
     override fun onRequestPermissionsResult(
