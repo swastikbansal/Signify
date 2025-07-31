@@ -1,7 +1,15 @@
+import warnings
+warnings.filterwarnings("ignore")
+
 from flask import Flask, request, jsonify
 import pickle
 import numpy as np
 from utils_api import Utils
+from matplotlib import pyplot as plt
+import os 
+import json
+import datetime
+import time
 
 app = Flask(__name__)
 
@@ -9,6 +17,135 @@ app = Flask(__name__)
 accumulated_probs = None
 frame_count = 0
 
+# Directory for debug data
+DEBUG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "debug_data")
+os.makedirs(DEBUG_DIR, exist_ok=True)
+
+# Enable/disable debug mode
+DEBUG_MODE = False
+
+def analyze_coordinate_stats(coords, coord_type):
+    """Analyze coordinate statistics for debugging"""
+    if not coords:
+        return None
+    
+    try:
+        flat_coords = np.array([val for point in coords for val in point if isinstance(val, (int, float))])
+        x_coords = [p[0] for p in coords if isinstance(p, list) and len(p) >= 3]
+        y_coords = [p[1] for p in coords if isinstance(p, list) and len(p) >= 3]
+        z_coords = [p[2] for p in coords if isinstance(p, list) and len(p) >= 3]
+        
+        stats = {
+            "count": len(coords),
+            "dimensions": len(coords[0]) if coords and isinstance(coords[0], list) else 0,
+            "overall": {
+                "min": float(np.min(flat_coords)),
+                "max": float(np.max(flat_coords)),
+                "mean": float(np.mean(flat_coords)),
+                "std": float(np.std(flat_coords))
+            },
+            "x": {
+                "min": float(np.min(x_coords)) if x_coords else None,
+                "max": float(np.max(x_coords)) if x_coords else None,
+                "mean": float(np.mean(x_coords)) if x_coords else None
+            },
+            "y": {
+                "min": float(np.min(y_coords)) if y_coords else None,
+                "max": float(np.max(y_coords)) if y_coords else None,
+                "mean": float(np.mean(y_coords)) if y_coords else None
+            },
+            "z": {
+                "min": float(np.min(z_coords)) if z_coords else None,
+                "max": float(np.max(z_coords)) if z_coords else None,
+                "mean": float(np.mean(z_coords)) if z_coords else None
+            }
+        }
+        return stats
+    except Exception as e:
+        return {"error": str(e)}
+
+def save_debug_data(left_coords, right_coords, pose_coords, prediction=None):
+    """Save coordinate data to file for debugging"""
+    if not DEBUG_MODE:
+        return
+    
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+    
+    # Get coordinate statistics
+    stats = {}
+    if left_coords:
+        stats["left_hand"] = analyze_coordinate_stats(left_coords, "left_hand")
+    if right_coords:
+        stats["right_hand"] = analyze_coordinate_stats(right_coords, "right_hand")
+    if pose_coords:
+        stats["pose"] = analyze_coordinate_stats(pose_coords, "pose")
+    
+    data = {
+        "timestamp": timestamp,
+        "left_hand": left_coords,
+        "right_hand": right_coords,
+        "pose": pose_coords,
+        "prediction": prediction,
+        "statistics": stats
+    }
+    
+    filename = os.path.join(DEBUG_DIR, f"coords_{timestamp}.json")
+    with open(filename, 'w') as f:
+        json.dump(data, f, indent=2)
+    
+    return filename
+
+def visualize_coordinates(left_coords, right_coords, pose_coords, filename=None):
+    """Generate a visualization of the coordinates"""
+    if not DEBUG_MODE:
+        return None
+        
+    fig = plt.figure(figsize=(15, 7))
+    
+    # Plot left hand
+    if left_coords:
+        ax1 = fig.add_subplot(131, projection='3d')
+        x = [p[0] for p in left_coords]
+        y = [p[1] for p in left_coords]
+        z = [p[2] for p in left_coords]
+        ax1.scatter(x, y, z, c='r')
+        ax1.set_title('Left Hand')
+        ax1.set_xlabel('X')
+        ax1.set_ylabel('Y')
+        ax1.set_zlabel('Z')
+    
+    # Plot right hand
+    if right_coords:
+        ax2 = fig.add_subplot(132, projection='3d')
+        x = [p[0] for p in right_coords]
+        y = [p[1] for p in right_coords]
+        z = [p[2] for p in right_coords]
+        ax2.scatter(x, y, z, c='b')
+        ax2.set_title('Right Hand')
+        ax2.set_xlabel('X')
+        ax2.set_ylabel('Y')
+        ax2.set_zlabel('Z')
+    
+    # Plot pose
+    if pose_coords:
+        ax3 = fig.add_subplot(133, projection='3d')
+        x = [p[0] for p in pose_coords]
+        y = [p[1] for p in pose_coords]
+        z = [p[2] for p in pose_coords]
+        ax3.scatter(x, y, z, c='g')
+        ax3.set_title('Pose')
+        ax3.set_xlabel('X')
+        ax3.set_ylabel('Y')
+        ax3.set_zlabel('Z')
+    
+    plt.tight_layout()
+    
+    if filename:
+        plt.savefig(filename)
+        plt.close()
+        return filename
+    
+    return fig
 
 def calulating_percentage(avg, all_classes):
     """
@@ -65,6 +202,9 @@ def process_frame(left_coords, right_coords, pose_coords):
     """Process a single frame of coordinate data"""
     global accumulated_probs, frame_count
     
+    
+        
+    # Original processing logic
     pred = None
     left_probs, right_probs, pose_probs = None, None, None
     
@@ -128,13 +268,13 @@ def process_frame(left_coords, right_coords, pose_coords):
     frame_count += 1
     
     # Updating the final prediction text after a fixed no. of frames
-    if frame_count == 5:
+    if frame_count == 10:
         max_idx = np.argmax(accumulated_probs)
         pred = all_classes[max_idx]
         accumulated_probs = None
         frame_count = 0
 
-    print("prediction:", pred)
+    
 
     return {"prediction": pred} if pred else {"message": "Collecting frames", "frame_count": frame_count}
 
@@ -143,7 +283,6 @@ def predict():
     """Receive coordinates and return prediction"""
     try:
         data = request.get_json()
-        print("Mediapipe data received:")
         
         if not data:
             return jsonify({"status": "error", "message": "No data received"}), 400
@@ -153,15 +292,25 @@ def predict():
         right_coords = data.get('right_hand')
         pose_coords = data.get('pose')
         
+        # Save debug data if debug mode is enabled
+        debug_file = save_debug_data(left_coords, right_coords, pose_coords)
+        
         # Validate that at least one type of data is present
         if not any([left_coords, right_coords, pose_coords]):
             return jsonify({"status": "error", "message": "No valid coordinate data received"}), 400
         
         # Process the frame
         result = process_frame(left_coords, right_coords, pose_coords)
-        
-        
+
+        # If in debug mode and we have a prediction, save a visualization
+        if DEBUG_MODE and result.get("prediction"):
+            vis_filename = os.path.splitext(debug_file)[0] + ".png" if debug_file else None
+            visualize_coordinates(left_coords, right_coords, pose_coords, vis_filename)
+            # Update the debug file with prediction
+            save_debug_data(left_coords, right_coords, pose_coords, result.get("prediction"))
+
         if result.get("prediction"):
+            print("prediction:", result["prediction"])
             return jsonify({
                 "status": "success",
                 "prediction": result["prediction"]
@@ -193,15 +342,26 @@ def health_check():
         "models_loaded": True
     }), 200
 
+@app.route('/debug/toggle', methods=['POST'])
+def toggle_debug():
+    """Toggle debug mode"""
+    global DEBUG_MODE
+    DEBUG_MODE = not DEBUG_MODE
+    return jsonify({
+        "status": "success",
+        "debug_mode": DEBUG_MODE,
+        "debug_dir": DEBUG_DIR
+    }), 200
+
 if __name__ == '__main__':
     print("Starting prediction API server...")
     print("Endpoints available:")
     print("- POST /predict - Send coordinates and get prediction")
     print("- POST /reset - Reset frame accumulation")
     print("- GET /health - Health check")
+    print("- POST /debug/toggle - Toggle debug mode")
     
-    app.run(host='localhost', port=5000, debug=False, threaded=True)
-    print("- POST /reset - Reset frame accumulation")
-    print("- GET /health - Health check")
+    print(f"Debug directory: {DEBUG_DIR}")
     
-    app.run(host='localhost', port=5000, debug=False, threaded=True)
+    app.run(host='192.168.29.42', port=5000, debug=False, threaded=True)
+

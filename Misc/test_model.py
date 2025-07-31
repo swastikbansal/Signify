@@ -7,7 +7,7 @@ import mediapipe as mp
 from numpy import  argmax, array, expand_dims 
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Bidirectional,LSTM, Dense,Input,Flatten, GRU
-import Direct_python_version.utils as utils
+import utils as utils
 
 from glob import glob
 import time
