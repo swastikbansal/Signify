@@ -1,9 +1,7 @@
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import 'walkelement_cardsmall_model.dart';
 export 'walkelement_cardsmall_model.dart';
 
@@ -54,7 +52,7 @@ class _WalkelementCardsmallWidgetState extends State<WalkelementCardsmallWidget>
         ?.call(_model);
 
     return Container(
-      constraints: BoxConstraints(
+      constraints: const BoxConstraints(
         minWidth: 300.0,
         minHeight: 100.0,
         maxWidth: 340.0,
@@ -70,7 +68,7 @@ class _WalkelementCardsmallWidgetState extends State<WalkelementCardsmallWidget>
         ),
       ),
       child: Padding(
-        padding: EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(8.0),
         child: Row(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.start,
@@ -89,11 +87,11 @@ class _WalkelementCardsmallWidgetState extends State<WalkelementCardsmallWidget>
                 ),
               ),
               child: Padding(
-                padding: EdgeInsets.all(2.0),
+                padding: const EdgeInsets.all(2.0),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(12.0),
                   child: Image.network(
-                    widget!.img!,
+                    widget.img!,
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -101,7 +99,7 @@ class _WalkelementCardsmallWidgetState extends State<WalkelementCardsmallWidget>
             ),
             Expanded(
               child: Padding(
-                padding: EdgeInsetsDirectional.fromSTEB(8.0, 0.0, 0.0, 0.0),
+                padding: const EdgeInsetsDirectional.fromSTEB(8.0, 0.0, 0.0, 0.0),
                 child: Column(
                   mainAxisSize: MainAxisSize.max,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -109,7 +107,7 @@ class _WalkelementCardsmallWidgetState extends State<WalkelementCardsmallWidget>
                   children: [
                     Text(
                       valueOrDefault<String>(
-                        widget!.title,
+                        widget.title,
                         'Element Title',
                       ),
                       style: FlutterFlowTheme.of(context).labelMedium.override(
@@ -123,7 +121,7 @@ class _WalkelementCardsmallWidgetState extends State<WalkelementCardsmallWidget>
                     ),
                     Text(
                       valueOrDefault<String>(
-                        widget!.description,
+                        widget.description,
                         'Element Description',
                       ),
                       maxLines: 4,

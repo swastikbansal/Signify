@@ -7,14 +7,10 @@ import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '/flutter_flow/upload_data.dart';
-import 'dart:math';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import 'edit_profile_model.dart';
 export 'edit_profile_model.dart';
 
@@ -173,7 +169,7 @@ class _EditProfileWidgetState extends State<EditProfileWidget>
                       context.pushNamed(
                         'account4',
                         extra: <String, dynamic>{
-                          kTransitionInfoKey: TransitionInfo(
+                          kTransitionInfoKey: const TransitionInfo(
                             hasTransition: true,
                             transitionType: PageTransitionType.fade,
                           ),
@@ -194,7 +190,7 @@ class _EditProfileWidgetState extends State<EditProfileWidget>
                   ),
                 ],
               ),
-              actions: [],
+              actions: const [],
               centerTitle: false,
               elevation: 0.0,
             ),
@@ -217,7 +213,7 @@ class _EditProfileWidgetState extends State<EditProfileWidget>
                     child: Stack(
                       children: [
                         Align(
-                          alignment: AlignmentDirectional(0.0, 0.0),
+                          alignment: const AlignmentDirectional(0.0, 0.0),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(100.0),
                             child: Image.network(
@@ -225,20 +221,20 @@ class _EditProfileWidgetState extends State<EditProfileWidget>
                               width: 150.0,
                               height: 150.0,
                               fit: BoxFit.cover,
-                              alignment: Alignment(0.0, 0.0),
+                              alignment: const Alignment(0.0, 0.0),
                               errorBuilder: (context, error, stackTrace) =>
                                   Image.asset(
                                 'assets/images/error_image.png',
                                 width: 150.0,
                                 height: 150.0,
                                 fit: BoxFit.cover,
-                                alignment: Alignment(0.0, 0.0),
+                                alignment: const Alignment(0.0, 0.0),
                               ),
                             ),
                           ),
                         ),
                         Align(
-                          alignment: AlignmentDirectional(1.0, 1.0),
+                          alignment: const AlignmentDirectional(1.0, 1.0),
                           child: FlutterFlowIconButton(
                             borderRadius: 50.0,
                             buttonSize: 50.0,
@@ -323,7 +319,7 @@ class _EditProfileWidgetState extends State<EditProfileWidget>
                       borderRadius: BorderRadius.circular(0.0),
                     ),
                     child: Padding(
-                      padding: EdgeInsets.all(24.0),
+                      padding: const EdgeInsets.all(24.0),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -334,7 +330,7 @@ class _EditProfileWidgetState extends State<EditProfileWidget>
                             ),
                             focusNode: _model.textFieldFocusNode1,
                             autofocus: false,
-                            autofillHints: [AutofillHints.name],
+                            autofillHints: const [AutofillHints.name],
                             textCapitalization: TextCapitalization.words,
                             textInputAction: TextInputAction.next,
                             obscureText: false,
@@ -424,7 +420,7 @@ class _EditProfileWidgetState extends State<EditProfileWidget>
                             ),
                             focusNode: _model.textFieldFocusNode2,
                             autofocus: false,
-                            autofillHints: [AutofillHints.username],
+                            autofillHints: const [AutofillHints.username],
                             textInputAction: TextInputAction.next,
                             obscureText: false,
                             decoration: InputDecoration(
@@ -513,7 +509,7 @@ class _EditProfileWidgetState extends State<EditProfileWidget>
                             ),
                             focusNode: _model.textFieldFocusNode3,
                             autofocus: false,
-                            autofillHints: [AutofillHints.email],
+                            autofillHints: const [AutofillHints.email],
                             textInputAction: TextInputAction.next,
                             obscureText: false,
                             decoration: InputDecoration(
@@ -601,7 +597,7 @@ class _EditProfileWidgetState extends State<EditProfileWidget>
                             ),
                             focusNode: _model.textFieldFocusNode4,
                             autofocus: false,
-                            autofillHints: [AutofillHints.telephoneNumber],
+                            autofillHints: const [AutofillHints.telephoneNumber],
                             textInputAction: TextInputAction.next,
                             obscureText: false,
                             decoration: InputDecoration(
@@ -689,7 +685,7 @@ class _EditProfileWidgetState extends State<EditProfileWidget>
                             ),
                             focusNode: _model.textFieldFocusNode5,
                             autofocus: false,
-                            autofillHints: [AutofillHints.addressState],
+                            autofillHints: const [AutofillHints.addressState],
                             textCapitalization: TextCapitalization.words,
                             textInputAction: TextInputAction.next,
                             obscureText: false,
@@ -777,7 +773,7 @@ class _EditProfileWidgetState extends State<EditProfileWidget>
                             ),
                             focusNode: _model.textFieldFocusNode6,
                             autofocus: false,
-                            autofillHints: [AutofillHints.addressCity],
+                            autofillHints: const [AutofillHints.addressCity],
                             textCapitalization: TextCapitalization.words,
                             textInputAction: TextInputAction.next,
                             obscureText: false,
@@ -945,7 +941,7 @@ class _EditProfileWidgetState extends State<EditProfileWidget>
                             validator: _model.textController7Validator
                                 .asValidator(context),
                           ),
-                        ].divide(SizedBox(height: 16.0)),
+                        ].divide(const SizedBox(height: 16.0)),
                       ),
                     ),
                   ),
@@ -954,7 +950,7 @@ class _EditProfileWidgetState extends State<EditProfileWidget>
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Align(
-                        alignment: AlignmentDirectional(0.0, 0.0),
+                        alignment: const AlignmentDirectional(0.0, 0.0),
                         child: FFButtonWidget(
                           onPressed: () async {
                             await editProfileUsersRecord.reference.update({
@@ -993,7 +989,7 @@ class _EditProfileWidgetState extends State<EditProfileWidget>
                                                     .bodyLargeFamily),
                                       ),
                                 ),
-                                duration: Duration(milliseconds: 2000),
+                                duration: const Duration(milliseconds: 2000),
                                 backgroundColor:
                                     FlutterFlowTheme.of(context).info,
                               ),
@@ -1005,10 +1001,10 @@ class _EditProfileWidgetState extends State<EditProfileWidget>
                           options: FFButtonOptions(
                             width: MediaQuery.sizeOf(context).width * 0.4,
                             height: 50.0,
-                            padding: EdgeInsetsDirectional.fromSTEB(
+                            padding: const EdgeInsetsDirectional.fromSTEB(
                                 0.0, 0.0, 0.0, 0.0),
                             iconAlignment: IconAlignment.end,
-                            iconPadding: EdgeInsetsDirectional.fromSTEB(
+                            iconPadding: const EdgeInsetsDirectional.fromSTEB(
                                 0.0, 0.0, 0.0, 0.0),
                             color: FlutterFlowTheme.of(context).primary,
                             textStyle: FlutterFlowTheme.of(context)
@@ -1043,8 +1039,8 @@ class _EditProfileWidgetState extends State<EditProfileWidget>
                     ],
                   ),
                 ]
-                    .addToStart(SizedBox(height: 16.0))
-                    .addToEnd(SizedBox(height: 46.0)),
+                    .addToStart(const SizedBox(height: 16.0))
+                    .addToEnd(const SizedBox(height: 46.0)),
               ),
             ),
           ),

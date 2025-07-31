@@ -8,12 +8,9 @@ import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '/flutter_flow/form_field_controller.dart';
 import '/flutter_flow/upload_data.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import 'report_bug_model.dart';
 export 'report_bug_model.dart';
 
@@ -173,14 +170,14 @@ class _ReportBugWidgetState extends State<ReportBugWidget> with RouteAware {
                   ),
                 ],
               ),
-              actions: [],
+              actions: const [],
               centerTitle: false,
               elevation: 0.0,
             ),
             body: SafeArea(
               top: true,
               child: Padding(
-                padding: EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(16.0),
                 child: SingleChildScrollView(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -274,7 +271,7 @@ class _ReportBugWidgetState extends State<ReportBugWidget> with RouteAware {
                           ),
                         ),
                         child: Padding(
-                          padding: EdgeInsets.all(16.0),
+                          padding: const EdgeInsets.all(16.0),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -522,7 +519,7 @@ class _ReportBugWidgetState extends State<ReportBugWidget> with RouteAware {
                                     FlutterFlowTheme.of(context).alternate,
                                 borderWidth: 1.0,
                                 borderRadius: 12.0,
-                                margin: EdgeInsets.all(12.0),
+                                margin: const EdgeInsets.all(12.0),
                                 hidesUnderline: true,
                                 isOverButton: false,
                                 isSearchable: false,
@@ -542,7 +539,7 @@ class _ReportBugWidgetState extends State<ReportBugWidget> with RouteAware {
                                   ),
                                 ),
                                 child: Padding(
-                                  padding: EdgeInsets.all(16.0),
+                                  padding: const EdgeInsets.all(16.0),
                                   child: InkWell(
                                     splashColor: Colors.transparent,
                                     focusColor: Colors.transparent,
@@ -676,7 +673,7 @@ class _ReportBugWidgetState extends State<ReportBugWidget> with RouteAware {
                                                             .bodySmallFamily),
                                               ),
                                         ),
-                                      ].divide(SizedBox(height: 8.0)),
+                                      ].divide(const SizedBox(height: 8.0)),
                                     ),
                                   ),
                                 ),
@@ -870,12 +867,12 @@ class _ReportBugWidgetState extends State<ReportBugWidget> with RouteAware {
                                 validator: _model.textController4Validator
                                     .asValidator(context),
                               ),
-                            ].divide(SizedBox(height: 16.0)),
+                            ].divide(const SizedBox(height: 16.0)),
                           ),
                         ),
                       ),
                       Align(
-                        alignment: AlignmentDirectional(0.0, 0.0),
+                        alignment: const AlignmentDirectional(0.0, 0.0),
                         child: FFButtonWidget(
                           onPressed: () async {
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -896,7 +893,7 @@ class _ReportBugWidgetState extends State<ReportBugWidget> with RouteAware {
                                                     .bodyLargeFamily),
                                       ),
                                 ),
-                                duration: Duration(milliseconds: 2000),
+                                duration: const Duration(milliseconds: 2000),
                                 backgroundColor:
                                     FlutterFlowTheme.of(context).info,
                               ),
@@ -919,9 +916,9 @@ class _ReportBugWidgetState extends State<ReportBugWidget> with RouteAware {
                           options: FFButtonOptions(
                             width: MediaQuery.sizeOf(context).width * 0.56,
                             height: 50.0,
-                            padding: EdgeInsetsDirectional.fromSTEB(
+                            padding: const EdgeInsetsDirectional.fromSTEB(
                                 0.0, 0.0, 0.0, 0.0),
-                            iconPadding: EdgeInsetsDirectional.fromSTEB(
+                            iconPadding: const EdgeInsetsDirectional.fromSTEB(
                                 0.0, 0.0, 0.0, 0.0),
                             color: FlutterFlowTheme.of(context).primary,
                             textStyle: FlutterFlowTheme.of(context)
@@ -962,7 +959,7 @@ class _ReportBugWidgetState extends State<ReportBugWidget> with RouteAware {
                                   FlutterFlowTheme.of(context).bodySmallFamily),
                             ),
                       ),
-                    ].divide(SizedBox(height: 24.0)),
+                    ].divide(const SizedBox(height: 24.0)),
                   ),
                 ),
               ),

@@ -3,20 +3,27 @@ import '/backend/backend.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
-import '/walkthroughs/signify_screen_4.dart';
 import '/pages/customs_signs/custom_signs_widget.dart';
-import 'package:tutorial_coach_mark/tutorial_coach_mark.dart'
-    show TutorialCoachMark;
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import 'account4_model.dart';
 export 'account4_model.dart';
 
-  // adjust path based on your folder structure
+// Performance optimization imports
+import '/services/memory_optimizer.dart';
+
+/// Disposable wrapper for account widget
+class _AccountDisposable implements Disposable {
+  final _Account4WidgetState state;
+  _AccountDisposable(this.state);
+
+  @override
+  void dispose() {
+    // Additional cleanup if needed
+  }
+}
 
 class Account4Widget extends StatefulWidget {
   const Account4Widget({super.key});
@@ -25,7 +32,8 @@ class Account4Widget extends StatefulWidget {
   State<Account4Widget> createState() => _Account4WidgetState();
 }
 
-class _Account4WidgetState extends State<Account4Widget> with RouteAware {
+class _Account4WidgetState extends State<Account4Widget>
+    with RouteAware, MemoryOptimizedWidget {
   late Account4Model _model;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
@@ -35,32 +43,16 @@ class _Account4WidgetState extends State<Account4Widget> with RouteAware {
     super.initState();
     _model = createModel(context, () => Account4Model());
 
-    // On page load action.
-    SchedulerBinding.instance.addPostFrameCallback((_) async {
-      if (dateTimeFormat(
-            "relative",
-            currentUserDocument?.loggedinTime,
-            locale: FFLocalizations.of(context).languageCode,
-          ) ==
-          dateTimeFormat(
-            "relative",
-            getCurrentTimestamp,
-            locale: FFLocalizations.of(context).languageCode,
-          )) {
-        safeSetState(() =>
-            _model.signifyScreen4Controller = createPageWalkthrough(context));
-        _model.signifyScreen4Controller?.show(context: context);
-        return;
-      } else {
-        return;
-      }
-    });
+    // Tutorial walkthrough removed for performance optimization
+    // Performance optimization: register for memory cleanup
+    MemoryOptimizer.instance.registerDisposable(_AccountDisposable(this));
   }
 
   @override
   void dispose() {
     _model.dispose();
-
+    // Clean up memory-tracked resources
+    disposeMemoryResources();
     super.dispose();
   }
 
@@ -117,8 +109,7 @@ class _Account4WidgetState extends State<Account4Widget> with RouteAware {
               ),
             ),
           );
-        };
-
+        }
 
         final account4UsersRecord = snapshot.data!;
         _model.debugBackendQueries['account4UsersRecord_Scaffold_1o3oa7a6'] =
@@ -151,14 +142,14 @@ class _Account4WidgetState extends State<Account4Widget> with RouteAware {
                           GoogleFonts.asMap().containsKey('Space Grotesk'),
                     ),
               ),
-              actions: [],
+              actions: const [],
               centerTitle: false,
               elevation: 0.0,
             ),
             body: SafeArea(
               top: true,
               child: Padding(
-                padding: EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
+                padding: const EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
                 child: SingleChildScrollView(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -252,18 +243,18 @@ class _Account4WidgetState extends State<Account4Widget> with RouteAware {
                                                           .labelMediumFamily),
                                             ),
                                       ),
-                                    ].divide(SizedBox(height: 2.0)),
+                                    ].divide(const SizedBox(height: 2.0)),
                                   ),
-                                ].divide(SizedBox(width: 12.0)),
+                                ].divide(const SizedBox(width: 12.0)),
                               ),
                               Align(
-                                alignment: AlignmentDirectional(0.0, 0.0),
+                                alignment: const AlignmentDirectional(0.0, 0.0),
                                 child: FFButtonWidget(
                                   onPressed: () async {
                                     context.pushNamed(
                                       'editProfile',
                                       extra: <String, dynamic>{
-                                        kTransitionInfoKey: TransitionInfo(
+                                        kTransitionInfoKey: const TransitionInfo(
                                           hasTransition: true,
                                           transitionType:
                                               PageTransitionType.fade,
@@ -284,9 +275,9 @@ class _Account4WidgetState extends State<Account4Widget> with RouteAware {
                                     width:
                                         MediaQuery.sizeOf(context).width * 0.5,
                                     height: 46.0,
-                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                    padding: const EdgeInsetsDirectional.fromSTEB(
                                         0.0, 0.0, 0.0, 0.0),
-                                    iconPadding: EdgeInsetsDirectional.fromSTEB(
+                                    iconPadding: const EdgeInsetsDirectional.fromSTEB(
                                         0.0, 0.0, 0.0, 0.0),
                                     color: FlutterFlowTheme.of(context)
                                         .primaryBackground,
@@ -323,10 +314,7 @@ class _Account4WidgetState extends State<Account4Widget> with RouteAware {
                                   ),
                                 ),
                               ),
-                            ].divide(SizedBox(height: 24.0)),
-                          ).addWalkthrough(
-                            columnOfubeq9b,
-                            _model.signifyScreen4Controller,
+                            ].divide(const SizedBox(height: 24.0)),
                           ),
                         ),
                       ),
@@ -342,7 +330,7 @@ class _Account4WidgetState extends State<Account4Widget> with RouteAware {
                           ),
                         ),
                         child: Padding(
-                          padding: EdgeInsets.all(16.0),
+                          padding: const EdgeInsets.all(16.0),
                           child: Column(
                             mainAxisSize: MainAxisSize.max,
                             mainAxisAlignment: MainAxisAlignment.start,
@@ -415,11 +403,11 @@ class _Account4WidgetState extends State<Account4Widget> with RouteAware {
                                                 children: [
                                                   Align(
                                                     alignment:
-                                                        AlignmentDirectional(
+                                                        const AlignmentDirectional(
                                                             0.95, 0.0),
                                                     child: Padding(
                                                       padding:
-                                                          EdgeInsetsDirectional
+                                                          const EdgeInsetsDirectional
                                                               .fromSTEB(
                                                                   0.0,
                                                                   0.0,
@@ -437,7 +425,7 @@ class _Account4WidgetState extends State<Account4Widget> with RouteAware {
                                                   ),
                                                   Align(
                                                     alignment:
-                                                        AlignmentDirectional(
+                                                        const AlignmentDirectional(
                                                             -0.85, 0.0),
                                                     child: Container(
                                                       width: 32.0,
@@ -447,7 +435,7 @@ class _Account4WidgetState extends State<Account4Widget> with RouteAware {
                                                             FlutterFlowTheme.of(
                                                                     context)
                                                                 .secondaryText,
-                                                        boxShadow: [
+                                                        boxShadow: const [
                                                           BoxShadow(
                                                             blurRadius: 4.0,
                                                             color: Color(
@@ -544,11 +532,11 @@ class _Account4WidgetState extends State<Account4Widget> with RouteAware {
                                                 children: [
                                                   Align(
                                                     alignment:
-                                                        AlignmentDirectional(
+                                                        const AlignmentDirectional(
                                                             -0.9, 0.0),
                                                     child: Padding(
                                                       padding:
-                                                          EdgeInsetsDirectional
+                                                          const EdgeInsetsDirectional
                                                               .fromSTEB(
                                                                   8.0,
                                                                   2.0,
@@ -566,7 +554,7 @@ class _Account4WidgetState extends State<Account4Widget> with RouteAware {
                                                   ),
                                                   Align(
                                                     alignment:
-                                                        AlignmentDirectional(
+                                                        const AlignmentDirectional(
                                                             0.9, 0.0),
                                                     child: Container(
                                                       width: 32.0,
@@ -576,7 +564,7 @@ class _Account4WidgetState extends State<Account4Widget> with RouteAware {
                                                             FlutterFlowTheme.of(
                                                                     context)
                                                                 .primary,
-                                                        boxShadow: [
+                                                        boxShadow: const [
                                                           BoxShadow(
                                                             blurRadius: 4.0,
                                                             color: Color(
@@ -623,29 +611,41 @@ class _Account4WidgetState extends State<Account4Widget> with RouteAware {
                                 },
                                 child: Row(
                                   mainAxisSize: MainAxisSize.max,
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Row(
                                       mainAxisSize: MainAxisSize.max,
                                       children: [
                                         Icon(
                                           Icons.lock_outline,
-                                          color: FlutterFlowTheme.of(context).primary,
+                                          color: FlutterFlowTheme.of(context)
+                                              .primary,
                                           size: 24.0,
-                                        ),                        Text(
-                          'Change Password',
-                          style: FlutterFlowTheme.of(context).bodyLarge.override(
-                            fontFamily: FlutterFlowTheme.of(context).bodyLargeFamily,
-                            letterSpacing: 0.0,
-                            useGoogleFonts: GoogleFonts.asMap().containsKey(
-                                FlutterFlowTheme.of(context).bodyLargeFamily),
-                          ),
-                        ),
+                                        ),
+                                        Text(
+                                          'Change Password',
+                                          style: FlutterFlowTheme.of(context)
+                                              .bodyLarge
+                                              .override(
+                                                fontFamily:
+                                                    FlutterFlowTheme.of(context)
+                                                        .bodyLargeFamily,
+                                                letterSpacing: 0.0,
+                                                useGoogleFonts: GoogleFonts
+                                                        .asMap()
+                                                    .containsKey(
+                                                        FlutterFlowTheme.of(
+                                                                context)
+                                                            .bodyLargeFamily),
+                                              ),
+                                        ),
                                       ].divide(const SizedBox(width: 12.0)),
                                     ),
                                     Icon(
                                       Icons.chevron_right,
-                                      color: FlutterFlowTheme.of(context).secondaryText,
+                                      color: FlutterFlowTheme.of(context)
+                                          .secondaryText,
                                       size: 24.0,
                                     ),
                                   ],
@@ -664,46 +664,57 @@ class _Account4WidgetState extends State<Account4Widget> with RouteAware {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => const CustomSignsPage(),
+                                      builder: (context) =>
+                                          const CustomSignsPage(),
                                     ),
                                   );
                                 },
                                 child: Row(
                                   mainAxisSize: MainAxisSize.max,
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Row(
                                       mainAxisSize: MainAxisSize.max,
                                       children: [
                                         Icon(
                                           Icons.gesture,
-                                          color: FlutterFlowTheme.of(context).primary,
+                                          color: FlutterFlowTheme.of(context)
+                                              .primary,
                                           size: 24.0,
                                         ),
                                         Text(
                                           'Custom Signs',
-                                          style: FlutterFlowTheme.of(context).bodyLarge.override(
-                                            fontFamily: FlutterFlowTheme.of(context).bodyLargeFamily,
-                                            letterSpacing: 0.0,
-                                            useGoogleFonts: GoogleFonts.asMap().containsKey(
-                                                FlutterFlowTheme.of(context).bodyLargeFamily),
-                                          ),
+                                          style: FlutterFlowTheme.of(context)
+                                              .bodyLarge
+                                              .override(
+                                                fontFamily:
+                                                    FlutterFlowTheme.of(context)
+                                                        .bodyLargeFamily,
+                                                letterSpacing: 0.0,
+                                                useGoogleFonts: GoogleFonts
+                                                        .asMap()
+                                                    .containsKey(
+                                                        FlutterFlowTheme.of(
+                                                                context)
+                                                            .bodyLargeFamily),
+                                              ),
                                         ),
                                       ].divide(const SizedBox(width: 12.0)),
                                     ),
                                     Icon(
                                       Icons.chevron_right,
-                                      color: FlutterFlowTheme.of(context).secondaryText,
+                                      color: FlutterFlowTheme.of(context)
+                                          .secondaryText,
                                       size: 24.0,
                                     ),
                                   ],
                                 ),
                               ),
-
                               Divider(
                                 thickness: 1.0,
                                 color: FlutterFlowTheme.of(context).alternate,
-                               ),
+                              ),
                               InkWell(
                                 splashColor: Colors.transparent,
                                 focusColor: Colors.transparent,
@@ -746,7 +757,7 @@ class _Account4WidgetState extends State<Account4Widget> with RouteAware {
                                                             .bodyLargeFamily),
                                               ),
                                         ),
-                                      ].divide(SizedBox(width: 12.0)),
+                                      ].divide(const SizedBox(width: 12.0)),
                                     ),
                                     Icon(
                                       Icons.chevron_right,
@@ -804,7 +815,7 @@ class _Account4WidgetState extends State<Account4Widget> with RouteAware {
                                                             .bodyLargeFamily),
                                               ),
                                         ),
-                                      ].divide(SizedBox(width: 12.0)),
+                                      ].divide(const SizedBox(width: 12.0)),
                                     ),
                                     Icon(
                                       Icons.chevron_right,
@@ -828,7 +839,7 @@ class _Account4WidgetState extends State<Account4Widget> with RouteAware {
                                   context.pushNamed(
                                     'tutorialPage',
                                     extra: <String, dynamic>{
-                                      kTransitionInfoKey: TransitionInfo(
+                                      kTransitionInfoKey: const TransitionInfo(
                                         hasTransition: true,
                                         transitionType: PageTransitionType.fade,
                                       ),
@@ -868,7 +879,7 @@ class _Account4WidgetState extends State<Account4Widget> with RouteAware {
                                                             .bodyLargeFamily),
                                               ),
                                         ),
-                                      ].divide(SizedBox(width: 12.0)),
+                                      ].divide(const SizedBox(width: 12.0)),
                                     ),
                                     Icon(
                                       Icons.chevron_right,
@@ -924,7 +935,7 @@ class _Account4WidgetState extends State<Account4Widget> with RouteAware {
                                                             .bodyLargeFamily),
                                               ),
                                         ),
-                                      ].divide(SizedBox(width: 12.0)),
+                                      ].divide(const SizedBox(width: 12.0)),
                                     ),
                                     Icon(
                                       Icons.chevron_right,
@@ -980,7 +991,7 @@ class _Account4WidgetState extends State<Account4Widget> with RouteAware {
                                                             .bodyLargeFamily),
                                               ),
                                         ),
-                                      ].divide(SizedBox(width: 12.0)),
+                                      ].divide(const SizedBox(width: 12.0)),
                                     ),
                                     Icon(
                                       Icons.chevron_right,
@@ -991,15 +1002,12 @@ class _Account4WidgetState extends State<Account4Widget> with RouteAware {
                                   ],
                                 ),
                               ),
-                            ].divide(SizedBox(height: 8.0)),
+                            ].divide(const SizedBox(height: 8.0)),
                           ),
                         ),
-                      ).addWalkthrough(
-                        containerXdqk8aw2,
-                        _model.signifyScreen4Controller,
                       ),
                       Align(
-                        alignment: AlignmentDirectional(0.0, 0.0),
+                        alignment: const AlignmentDirectional(0.0, 0.0),
                         child: FFButtonWidget(
                           onPressed: () async {
                             GoRouter.of(context).prepareAuthEvent();
@@ -1015,8 +1023,8 @@ class _Account4WidgetState extends State<Account4Widget> with RouteAware {
                           options: FFButtonOptions(
                             width: 180.0,
                             height: 50.0,
-                            padding: EdgeInsets.all(8.0),
-                            iconPadding: EdgeInsetsDirectional.fromSTEB(
+                            padding: const EdgeInsets.all(8.0),
+                            iconPadding: const EdgeInsetsDirectional.fromSTEB(
                                 0.0, 0.0, 0.0, 0.0),
                             color: Colors.transparent,
                             textStyle: FlutterFlowTheme.of(context)
@@ -1048,9 +1056,9 @@ class _Account4WidgetState extends State<Account4Widget> with RouteAware {
                         ),
                       ),
                     ]
-                        .divide(SizedBox(height: 24.0))
-                        .addToStart(SizedBox(height: 16.0))
-                        .addToEnd(SizedBox(height: 36.0)),
+                        .divide(const SizedBox(height: 24.0))
+                        .addToStart(const SizedBox(height: 16.0))
+                        .addToEnd(const SizedBox(height: 36.0)),
                   ),
                 ),
               ),
@@ -1060,15 +1068,4 @@ class _Account4WidgetState extends State<Account4Widget> with RouteAware {
       },
     );
   }
-
-  TutorialCoachMark createPageWalkthrough(BuildContext context) =>
-      TutorialCoachMark(
-        targets: createWalkthroughTargets(context),
-        onFinish: () async {
-          safeSetState(() => _model.signifyScreen4Controller = null);
-        },
-        onSkip: () {
-          return true;
-        },
-      );
 }

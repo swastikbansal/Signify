@@ -1,13 +1,10 @@
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import 'app_settings_model.dart';
 export 'app_settings_model.dart';
 
@@ -115,14 +112,14 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
               ),
             ],
           ),
-          actions: [],
+          actions: const [],
           centerTitle: false,
           elevation: 0.0,
         ),
         body: SafeArea(
           top: true,
           child: Padding(
-            padding: EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16.0),
             child: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -141,7 +138,7 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                     child: Stack(
                       children: [
                         Padding(
-                          padding: EdgeInsets.all(16.0),
+                          padding: const EdgeInsets.all(16.0),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             mainAxisAlignment: MainAxisAlignment.start,
@@ -203,8 +200,8 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                                     value: _model.switchValue1!,
                                     onChanged: (newValue) async {
                                       safeSetState(() =>
-                                          _model.switchValue1 = newValue!);
-                                      if (newValue!) {
+                                          _model.switchValue1 = newValue);
+                                      if (newValue) {
                                         HapticFeedback.mediumImpact();
                                       }
                                     },
@@ -283,8 +280,8 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                                     value: _model.switchValue2!,
                                     onChanged: (newValue) async {
                                       safeSetState(() =>
-                                          _model.switchValue2 = newValue!);
-                                      if (newValue!) {
+                                          _model.switchValue2 = newValue);
+                                      if (newValue) {
                                         HapticFeedback.heavyImpact();
                                       }
                                     },
@@ -362,8 +359,8 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                                     value: _model.switchValue3!,
                                     onChanged: (newValue) async {
                                       safeSetState(() =>
-                                          _model.switchValue3 = newValue!);
-                                      if (newValue!) {
+                                          _model.switchValue3 = newValue);
+                                      if (newValue) {
                                         HapticFeedback.heavyImpact();
                                       }
                                     },
@@ -525,7 +522,7 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                                   ),
                                 ],
                               ),
-                            ].divide(SizedBox(height: 8.0)),
+                            ].divide(const SizedBox(height: 8.0)),
                           ),
                         ),
                       ],
@@ -541,7 +538,7 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                       ),
                     ),
                     child: Padding(
-                      padding: EdgeInsets.all(16.0),
+                      padding: const EdgeInsets.all(16.0),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -609,7 +606,7 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                                 ),
                               ),
                               Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(
+                                padding: const EdgeInsetsDirectional.fromSTEB(
                                     30.0, 0.0, 0.0, 0.0),
                                 child: Column(
                                   mainAxisSize: MainAxisSize.max,
@@ -617,7 +614,7 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Padding(
-                                      padding: EdgeInsetsDirectional.fromSTEB(
+                                      padding: const EdgeInsetsDirectional.fromSTEB(
                                           0.0, 0.0, 0.0, 2.0),
                                       child: Text(
                                         FFLocalizations.of(context).getText(
@@ -689,12 +686,12 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                                             ),
                                       ),
                                     ),
-                                  ].divide(SizedBox(height: 2.0)),
+                                  ].divide(const SizedBox(height: 2.0)),
                                 ),
                               ),
                             ],
                           ),
-                        ].divide(SizedBox(height: 12.0)),
+                        ].divide(const SizedBox(height: 12.0)),
                       ),
                     ),
                   ),
@@ -708,7 +705,7 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                       ),
                     ),
                     child: Padding(
-                      padding: EdgeInsets.all(16.0),
+                      padding: const EdgeInsets.all(16.0),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         mainAxisAlignment: MainAxisAlignment.start,
@@ -742,7 +739,7 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
                               Align(
-                                alignment: AlignmentDirectional(0.0, 0.0),
+                                alignment: const AlignmentDirectional(0.0, 0.0),
                                 child: FlutterFlowIconButton(
                                   borderColor:
                                       FlutterFlowTheme.of(context).alternate,
@@ -768,7 +765,7 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                                 ),
                               ),
                               Align(
-                                alignment: AlignmentDirectional(0.0, 0.0),
+                                alignment: const AlignmentDirectional(0.0, 0.0),
                                 child: FlutterFlowIconButton(
                                   borderColor:
                                       FlutterFlowTheme.of(context).alternate,
@@ -794,7 +791,7 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                                 ),
                               ),
                               Align(
-                                alignment: AlignmentDirectional(0.0, 0.0),
+                                alignment: const AlignmentDirectional(0.0, 0.0),
                                 child: FlutterFlowIconButton(
                                   borderColor:
                                       FlutterFlowTheme.of(context).alternate,
@@ -820,7 +817,7 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                                 ),
                               ),
                               Align(
-                                alignment: AlignmentDirectional(0.0, 0.0),
+                                alignment: const AlignmentDirectional(0.0, 0.0),
                                 child: FlutterFlowIconButton(
                                   borderColor:
                                       FlutterFlowTheme.of(context).alternate,
@@ -845,13 +842,13 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                                   },
                                 ),
                               ),
-                            ].divide(SizedBox(width: 20.0)),
+                            ].divide(const SizedBox(width: 20.0)),
                           ),
-                        ].divide(SizedBox(height: 12.0)),
+                        ].divide(const SizedBox(height: 12.0)),
                       ),
                     ),
                   ),
-                ].divide(SizedBox(height: 16.0)).around(SizedBox(height: 16.0)),
+                ].divide(const SizedBox(height: 16.0)).around(const SizedBox(height: 16.0)),
               ),
             ),
           ),

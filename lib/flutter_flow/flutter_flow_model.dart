@@ -163,7 +163,7 @@ class FlutterFlowDynamicModels<T extends FlutterFlowModel> {
   DynamicWidgetClassDebugData toDynamicWidgetClassDebugData() =>
       DynamicWidgetClassDebugData(
         componentStates: _childrenModels.map((key, value) =>
-            MapEntry('Key(${key})', value.toWidgetClassDebugData())),
+            MapEntry('Key($key)', value.toWidgetClassDebugData())),
       );
 }
 

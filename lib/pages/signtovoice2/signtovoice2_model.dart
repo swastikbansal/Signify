@@ -1,15 +1,14 @@
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/form_field_controller.dart';
+import '/services/performance_cache_manager.dart';
 import 'signtovoice2_widget.dart' show Signtovoice2Widget;
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:image/image.dart' as img;
 import 'package:http_parser/http_parser.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart'
     show TutorialCoachMark;
 import 'package:camera/camera.dart';
 import 'dart:convert';
-import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:translator/translator.dart';
@@ -19,7 +18,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
 
   TutorialCoachMark? signifyScreen2Controller;
 
-  // MediaPipe related state
+  // API-based sign detection state
   bool _isDetecting = false;
   bool _isInitialized = false;
   bool _isCameraReady = false;
@@ -71,9 +70,13 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
     return _cameraController?.value.aspectRatio;
   }
 
+  // Cache manager for improved performance
+  final PerformanceCacheManager _cacheManager =
+      PerformanceCacheManager.instance;
+
   // Store coordinate data
-  List<List<Map<String, dynamic>>> _handLandmarks = [];
-  List<List<Map<String, dynamic>>> _poseLandmarks = [];
+  final List<List<Map<String, dynamic>>> _handLandmarks = [];
+  final List<List<Map<String, dynamic>>> _poseLandmarks = [];
   String _lastUpdateTime = '';
 
   // Enhanced coordinate storage for API
@@ -83,10 +86,10 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   List<String>? _handLabels; // To store hand labels (Left/Right)
 
   // Prediction history for debug
-  List<String> _predictionHistory = [];
+  final List<String> _predictionHistory = [];
 
   // Sentence building state
-  List<String> _currentSentence = [];
+  final List<String> _currentSentence = [];
   String _lastPrediction = "";
   int _lastPredictionTime = 0;
   static const int _wordCooldownMs =
@@ -104,7 +107,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   // API related state
   String _apiUrl =
       // 'http://192.168.29.42:5000/predict';
-      'http://192.168.29.42:5000/process_frame';
+      'http://192.168.29.168:5000/process_frame';
   bool _isApiEnabled = true;
   int _lastApiCallTime = 0;
   static const int _apiCallInterval =
@@ -732,7 +735,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
         final int uValue = uPlane.bytes[uvIndex];
         final int vValue = vPlane.bytes[uvIndex];
 
-        // YUV to RGB conversion
+        // Optimized YUV to RGB conversion
         final int r = (yValue + 1.402 * (vValue - 128)).round().clamp(0, 255);
         final int g =
             (yValue - 0.344136 * (uValue - 128) - 0.714136 * (vValue - 128))
@@ -748,6 +751,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   }
 
   // Send camera frame to API for prediction
+  // Add connection pooling and retry logic
   Future<void> _sendFrameToApi(CameraImage image) async {
     try {
       // Throttle API calls to prevent overwhelming the server
@@ -826,9 +830,33 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
       } else {
         print('Frame API call failed with status: ${response.statusCode}');
         print('Response: $responseString');
+
+        // Set error message to trigger red glow
+        _errorMessage = 'API Error: ${response.statusCode}';
+        _notifyStateChange();
+
+        // Clear error after 3 seconds
+        Future.delayed(const Duration(seconds: 3), () {
+          if (_errorMessage.startsWith('API Error:')) {
+            _errorMessage = '';
+            _notifyStateChange();
+          }
+        });
       }
     } catch (e) {
       print('Error sending frame to API: $e');
+
+      // Set error message to trigger red glow
+      _errorMessage = 'Network Error: ${e.toString().substring(0, 30)}...';
+      _notifyStateChange();
+
+      // Clear error after 3 seconds
+      Future.delayed(const Duration(seconds: 3), () {
+        if (_errorMessage.startsWith('Network Error:')) {
+          _errorMessage = '';
+          _notifyStateChange();
+        }
+      });
     }
   }
 
@@ -848,7 +876,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   void togglePredictionMode() {
     _isApiEnabled = !_isApiEnabled;
     print(
-        'Switched to ${_isApiEnabled ? 'API-based' : 'local MediaPipe'} prediction mode');
+        'Switched to ${_isApiEnabled ? 'API-based' : 'local'} prediction mode');
     _notifyStateChange();
   }
 
@@ -957,7 +985,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
 
         await _cameraController!.initialize();
 
-        // Start image stream for MediaPipe processing
+        // Start image stream for camera processing
         if (_isDetecting) {
           await _cameraController!.startImageStream((CameraImage image) {
             _processCameraImage(image);
@@ -968,7 +996,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
         _notifyStateChange();
         print(
             'Front camera initialized successfully: ${_cameraController!.description.name}');
-        print('Camera is front: ${isFrontCamera}');
+        print('Camera is front: $isFrontCamera');
         print(
             'Camera aspect ratio: ${cameraAspectRatio?.toStringAsFixed(3) ?? "Unknown"}');
       }
@@ -1002,7 +1030,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
               'Processing camera image: ${image.width}x${image.height}, format: ${image.format.group.name}, planes: ${image.planes.length}');
         }
 
-        // Send frame to API for prediction instead of local MediaPipe processing
+        // Send frame to API for prediction instead of local processing
         if (_isApiEnabled) {
           _sendFrameToApi(image).then((_) {
             _isProcessingFrame = false; // Reset flag when processing completes
@@ -1063,12 +1091,11 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
         // Initialize camera with image stream
         await _initializeCamera();
 
-        // Start MediaPipe detection
+        // Start detection
         try {
           _errorMessage = '';
           _isInitialized = true; // Add this line to set initialized to true
-          print(
-              'MediaPipe detection started - landmarks will be printed to console');
+          print('Detection started - API-based processing');
           print(
               'Detection initialized: $_isInitialized, detecting: $_isDetecting');
         } catch (e) {
@@ -1101,12 +1128,30 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
         _flutterTts = null;
       }
 
+      // Clear all caches and coordinate data for memory optimization
+      _predictionHistory.clear();
+      _currentSentence.clear();
+      _handLandmarks.clear();
+      _poseLandmarks.clear();
+      _leftHandCoords = null;
+      _rightHandCoords = null;
+      _poseCoords = null;
+      _handLabels = null;
+
+      // Dispose cache manager - use the performance cache manager
+      _cacheManager.clearAll();
+
       // Dispose camera
       _disposeCamera();
 
       signifyScreen2Controller?.finish();
       textFieldFocusNode?.dispose();
       textController?.dispose();
+
+      // Clear state callback to prevent memory leaks
+      _stateChangeCallback = null;
+
+      print('SignToVoice2Model disposed successfully with memory cleanup');
     } catch (e) {
       print('Error during dispose: $e');
     }

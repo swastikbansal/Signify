@@ -1,21 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:go_router/go_router.dart';
-import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
-import '/backend/backend.dart';
 
 import '/auth/base_auth_user_provider.dart';
 
 import '/index.dart';
 import '/main.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
-import '/flutter_flow/lat_lng.dart';
-import '/flutter_flow/place.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import 'serialization_util.dart';
 
 export 'package:go_router/go_router.dart';
 export 'serialization_util.dart';
@@ -117,20 +109,20 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
       debugLogDiagnostics: true,
       refreshListenable: appStateNotifier,
       errorBuilder: (context, state) =>
-          appStateNotifier.loggedIn ? NavBarPage() : SelectlanguageWidget(),
+          appStateNotifier.loggedIn ? const NavBarPage() : const SelectlanguageWidget(),
       routes: [
         FFRoute(
           name: '_initialize',
           path: '/',
           builder: (context, _) =>
-              appStateNotifier.loggedIn ? NavBarPage() : SelectlanguageWidget(),
+              appStateNotifier.loggedIn ? const NavBarPage() : const SelectlanguageWidget(),
         ),
         FFRoute(
           name: 'voicetosign1',
           path: '/voicetosign1',
           builder: (context, params) => params.isEmpty
-              ? NavBarPage(initialPage: 'voicetosign1')
-              : NavBarPage(
+              ? const NavBarPage(initialPage: 'voicetosign1')
+              : const NavBarPage(
                   initialPage: 'voicetosign1',
                   page: Voicetosign1Widget(),
                 ),
@@ -139,8 +131,8 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           name: 'signtovoice2',
           path: '/signtovoice2',
           builder: (context, params) => params.isEmpty
-              ? NavBarPage(initialPage: 'signtovoice2')
-              : NavBarPage(
+              ? const NavBarPage(initialPage: 'signtovoice2')
+              : const NavBarPage(
                   initialPage: 'signtovoice2',
                   page: Signtovoice2Widget(),
                 ),
@@ -149,8 +141,8 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           name: 'education3',
           path: '/education3',
           builder: (context, params) => params.isEmpty
-              ? NavBarPage(initialPage: 'education3')
-              : NavBarPage(
+              ? const NavBarPage(initialPage: 'education3')
+              : const NavBarPage(
                   initialPage: 'education3',
                   page: Education3Widget(),
                 ),
@@ -158,29 +150,29 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
         FFRoute(
           name: 'onboardingPage',
           path: '/onboardingPage',
-          builder: (context, params) => OnboardingPageWidget(),
+          builder: (context, params) => const OnboardingPageWidget(),
         ),
         FFRoute(
           name: 'forgotPassword',
           path: '/forgotPassword',
-          builder: (context, params) => ForgotPasswordWidget(),
+          builder: (context, params) => const ForgotPasswordWidget(),
         ),
         FFRoute(
           name: 'appSettings',
           path: '/appSettings',
-          builder: (context, params) => AppSettingsWidget(),
+          builder: (context, params) => const AppSettingsWidget(),
         ),
         FFRoute(
           name: 'editProfile',
           path: '/editProfile',
-          builder: (context, params) => EditProfileWidget(),
+          builder: (context, params) => const EditProfileWidget(),
         ),
         FFRoute(
           name: 'account4',
           path: '/account4',
           builder: (context, params) => params.isEmpty
-              ? NavBarPage(initialPage: 'account4')
-              : NavBarPage(
+              ? const NavBarPage(initialPage: 'account4')
+              : const NavBarPage(
                   initialPage: 'account4',
                   page: Account4Widget(),
                 ),
@@ -188,47 +180,47 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
         FFRoute(
           name: 'supportPage',
           path: '/supportPage',
-          builder: (context, params) => SupportPageWidget(),
+          builder: (context, params) => const SupportPageWidget(),
         ),
         FFRoute(
           name: 'selectlanguage',
           path: '/selectLanguage',
-          builder: (context, params) => SelectlanguageWidget(),
+          builder: (context, params) => const SelectlanguageWidget(),
         ),
         FFRoute(
           name: 'reportBug',
           path: '/reportBug',
-          builder: (context, params) => ReportBugWidget(),
+          builder: (context, params) => const ReportBugWidget(),
         ),
         FFRoute(
           name: 'requestFeature',
           path: '/requestFeature',
-          builder: (context, params) => RequestFeatureWidget(),
+          builder: (context, params) => const RequestFeatureWidget(),
         ),
         FFRoute(
           name: 'islDict',
           path: '/islDict',
-          builder: (context, params) => IslDictWidget(),
+          builder: (context, params) => const IslDictWidget(),
         ),
         FFRoute(
           name: 'islCommunity',
           path: '/islCommunity',
-          builder: (context, params) => IslCommunityWidget(),
+          builder: (context, params) => const IslCommunityWidget(),
         ),
         FFRoute(
           name: 'authPage',
           path: '/authPage',
-          builder: (context, params) => AuthPageWidget(),
+          builder: (context, params) => const AuthPageWidget(),
         ),
         FFRoute(
           name: 'tutorialPage',
           path: '/tutorialPage',
-          builder: (context, params) => TutorialPageWidget(),
+          builder: (context, params) => const TutorialPageWidget(),
         ),
         FFRoute(
           name: 'customSigns',
           path: '/customSigns',
-          builder: (context, params) => CustomSignsPage(),
+          builder: (context, params) => const CustomSignsPage(),
         )
       ].map((r) => r.toRoute(appStateNotifier)).toList(),
       observers: [routeObserver],
@@ -415,7 +407,7 @@ class FFRoute {
               : builder(context, ffParams);
           final child = appStateNotifier.loading
               ? Container(
-                  color: Color(0xFFFAB713),
+                  color: const Color(0xFFFAB713),
                   child: Image.asset(
                     'assets/images/color_png_(2).png',
                     fit: BoxFit.contain,
@@ -463,7 +455,7 @@ class TransitionInfo {
   final Duration duration;
   final Alignment? alignment;
 
-  static TransitionInfo appDefault() => TransitionInfo(hasTransition: false);
+  static TransitionInfo appDefault() => const TransitionInfo(hasTransition: false);
 }
 
 class RootPageContext {

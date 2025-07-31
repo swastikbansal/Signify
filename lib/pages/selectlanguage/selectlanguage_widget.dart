@@ -6,9 +6,7 @@ import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '/flutter_flow/form_field_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import 'selectlanguage_model.dart';
 export 'selectlanguage_model.dart';
 
@@ -81,7 +79,7 @@ class _SelectlanguageWidgetState extends State<SelectlanguageWidget>
         body: SafeArea(
           top: true,
           child: Padding(
-            padding: EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
+            padding: const EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
             child: Column(
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.start,
@@ -178,7 +176,7 @@ class _SelectlanguageWidgetState extends State<SelectlanguageWidget>
                     ),
                     Padding(
                       padding:
-                          EdgeInsetsDirectional.fromSTEB(0.0, 12.0, 0.0, 0.0),
+                          const EdgeInsetsDirectional.fromSTEB(0.0, 12.0, 0.0, 0.0),
                       child: Text(
                         FFLocalizations.of(context).getText(
                           'pf9hvmso' /* Select you hand preference */,
@@ -238,7 +236,7 @@ class _SelectlanguageWidgetState extends State<SelectlanguageWidget>
                       borderColor: FlutterFlowTheme.of(context).alternate,
                       borderWidth: 1.0,
                       borderRadius: 12.0,
-                      margin: EdgeInsets.all(12.0),
+                      margin: const EdgeInsets.all(12.0),
                       hidesUnderline: true,
                       isOverButton: false,
                       isSearchable: false,
@@ -246,7 +244,7 @@ class _SelectlanguageWidgetState extends State<SelectlanguageWidget>
                     ),
                     Padding(
                       padding:
-                          EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
+                          const EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
                       child: Text(
                         FFLocalizations.of(context).getText(
                           'hl1npvsk' /* Our model works better if we k... */,
@@ -264,7 +262,7 @@ class _SelectlanguageWidgetState extends State<SelectlanguageWidget>
                     ),
                     Padding(
                       padding:
-                          EdgeInsetsDirectional.fromSTEB(0.0, 8.0, 0.0, 0.0),
+                          const EdgeInsetsDirectional.fromSTEB(0.0, 8.0, 0.0, 0.0),
                       child: FFButtonWidget(
                         onPressed: () async {
                           if (loggedIn) {
@@ -287,7 +285,7 @@ class _SelectlanguageWidgetState extends State<SelectlanguageWidget>
                                                     .bodyLargeFamily),
                                       ),
                                 ),
-                                duration: Duration(milliseconds: 2000),
+                                duration: const Duration(milliseconds: 2000),
                                 backgroundColor:
                                     FlutterFlowTheme.of(context).info,
                               ),
@@ -296,7 +294,7 @@ class _SelectlanguageWidgetState extends State<SelectlanguageWidget>
                             context.pushNamed(
                               'onboardingPage',
                               extra: <String, dynamic>{
-                                kTransitionInfoKey: TransitionInfo(
+                                kTransitionInfoKey: const TransitionInfo(
                                   hasTransition: true,
                                   transitionType: PageTransitionType.fade,
                                 ),
@@ -310,8 +308,8 @@ class _SelectlanguageWidgetState extends State<SelectlanguageWidget>
                         options: FFButtonOptions(
                           width: MediaQuery.sizeOf(context).width * 0.5,
                           height: 50.0,
-                          padding: EdgeInsets.all(0.0),
-                          iconPadding: EdgeInsetsDirectional.fromSTEB(
+                          padding: const EdgeInsets.all(0.0),
+                          iconPadding: const EdgeInsetsDirectional.fromSTEB(
                               0.0, 0.0, 0.0, 0.0),
                           color: FlutterFlowTheme.of(context).primary,
                           textStyle: FlutterFlowTheme.of(context)
@@ -340,7 +338,7 @@ class _SelectlanguageWidgetState extends State<SelectlanguageWidget>
                     ),
                     Padding(
                       padding:
-                          EdgeInsetsDirectional.fromSTEB(0.0, 16.0, 0.0, 8.0),
+                          const EdgeInsetsDirectional.fromSTEB(0.0, 16.0, 0.0, 8.0),
                       child: Text(
                         FFLocalizations.of(context).getText(
                           'v088ak2u' /* Disclaimer: The app translatio... */,
@@ -357,8 +355,8 @@ class _SelectlanguageWidgetState extends State<SelectlanguageWidget>
                       ),
                     ),
                   ]
-                      .divide(SizedBox(height: 16.0))
-                      .addToStart(SizedBox(height: 16.0)),
+                      .divide(const SizedBox(height: 16.0))
+                      .addToStart(const SizedBox(height: 16.0)),
                 ),
               ],
             ),

@@ -3,20 +3,16 @@ import '/backend/backend.dart';
 import '/flutter_flow/flutter_flow_choice_chips.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import '/flutter_flow/flutter_flow_widgets.dart';
 import '/flutter_flow/form_field_controller.dart';
 import '/walkthroughs/signify_screen_3.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart'
     show TutorialCoachMark;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_debounce/easy_debounce.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import 'education3_model.dart';
 export 'education3_model.dart';
 
@@ -158,7 +154,7 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                           GoogleFonts.asMap().containsKey('Space Grotesk'),
                     ),
               ),
-              actions: [],
+              actions: const [],
               centerTitle: false,
               elevation: 0.0,
             ),
@@ -172,7 +168,7 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                   children: [
                     Padding(
                       padding:
-                          EdgeInsetsDirectional.fromSTEB(16.0, 8.0, 0.0, 0.0),
+                          const EdgeInsetsDirectional.fromSTEB(16.0, 8.0, 0.0, 0.0),
                       child: RichText(
                         textScaler: MediaQuery.of(context).textScaler,
                         text: TextSpan(
@@ -241,7 +237,7 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                     ),
                     Padding(
                       padding:
-                          EdgeInsetsDirectional.fromSTEB(16.0, 2.0, 0.0, 16.0),
+                          const EdgeInsetsDirectional.fromSTEB(16.0, 2.0, 0.0, 16.0),
                       child: Text(
                         FFLocalizations.of(context).getText(
                           'ddp2sajy' /* Stay up to date with us. */,
@@ -259,13 +255,13 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                     ),
                     Padding(
                       padding:
-                          EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
+                          const EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
                       child: TextFormField(
                         controller: _model.textController,
                         focusNode: _model.textFieldFocusNode,
                         onChanged: (_) => EasyDebounce.debounce(
                           '_model.textController',
-                          Duration(milliseconds: 2000),
+                          const Duration(milliseconds: 2000),
                           () => safeSetState(() {}),
                         ),
                         autofocus: false,
@@ -328,7 +324,7 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                             ),
                             borderRadius: BorderRadius.circular(12.0),
                           ),
-                          contentPadding: EdgeInsets.all(16.0),
+                          contentPadding: const EdgeInsets.all(16.0),
                           hoverColor:
                               FlutterFlowTheme.of(context).secondaryBackground,
                           prefixIcon: Icon(
@@ -375,12 +371,12 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                         borderRadius: BorderRadius.circular(0.0),
                       ),
                       child: ListView(
-                        padding: EdgeInsets.symmetric(horizontal: 16.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
                         primary: false,
                         scrollDirection: Axis.horizontal,
                         children: [
                           Padding(
-                            padding: EdgeInsetsDirectional.fromSTEB(
+                            padding: const EdgeInsetsDirectional.fromSTEB(
                                 0.0, 16.0, 0.0, 16.0),
                             child: InkWell(
                               splashColor: Colors.transparent,
@@ -391,7 +387,7 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                                 context.pushNamed(
                                   'islDict',
                                   extra: <String, dynamic>{
-                                    kTransitionInfoKey: TransitionInfo(
+                                    kTransitionInfoKey: const TransitionInfo(
                                       hasTransition: true,
                                       transitionType: PageTransitionType.fade,
                                     ),
@@ -410,7 +406,7 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                                   ),
                                 ),
                                 child: Padding(
-                                  padding: EdgeInsets.all(8.0),
+                                  padding: const EdgeInsets.all(8.0),
                                   child: Column(
                                     mainAxisSize: MainAxisSize.max,
                                     crossAxisAlignment:
@@ -433,15 +429,15 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                                             ),
                                           ),
                                           child: Padding(
-                                            padding: EdgeInsets.all(2.0),
+                                            padding: const EdgeInsets.all(2.0),
                                             child: ClipRRect(
                                               borderRadius:
                                                   BorderRadius.circular(6.0),
                                               child: CachedNetworkImage(
                                                 fadeInDuration:
-                                                    Duration(milliseconds: 500),
+                                                    const Duration(milliseconds: 500),
                                                 fadeOutDuration:
-                                                    Duration(milliseconds: 500),
+                                                    const Duration(milliseconds: 500),
                                                 imageUrl:
                                                     'https://images.unsplash.com/photo-1535572290543-960a8046f5af?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwyNHx8bGV0dGVyc3xlbnwwfHx8fDE3MzI2ODA2NDV8MA&ixlib=rb-4.0.3&q=80&w=1080',
                                                 width: 120.0,
@@ -453,7 +449,7 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                                         ),
                                       ),
                                       Padding(
-                                        padding: EdgeInsetsDirectional.fromSTEB(
+                                        padding: const EdgeInsetsDirectional.fromSTEB(
                                             4.0, 8.0, 4.0, 4.0),
                                         child: Column(
                                           mainAxisSize: MainAxisSize.max,
@@ -487,7 +483,7 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                                                       ),
                                             ),
                                             Padding(
-                                              padding: EdgeInsetsDirectional
+                                              padding: const EdgeInsetsDirectional
                                                   .fromSTEB(0.0, 4.0, 0.0, 0.0),
                                               child: Wrap(
                                                 spacing: 0.0,
@@ -504,7 +500,7 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                                                 children: [
                                                   Padding(
                                                     padding:
-                                                        EdgeInsetsDirectional
+                                                        const EdgeInsetsDirectional
                                                             .fromSTEB(0.0, 0.0,
                                                                 12.0, 0.0),
                                                     child: Text(
@@ -533,11 +529,11 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                                                   ),
                                                   Align(
                                                     alignment:
-                                                        AlignmentDirectional(
+                                                        const AlignmentDirectional(
                                                             1.0, 1.0),
                                                     child: Padding(
                                                       padding:
-                                                          EdgeInsetsDirectional
+                                                          const EdgeInsetsDirectional
                                                               .fromSTEB(
                                                                   0.0,
                                                                   0.0,
@@ -557,7 +553,7 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                                                 ],
                                               ),
                                             ),
-                                          ].divide(SizedBox(height: 4.0)),
+                                          ].divide(const SizedBox(height: 4.0)),
                                         ),
                                       ),
                                     ],
@@ -570,7 +566,7 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                             ),
                           ),
                           Padding(
-                            padding: EdgeInsetsDirectional.fromSTEB(
+                            padding: const EdgeInsetsDirectional.fromSTEB(
                                 0.0, 16.0, 0.0, 16.0),
                             child: InkWell(
                               splashColor: Colors.transparent,
@@ -592,7 +588,7 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                                   ),
                                 ),
                                 child: Padding(
-                                  padding: EdgeInsets.all(8.0),
+                                  padding: const EdgeInsets.all(8.0),
                                   child: Column(
                                     mainAxisSize: MainAxisSize.max,
                                     crossAxisAlignment:
@@ -615,15 +611,15 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                                             ),
                                           ),
                                           child: Padding(
-                                            padding: EdgeInsets.all(2.0),
+                                            padding: const EdgeInsets.all(2.0),
                                             child: ClipRRect(
                                               borderRadius:
                                                   BorderRadius.circular(6.0),
                                               child: CachedNetworkImage(
                                                 fadeInDuration:
-                                                    Duration(milliseconds: 500),
+                                                    const Duration(milliseconds: 500),
                                                 fadeOutDuration:
-                                                    Duration(milliseconds: 500),
+                                                    const Duration(milliseconds: 500),
                                                 imageUrl:
                                                     'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwyMHx8dG9nZXRoZXJ8ZW58MHx8fHwxNzMyNzkxMDMwfDA&ixlib=rb-4.0.3&q=80&w=1080',
                                                 width: 120.0,
@@ -635,7 +631,7 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                                         ),
                                       ),
                                       Padding(
-                                        padding: EdgeInsetsDirectional.fromSTEB(
+                                        padding: const EdgeInsetsDirectional.fromSTEB(
                                             4.0, 8.0, 4.0, 4.0),
                                         child: Column(
                                           mainAxisSize: MainAxisSize.max,
@@ -669,7 +665,7 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                                                       ),
                                             ),
                                             Padding(
-                                              padding: EdgeInsetsDirectional
+                                              padding: const EdgeInsetsDirectional
                                                   .fromSTEB(0.0, 4.0, 0.0, 0.0),
                                               child: Wrap(
                                                 spacing: 0.0,
@@ -686,7 +682,7 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                                                 children: [
                                                   Padding(
                                                     padding:
-                                                        EdgeInsetsDirectional
+                                                        const EdgeInsetsDirectional
                                                             .fromSTEB(0.0, 0.0,
                                                                 12.0, 0.0),
                                                     child: Text(
@@ -715,7 +711,7 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                                                   ),
                                                   Align(
                                                     alignment:
-                                                        AlignmentDirectional(
+                                                        const AlignmentDirectional(
                                                             1.0, 1.0),
                                                     child: Icon(
                                                       Icons
@@ -730,7 +726,7 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                                                 ],
                                               ),
                                             ),
-                                          ].divide(SizedBox(height: 4.0)),
+                                          ].divide(const SizedBox(height: 4.0)),
                                         ),
                                       ),
                                     ],
@@ -742,7 +738,7 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                               _model.signifyScreen3Controller,
                             ),
                           ),
-                        ].divide(SizedBox(width: 16.0)),
+                        ].divide(const SizedBox(width: 16.0)),
                       ).addWalkthrough(
                         listView86zm3y4x,
                         _model.signifyScreen3Controller,
@@ -760,7 +756,7 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Padding(
-                            padding: EdgeInsets.all(8.0),
+                            padding: const EdgeInsets.all(8.0),
                             child: FlutterFlowChoiceChips(
                               options: [
                                 ChipData(FFLocalizations.of(context).getText(
@@ -849,8 +845,8 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                             ),
                           ),
                         ]
-                            .addToStart(SizedBox(width: 16.0))
-                            .addToEnd(SizedBox(width: 16.0)),
+                            .addToStart(const SizedBox(width: 16.0))
+                            .addToEnd(const SizedBox(width: 16.0)),
                       ),
                     ),
                     Divider(
@@ -860,7 +856,7 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                     ),
                     Padding(
                       padding:
-                          EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 0.0, 0.0),
+                          const EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 0.0, 0.0),
                       child: Text(
                         FFLocalizations.of(context).getText(
                           'gebkvr2g' /* Popular Today */,
@@ -877,7 +873,7 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                       ),
                     ),
                     ListView(
-                      padding: EdgeInsets.fromLTRB(
+                      padding: const EdgeInsets.fromLTRB(
                         0,
                         12.0,
                         0,
@@ -888,7 +884,7 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                       scrollDirection: Axis.vertical,
                       children: [
                         Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(
+                          padding: const EdgeInsetsDirectional.fromSTEB(
                               16.0, 0.0, 16.0, 16.0),
                           child: Container(
                             width: 100.0,
@@ -901,7 +897,7 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                               ),
                             ),
                             child: Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
+                              padding: const EdgeInsetsDirectional.fromSTEB(
                                   10.0, 8.0, 10.0, 8.0),
                               child: Row(
                                 mainAxisSize: MainAxisSize.max,
@@ -920,17 +916,17 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                                     ),
                                     child: Align(
                                       alignment:
-                                          AlignmentDirectional(-1.0, 0.0),
+                                          const AlignmentDirectional(-1.0, 0.0),
                                       child: Padding(
-                                        padding: EdgeInsets.all(2.0),
+                                        padding: const EdgeInsets.all(2.0),
                                         child: ClipRRect(
                                           borderRadius:
                                               BorderRadius.circular(10.0),
                                           child: CachedNetworkImage(
                                             fadeInDuration:
-                                                Duration(milliseconds: 500),
+                                                const Duration(milliseconds: 500),
                                             fadeOutDuration:
-                                                Duration(milliseconds: 500),
+                                                const Duration(milliseconds: 500),
                                             imageUrl:
                                                 'https://images.unsplash.com/photo-1524683745036-b46f52b8505a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHw3fHxzY2llbmNlfGVufDB8fHx8MTczMjc5MDUxMXww&ixlib=rb-4.0.3&q=80&w=1080',
                                             width: 120.0,
@@ -943,7 +939,7 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                                   ),
                                   Expanded(
                                     child: Padding(
-                                      padding: EdgeInsetsDirectional.fromSTEB(
+                                      padding: const EdgeInsetsDirectional.fromSTEB(
                                           12.0, 0.0, 0.0, 0.0),
                                       child: Column(
                                         mainAxisSize: MainAxisSize.max,
@@ -974,13 +970,13 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                                           ),
                                           Padding(
                                             padding:
-                                                EdgeInsetsDirectional.fromSTEB(
+                                                const EdgeInsetsDirectional.fromSTEB(
                                                     0.0, 4.0, 0.0, 0.0),
                                             child: Row(
                                               mainAxisSize: MainAxisSize.max,
                                               children: [
                                                 Padding(
-                                                  padding: EdgeInsetsDirectional
+                                                  padding: const EdgeInsetsDirectional
                                                       .fromSTEB(
                                                           0.0, 0.0, 12.0, 0.0),
                                                   child: Text(
@@ -1007,7 +1003,7 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                                                   ),
                                                 ),
                                                 Padding(
-                                                  padding: EdgeInsetsDirectional
+                                                  padding: const EdgeInsetsDirectional
                                                       .fromSTEB(
                                                           0.0, 0.0, 4.0, 0.0),
                                                   child: Icon(
@@ -1020,7 +1016,7 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                                                   ),
                                                 ),
                                                 Padding(
-                                                  padding: EdgeInsetsDirectional
+                                                  padding: const EdgeInsetsDirectional
                                                       .fromSTEB(
                                                           0.0, 0.0, 16.0, 0.0),
                                                   child: Text(
@@ -1071,7 +1067,7 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                                                   ),
                                                 ),
                                                 Padding(
-                                                  padding: EdgeInsetsDirectional
+                                                  padding: const EdgeInsetsDirectional
                                                       .fromSTEB(
                                                           0.0, 0.0, 4.0, 0.0),
                                                   child: Icon(
@@ -1088,7 +1084,7 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                                           ),
                                           Padding(
                                             padding:
-                                                EdgeInsetsDirectional.fromSTEB(
+                                                const EdgeInsetsDirectional.fromSTEB(
                                                     0.0, 8.0, 12.0, 0.0),
                                             child: Text(
                                               FFLocalizations.of(context)
@@ -1117,7 +1113,7 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                                                       ),
                                             ),
                                           ),
-                                        ].divide(SizedBox(height: 4.0)),
+                                        ].divide(const SizedBox(height: 4.0)),
                                       ),
                                     ),
                                   ),
@@ -1130,7 +1126,7 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                           ),
                         ),
                         Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(
+                          padding: const EdgeInsetsDirectional.fromSTEB(
                               16.0, 0.0, 16.0, 16.0),
                           child: Container(
                             width: 100.0,
@@ -1143,7 +1139,7 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                               ),
                             ),
                             child: Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
+                              padding: const EdgeInsetsDirectional.fromSTEB(
                                   10.0, 8.0, 10.0, 8.0),
                               child: Row(
                                 mainAxisSize: MainAxisSize.max,
@@ -1161,15 +1157,15 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                                       ),
                                     ),
                                     child: Padding(
-                                      padding: EdgeInsets.all(2.0),
+                                      padding: const EdgeInsets.all(2.0),
                                       child: ClipRRect(
                                         borderRadius:
                                             BorderRadius.circular(10.0),
                                         child: CachedNetworkImage(
                                           fadeInDuration:
-                                              Duration(milliseconds: 500),
+                                              const Duration(milliseconds: 500),
                                           fadeOutDuration:
-                                              Duration(milliseconds: 500),
+                                              const Duration(milliseconds: 500),
                                           imageUrl:
                                               'https://images.unsplash.com/photo-1642444616393-df04dcb1492c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxNHx8Z2FtZXN8ZW58MHx8fHwxNzMyNzkwNjA1fDA&ixlib=rb-4.0.3&q=80&w=1080',
                                           width: 120.0,
@@ -1181,7 +1177,7 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                                   ),
                                   Expanded(
                                     child: Padding(
-                                      padding: EdgeInsetsDirectional.fromSTEB(
+                                      padding: const EdgeInsetsDirectional.fromSTEB(
                                           12.0, 0.0, 0.0, 0.0),
                                       child: Column(
                                         mainAxisSize: MainAxisSize.max,
@@ -1212,13 +1208,13 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                                           ),
                                           Padding(
                                             padding:
-                                                EdgeInsetsDirectional.fromSTEB(
+                                                const EdgeInsetsDirectional.fromSTEB(
                                                     0.0, 4.0, 0.0, 0.0),
                                             child: Row(
                                               mainAxisSize: MainAxisSize.max,
                                               children: [
                                                 Padding(
-                                                  padding: EdgeInsetsDirectional
+                                                  padding: const EdgeInsetsDirectional
                                                       .fromSTEB(
                                                           0.0, 0.0, 12.0, 0.0),
                                                   child: Text(
@@ -1245,7 +1241,7 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                                                   ),
                                                 ),
                                                 Padding(
-                                                  padding: EdgeInsetsDirectional
+                                                  padding: const EdgeInsetsDirectional
                                                       .fromSTEB(
                                                           0.0, 0.0, 4.0, 0.0),
                                                   child: Icon(
@@ -1258,7 +1254,7 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                                                   ),
                                                 ),
                                                 Padding(
-                                                  padding: EdgeInsetsDirectional
+                                                  padding: const EdgeInsetsDirectional
                                                       .fromSTEB(
                                                           0.0, 0.0, 16.0, 0.0),
                                                   child: Text(
@@ -1309,7 +1305,7 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                                                   ),
                                                 ),
                                                 Padding(
-                                                  padding: EdgeInsetsDirectional
+                                                  padding: const EdgeInsetsDirectional
                                                       .fromSTEB(
                                                           0.0, 0.0, 4.0, 0.0),
                                                   child: Icon(
@@ -1326,7 +1322,7 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                                           ),
                                           Padding(
                                             padding:
-                                                EdgeInsetsDirectional.fromSTEB(
+                                                const EdgeInsetsDirectional.fromSTEB(
                                                     0.0, 8.0, 12.0, 0.0),
                                             child: Text(
                                               FFLocalizations.of(context)
@@ -1355,7 +1351,7 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                                                       ),
                                             ),
                                           ),
-                                        ].divide(SizedBox(height: 4.0)),
+                                        ].divide(const SizedBox(height: 4.0)),
                                       ),
                                     ),
                                   ),
@@ -1365,7 +1361,7 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                           ),
                         ),
                         Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(
+                          padding: const EdgeInsetsDirectional.fromSTEB(
                               16.0, 0.0, 16.0, 16.0),
                           child: Container(
                             width: 100.0,
@@ -1378,7 +1374,7 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                               ),
                             ),
                             child: Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
+                              padding: const EdgeInsetsDirectional.fromSTEB(
                                   10.0, 8.0, 10.0, 8.0),
                               child: Row(
                                 mainAxisSize: MainAxisSize.max,
@@ -1396,15 +1392,15 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                                       ),
                                     ),
                                     child: Padding(
-                                      padding: EdgeInsets.all(2.0),
+                                      padding: const EdgeInsets.all(2.0),
                                       child: ClipRRect(
                                         borderRadius:
                                             BorderRadius.circular(10.0),
                                         child: CachedNetworkImage(
                                           fadeInDuration:
-                                              Duration(milliseconds: 500),
+                                              const Duration(milliseconds: 500),
                                           fadeOutDuration:
-                                              Duration(milliseconds: 500),
+                                              const Duration(milliseconds: 500),
                                           imageUrl:
                                               'https://images.unsplash.com/photo-1604866830893-c13cafa515d5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxib29rc3xlbnwwfHx8fDE3MzI3ODQ2NzB8MA&ixlib=rb-4.0.3&q=80&w=1080',
                                           width: 120.0,
@@ -1416,7 +1412,7 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                                   ),
                                   Expanded(
                                     child: Padding(
-                                      padding: EdgeInsetsDirectional.fromSTEB(
+                                      padding: const EdgeInsetsDirectional.fromSTEB(
                                           12.0, 0.0, 0.0, 0.0),
                                       child: Column(
                                         mainAxisSize: MainAxisSize.max,
@@ -1447,13 +1443,13 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                                           ),
                                           Padding(
                                             padding:
-                                                EdgeInsetsDirectional.fromSTEB(
+                                                const EdgeInsetsDirectional.fromSTEB(
                                                     0.0, 4.0, 0.0, 0.0),
                                             child: Row(
                                               mainAxisSize: MainAxisSize.max,
                                               children: [
                                                 Padding(
-                                                  padding: EdgeInsetsDirectional
+                                                  padding: const EdgeInsetsDirectional
                                                       .fromSTEB(
                                                           0.0, 0.0, 12.0, 0.0),
                                                   child: Text(
@@ -1480,7 +1476,7 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                                                   ),
                                                 ),
                                                 Padding(
-                                                  padding: EdgeInsetsDirectional
+                                                  padding: const EdgeInsetsDirectional
                                                       .fromSTEB(
                                                           0.0, 0.0, 4.0, 0.0),
                                                   child: Icon(
@@ -1493,7 +1489,7 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                                                   ),
                                                 ),
                                                 Padding(
-                                                  padding: EdgeInsetsDirectional
+                                                  padding: const EdgeInsetsDirectional
                                                       .fromSTEB(
                                                           0.0, 0.0, 16.0, 0.0),
                                                   child: Text(
@@ -1544,7 +1540,7 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                                                   ),
                                                 ),
                                                 Padding(
-                                                  padding: EdgeInsetsDirectional
+                                                  padding: const EdgeInsetsDirectional
                                                       .fromSTEB(
                                                           0.0, 0.0, 4.0, 0.0),
                                                   child: Icon(
@@ -1561,7 +1557,7 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                                           ),
                                           Padding(
                                             padding:
-                                                EdgeInsetsDirectional.fromSTEB(
+                                                const EdgeInsetsDirectional.fromSTEB(
                                                     0.0, 8.0, 12.0, 0.0),
                                             child: Text(
                                               FFLocalizations.of(context)
@@ -1590,7 +1586,7 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                                                       ),
                                             ),
                                           ),
-                                        ].divide(SizedBox(height: 4.0)),
+                                        ].divide(const SizedBox(height: 4.0)),
                                       ),
                                     ),
                                   ),
@@ -1601,7 +1597,7 @@ class _Education3WidgetState extends State<Education3Widget> with RouteAware {
                         ),
                       ],
                     ),
-                  ].addToStart(SizedBox(height: 8.0)),
+                  ].addToStart(const SizedBox(height: 8.0)),
                 ),
               ),
             ),

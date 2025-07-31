@@ -1,4 +1,3 @@
-import '/auth/firebase_auth/auth_util.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 // import '/walkthroughs/signify_screen_2.dart'; // Commented out to disable walkthrough
@@ -11,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:camera/camera.dart';
-import 'package:flutter/services.dart';
+import 'dart:math' as math;
 
 class Signtovoice2Widget extends StatefulWidget {
   const Signtovoice2Widget({super.key});
@@ -32,7 +31,6 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
   late Animation<double> _movingLineAnimation;
   bool isGlowActive = false;
   bool isSpeakerOn = false; // Add speaker toggle state
-  int _lastLandmarkCount = 0; // Track landmark changes
 
   @override
   void initState() {
@@ -108,20 +106,12 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
     _model.setStateChangeCallback(() {
       try {
         if (mounted) {
-          /*
-          // Calculate current landmark count
-          int currentLandmarkCount =
-              _model.handLandmarks.length + _model.poseLandmarks.length;
-
-          // Trigger animation when new poses/hands are detected (landmark count changes)
-          if (currentLandmarkCount > 0 &&
-              currentLandmarkCount != _lastLandmarkCount &&
-              _model.isDetecting &&
-              !isGlowActive) {
-            _triggerGlowAnimation();
-            _lastLandmarkCount = currentLandmarkCount;
+          // Trigger glow animation when detection state changes
+          if (_model.isDetecting && !_glowController.isAnimating) {
+            _startGlowAnimation();
+          } else if (!_model.isDetecting && _glowController.isAnimating) {
+            _stopGlowAnimation();
           }
-          */
 
           // Also trigger when text changes
           final currentText = _model.textController?.text ?? '';
@@ -143,6 +133,19 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
     _glowController.dispose();
     _movingLineController.dispose();
     super.dispose();
+  }
+
+  // Method to start continuous glow animation for API processing
+  void _startGlowAnimation() {
+    if (!mounted) return;
+    _glowController.repeat();
+  }
+
+  // Method to stop glow animation
+  void _stopGlowAnimation() {
+    if (!mounted) return;
+    _glowController.stop();
+    _glowController.reset();
   }
 
   // Method to trigger the Google Assistant-like glow animation
@@ -211,7 +214,7 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
               height: double.infinity,
               color: FlutterFlowTheme.of(context).primaryBackground,
               child: _model.isCameraOn || _model.isDetecting
-                  ? _buildMediaPipeDisplay()
+                  ? _buildCameraDisplay()
                   : Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -221,9 +224,9 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                             size: 80.0,
                             color: FlutterFlowTheme.of(context).info,
                           ),
-                          SizedBox(height: 16.0),
+                          const SizedBox(height: 16.0),
                           Text(
-                            'Press camera button to start MediaPipe detection',
+                            'Press camera button to start detection',
                             textAlign: TextAlign.center,
                             style: FlutterFlowTheme.of(context)
                                 .bodyMedium
@@ -372,8 +375,8 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                                   message:
                                       'Select language for text-to-speech output',
                                   decoration: BoxDecoration(
-                                    color: FlutterFlowTheme.of(context)
-                                        .alternate,
+                                    color:
+                                        FlutterFlowTheme.of(context).alternate,
                                     borderRadius: BorderRadius.circular(8.0),
                                     boxShadow: [
                                       BoxShadow(
@@ -433,8 +436,8 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                                       ? 'Turn off text-to-speech'
                                       : 'Turn on text-to-speech',
                                   decoration: BoxDecoration(
-                                    color: FlutterFlowTheme.of(context)
-                                        .alternate,
+                                    color:
+                                        FlutterFlowTheme.of(context).alternate,
                                     borderRadius: BorderRadius.circular(8.0),
                                     boxShadow: [
                                       BoxShadow(
@@ -460,7 +463,7 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                                         await _model.toggleTts();
                                         safeSetState(() {});
                                       },
-                                      child: Container(
+                                      child: SizedBox(
                                         width: 42.0,
                                         height: 42.0,
                                         child: Icon(
@@ -489,8 +492,8 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                                       ? 'Stop sign detection'
                                       : 'Start sign detection',
                                   decoration: BoxDecoration(
-                                    color: FlutterFlowTheme.of(context)
-                                        .alternate,
+                                    color:
+                                        FlutterFlowTheme.of(context).alternate,
                                     borderRadius: BorderRadius.circular(8.0),
                                     boxShadow: [
                                       BoxShadow(
@@ -516,7 +519,7 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                                         await _model.toggleDetection();
                                         safeSetState(() {});
                                       },
-                                      child: Container(
+                                      child: SizedBox(
                                         width: 42.0,
                                         height: 42.0,
                                         child: Icon(
@@ -534,7 +537,6 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                                   ),
                                 ),
                               ), // Removed walkthrough functionality
-                              
                             ],
                           ),
                         ),
@@ -550,41 +552,12 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
     );
   }
 
-  Widget _buildMediaPipeDisplay() {
+  Widget _buildCameraDisplay() {
     return Container(
       color: Colors.black,
       child: Column(
         children: [
-          // Minimal status indicator
-          Container(
-            padding: EdgeInsets.all(4.0),
-            color: _model.isDetecting
-                ? Colors.green.withOpacity(0.8)
-                : Colors.orange.withOpacity(0.8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  _model.isDetecting
-                      ? Icons.fiber_manual_record
-                      : Icons.pause_circle_outline,
-                  color: Colors.white,
-                  size: 12,
-                ),
-                SizedBox(width: 4),
-                Text(
-                  _model.isDetecting ? 'LIVE' : 'PAUSED',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 10,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Live camera feed area with Flutter CameraPreview
+          // Live camera feed area with Flutter CameraPreview (clean, no overlays)
           Expanded(
             child: Container(
               width: double.infinity,
@@ -595,7 +568,7 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                     ? Stack(
                         children: [
                           // Flutter Camera Preview with mirroring for front camera
-                          Container(
+                          SizedBox(
                             width: double.infinity,
                             height: double.infinity,
                             child: Transform(
@@ -607,50 +580,11 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                               child: CameraPreview(_model.cameraController!),
                             ),
                           ),
-                          
-                          // MediaPipe landmarks overlay (minimal)
+
+                          // Beautiful edge glow animation when API is active
                           if (_model.isDetecting)
-                            Positioned(
-                              bottom: 8,
-                              right: 8,
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: Colors.black54,
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: Text(
-                                  'H:${_model.handLandmarks.length} P:${_model.poseLandmarks.length}',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 10,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          // Landmarks printing indicator
-                          if (_model.isDetecting)
-                            Positioned(
-                              top: 8,
-                              left: 8,
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 6, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: Colors.green.withOpacity(0.7),
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: Text(
-                                  _model.isSkeletonOverlayEnabled
-                                      ? 'Skeleton Overlay Active'
-                                      : 'Tracking Active',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 8,
-                                  ),
-                                ),
-                              ),
+                            Positioned.fill(
+                              child: _buildEdgeGlowAnimation(),
                             ),
                         ],
                       )
@@ -658,17 +592,17 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.camera_alt,
                               size: 80.0,
                               color: Colors.white70,
                             ),
-                            SizedBox(height: 16.0),
+                            const SizedBox(height: 16.0),
                             Text(
                               _model.isCameraOn
                                   ? 'Initializing camera...'
                                   : 'Press camera button to start',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
@@ -676,10 +610,10 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                               textAlign: TextAlign.center,
                             ),
                             if (_model.errorMessage.isNotEmpty) ...[
-                              SizedBox(height: 8),
+                              const SizedBox(height: 8),
                               Text(
                                 'Error: ${_model.errorMessage}',
-                                style: TextStyle(
+                                style: const TextStyle(
                                   color: Colors.red,
                                   fontSize: 12,
                                 ),
@@ -695,6 +629,34 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
         ],
       ),
     );
+  }
+
+  // Beautiful edge glow animation widget
+  Widget _buildEdgeGlowAnimation() {
+    return AnimatedBuilder(
+      animation: _glowController,
+      builder: (context, child) {
+        return CustomPaint(
+          painter: EdgeGlowPainter(
+            glowIntensity: _glowController.value,
+            glowColor: _getGlowColor(),
+            isAnimating: _model.isDetecting,
+          ),
+          child: Container(),
+        );
+      },
+    );
+  }
+
+  // Get glow color based on API status
+  Color _getGlowColor() {
+    if (_model.errorMessage.isNotEmpty) {
+      return Colors.red; // Red for errors
+    } else if (_model.isDetecting) {
+      return Colors.amber; // Yellow/amber for active API processing
+    } else {
+      return Colors.transparent; // No glow when inactive
+    }
   }
 }
 
@@ -784,13 +746,13 @@ class ModernDropDown extends StatefulWidget {
   final double height;
 
   const ModernDropDown({
-    Key? key,
+    super.key,
     required this.value,
     required this.options,
     required this.onChanged,
     required this.width,
     required this.height,
-  }) : super(key: key);
+  });
 
   @override
   State<ModernDropDown> createState() => _ModernDropDownState();
@@ -846,100 +808,104 @@ class _ModernDropDownState extends State<ModernDropDown>
         (widget.options.length * 40.0).clamp(0.0, maxDropdownHeight);
 
     _overlayEntry = OverlayEntry(
-      builder: (context) => Positioned(
-        left: offset.dx,
-        top: offset.dy - dropdownHeight - 4, // Position above with 4px gap
-        width: size.width,
-        child: Material(
-          elevation: 8,
-          borderRadius: BorderRadius.circular(12),
-          color: FlutterFlowTheme.of(context).secondaryBackground,
-          shadowColor: Colors.black26,
-          child: Container(
-            constraints: BoxConstraints(
-              maxHeight: 200, // Scrollable if more than 5 items (40 each)
-            ),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: FlutterFlowTheme.of(context).alternate,
-                width: 1,
-              ),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Scrollbar(
-                thumbVisibility: widget.options.length > 5,
-                child: ListView.separated(
-                  padding: EdgeInsets.zero,
-                  shrinkWrap: true,
-                  itemCount: widget.options.length,
-                  separatorBuilder: (context, index) => Divider(
-                    height: 1,
-                    color: FlutterFlowTheme.of(context).alternate,
+        builder: (context) => Positioned(
+              left: offset.dx,
+              top:
+                  offset.dy - dropdownHeight - 4, // Position above with 4px gap
+              width: size.width,
+              child: Material(
+                elevation: 8,
+                borderRadius: BorderRadius.circular(12),
+                color: FlutterFlowTheme.of(context).secondaryBackground,
+                shadowColor: Colors.black26,
+                child: Container(
+                  constraints: const BoxConstraints(
+                    maxHeight: 200, // Scrollable if more than 5 items (40 each)
                   ),
-                  itemBuilder: (context, index) {
-                    final option = widget.options[index];
-                    final isSelected = option == widget.value;
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: FlutterFlowTheme.of(context).alternate,
+                      width: 1,
+                    ),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Scrollbar(
+                      thumbVisibility: widget.options.length > 5,
+                      child: ListView.separated(
+                        padding: EdgeInsets.zero,
+                        shrinkWrap: true,
+                        itemCount: widget.options.length,
+                        separatorBuilder: (context, index) => Divider(
+                          height: 1,
+                          color: FlutterFlowTheme.of(context).alternate,
+                        ),
+                        itemBuilder: (context, index) {
+                          final option = widget.options[index];
+                          final isSelected = option == widget.value;
 
-                    return InkWell(
-                      onTap: () {
-                        widget.onChanged(option);
-                        _collapseDropdown();
-                      },
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 150),
-                        height: 40,
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        color: isSelected
-                            ? FlutterFlowTheme.of(context)
-                                .accent1
-                                .withOpacity(0.1)
-                            : Colors.transparent,
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                option,
-                                style: FlutterFlowTheme.of(context)
-                                    .bodySmall
-                                    .override(
-                                      fontFamily: FlutterFlowTheme.of(context)
-                                          .bodySmallFamily,
-                                      color: isSelected
-                                          ? FlutterFlowTheme.of(context).primary
-                                          : FlutterFlowTheme.of(context)
-                                              .primaryText,
-                                      fontSize: 12.0,
-                                      letterSpacing: 0.0,
-                                      fontWeight: isSelected
-                                          ? FontWeight.w600
-                                          : FontWeight.w500,
-                                      useGoogleFonts: GoogleFonts.asMap()
-                                          .containsKey(
-                                              FlutterFlowTheme.of(context)
-                                                  .bodySmallFamily),
+                          return InkWell(
+                            onTap: () {
+                              widget.onChanged(option);
+                              _collapseDropdown();
+                            },
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 150),
+                              height: 40,
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 12),
+                              color: isSelected
+                                  ? FlutterFlowTheme.of(context)
+                                      .accent1
+                                      .withOpacity(0.1)
+                                  : Colors.transparent,
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      option,
+                                      style: FlutterFlowTheme.of(context)
+                                          .bodySmall
+                                          .override(
+                                            fontFamily:
+                                                FlutterFlowTheme.of(context)
+                                                    .bodySmallFamily,
+                                            color: isSelected
+                                                ? FlutterFlowTheme.of(context)
+                                                    .primary
+                                                : FlutterFlowTheme.of(context)
+                                                    .primaryText,
+                                            fontSize: 12.0,
+                                            letterSpacing: 0.0,
+                                            fontWeight: isSelected
+                                                ? FontWeight.w600
+                                                : FontWeight.w500,
+                                            useGoogleFonts: GoogleFonts.asMap()
+                                                .containsKey(
+                                                    FlutterFlowTheme.of(context)
+                                                        .bodySmallFamily),
+                                          ),
                                     ),
+                                  ),
+                                  if (isSelected)
+                                    Icon(
+                                      Icons.check_rounded,
+                                      size: 16,
+                                      color:
+                                          FlutterFlowTheme.of(context).primary,
+                                    ),
+                                ],
                               ),
                             ),
-                            if (isSelected)
-                              Icon(
-                                Icons.check_rounded,
-                                size: 16,
-                                color: FlutterFlowTheme.of(context).primary,
-                              ),
-                          ],
-                        ),
+                          );
+                        },
                       ),
-                    );
-                  },
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
-        ),
-      )
-      );
+            ));
 
     Overlay.of(context).insert(_overlayEntry!);
     _animationController.forward();
@@ -1013,5 +979,112 @@ class _ModernDropDownState extends State<ModernDropDown>
         ),
       ),
     );
+  }
+}
+
+// Beautiful edge glow painter for camera frame
+class EdgeGlowPainter extends CustomPainter {
+  final double glowIntensity;
+  final Color glowColor;
+  final bool isAnimating;
+
+  EdgeGlowPainter({
+    required this.glowIntensity,
+    required this.glowColor,
+    required this.isAnimating,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (!isAnimating || glowColor == Colors.transparent) return;
+
+    final rect = Rect.fromLTWH(0, 0, size.width, size.height);
+    const double glowWidth = 4.0;
+    const double animationWidth = 8.0;
+
+    // Create animated pulse effect with varying intensity
+    final animatedIntensity =
+        (math.sin(glowIntensity * math.pi * 4) * 0.3 + 0.7);
+    final currentOpacity = (animatedIntensity * 0.8).clamp(0.0, 1.0);
+
+    // Create gradient paint for glow effect
+    final glowPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = glowWidth
+      ..shader = LinearGradient(
+        colors: [
+          glowColor.withOpacity(0.0),
+          glowColor.withOpacity(currentOpacity),
+          glowColor.withOpacity(0.0),
+        ],
+        stops: const [0.0, 0.5, 1.0],
+      ).createShader(rect);
+
+    // Create outer glow for more dramatic effect
+    final outerGlowPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = animationWidth
+      ..shader = LinearGradient(
+        colors: [
+          glowColor.withOpacity(0.0),
+          glowColor.withOpacity(currentOpacity * 0.3),
+          glowColor.withOpacity(0.0),
+        ],
+        stops: const [0.0, 0.5, 1.0],
+      ).createShader(rect);
+
+    // Draw outer glow
+    canvas.drawRect(
+      Rect.fromLTWH(-animationWidth / 2, -animationWidth / 2,
+          size.width + animationWidth, size.height + animationWidth),
+      outerGlowPaint,
+    );
+
+    // Draw main glow
+    canvas.drawRect(
+      Rect.fromLTWH(-glowWidth / 2, -glowWidth / 2, size.width + glowWidth,
+          size.height + glowWidth),
+      glowPaint,
+    );
+
+    // Add corner highlights for more elegance
+    final cornerPaint = Paint()
+      ..color = glowColor.withOpacity(currentOpacity * 0.6)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.0
+      ..strokeCap = StrokeCap.round;
+
+    const double cornerLength = 30.0;
+
+    // Top-left corner
+    canvas.drawLine(
+        const Offset(0, 0), const Offset(cornerLength, 0), cornerPaint);
+    canvas.drawLine(
+        const Offset(0, 0), const Offset(0, cornerLength), cornerPaint);
+
+    // Top-right corner
+    canvas.drawLine(Offset(size.width, 0), Offset(size.width - cornerLength, 0),
+        cornerPaint);
+    canvas.drawLine(
+        Offset(size.width, 0), Offset(size.width, cornerLength), cornerPaint);
+
+    // Bottom-left corner
+    canvas.drawLine(
+        Offset(0, size.height), Offset(cornerLength, size.height), cornerPaint);
+    canvas.drawLine(Offset(0, size.height),
+        Offset(0, size.height - cornerLength), cornerPaint);
+
+    // Bottom-right corner
+    canvas.drawLine(Offset(size.width, size.height),
+        Offset(size.width - cornerLength, size.height), cornerPaint);
+    canvas.drawLine(Offset(size.width, size.height),
+        Offset(size.width, size.height - cornerLength), cornerPaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant EdgeGlowPainter oldDelegate) {
+    return oldDelegate.glowIntensity != glowIntensity ||
+        oldDelegate.glowColor != glowColor ||
+        oldDelegate.isAnimating != isAnimating;
   }
 }

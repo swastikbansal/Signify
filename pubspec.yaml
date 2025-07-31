@@ -138,16 +138,19 @@ dependencies:
   video_player_avfoundation: 2.6.2
   video_player_platform_interface: 6.2.3
   video_player_web: 2.3.2
-  speech_to_text: ^7.0.0
   flutter_tts: ^4.0.2
   translator: ^0.1.7
   http_parser: ^4.0.2
+  speech_to_text: 7.0.0
   xml: 6.5.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.0
 
+  crypto: any
+  http: any
+  image: any
 dependency_overrides:
   http: 1.2.2
   pointer_interceptor: 0.10.1+2
@@ -168,7 +171,6 @@ dev_dependencies:
   #    git:
   #      url: https://github.com/FlutterFlow/debug_panel_devtool.git
   #      ref: v0.2.0
-  image: 4.2.0
   lints: 4.0.0
   flutter_test:
     sdk: flutter

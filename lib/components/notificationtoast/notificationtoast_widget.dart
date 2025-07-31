@@ -2,9 +2,7 @@ import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import 'notificationtoast_model.dart';
 export 'notificationtoast_model.dart';
 
@@ -14,8 +12,8 @@ class NotificationtoastWidget extends StatefulWidget {
     String? title,
     String? description,
     required this.icon,
-  })  : this.title = title ?? 'Title',
-        this.description = description ?? 'Description';
+  })  : title = title ?? 'Title',
+        description = description ?? 'Description';
 
   final String title;
   final String description;
@@ -67,7 +65,7 @@ class _NotificationtoastWidgetState extends State<NotificationtoastWidget>
         ),
       ),
       child: Padding(
-        padding: EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(8.0),
         child: Row(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.start,
@@ -83,7 +81,7 @@ class _NotificationtoastWidgetState extends State<NotificationtoastWidget>
                 ),
               ),
               child: Padding(
-                padding: EdgeInsets.all(4.0),
+                padding: const EdgeInsets.all(4.0),
                 child: Icon(
                   Icons.add_task_rounded,
                   color: FlutterFlowTheme.of(context).primary,
@@ -121,7 +119,7 @@ class _NotificationtoastWidgetState extends State<NotificationtoastWidget>
                               FlutterFlowTheme.of(context).labelMediumFamily),
                         ),
                   ),
-                ].divide(SizedBox(height: 2.0)),
+                ].divide(const SizedBox(height: 2.0)),
               ),
             ),
             FlutterFlowIconButton(
@@ -138,7 +136,7 @@ class _NotificationtoastWidgetState extends State<NotificationtoastWidget>
                 Navigator.pop(context);
               },
             ),
-          ].divide(SizedBox(width: 8.0)),
+          ].divide(const SizedBox(width: 8.0)),
         ),
       ),
     );

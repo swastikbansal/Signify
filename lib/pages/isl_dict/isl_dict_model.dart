@@ -1,18 +1,7 @@
-import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import '/flutter_flow/flutter_flow_widgets.dart';
 import 'isl_dict_widget.dart' show IslDictWidget;
-import 'package:auto_size_text/auto_size_text.dart';
-import 'package:easy_debounce/easy_debounce.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 
 // Data Models for ISL Dictionary
 class ISLSign {
@@ -264,7 +253,7 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
         description: 'The letter A in Indian Sign Language',
         tags: ['alphabet', 'letter', 'basic'],
         difficulty: 1,
-        dateAdded: DateTime.now().subtract(Duration(days: 5)),
+        dateAdded: DateTime.now().subtract(const Duration(days: 5)),
       ),
       ISLSign(
         id: 'sign_b',
@@ -275,7 +264,7 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
         description: 'The letter B in Indian Sign Language',
         tags: ['alphabet', 'letter', 'basic'],
         difficulty: 1,
-        dateAdded: DateTime.now().subtract(Duration(days: 4)),
+        dateAdded: DateTime.now().subtract(const Duration(days: 4)),
       ),
       // Numbers
       ISLSign(
@@ -287,7 +276,7 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
         description: 'Number one in Indian Sign Language',
         tags: ['number', 'counting', 'basic'],
         difficulty: 1,
-        dateAdded: DateTime.now().subtract(Duration(days: 3)),
+        dateAdded: DateTime.now().subtract(const Duration(days: 3)),
       ),
       // Greetings
       ISLSign(
@@ -299,7 +288,7 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
         description: 'Greeting: Hello in Indian Sign Language',
         tags: ['greeting', 'hello', 'basic', 'communication'],
         difficulty: 1,
-        dateAdded: DateTime.now().subtract(Duration(days: 2)),
+        dateAdded: DateTime.now().subtract(const Duration(days: 2)),
         viewCount: 25,
       ),
       ISLSign(
@@ -311,7 +300,7 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
         description: 'Expression of gratitude in Indian Sign Language',
         tags: ['greeting', 'thanks', 'gratitude', 'polite'],
         difficulty: 2,
-        dateAdded: DateTime.now().subtract(Duration(days: 1)),
+        dateAdded: DateTime.now().subtract(const Duration(days: 1)),
         viewCount: 18,
       ),
       // Family

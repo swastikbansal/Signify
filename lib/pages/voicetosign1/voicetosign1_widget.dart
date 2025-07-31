@@ -1,4 +1,3 @@
-import '/auth/firebase_auth/auth_util.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 // import '/walkthroughs/signify_screen_1.dart'; // Commented out to disable walkthrough
@@ -1035,7 +1034,7 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
                                       onTap: isProcessingImage
                                           ? null
                                           : _showImagePickerBottomSheet,
-                                      child: Container(
+                                      child: SizedBox(
                                         width: 32.0,
                                         height: 32.0,
                                         child: Icon(
@@ -1116,7 +1115,7 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
                                           _model.stopListening();
                                         }
                                       },
-                                      child: Container(
+                                      child: SizedBox(
                                         width: 32.0,
                                         height: 32.0,
                                         child: Icon(
@@ -1179,7 +1178,7 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
                                               _handleSendAction();
                                             }
                                           : null,
-                                      child: Container(
+                                      child: SizedBox(
                                         width: 32.0,
                                         height: 32.0,
                                         child: Icon(
@@ -1207,7 +1206,7 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
                   ],
                 ),
               ),
-            ].addToEnd(SizedBox(height: 12.0)), // Reduced from 24.0 to 12.0
+            ].addToEnd(const SizedBox(height: 12.0)), // Reduced from 24.0 to 12.0
           ),
         ),
       ),
@@ -1243,9 +1242,9 @@ class MovingLinePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final borderRadius = 16.0; // Match sign to voice page border radius
+    const borderRadius = 16.0; // Match sign to voice page border radius
     final rect = Rect.fromLTWH(0, 0, size.width, size.height);
-    final rrect = RRect.fromRectAndRadius(rect, Radius.circular(borderRadius));
+    final rrect = RRect.fromRectAndRadius(rect, const Radius.circular(borderRadius));
 
     // Calculate the total perimeter path
     final path = Path()..addRRect(rrect);

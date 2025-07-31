@@ -10,7 +10,6 @@ import '/flutter_flow/flutter_flow_theme.dart';
 import 'flutter_flow_util.dart';
 import 'package:collection/collection.dart';
 import 'package:easy_debounce/easy_debounce.dart';
-import 'package:debug_panel_proto/debug_panel_proto.dart';
 
 import '/auth/firebase_auth/auth_util.dart';
 
@@ -101,7 +100,7 @@ void debugLogGlobalProperty(
   List<String>? routeStack,
 }) async {
   final currentUserLocation = await getCurrentUserLocation(
-      defaultLocation: LatLng(0.0, 0.0), cached: true);
+      defaultLocation: const LatLng(0.0, 0.0), cached: true);
   debouncedDebugLogging(
       '405ebf2ff50c295c675b5802889ea941f081fd51',
       () => {

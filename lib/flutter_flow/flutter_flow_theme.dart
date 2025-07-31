@@ -189,28 +189,28 @@ class LightModeTheme extends FlutterFlowTheme {
   late Color error = const Color(0xFFFF0010);
   late Color info = const Color(0xFF14181B);
 
-  late Color customColor1 = Color(0xFFE6DFF1);
-  late Color customColor2 = Color(0xFF212325);
-  late Color customColor3 = Color(0xFFD0C7BA);
-  late Color customColor4 = Color(0xFFACD1BF);
-  late Color customColor5 = Color(0xFF000000);
-  late Color customColor6 = Color(0xFFFFFFFF);
-  late Color accentDict1 = Color(0xFFFFD4AF);
-  late Color accentDict2 = Color(0xFFFFC0CF);
-  late Color accentDict3 = Color(0xFFB555CB);
-  late Color accentDict4 = Color(0xFF64BDCF);
-  late Color accentDict5 = Color(0xFF58B878);
-  late Color accentDict6 = Color(0xFFCFC33B);
-  late Color accentDict7 = Color(0xFFC9874F);
-  late Color accentDict8 = Color(0xFFCA5C77);
-  late Color buttonShadow = Color(0xFF163959);
-  late Color buttonShadow2 = Color(0xFF3E1674);
-  late Color gradient1 = Color(0xFFBA5DA2);
-  late Color gradient2 = Color(0xFF714AB4);
-  late Color accentDict11 = Color(0xFFEAB7F6);
-  late Color accentDict22 = Color(0xFFB7EBF6);
-  late Color accentDict33 = Color(0xFFB7F6CC);
-  late Color accentDict44 = Color(0xFFF6ED8E);
+  late Color customColor1 = const Color(0xFFE6DFF1);
+  late Color customColor2 = const Color(0xFF212325);
+  late Color customColor3 = const Color(0xFFD0C7BA);
+  late Color customColor4 = const Color(0xFFACD1BF);
+  late Color customColor5 = const Color(0xFF000000);
+  late Color customColor6 = const Color(0xFFFFFFFF);
+  late Color accentDict1 = const Color(0xFFFFD4AF);
+  late Color accentDict2 = const Color(0xFFFFC0CF);
+  late Color accentDict3 = const Color(0xFFB555CB);
+  late Color accentDict4 = const Color(0xFF64BDCF);
+  late Color accentDict5 = const Color(0xFF58B878);
+  late Color accentDict6 = const Color(0xFFCFC33B);
+  late Color accentDict7 = const Color(0xFFC9874F);
+  late Color accentDict8 = const Color(0xFFCA5C77);
+  late Color buttonShadow = const Color(0xFF163959);
+  late Color buttonShadow2 = const Color(0xFF3E1674);
+  late Color gradient1 = const Color(0xFFBA5DA2);
+  late Color gradient2 = const Color(0xFF714AB4);
+  late Color accentDict11 = const Color(0xFFEAB7F6);
+  late Color accentDict22 = const Color(0xFFB7EBF6);
+  late Color accentDict33 = const Color(0xFFB7F6CC);
+  late Color accentDict44 = const Color(0xFFF6ED8E);
 }
 
 abstract class Typography {
@@ -607,28 +607,28 @@ class DarkModeTheme extends FlutterFlowTheme {
   late Color error = const Color(0xFFFF0010);
   late Color info = const Color(0xFFFFFFFF);
 
-  late Color customColor1 = Color(0xFFE6DFF1);
-  late Color customColor2 = Color(0xFF212325);
-  late Color customColor3 = Color(0xFFD0C7BA);
-  late Color customColor4 = Color(0xFFACD1BF);
-  late Color customColor5 = Color(0xFF000000);
-  late Color customColor6 = Color(0xFFFFFFFF);
-  late Color accentDict1 = Color(0xFFFFD4AF);
-  late Color accentDict2 = Color(0xFFFFC0CF);
-  late Color accentDict3 = Color(0xFFB555CB);
-  late Color accentDict4 = Color(0xFF64BDCF);
-  late Color accentDict5 = Color(0xFF58B878);
-  late Color accentDict6 = Color(0xFFCFC33B);
-  late Color accentDict7 = Color(0xFFC9874F);
-  late Color accentDict8 = Color(0xFFCA5C77);
-  late Color buttonShadow = Color(0xFF163959);
-  late Color buttonShadow2 = Color(0xFF3E1674);
-  late Color gradient1 = Color(0xFFBA5DA2);
-  late Color gradient2 = Color(0xFF714AB4);
-  late Color accentDict11 = Color(0xFFEAB7F6);
-  late Color accentDict22 = Color(0xFFB7EBF6);
-  late Color accentDict33 = Color(0xFFB7F6CC);
-  late Color accentDict44 = Color(0xFFF6ED8E);
+  late Color customColor1 = const Color(0xFFE6DFF1);
+  late Color customColor2 = const Color(0xFF212325);
+  late Color customColor3 = const Color(0xFFD0C7BA);
+  late Color customColor4 = const Color(0xFFACD1BF);
+  late Color customColor5 = const Color(0xFF000000);
+  late Color customColor6 = const Color(0xFFFFFFFF);
+  late Color accentDict1 = const Color(0xFFFFD4AF);
+  late Color accentDict2 = const Color(0xFFFFC0CF);
+  late Color accentDict3 = const Color(0xFFB555CB);
+  late Color accentDict4 = const Color(0xFF64BDCF);
+  late Color accentDict5 = const Color(0xFF58B878);
+  late Color accentDict6 = const Color(0xFFCFC33B);
+  late Color accentDict7 = const Color(0xFFC9874F);
+  late Color accentDict8 = const Color(0xFFCA5C77);
+  late Color buttonShadow = const Color(0xFF163959);
+  late Color buttonShadow2 = const Color(0xFF3E1674);
+  late Color gradient1 = const Color(0xFFBA5DA2);
+  late Color gradient2 = const Color(0xFF714AB4);
+  late Color accentDict11 = const Color(0xFFEAB7F6);
+  late Color accentDict22 = const Color(0xFFB7EBF6);
+  late Color accentDict33 = const Color(0xFFB7F6CC);
+  late Color accentDict44 = const Color(0xFFF6ED8E);
 }
 
 extension TextStyleHelper on TextStyle {

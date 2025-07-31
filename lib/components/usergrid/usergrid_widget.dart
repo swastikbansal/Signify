@@ -1,9 +1,7 @@
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import 'usergrid_model.dart';
 export 'usergrid_model.dart';
 
@@ -60,7 +58,7 @@ class _UsergridWidgetState extends State<UsergridWidget> with RouteAware {
           BoxShadow(
             blurRadius: 4.0,
             color: FlutterFlowTheme.of(context).alternate,
-            offset: Offset(
+            offset: const Offset(
               0.0,
               0.0,
             ),
@@ -73,7 +71,7 @@ class _UsergridWidgetState extends State<UsergridWidget> with RouteAware {
         ),
       ),
       child: Padding(
-        padding: EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(8.0),
         child: Column(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.center,
@@ -81,17 +79,17 @@ class _UsergridWidgetState extends State<UsergridWidget> with RouteAware {
             ClipRRect(
               borderRadius: BorderRadius.circular(50.0),
               child: Image.network(
-                widget!.img!,
+                widget.img!,
                 width: 60.0,
                 height: 60.0,
                 fit: BoxFit.cover,
               ),
             ),
             Padding(
-              padding: EdgeInsetsDirectional.fromSTEB(0.0, 4.0, 0.0, 0.0),
+              padding: const EdgeInsetsDirectional.fromSTEB(0.0, 4.0, 0.0, 0.0),
               child: Text(
                 valueOrDefault<String>(
-                  widget!.title,
+                  widget.title,
                   'Element Title',
                 ),
                 style: FlutterFlowTheme.of(context).bodyMedium.override(
@@ -103,10 +101,10 @@ class _UsergridWidgetState extends State<UsergridWidget> with RouteAware {
               ),
             ),
             Padding(
-              padding: EdgeInsetsDirectional.fromSTEB(0.0, 4.0, 0.0, 0.0),
+              padding: const EdgeInsetsDirectional.fromSTEB(0.0, 4.0, 0.0, 0.0),
               child: Text(
                 valueOrDefault<String>(
-                  widget!.description,
+                  widget.description,
                   'Element Description.',
                 ),
                 style: FlutterFlowTheme.of(context).labelSmall.override(

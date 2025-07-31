@@ -5,11 +5,9 @@ import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import 'isl_community_model.dart';
 export 'isl_community_model.dart';
 
@@ -144,7 +142,7 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
             body: SafeArea(
               top: true,
               child: Padding(
-                padding: EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
+                padding: const EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
                 child: SingleChildScrollView(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -158,14 +156,14 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                           ),
                         ),
                         child: Padding(
-                          padding: EdgeInsets.all(16.0),
+                          padding: const EdgeInsets.all(16.0),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Align(
-                                alignment: AlignmentDirectional(-1.0, 0.0),
+                                alignment: const AlignmentDirectional(-1.0, 0.0),
                                 child: RichText(
                                   textScaler: MediaQuery.of(context).textScaler,
                                   text: TextSpan(
@@ -265,7 +263,7 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                                     ),
                               ),
                               Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(
+                                padding: const EdgeInsetsDirectional.fromSTEB(
                                     0.0, 8.0, 0.0, 0.0),
                                 child: FFButtonWidget(
                                   onPressed: () {
@@ -277,9 +275,9 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                                   options: FFButtonOptions(
                                     width: 160.0,
                                     height: 50.0,
-                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                    padding: const EdgeInsetsDirectional.fromSTEB(
                                         0.0, 0.0, 0.0, 0.0),
-                                    iconPadding: EdgeInsetsDirectional.fromSTEB(
+                                    iconPadding: const EdgeInsetsDirectional.fromSTEB(
                                         0.0, 0.0, 0.0, 0.0),
                                     color: FlutterFlowTheme.of(context).primary,
                                     textStyle: FlutterFlowTheme.of(context)
@@ -310,7 +308,7 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                                   ),
                                 ),
                               ),
-                            ].divide(SizedBox(height: 12.0)),
+                            ].divide(const SizedBox(height: 12.0)),
                           ),
                         ),
                       ),
@@ -323,7 +321,7 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                           ),
                         ),
                         child: Padding(
-                          padding: EdgeInsets.all(16.0),
+                          padding: const EdgeInsets.all(16.0),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -370,9 +368,9 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                                               BorderRadius.circular(25.0),
                                           child: CachedNetworkImage(
                                             fadeInDuration:
-                                                Duration(milliseconds: 0),
+                                                const Duration(milliseconds: 0),
                                             fadeOutDuration:
-                                                Duration(milliseconds: 0),
+                                                const Duration(milliseconds: 0),
                                             imageUrl:
                                                 'https://images.unsplash.com/photo-1579591919791-0e3737ae3808?w=500&h=500',
                                             width: 50.0,
@@ -417,7 +415,7 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                                           Row(
                                             mainAxisSize: MainAxisSize.max,
                                             children: [
-                                              Icon(
+                                              const Icon(
                                                 Icons.star,
                                                 color: Color(0xFFFFD700),
                                                 size: 16.0,
@@ -447,11 +445,11 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                                                                       .bodySmallFamily),
                                                         ),
                                               ),
-                                            ].divide(SizedBox(width: 4.0)),
+                                            ].divide(const SizedBox(width: 4.0)),
                                           ),
                                         ],
                                       ),
-                                    ].divide(SizedBox(width: 12.0)),
+                                    ].divide(const SizedBox(width: 12.0)),
                                   ),
                                   Container(
                                     decoration: BoxDecoration(
@@ -460,7 +458,7 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                                       borderRadius: BorderRadius.circular(24.0),
                                     ),
                                     child: Padding(
-                                      padding: EdgeInsetsDirectional.fromSTEB(
+                                      padding: const EdgeInsetsDirectional.fromSTEB(
                                           12.0, 8.0, 12.0, 8.0),
                                       child: Text(
                                         FFLocalizations.of(context).getText(
@@ -488,7 +486,7 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                                   ),
                                 ],
                               ),
-                            ].divide(SizedBox(height: 12.0)),
+                            ].divide(const SizedBox(height: 12.0)),
                           ),
                         ),
                       ),
@@ -502,7 +500,7 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                             ),
                           ),
                           child: Padding(
-                            padding: EdgeInsets.all(16.0),
+                            padding: const EdgeInsets.all(16.0),
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               mainAxisAlignment: MainAxisAlignment.start,
@@ -523,7 +521,7 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                                                     .titleLargeFamily),
                                       ),
                                 ),
-                                Container(
+                                SizedBox(
                                   height: 100.0,
                                   child: ListView(
                                     padding: EdgeInsets.zero,
@@ -583,7 +581,7 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                                                               .bodySmallFamily),
                                                 ),
                                           ),
-                                        ].divide(SizedBox(height: 8.0)),
+                                        ].divide(const SizedBox(height: 8.0)),
                                       ),
                                       Column(
                                         mainAxisSize: MainAxisSize.min,
@@ -637,7 +635,7 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                                                               .bodySmallFamily),
                                                 ),
                                           ),
-                                        ].divide(SizedBox(height: 8.0)),
+                                        ].divide(const SizedBox(height: 8.0)),
                                       ),
                                       Column(
                                         mainAxisSize: MainAxisSize.min,
@@ -691,12 +689,12 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                                                               .bodySmallFamily),
                                                 ),
                                           ),
-                                        ].divide(SizedBox(height: 8.0)),
+                                        ].divide(const SizedBox(height: 8.0)),
                                       ),
-                                    ].divide(SizedBox(width: 46.0)),
+                                    ].divide(const SizedBox(width: 46.0)),
                                   ),
                                 ),
-                              ].divide(SizedBox(height: 12.0)),
+                              ].divide(const SizedBox(height: 12.0)),
                             ),
                           ),
                         ),
@@ -710,7 +708,7 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                           ),
                         ),
                         child: Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(
+                          padding: const EdgeInsetsDirectional.fromSTEB(
                               20.0, 20.0, 20.0, 20.0),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
@@ -820,7 +818,7 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                                             ],
                                           ),
                                         ),
-                                      ].divide(SizedBox(width: 16.0)),
+                                      ].divide(const SizedBox(width: 16.0)),
                                     ),
                                   ),
                                   Container(
@@ -906,12 +904,12 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                                             ],
                                           ),
                                         ),
-                                      ].divide(SizedBox(width: 16.0)),
+                                      ].divide(const SizedBox(width: 16.0)),
                                     ),
                                   ),
-                                ].divide(SizedBox(height: 16.0)),
+                                ].divide(const SizedBox(height: 16.0)),
                               ),
-                            ].divide(SizedBox(height: 12.0)),
+                            ].divide(const SizedBox(height: 12.0)),
                           ),
                         ),
                       ),
@@ -966,7 +964,7 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                                       ),
                                     ),
                                     child: Padding(
-                                      padding: EdgeInsets.all(16.0),
+                                      padding: const EdgeInsets.all(16.0),
                                       child: Column(
                                         mainAxisSize: MainAxisSize.min,
                                         mainAxisAlignment:
@@ -978,11 +976,11 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                                             width: 60.0,
                                             height: 60.0,
                                             decoration: BoxDecoration(
-                                              color: Color(0xFFE3F2FD),
+                                              color: const Color(0xFFE3F2FD),
                                               borderRadius:
                                                   BorderRadius.circular(30.0),
                                             ),
-                                            child: Icon(
+                                            child: const Icon(
                                               Icons.translate,
                                               color: Color(0xFF1565C0),
                                               size: 30.0,
@@ -1009,7 +1007,7 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                                                               .bodyMediumFamily),
                                                 ),
                                           ),
-                                        ].divide(SizedBox(height: 12.0)),
+                                        ].divide(const SizedBox(height: 12.0)),
                                       ),
                                     ),
                                   ),
@@ -1033,7 +1031,7 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                                       ),
                                     ),
                                     child: Padding(
-                                      padding: EdgeInsetsDirectional.fromSTEB(
+                                      padding: const EdgeInsetsDirectional.fromSTEB(
                                           16.0, 16.0, 16.0, 16.0),
                                       child: Column(
                                         mainAxisSize: MainAxisSize.min,
@@ -1046,11 +1044,11 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                                             width: 60.0,
                                             height: 60.0,
                                             decoration: BoxDecoration(
-                                              color: Color(0xFFFFF3E0),
+                                              color: const Color(0xFFFFF3E0),
                                               borderRadius:
                                                   BorderRadius.circular(30.0),
                                             ),
-                                            child: Icon(
+                                            child: const Icon(
                                               Icons.rate_review,
                                               color: Color(0xFFEF6C00),
                                               size: 30.0,
@@ -1077,7 +1075,7 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                                                               .bodyMediumFamily),
                                                 ),
                                           ),
-                                        ].divide(SizedBox(height: 12.0)),
+                                        ].divide(const SizedBox(height: 12.0)),
                                       ),
                                     ),
                                   ),
@@ -1085,8 +1083,8 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                               ],
                             ),
                           ]
-                              .divide(SizedBox(height: 12.0))
-                              .around(SizedBox(height: 12.0)),
+                              .divide(const SizedBox(height: 12.0))
+                              .around(const SizedBox(height: 12.0)),
                         ),
                       ),
                       Container(
@@ -1097,7 +1095,7 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                           ),
                         ),
                         child: Padding(
-                          padding: EdgeInsets.all(16.0),
+                          padding: const EdgeInsets.all(16.0),
                           child: Column(
                             mainAxisSize: MainAxisSize.max,
                             children: [
@@ -1132,7 +1130,7 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                                   mainAxisSize: MainAxisSize.max,
                                   children: [
                                     Padding(
-                                      padding: EdgeInsets.all(16.0),
+                                      padding: const EdgeInsets.all(16.0),
                                       child: Column(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
@@ -1166,7 +1164,7 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                                                         ),
                                               ),
                                               Padding(
-                                                padding: EdgeInsetsDirectional
+                                                padding: const EdgeInsetsDirectional
                                                     .fromSTEB(
                                                         4.0, 8.0, 4.0, 8.0),
                                                 child: Container(
@@ -1183,7 +1181,7 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                                                   ),
                                                   child: Padding(
                                                     padding:
-                                                        EdgeInsets.all(8.0),
+                                                        const EdgeInsets.all(8.0),
                                                     child: Text(
                                                       FFLocalizations.of(
                                                               context)
@@ -1255,7 +1253,7 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                                   ),
                                 ),
                                 child: Padding(
-                                  padding: EdgeInsets.all(16.0),
+                                  padding: const EdgeInsets.all(16.0),
                                   child: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     mainAxisAlignment: MainAxisAlignment.start,
@@ -1288,7 +1286,7 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                                           ),
                                           Padding(
                                             padding:
-                                                EdgeInsetsDirectional.fromSTEB(
+                                                const EdgeInsetsDirectional.fromSTEB(
                                                     4.0, 8.0, 4.0, 8.0),
                                             child: Container(
                                               decoration: BoxDecoration(
@@ -1301,7 +1299,7 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                                                 ),
                                               ),
                                               child: Padding(
-                                                padding: EdgeInsets.all(8.0),
+                                                padding: const EdgeInsets.all(8.0),
                                                 child: Text(
                                                   FFLocalizations.of(context)
                                                       .getText(
@@ -1370,7 +1368,7 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                                   ),
                                 ),
                                 child: Padding(
-                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                  padding: const EdgeInsetsDirectional.fromSTEB(
                                       16.0, 16.0, 16.0, 16.0),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.max,
@@ -1384,11 +1382,11 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                                             width: 40.0,
                                             height: 40.0,
                                             decoration: BoxDecoration(
-                                              color: Color(0xFFE8F5E9),
+                                              color: const Color(0xFFE8F5E9),
                                               borderRadius:
                                                   BorderRadius.circular(20.0),
                                             ),
-                                            child: Icon(
+                                            child: const Icon(
                                               Icons.forum,
                                               color: Color(0xFF2E7D32),
                                               size: 20.0,
@@ -1448,7 +1446,7 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                                               ),
                                             ],
                                           ),
-                                        ].divide(SizedBox(width: 12.0)),
+                                        ].divide(const SizedBox(width: 12.0)),
                                       ),
                                       Icon(
                                         Icons.chevron_right,
@@ -1471,7 +1469,7 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                                   ),
                                 ),
                                 child: Padding(
-                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                  padding: const EdgeInsetsDirectional.fromSTEB(
                                       16.0, 16.0, 16.0, 16.0),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.max,
@@ -1485,11 +1483,11 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                                             width: 40.0,
                                             height: 40.0,
                                             decoration: BoxDecoration(
-                                              color: Color(0xFFE3F2FD),
+                                              color: const Color(0xFFE3F2FD),
                                               borderRadius:
                                                   BorderRadius.circular(20.0),
                                             ),
-                                            child: Icon(
+                                            child: const Icon(
                                               Icons.school,
                                               color: Color(0xFF1565C0),
                                               size: 20.0,
@@ -1549,7 +1547,7 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                                               ),
                                             ],
                                           ),
-                                        ].divide(SizedBox(width: 12.0)),
+                                        ].divide(const SizedBox(width: 12.0)),
                                       ),
                                       Icon(
                                         Icons.chevron_right,
@@ -1571,9 +1569,9 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                                 options: FFButtonOptions(
                                   width: MediaQuery.sizeOf(context).width * 0.6,
                                   height: 50.0,
-                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                  padding: const EdgeInsetsDirectional.fromSTEB(
                                       0.0, 0.0, 0.0, 0.0),
-                                  iconPadding: EdgeInsetsDirectional.fromSTEB(
+                                  iconPadding: const EdgeInsetsDirectional.fromSTEB(
                                       0.0, 0.0, 0.0, 0.0),
                                   color: FlutterFlowTheme.of(context).primary,
                                   textStyle: FlutterFlowTheme.of(context)
@@ -1601,7 +1599,7 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                                   hoverElevation: 2.0,
                                 ),
                               ),
-                            ].divide(SizedBox(height: 16.0)),
+                            ].divide(const SizedBox(height: 16.0)),
                           ),
                         ),
                       ),
@@ -1615,7 +1613,7 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                           ),
                         ),
                         child: Padding(
-                          padding: EdgeInsets.all(16.0),
+                          padding: const EdgeInsets.all(16.0),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -1654,7 +1652,7 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                                       ),
                                     ),
                                     child: Align(
-                                      alignment: AlignmentDirectional(0.0, 0.0),
+                                      alignment: const AlignmentDirectional(0.0, 0.0),
                                       child: Text(
                                         FFLocalizations.of(context).getText(
                                           'uscq0w9r' /* View All */,
@@ -1707,7 +1705,7 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                                         ),
                                       ),
                                       child: Padding(
-                                        padding: EdgeInsetsDirectional.fromSTEB(
+                                        padding: const EdgeInsetsDirectional.fromSTEB(
                                             16.0, 16.0, 16.0, 16.0),
                                         child: Column(
                                           mainAxisSize: MainAxisSize.min,
@@ -1726,7 +1724,7 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                                                         BorderRadius.circular(
                                                             25.0),
                                                   ),
-                                                  child: Icon(
+                                                  child: const Icon(
                                                     Icons.event,
                                                     color: Color(0xFF2E7D32),
                                                     size: 24.0,
@@ -1792,7 +1790,7 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                                                     ),
                                                   ],
                                                 ),
-                                              ].divide(SizedBox(width: 12.0)),
+                                              ].divide(const SizedBox(width: 12.0)),
                                             ),
                                             Text(
                                               FFLocalizations.of(context)
@@ -1830,11 +1828,11 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                                                             .width *
                                                         0.4,
                                                 height: 40.0,
-                                                padding: EdgeInsetsDirectional
+                                                padding: const EdgeInsetsDirectional
                                                     .fromSTEB(
                                                         0.0, 0.0, 0.0, 0.0),
                                                 iconPadding:
-                                                    EdgeInsetsDirectional
+                                                    const EdgeInsetsDirectional
                                                         .fromSTEB(
                                                             0.0, 0.0, 0.0, 0.0),
                                                 color:
@@ -1875,7 +1873,7 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                                                         .primaryText,
                                               ),
                                             ),
-                                          ].divide(SizedBox(height: 12.0)),
+                                          ].divide(const SizedBox(height: 12.0)),
                                         ),
                                       ),
                                     ),
@@ -1892,7 +1890,7 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                                         ),
                                       ),
                                       child: Padding(
-                                        padding: EdgeInsetsDirectional.fromSTEB(
+                                        padding: const EdgeInsetsDirectional.fromSTEB(
                                             16.0, 16.0, 16.0, 16.0),
                                         child: Column(
                                           mainAxisSize: MainAxisSize.min,
@@ -1911,7 +1909,7 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                                                         BorderRadius.circular(
                                                             25.0),
                                                   ),
-                                                  child: Icon(
+                                                  child: const Icon(
                                                     Icons.groups,
                                                     color: Color(0xFFEF6C00),
                                                     size: 24.0,
@@ -1977,7 +1975,7 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                                                     ),
                                                   ],
                                                 ),
-                                              ].divide(SizedBox(width: 12.0)),
+                                              ].divide(const SizedBox(width: 12.0)),
                                             ),
                                             Text(
                                               FFLocalizations.of(context)
@@ -2015,11 +2013,11 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                                                             .width *
                                                         0.4,
                                                 height: 40.0,
-                                                padding: EdgeInsetsDirectional
+                                                padding: const EdgeInsetsDirectional
                                                     .fromSTEB(
                                                         0.0, 0.0, 0.0, 0.0),
                                                 iconPadding:
-                                                    EdgeInsetsDirectional
+                                                    const EdgeInsetsDirectional
                                                         .fromSTEB(
                                                             0.0, 0.0, 0.0, 0.0),
                                                 color:
@@ -2060,21 +2058,21 @@ class _IslCommunityWidgetState extends State<IslCommunityWidget>
                                                         .primaryText,
                                               ),
                                             ),
-                                          ].divide(SizedBox(height: 12.0)),
+                                          ].divide(const SizedBox(height: 12.0)),
                                         ),
                                       ),
                                     ),
-                                  ].divide(SizedBox(width: 16.0)),
+                                  ].divide(const SizedBox(width: 16.0)),
                                 ),
                               ),
-                            ].divide(SizedBox(height: 16.0)),
+                            ].divide(const SizedBox(height: 16.0)),
                           ),
                         ),
                       ),
                     ]
-                        .divide(SizedBox(height: 16.0))
-                        .addToStart(SizedBox(height: 16.0))
-                        .addToEnd(SizedBox(height: 36.0)),
+                        .divide(const SizedBox(height: 16.0))
+                        .addToStart(const SizedBox(height: 16.0))
+                        .addToEnd(const SizedBox(height: 36.0)),
                   ),
                 ),
               ),

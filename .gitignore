@@ -4,6 +4,11 @@
 .packages
 
 .pub-cache/
+.gradle
+.local_plugins
+.flutter-plugins-dependencies
+.local
+.flutter-plugins
 
 .pub/
 

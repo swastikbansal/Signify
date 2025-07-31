@@ -1,12 +1,9 @@
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
-import 'package:provider/provider.dart';
 import 'tutorial_page_model.dart';
 export 'tutorial_page_model.dart';
 
@@ -90,7 +87,7 @@ class _TutorialPageWidgetState extends State<TutorialPageWidget>
                       GoogleFonts.asMap().containsKey('Space Grotesk'),
                 ),
           ),
-          actions: [],
+          actions: const [],
           centerTitle: false,
           elevation: 0.0,
         ),
@@ -99,7 +96,7 @@ class _TutorialPageWidgetState extends State<TutorialPageWidget>
           child: Column(
             mainAxisSize: MainAxisSize.max,
             children: [
-              Container(
+              SizedBox(
                 width: double.infinity,
                 height: 700.0,
                 child: CarouselSlider(
@@ -120,7 +117,7 @@ class _TutorialPageWidgetState extends State<TutorialPageWidget>
                               width: double.infinity,
                               height: 500.0,
                               decoration: BoxDecoration(
-                                color: Color(0xFFFAB713),
+                                color: const Color(0xFFFAB713),
                                 borderRadius: BorderRadius.circular(8.0),
                               ),
                               child: ClipRRect(
@@ -134,7 +131,7 @@ class _TutorialPageWidgetState extends State<TutorialPageWidget>
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
+                              padding: const EdgeInsetsDirectional.fromSTEB(
                                   0.0, 8.0, 0.0, 4.0),
                               child: Text(
                                 FFLocalizations.of(context).getText(
@@ -152,7 +149,7 @@ class _TutorialPageWidgetState extends State<TutorialPageWidget>
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
+                              padding: const EdgeInsetsDirectional.fromSTEB(
                                   8.0, 0.0, 8.0, 0.0),
                               child: Text(
                                 FFLocalizations.of(context).getText(
@@ -198,7 +195,7 @@ class _TutorialPageWidgetState extends State<TutorialPageWidget>
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
+                              padding: const EdgeInsetsDirectional.fromSTEB(
                                   0.0, 8.0, 0.0, 4.0),
                               child: Text(
                                 FFLocalizations.of(context).getText(
@@ -216,7 +213,7 @@ class _TutorialPageWidgetState extends State<TutorialPageWidget>
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
+                              padding: const EdgeInsetsDirectional.fromSTEB(
                                   8.0, 0.0, 8.0, 0.0),
                               child: Text(
                                 FFLocalizations.of(context).getText(
@@ -273,7 +270,7 @@ class _TutorialPageWidgetState extends State<TutorialPageWidget>
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
+                              padding: const EdgeInsetsDirectional.fromSTEB(
                                   0.0, 8.0, 0.0, 4.0),
                               child: Text(
                                 FFLocalizations.of(context).getText(
@@ -290,7 +287,7 @@ class _TutorialPageWidgetState extends State<TutorialPageWidget>
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
+                              padding: const EdgeInsetsDirectional.fromSTEB(
                                   8.0, 0.0, 8.0, 0.0),
                               child: Text(
                                 FFLocalizations.of(context).getText(
@@ -330,7 +327,7 @@ class _TutorialPageWidgetState extends State<TutorialPageWidget>
                               width: double.infinity,
                               height: 500.0,
                               decoration: BoxDecoration(
-                                color: Color(0xFFFCFCFC),
+                                color: const Color(0xFFFCFCFC),
                                 borderRadius: BorderRadius.circular(12.0),
                                 border: Border.all(
                                   color: FlutterFlowTheme.of(context).alternate,
@@ -352,7 +349,7 @@ class _TutorialPageWidgetState extends State<TutorialPageWidget>
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
+                              padding: const EdgeInsetsDirectional.fromSTEB(
                                   0.0, 8.0, 0.0, 4.0),
                               child: Text(
                                 FFLocalizations.of(context).getText(
@@ -370,7 +367,7 @@ class _TutorialPageWidgetState extends State<TutorialPageWidget>
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
+                              padding: const EdgeInsetsDirectional.fromSTEB(
                                   8.0, 0.0, 8.0, 0.0),
                               child: Text(
                                 FFLocalizations.of(context).getText(
@@ -430,7 +427,7 @@ class _TutorialPageWidgetState extends State<TutorialPageWidget>
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
+                              padding: const EdgeInsetsDirectional.fromSTEB(
                                   0.0, 8.0, 0.0, 4.0),
                               child: Text(
                                 FFLocalizations.of(context).getText(
@@ -448,7 +445,7 @@ class _TutorialPageWidgetState extends State<TutorialPageWidget>
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
+                              padding: const EdgeInsetsDirectional.fromSTEB(
                                   8.0, 0.0, 8.0, 0.0),
                               child: Text(
                                 FFLocalizations.of(context).getText(
@@ -503,7 +500,7 @@ class _TutorialPageWidgetState extends State<TutorialPageWidget>
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
+                              padding: const EdgeInsetsDirectional.fromSTEB(
                                   0.0, 8.0, 0.0, 4.0),
                               child: Text(
                                 FFLocalizations.of(context).getText(
@@ -521,7 +518,7 @@ class _TutorialPageWidgetState extends State<TutorialPageWidget>
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
+                              padding: const EdgeInsetsDirectional.fromSTEB(
                                   8.0, 0.0, 8.0, 0.0),
                               child: Text(
                                 FFLocalizations.of(context).getText(
@@ -579,7 +576,7 @@ class _TutorialPageWidgetState extends State<TutorialPageWidget>
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
+                              padding: const EdgeInsetsDirectional.fromSTEB(
                                   0.0, 8.0, 0.0, 4.0),
                               child: Text(
                                 FFLocalizations.of(context).getText(
@@ -600,7 +597,7 @@ class _TutorialPageWidgetState extends State<TutorialPageWidget>
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
+                              padding: const EdgeInsetsDirectional.fromSTEB(
                                   8.0, 0.0, 8.0, 0.0),
                               child: Text(
                                 FFLocalizations.of(context).getText(
@@ -658,7 +655,7 @@ class _TutorialPageWidgetState extends State<TutorialPageWidget>
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
+                              padding: const EdgeInsetsDirectional.fromSTEB(
                                   0.0, 8.0, 0.0, 4.0),
                               child: Text(
                                 FFLocalizations.of(context).getText(
@@ -676,7 +673,7 @@ class _TutorialPageWidgetState extends State<TutorialPageWidget>
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
+                              padding: const EdgeInsetsDirectional.fromSTEB(
                                   8.0, 0.0, 8.0, 0.0),
                               child: Text(
                                 FFLocalizations.of(context).getText(
@@ -731,7 +728,7 @@ class _TutorialPageWidgetState extends State<TutorialPageWidget>
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
+                              padding: const EdgeInsetsDirectional.fromSTEB(
                                   0.0, 8.0, 0.0, 4.0),
                               child: Text(
                                 FFLocalizations.of(context).getText(
@@ -749,7 +746,7 @@ class _TutorialPageWidgetState extends State<TutorialPageWidget>
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
+                              padding: const EdgeInsetsDirectional.fromSTEB(
                                   8.0, 0.0, 8.0, 0.0),
                               child: Text(
                                 FFLocalizations.of(context).getText(
@@ -807,7 +804,7 @@ class _TutorialPageWidgetState extends State<TutorialPageWidget>
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
+                              padding: const EdgeInsetsDirectional.fromSTEB(
                                   0.0, 8.0, 0.0, 4.0),
                               child: Text(
                                 FFLocalizations.of(context).getText(
@@ -825,7 +822,7 @@ class _TutorialPageWidgetState extends State<TutorialPageWidget>
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
+                              padding: const EdgeInsetsDirectional.fromSTEB(
                                   8.0, 0.0, 8.0, 0.0),
                               child: Text(
                                 FFLocalizations.of(context).getText(
@@ -882,7 +879,7 @@ class _TutorialPageWidgetState extends State<TutorialPageWidget>
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
+                              padding: const EdgeInsetsDirectional.fromSTEB(
                                   0.0, 8.0, 0.0, 4.0),
                               child: Text(
                                 FFLocalizations.of(context).getText(
@@ -900,7 +897,7 @@ class _TutorialPageWidgetState extends State<TutorialPageWidget>
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
+                              padding: const EdgeInsetsDirectional.fromSTEB(
                                   8.0, 0.0, 8.0, 0.0),
                               child: Text(
                                 FFLocalizations.of(context).getText(
@@ -957,7 +954,7 @@ class _TutorialPageWidgetState extends State<TutorialPageWidget>
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
+                              padding: const EdgeInsetsDirectional.fromSTEB(
                                   0.0, 8.0, 0.0, 4.0),
                               child: Text(
                                 FFLocalizations.of(context).getText(
@@ -975,7 +972,7 @@ class _TutorialPageWidgetState extends State<TutorialPageWidget>
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
+                              padding: const EdgeInsetsDirectional.fromSTEB(
                                   8.0, 0.0, 8.0, 0.0),
                               child: Text(
                                 FFLocalizations.of(context).getText(
@@ -1011,8 +1008,8 @@ class _TutorialPageWidgetState extends State<TutorialPageWidget>
                     enableInfiniteScroll: true,
                     scrollDirection: Axis.horizontal,
                     autoPlay: true,
-                    autoPlayAnimationDuration: Duration(milliseconds: 800),
-                    autoPlayInterval: Duration(milliseconds: (800 + 2000)),
+                    autoPlayAnimationDuration: const Duration(milliseconds: 800),
+                    autoPlayInterval: const Duration(milliseconds: (800 + 2000)),
                     autoPlayCurve: Curves.linear,
                     pauseAutoPlayInFiniteScroll: false,
                     onPageChanged: (index, _) =>
@@ -1020,7 +1017,7 @@ class _TutorialPageWidgetState extends State<TutorialPageWidget>
                   ),
                 ),
               ),
-            ].addToStart(SizedBox(height: 16.0)),
+            ].addToStart(const SizedBox(height: 16.0)),
           ),
         ),
       ),

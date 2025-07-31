@@ -4,12 +4,10 @@ import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import 'support_page_model.dart';
 export 'support_page_model.dart';
 
@@ -157,14 +155,14 @@ class _SupportPageWidgetState extends State<SupportPageWidget> with RouteAware {
                   ),
                 ],
               ),
-              actions: [],
+              actions: const [],
               centerTitle: false,
               elevation: 0.0,
             ),
             body: SafeArea(
               top: true,
               child: Padding(
-                padding: EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(16.0),
                 child: SingleChildScrollView(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -180,12 +178,12 @@ class _SupportPageWidgetState extends State<SupportPageWidget> with RouteAware {
                           ),
                         ),
                         child: Padding(
-                          padding: EdgeInsets.all(16.0),
+                          padding: const EdgeInsets.all(16.0),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(
+                                padding: const EdgeInsetsDirectional.fromSTEB(
                                     0.0, 0.0, 0.0, 8.0),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.max,
@@ -209,7 +207,7 @@ class _SupportPageWidgetState extends State<SupportPageWidget> with RouteAware {
                                                 .containsKey('Space Grotesk'),
                                           ),
                                     ),
-                                  ].divide(SizedBox(width: 16.0)),
+                                  ].divide(const SizedBox(width: 16.0)),
                                 ),
                               ),
                               Text(
@@ -258,7 +256,7 @@ class _SupportPageWidgetState extends State<SupportPageWidget> with RouteAware {
                                         ),
                                       ),
                                       child: Padding(
-                                        padding: EdgeInsets.all(16.0),
+                                        padding: const EdgeInsets.all(16.0),
                                         child: Column(
                                           mainAxisSize: MainAxisSize.min,
                                           mainAxisAlignment:
@@ -319,7 +317,7 @@ class _SupportPageWidgetState extends State<SupportPageWidget> with RouteAware {
                                                                     .bodySmallFamily),
                                                       ),
                                             ),
-                                          ].divide(SizedBox(height: 8.0)),
+                                          ].divide(const SizedBox(height: 8.0)),
                                         ),
                                       ),
                                     ),
@@ -347,7 +345,7 @@ class _SupportPageWidgetState extends State<SupportPageWidget> with RouteAware {
                                         ),
                                       ),
                                       child: Padding(
-                                        padding: EdgeInsets.all(16.0),
+                                        padding: const EdgeInsets.all(16.0),
                                         child: Column(
                                           mainAxisSize: MainAxisSize.min,
                                           mainAxisAlignment:
@@ -408,14 +406,14 @@ class _SupportPageWidgetState extends State<SupportPageWidget> with RouteAware {
                                                                     .bodySmallFamily),
                                                       ),
                                             ),
-                                          ].divide(SizedBox(height: 8.0)),
+                                          ].divide(const SizedBox(height: 8.0)),
                                         ),
                                       ),
                                     ),
                                   ),
-                                ].divide(SizedBox(width: 16.0)),
+                                ].divide(const SizedBox(width: 16.0)),
                               ),
-                            ].divide(SizedBox(height: 16.0)),
+                            ].divide(const SizedBox(height: 16.0)),
                           ),
                         ),
                       ),
@@ -429,12 +427,12 @@ class _SupportPageWidgetState extends State<SupportPageWidget> with RouteAware {
                           ),
                         ),
                         child: Padding(
-                          padding: EdgeInsets.all(16.0),
+                          padding: const EdgeInsets.all(16.0),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(
+                                padding: const EdgeInsetsDirectional.fromSTEB(
                                     0.0, 0.0, 0.0, 8.0),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.max,
@@ -458,7 +456,7 @@ class _SupportPageWidgetState extends State<SupportPageWidget> with RouteAware {
                                                 .containsKey('Space Grotesk'),
                                           ),
                                     ),
-                                  ].divide(SizedBox(width: 16.0)),
+                                  ].divide(const SizedBox(width: 16.0)),
                                 ),
                               ),
                               TextFormField(
@@ -644,7 +642,7 @@ class _SupportPageWidgetState extends State<SupportPageWidget> with RouteAware {
                                     .asValidator(context),
                               ),
                               Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(
+                                padding: const EdgeInsetsDirectional.fromSTEB(
                                     0.0, 4.0, 0.0, 0.0),
                                 child: Text(
                                   FFLocalizations.of(context).getText(
@@ -676,7 +674,7 @@ class _SupportPageWidgetState extends State<SupportPageWidget> with RouteAware {
                                     FlutterFlowTheme.of(context).alternate,
                                 itemCount: 5,
                                 itemPadding:
-                                    EdgeInsets.fromLTRB(4.0, 0.0, 4.0, 4.0),
+                                    const EdgeInsets.fromLTRB(4.0, 0.0, 4.0, 4.0),
                                 itemSize: 30.0,
                                 glowColor: FlutterFlowTheme.of(context).primary,
                               ),
@@ -704,7 +702,7 @@ class _SupportPageWidgetState extends State<SupportPageWidget> with RouteAware {
                                                               .bodyLargeFamily),
                                             ),
                                       ),
-                                      duration: Duration(milliseconds: 2000),
+                                      duration: const Duration(milliseconds: 2000),
                                       backgroundColor:
                                           FlutterFlowTheme.of(context).info,
                                     ),
@@ -724,9 +722,9 @@ class _SupportPageWidgetState extends State<SupportPageWidget> with RouteAware {
                                   width:
                                       MediaQuery.sizeOf(context).width * 0.56,
                                   height: 50.0,
-                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                  padding: const EdgeInsetsDirectional.fromSTEB(
                                       0.0, 0.0, 0.0, 0.0),
-                                  iconPadding: EdgeInsetsDirectional.fromSTEB(
+                                  iconPadding: const EdgeInsetsDirectional.fromSTEB(
                                       0.0, 0.0, 0.0, 0.0),
                                   color: FlutterFlowTheme.of(context).primary,
                                   textStyle: FlutterFlowTheme.of(context)
@@ -753,7 +751,7 @@ class _SupportPageWidgetState extends State<SupportPageWidget> with RouteAware {
                                       FlutterFlowTheme.of(context).primaryText,
                                 ),
                               ),
-                            ].divide(SizedBox(height: 16.0)),
+                            ].divide(const SizedBox(height: 16.0)),
                           ),
                         ),
                       ),
@@ -767,12 +765,12 @@ class _SupportPageWidgetState extends State<SupportPageWidget> with RouteAware {
                           ),
                         ),
                         child: Padding(
-                          padding: EdgeInsets.all(16.0),
+                          padding: const EdgeInsets.all(16.0),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(
+                                padding: const EdgeInsetsDirectional.fromSTEB(
                                     0.0, 0.0, 0.0, 8.0),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.max,
@@ -796,7 +794,7 @@ class _SupportPageWidgetState extends State<SupportPageWidget> with RouteAware {
                                                 .containsKey('Space Grotesk'),
                                           ),
                                     ),
-                                  ].divide(SizedBox(width: 16.0)),
+                                  ].divide(const SizedBox(width: 16.0)),
                                 ),
                               ),
                               Container(
@@ -913,10 +911,10 @@ class _SupportPageWidgetState extends State<SupportPageWidget> with RouteAware {
                                         ),
                                       ],
                                     ),
-                                  ].divide(SizedBox(height: 8.0)),
+                                  ].divide(const SizedBox(height: 8.0)),
                                 ),
                               ),
-                            ].divide(SizedBox(height: 16.0)),
+                            ].divide(const SizedBox(height: 16.0)),
                           ),
                         ),
                       ),
@@ -929,12 +927,12 @@ class _SupportPageWidgetState extends State<SupportPageWidget> with RouteAware {
                           ),
                         ),
                         child: Padding(
-                          padding: EdgeInsets.all(16.0),
+                          padding: const EdgeInsets.all(16.0),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(
+                                padding: const EdgeInsetsDirectional.fromSTEB(
                                     0.0, 0.0, 0.0, 8.0),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.max,
@@ -958,7 +956,7 @@ class _SupportPageWidgetState extends State<SupportPageWidget> with RouteAware {
                                                 .containsKey('Space Grotesk'),
                                           ),
                                     ),
-                                  ].divide(SizedBox(width: 16.0)),
+                                  ].divide(const SizedBox(width: 16.0)),
                                 ),
                               ),
                               Container(
@@ -1008,7 +1006,7 @@ class _SupportPageWidgetState extends State<SupportPageWidget> with RouteAware {
                                                                     .bodyLargeFamily),
                                                       ),
                                             ),
-                                          ].divide(SizedBox(width: 12.0)),
+                                          ].divide(const SizedBox(width: 12.0)),
                                         ),
                                         Icon(
                                           Icons.chevron_right,
@@ -1059,7 +1057,7 @@ class _SupportPageWidgetState extends State<SupportPageWidget> with RouteAware {
                                                                     .bodyLargeFamily),
                                                       ),
                                             ),
-                                          ].divide(SizedBox(width: 12.0)),
+                                          ].divide(const SizedBox(width: 12.0)),
                                         ),
                                         Icon(
                                           Icons.chevron_right,
@@ -1110,7 +1108,7 @@ class _SupportPageWidgetState extends State<SupportPageWidget> with RouteAware {
                                                                     .bodyLargeFamily),
                                                       ),
                                             ),
-                                          ].divide(SizedBox(width: 12.0)),
+                                          ].divide(const SizedBox(width: 12.0)),
                                         ),
                                         Icon(
                                           Icons.chevron_right,
@@ -1120,16 +1118,16 @@ class _SupportPageWidgetState extends State<SupportPageWidget> with RouteAware {
                                         ),
                                       ],
                                     ),
-                                  ].divide(SizedBox(height: 8.0)),
+                                  ].divide(const SizedBox(height: 8.0)),
                                 ),
                               ),
-                            ].divide(SizedBox(height: 16.0)),
+                            ].divide(const SizedBox(height: 16.0)),
                           ),
                         ),
                       ),
                     ]
-                        .divide(SizedBox(height: 16.0))
-                        .around(SizedBox(height: 16.0)),
+                        .divide(const SizedBox(height: 16.0))
+                        .around(const SizedBox(height: 16.0)),
                   ),
                 ),
               ),

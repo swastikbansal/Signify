@@ -10,14 +10,8 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
-import io.flutter.plugin.common.MethodCall
-import io.flutter.plugin.common.MethodChannel
-import io.flutter.plugin.common.MethodChannel.MethodCallHandler
-import io.flutter.plugin.common.MethodChannel.Result
 
-class MainActivity : FlutterActivity(), MethodCallHandler {
-
-    private lateinit var channel: MethodChannel
+class MainActivity : FlutterActivity() {
 
     companion object {
         private const val REQUEST_CODE_PERMISSIONS = 10
@@ -34,12 +28,7 @@ class MainActivity : FlutterActivity(), MethodCallHandler {
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
-        channel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "mediapipe_plugin")
-        channel.setMethodCallHandler(this)
-    }
-
-    override fun onMethodCall(call: MethodCall, result: Result) {
-        result.notImplemented()
+        // Camera permissions are handled via Flutter plugins
     }
 
     override fun onDestroy() {

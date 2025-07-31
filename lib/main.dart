@@ -1,9 +1,8 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'auth/firebase_auth/firebase_user_provider.dart';
 import 'auth/firebase_auth/auth_util.dart';
@@ -12,11 +11,12 @@ import 'backend/firebase/firebase_config.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import 'flutter_flow/flutter_flow_util.dart';
 import 'flutter_flow/internationalization.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'flutter_flow/nav/nav.dart';
 import 'index.dart';
+
+// Performance optimization services
+import 'services/performance_cache_manager.dart';
+import 'services/memory_optimizer.dart';
+import 'widgets/performance_monitor.dart';
 
 import 'dart:async';
 import 'package:easy_debounce/easy_debounce.dart';
@@ -25,6 +25,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   GoRouter.optionURLReflectsImperativeAPIs = true;
   usePathUrlStrategy();
+
+  // Initialize performance services first
+  await _initializePerformanceServices();
 
   await initFirebase();
 
@@ -85,29 +88,45 @@ Stack trace: ${filteredStackTrace.join("\n")}''';
     }
   };
 
-  /// Every second, fire logging call for different channel (tag) so that frequent
-  /// logging calls don't get delayed too much
-  Timer.periodic(const Duration(seconds: 2), (timer) {
-    EasyDebounce.fire('405ebf2ff50c295c675b5802889ea941f081fd51');
-    EasyDebounce.cancel('405ebf2ff50c295c675b5802889ea941f081fd51');
-
-    EasyDebounce.fire('c0186d2c21d5d9300ee148206df9fbd1850b8d41');
-    EasyDebounce.cancel('c0186d2c21d5d9300ee148206df9fbd1850b8d41');
-
-    EasyDebounce.fire('508f3c74205c87928b71f49040062e732f9c20b0');
+  /// Optimized debounce cleanup - reduced frequency to improve performance
+  Timer.periodic(const Duration(seconds: 5), (timer) {
     EasyDebounce.cancel('508f3c74205c87928b71f49040062e732f9c20b0');
   });
 
-   // Initialize Supabase for loading 3D ISL Animations
+  // Initialize Supabase for loading 3D ISL Animations
   await Supabase.initialize(
     url: 'https://qqyqwtoxjhgashwxyidg.supabase.co',
-    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFxeXF3dG94amhnYXNod3h5aWRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM2MjE5NjIsImV4cCI6MjA2OTE5Nzk2Mn0.IOB5ocrqZPKU6luezwhmLGXUkKgks9w0AM7X2-onI-c',
+    anonKey:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFxeXF3dG94amhnYXNod3h5aWRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM2MjE5NjIsImV4cCI6MjA2OTE5Nzk2Mn0.IOB5ocrqZPKU6luezwhmLGXUkKgks9w0AM7X2-onI-c',
   );
 
-  runApp(MyApp());
+  runApp(const MyApp());
+}
+
+/// Initialize performance optimization services
+Future<void> _initializePerformanceServices() async {
+  try {
+    // Initialize memory optimizer
+    await MemoryOptimizer.instance.initialize();
+
+    // Initialize cache manager
+    PerformanceCacheManager.instance.initialize();
+
+    // Add memory pressure listener for automatic cache cleanup
+    MemoryOptimizer.instance.addMemoryPressureListener(() {
+      PerformanceCacheManager.instance.clearAll();
+      print('🧹 Caches cleared due to memory pressure');
+    });
+
+    print('🚀 Performance services initialized successfully');
+  } catch (e) {
+    print('⚠️ Error initializing performance services: $e');
+  }
 }
 
 class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
   // This widget is the root of your application.
   @override
   State<MyApp> createState() => _MyAppState();
@@ -156,7 +175,7 @@ class _MyAppState extends State<MyApp> {
       });
     jwtTokenStream.listen((_) {});
     Future.delayed(
-      Duration(milliseconds: 1000),
+      const Duration(milliseconds: 1000),
       () => _appStateNotifier.stopShowingSplashImage(),
     );
 
@@ -176,6 +195,10 @@ class _MyAppState extends State<MyApp> {
   void dispose() {
     authUserSub.cancel();
 
+    // Dispose performance services
+    MemoryOptimizer.instance.dispose();
+    PerformanceCacheManager.instance.dispose();
+
     super.dispose();
   }
 
@@ -191,69 +214,89 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'Signify',
-      localizationsDelegates: [
-        FFLocalizationsDelegate(),
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-        FallbackMaterialLocalizationDelegate(),
-        FallbackCupertinoLocalizationDelegate(),
-      ],
-      locale: _locale,
-      supportedLocales: const [
-        Locale('en'),
-        Locale('hi'),
-        Locale('bn'),
-        Locale('mr'),
-        Locale('te'),
-        Locale('gu'),
-        Locale('pa'),
-        Locale('kn'),
-      ],
-      theme: ThemeData(
-        brightness: Brightness.light,
-        scrollbarTheme: ScrollbarThemeData(
-          thumbVisibility: MaterialStateProperty.all(false),
-          interactive: true,
-          radius: Radius.circular(50.0),
-          thumbColor: MaterialStateProperty.resolveWith((states) {
-            if (states.contains(MaterialState.dragged)) {
-              return Color(4278190080);
-            }
-            if (states.contains(MaterialState.hovered)) {
-              return Color(4294177779);
-            }
-            return Color(4278190080);
-          }),
+    return PerformanceMonitor(
+      showDebugInfo: kDebugMode,
+      child: MaterialApp.router(
+        title: 'Signify',
+        // Disable debug banner for better performance
+        debugShowCheckedModeBanner: false,
+        localizationsDelegates: const [
+          FFLocalizationsDelegate(),
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          FallbackMaterialLocalizationDelegate(),
+          FallbackCupertinoLocalizationDelegate(),
+        ],
+        locale: _locale,
+        supportedLocales: const [
+          Locale('en'),
+          Locale('hi'),
+          Locale('bn'),
+          Locale('mr'),
+          Locale('te'),
+          Locale('gu'),
+          Locale('pa'),
+          Locale('kn'),
+        ],
+        theme: ThemeData(
+          brightness: Brightness.light,
+          // Optimized scrollbar theme
+          scrollbarTheme: ScrollbarThemeData(
+            thumbVisibility: WidgetStateProperty.all(false),
+            interactive: true,
+            radius: const Radius.circular(50.0),
+            thumbColor: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.dragged)) {
+                return const Color(0xff000000);
+              }
+              if (states.contains(WidgetState.hovered)) {
+                return const Color(0xfff3f3f3);
+              }
+              return const Color(0xff000000);
+            }),
+          ),
+          // Performance optimization: reduce animation durations
+          pageTransitionsTheme: const PageTransitionsTheme(
+            builders: {
+              TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+              TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+            },
+          ),
         ),
-      ),
-      darkTheme: ThemeData(
-        brightness: Brightness.dark,
-        scrollbarTheme: ScrollbarThemeData(
-          thumbVisibility: MaterialStateProperty.all(false),
-          interactive: true,
-          radius: Radius.circular(50.0),
-          thumbColor: MaterialStateProperty.resolveWith((states) {
-            if (states.contains(MaterialState.dragged)) {
-              return Color(4294967295);
-            }
-            if (states.contains(MaterialState.hovered)) {
-              return Color(4280032284);
-            }
-            return Color(4294967295);
-          }),
+        darkTheme: ThemeData(
+          brightness: Brightness.dark,
+          scrollbarTheme: ScrollbarThemeData(
+            thumbVisibility: WidgetStateProperty.all(false),
+            interactive: true,
+            radius: const Radius.circular(50.0),
+            thumbColor: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.dragged)) {
+                return const Color(0xffffffff);
+              }
+              if (states.contains(WidgetState.hovered)) {
+                return const Color(0xff1c1c1c);
+              }
+              return const Color(0xffffffff);
+            }),
+          ),
+          // Performance optimization: reduce animation durations
+          pageTransitionsTheme: const PageTransitionsTheme(
+            builders: {
+              TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+              TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+            },
+          ),
         ),
+        themeMode: _themeMode,
+        routerConfig: _router,
       ),
-      themeMode: _themeMode,
-      routerConfig: _router,
     );
   }
 }
 
 class NavBarPage extends StatefulWidget {
-  NavBarPage({Key? key, this.initialPage, this.page}) : super(key: key);
+  const NavBarPage({super.key, this.initialPage, this.page});
 
   final String? initialPage;
   final Widget? page;
@@ -277,10 +320,10 @@ class _NavBarPageState extends State<NavBarPage> {
   @override
   Widget build(BuildContext context) {
     final tabs = {
-      'voicetosign1': Voicetosign1Widget(),
-      'signtovoice2': Signtovoice2Widget(),
-      'islDict': IslDictWidget(),
-      'account4': Account4Widget(),
+      'voicetosign1': const Voicetosign1Widget(),
+      'signtovoice2': const Signtovoice2Widget(),
+      'islDict': const IslDictWidget(),
+      'account4': const Account4Widget(),
     };
     final currentIndex = tabs.keys.toList().indexOf(_currentPageName);
 
@@ -300,11 +343,11 @@ class _NavBarPageState extends State<NavBarPage> {
         type: BottomNavigationBarType.fixed,
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(
+            icon: const Icon(
               Icons.sign_language_outlined,
               size: 30.0,
             ),
-            activeIcon: Icon(
+            activeIcon: const Icon(
               Icons.sign_language,
               size: 30.0,
             ),
@@ -314,11 +357,11 @@ class _NavBarPageState extends State<NavBarPage> {
             tooltip: '',
           ),
           BottomNavigationBarItem(
-            icon: Icon(
+            icon: const Icon(
               Icons.spatial_audio_off_outlined,
               size: 30.0,
             ),
-            activeIcon: Icon(
+            activeIcon: const Icon(
               Icons.spatial_audio_off_rounded,
               size: 30.0,
             ),
@@ -327,7 +370,7 @@ class _NavBarPageState extends State<NavBarPage> {
             ),
             tooltip: '',
           ),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(
               Icons.book_outlined,
               size: 30.0,
@@ -340,11 +383,11 @@ class _NavBarPageState extends State<NavBarPage> {
             tooltip: '',
           ),
           BottomNavigationBarItem(
-            icon: Icon(
+            icon: const Icon(
               Icons.account_circle_outlined,
               size: 30.0,
             ),
-            activeIcon: Icon(
+            activeIcon: const Icon(
               Icons.account_circle_rounded,
               size: 30.0,
             ),
