@@ -406,8 +406,7 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
   Future<void> searchDriveVideos(String query) async {
     if (kDebugMode) {
       print('🚀 Starting Drive video search for: "$query"');
-      print('👤 Current user: ${currentUser?.email ?? 'Not authenticated'}');
-      print('🔧 Google Drive configured: ${GoogleDriveService.isConfigured()}');
+      print(' Google Drive configured: ${GoogleDriveService.isConfigured()}');
       GoogleDriveService.testConfiguration();
     }
     
@@ -488,7 +487,6 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
     if (kDebugMode) {
       print('🧪 MANUAL TEST: Starting Google Drive access test...');
       print('📂 Target folder ID: ${GoogleDriveConfig.targetFolderId}');
-      print('👤 Current user: ${currentUser?.email ?? 'Not authenticated'}');
     }
     
     try {
@@ -573,7 +571,6 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
       print('  - Total results: $totalResults');
       print('  - Drive search error: $driveSearchError');
       print('  - Is loading Drive videos: $isLoadingDriveVideos');
-      print('  - Current user: ${currentUser?.email ?? 'Not authenticated'}');
     }
     
     if (totalResults == 0) {
