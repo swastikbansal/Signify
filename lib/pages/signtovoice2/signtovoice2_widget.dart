@@ -10,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:camera/camera.dart';
-import 'dart:math' as math;
 
 class Signtovoice2Widget extends StatefulWidget {
   const Signtovoice2Widget({super.key});
@@ -565,28 +564,17 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(0.0),
                 child: _model.isCameraOn && _model.isCameraInitialized
-                    ? Stack(
-                        children: [
-                          // Flutter Camera Preview with mirroring for front camera
-                          SizedBox(
-                            width: double.infinity,
-                            height: double.infinity,
-                            child: Transform(
-                              alignment: Alignment.center,
-                              transform: _model.isFrontCamera
-                                  ? Matrix4.rotationY(
-                                      3.14159) // Mirror horizontally for front camera
-                                  : Matrix4.identity(),
-                              child: CameraPreview(_model.cameraController!),
-                            ),
-                          ),
-
-                          // Beautiful edge glow animation when API is active
-                          if (_model.isDetecting)
-                            Positioned.fill(
-                              child: _buildEdgeGlowAnimation(),
-                            ),
-                        ],
+                    ? SizedBox(
+                        width: double.infinity,
+                        height: double.infinity,
+                        child: Transform(
+                          alignment: Alignment.center,
+                          transform: _model.isFrontCamera
+                              ? Matrix4.rotationY(
+                                  3.14159) // Mirror horizontally for front camera
+                              : Matrix4.identity(),
+                          child: CameraPreview(_model.cameraController!),
+                        ),
                       )
                     : Center(
                         child: Column(
@@ -629,34 +617,6 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
         ],
       ),
     );
-  }
-
-  // Beautiful edge glow animation widget
-  Widget _buildEdgeGlowAnimation() {
-    return AnimatedBuilder(
-      animation: _glowController,
-      builder: (context, child) {
-        return CustomPaint(
-          painter: EdgeGlowPainter(
-            glowIntensity: _glowController.value,
-            glowColor: _getGlowColor(),
-            isAnimating: _model.isDetecting,
-          ),
-          child: Container(),
-        );
-      },
-    );
-  }
-
-  // Get glow color based on API status
-  Color _getGlowColor() {
-    if (_model.errorMessage.isNotEmpty) {
-      return Colors.red; // Red for errors
-    } else if (_model.isDetecting) {
-      return Colors.amber; // Yellow/amber for active API processing
-    } else {
-      return Colors.transparent; // No glow when inactive
-    }
   }
 }
 
@@ -979,112 +939,5 @@ class _ModernDropDownState extends State<ModernDropDown>
         ),
       ),
     );
-  }
-}
-
-// Beautiful edge glow painter for camera frame
-class EdgeGlowPainter extends CustomPainter {
-  final double glowIntensity;
-  final Color glowColor;
-  final bool isAnimating;
-
-  EdgeGlowPainter({
-    required this.glowIntensity,
-    required this.glowColor,
-    required this.isAnimating,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    if (!isAnimating || glowColor == Colors.transparent) return;
-
-    final rect = Rect.fromLTWH(0, 0, size.width, size.height);
-    const double glowWidth = 4.0;
-    const double animationWidth = 8.0;
-
-    // Create animated pulse effect with varying intensity
-    final animatedIntensity =
-        (math.sin(glowIntensity * math.pi * 4) * 0.3 + 0.7);
-    final currentOpacity = (animatedIntensity * 0.8).clamp(0.0, 1.0);
-
-    // Create gradient paint for glow effect
-    final glowPaint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = glowWidth
-      ..shader = LinearGradient(
-        colors: [
-          glowColor.withOpacity(0.0),
-          glowColor.withOpacity(currentOpacity),
-          glowColor.withOpacity(0.0),
-        ],
-        stops: const [0.0, 0.5, 1.0],
-      ).createShader(rect);
-
-    // Create outer glow for more dramatic effect
-    final outerGlowPaint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = animationWidth
-      ..shader = LinearGradient(
-        colors: [
-          glowColor.withOpacity(0.0),
-          glowColor.withOpacity(currentOpacity * 0.3),
-          glowColor.withOpacity(0.0),
-        ],
-        stops: const [0.0, 0.5, 1.0],
-      ).createShader(rect);
-
-    // Draw outer glow
-    canvas.drawRect(
-      Rect.fromLTWH(-animationWidth / 2, -animationWidth / 2,
-          size.width + animationWidth, size.height + animationWidth),
-      outerGlowPaint,
-    );
-
-    // Draw main glow
-    canvas.drawRect(
-      Rect.fromLTWH(-glowWidth / 2, -glowWidth / 2, size.width + glowWidth,
-          size.height + glowWidth),
-      glowPaint,
-    );
-
-    // Add corner highlights for more elegance
-    final cornerPaint = Paint()
-      ..color = glowColor.withOpacity(currentOpacity * 0.6)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.0
-      ..strokeCap = StrokeCap.round;
-
-    const double cornerLength = 30.0;
-
-    // Top-left corner
-    canvas.drawLine(
-        const Offset(0, 0), const Offset(cornerLength, 0), cornerPaint);
-    canvas.drawLine(
-        const Offset(0, 0), const Offset(0, cornerLength), cornerPaint);
-
-    // Top-right corner
-    canvas.drawLine(Offset(size.width, 0), Offset(size.width - cornerLength, 0),
-        cornerPaint);
-    canvas.drawLine(
-        Offset(size.width, 0), Offset(size.width, cornerLength), cornerPaint);
-
-    // Bottom-left corner
-    canvas.drawLine(
-        Offset(0, size.height), Offset(cornerLength, size.height), cornerPaint);
-    canvas.drawLine(Offset(0, size.height),
-        Offset(0, size.height - cornerLength), cornerPaint);
-
-    // Bottom-right corner
-    canvas.drawLine(Offset(size.width, size.height),
-        Offset(size.width - cornerLength, size.height), cornerPaint);
-    canvas.drawLine(Offset(size.width, size.height),
-        Offset(size.width, size.height - cornerLength), cornerPaint);
-  }
-
-  @override
-  bool shouldRepaint(covariant EdgeGlowPainter oldDelegate) {
-    return oldDelegate.glowIntensity != glowIntensity ||
-        oldDelegate.glowColor != glowColor ||
-        oldDelegate.isAnimating != isAnimating;
   }
 }
