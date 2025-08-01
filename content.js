@@ -439,6 +439,357 @@ class ISLExtensionViewer {
 // Global viewer instance
 let islViewer = null;
 
+// YouTube Integration Variables
+let transcriptData = [];
+let translationActive = false;
+let lastSyncedWord = '';
+let syncInterval = null;
+let isYouTubePage = false;
+
+// YouTube Detection and Initialization
+function detectYouTubePage() {
+    return window.location.hostname === 'www.youtube.com' && window.location.pathname === '/watch';
+}
+
+function waitForElement(selector, timeout = 10000) {
+    return new Promise((resolve, reject) => {
+        const element = document.querySelector(selector);
+        if (element) {
+            resolve(element);
+            return;
+        }
+
+        const observer = new MutationObserver((mutations, obs) => {
+            const element = document.querySelector(selector);
+            if (element) {
+                obs.disconnect();
+                resolve(element);
+            }
+        });
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+
+        setTimeout(() => {
+            observer.disconnect();
+            reject(new Error(`Element ${selector} not found within ${timeout}ms`));
+        }, timeout);
+    });
+}
+
+async function extractTranscript() {
+    transcriptData = [];
+    try {
+        const transcriptButton = await waitForElement('button[aria-label="Show transcript"]');
+        transcriptButton.click();
+
+        await waitForElement('ytd-transcript-segment-renderer');
+        const segments = document.querySelectorAll('ytd-transcript-segment-renderer');
+
+        segments.forEach((segment, index) => {
+            const timeEl = segment.querySelector('.segment-timestamp');
+            const textEl = segment.querySelector('.segment-text');
+            if (timeEl && textEl) {
+                const timeText = timeEl.textContent.trim();
+                const startTime = parseTimeToSeconds(timeText);
+                const segmentText = textEl.textContent.trim();
+                const words = segmentText.split(/\s+/).filter(Boolean);
+                const wordDuration = 5 / words.length;
+
+                words.forEach((word, wordIndex) => {
+                    const cleanedWord = word.toLowerCase().replace(/[^\w\s'-]/g, '');
+                    const wordStartTime = startTime + (wordIndex * wordDuration);
+                    const wordEndTime = startTime + ((wordIndex + 1) * wordDuration);
+                    transcriptData.push({
+                        word: cleanedWord,
+                        startTime: wordStartTime,
+                        endTime: wordEndTime,
+                        originalText: word
+                    });
+                });
+            }
+        });
+        console.log('Transcript extracted:', transcriptData.length, 'words');
+    } catch (error) {
+        console.error('Transcript extraction failed:', error);
+    }
+}
+
+function parseTimeToSeconds(timeStr) {
+    const parts = timeStr.split(':').map(Number);
+    if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+    if (parts.length === 2) return parts[0] * 60 + parts[1];
+    return parts[0] || 0;
+}
+
+function syncWithVideo(video) {
+    if (syncInterval) clearInterval(syncInterval);
+
+    syncInterval = setInterval(() => {
+        if (!translationActive || video.paused) return;
+
+        const currentTime = video.currentTime;
+        const word = transcriptData.find(w =>
+            currentTime >= w.startTime && currentTime <= w.endTime
+        );
+
+        if (word && word.word !== lastSyncedWord) {
+            lastSyncedWord = word.word;
+            updateCurrentWord(word.originalText);
+            // Play ISL animation for the word
+            if (islViewer && word.word) {
+                const model = islViewer.availableModels.find(m => 
+                    m.name.toLowerCase() === `${word.word}.glb`
+                );
+                if (model) {
+                    islViewer.loadAndPlayAnimation(model.path).catch(err => {
+                        console.log('Animation not found for word:', word.word);
+                    });
+                }
+            }
+        }
+    }, 100);
+}
+
+function updateCurrentWord(word) {
+    const display = document.getElementById('currentWordDisplay');
+    if (display) {
+        display.textContent = word;
+        display.classList.add('word-animation');
+        setTimeout(() => display.classList.remove('word-animation'), 600);
+    }
+}
+
+function handleVideoPlay() {
+    const video = document.querySelector('video');
+    if (!video) return;
+    
+    if (transcriptData.length === 0) {
+        extractTranscript().then(() => {
+            translationActive = true;
+            syncWithVideo(video);
+        });
+    } else {
+        translationActive = true;
+        syncWithVideo(video);
+    }
+}
+
+function createSignifyButton() {
+    const oldBtn = document.getElementById('signify-toggle-btn');
+    if (oldBtn) oldBtn.remove();
+
+    const controls = document.querySelector('.ytp-right-controls');
+    if (!controls) {
+        console.log("Signify: YouTube controls not found, retrying...");
+        setTimeout(createSignifyButton, 1000);
+        return;
+    }
+
+    const signifyBtn = document.createElement('button');
+    signifyBtn.id = 'signify-toggle-btn';
+    signifyBtn.className = 'ytp-button';
+    signifyBtn.title = 'Translate to ISL (Signify)';
+
+    signifyBtn.innerHTML = `
+        <svg height="100%" width="100%" viewBox="0 0 36 36" fill="currentColor">
+            <text
+                x="50%"
+                y="50%"
+                dominant-baseline="central"
+                text-anchor="middle"
+                font-size="12px"
+                font-weight="bold"
+                fill="currentColor">
+                ISL
+            </text>
+        </svg>
+    `;
+
+    signifyBtn.addEventListener('click', () => {
+        console.log("Signify button clicked");
+        showAvatarInterface();
+        extractTranscriptAndStart();
+    });
+
+    controls.prepend(signifyBtn);
+    console.log("Signify button added to player controls");
+}
+
+function showAvatarInterface() {
+    if (document.getElementById('signify-avatar-container')) return;
+
+    const container = document.createElement('div');
+    container.id = 'signify-avatar-container';
+    container.innerHTML = `
+        <div class="signify-header">
+            <div class="signify-title">🤟 Signify ISL Translator</div>
+            <button id="signify-close" title="Close">✕</button>
+        </div>
+        <div class="avatar-display" id="avatarDisplay">
+            <div class="avatar-loading">Loading 3D Avatar...</div>
+        </div>
+        <div class="current-word-display" id="currentWordDisplay">Ready to translate</div>
+    `;
+    
+    // Add styles
+    const style = document.createElement('style');
+    style.textContent = `
+        #signify-avatar-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 320px;
+            height: 450px;
+            background: #1a1a1a;
+            border: 2px solid #333;
+            border-radius: 10px;
+            z-index: 10000;
+            font-family: Arial, sans-serif;
+        }
+        .signify-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #333;
+            color: white;
+            padding: 10px;
+            border-radius: 8px 8px 0 0;
+        }
+        .signify-title {
+            font-weight: bold;
+            font-size: 14px;
+        }
+        #signify-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 0;
+            width: 20px;
+            height: 20px;
+        }
+        .avatar-display {
+            height: 360px;
+            background: #2a2a2a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+        }
+        .current-word-display {
+            padding: 10px;
+            text-align: center;
+            background: #222;
+            color: #ffeb3b;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 0 0 8px 8px;
+        }
+        .word-animation {
+            animation: wordPulse 0.6s ease-in-out;
+        }
+        @keyframes wordPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+    `;
+    document.head.appendChild(style);
+    
+    document.body.appendChild(container);
+
+    document.getElementById('signify-close').addEventListener('click', () => {
+        container.remove();
+        translationActive = false;
+        if (syncInterval) clearInterval(syncInterval);
+    });
+
+    // Initialize the ISL viewer in the avatar display
+    createImmediateAvatar();
+}
+
+function createImmediateAvatar() {
+    if (!islViewer) {
+        islViewer = new ISLExtensionViewer();
+    }
+    
+    // Replace the avatar display with the ISL viewer
+    const avatarDisplay = document.getElementById('avatarDisplay');
+    if (avatarDisplay) {
+        avatarDisplay.innerHTML = '';
+        
+        islViewer.createViewer().then(() => {
+            // Move the ISL viewer container into the avatar display
+            const islContainer = document.getElementById('isl-viewer-container');
+            if (islContainer) {
+                islContainer.style.position = 'relative';
+                islContainer.style.width = '100%';
+                islContainer.style.height = '100%';
+                avatarDisplay.appendChild(islContainer);
+                islViewer.showViewer();
+            }
+        });
+    }
+}
+
+function extractTranscriptAndStart() {
+    const video = document.querySelector('video');
+    if (!video) {
+        console.error('No video found on page');
+        return;
+    }
+
+    // Extract transcript and start sync
+    handleVideoPlay();
+    
+    // Listen for video play/pause events
+    video.addEventListener('play', () => {
+        if (translationActive) {
+            syncWithVideo(video);
+        }
+    });
+    
+    video.addEventListener('pause', () => {
+        if (syncInterval) clearInterval(syncInterval);
+    });
+}
+
+// Initialize YouTube integration when page loads
+function initYouTubeIntegration() {
+    isYouTubePage = detectYouTubePage();
+    
+    if (isYouTubePage) {
+        console.log('YouTube page detected, initializing Signify integration');
+        
+        // Wait for YouTube player to load
+        setTimeout(() => {
+            createSignifyButton();
+        }, 2000);
+        
+        // Handle navigation within YouTube (SPA routing)
+        const observer = new MutationObserver(() => {
+            if (detectYouTubePage() && !document.getElementById('signify-toggle-btn')) {
+                setTimeout(createSignifyButton, 1000);
+            }
+        });
+        
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    }
+}
+
+// Initialize when page is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initYouTubeIntegration);
+} else {
+    initYouTubeIntegration();
+}
+
 // Listen for messages from popup
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     if (request.action === 'showViewer') {
@@ -465,11 +816,30 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         }
         sendResponse({success: true});
     }
+    else if (request.action === 'toggleYouTubeTranslation') {
+        if (isYouTubePage) {
+            if (translationActive) {
+                translationActive = false;
+                if (syncInterval) clearInterval(syncInterval);
+                sendResponse({success: true, status: 'Translation stopped'});
+            } else {
+                showAvatarInterface();
+                extractTranscriptAndStart();
+                sendResponse({success: true, status: 'Translation started'});
+            }
+        } else {
+            sendResponse({success: false, error: 'Not on a YouTube page'});
+        }
+        return true;
+    }
 });
 
 // Clean up on page unload
 window.addEventListener('beforeunload', function() {
     if (islViewer) {
         islViewer.destroy();
+    }
+    if (syncInterval) {
+        clearInterval(syncInterval);
     }
 });
