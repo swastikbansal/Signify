@@ -1,64 +1,33 @@
 {
   "manifest_version": 3,
-  "name": "Signify - ISL Translator",
-  "version": "1.0.2",
-  "description": "Indian Sign Language translator for YouTube videos with 3D animated avatar powered by Supabase",
+  "name": "Signigy-ISL Animation Viewer",
+  "version": "1.0.0",
+  "description": "View Indian Sign Language animations on any webpage",
   "permissions": [
     "activeTab",
-    "storage",
-    "scripting",
-    "tabs"
+    "storage"
   ],
-  "host_permissions": [
-    "*://www.youtube.com/*",
-    "*://youtube.com/*",
-    "*://qqyqwtoxjhgashwxyidg.supabase.co/*",
-    "*://cdn.jsdelivr.net/*",
-    "*://*.supabase.co/*"
-  ],
-  "background": {
-    "service_worker": "background.js"
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "ISL Animation Viewer"
   },
   "content_scripts": [
     {
-      "matches": ["*://www.youtube.com/*", "*://youtube.com/*"],
+      "matches": ["<all_urls>"],
       "js": ["content.js"],
       "css": ["styles.css"],
-      "run_at": "document_end",
-      "all_frames": false
+      "run_at": "document_end"
     }
   ],
   "web_accessible_resources": [
     {
-      "resources": [
-        "popup.html",
-        "popup.js",
-        "three.min.js",
-        "GLTFLoader.js",
-        "OrbitControls.js",
-        "supabase.js",
-        "simple-test.js",
-        "fallback-avatar.js",
-        "animation/*.glb"
-      ],
-      "matches": ["*://www.youtube.com/*", "*://youtube.com/*"]
+      "resources": ["animation/*", "viewer.html"],
+      "matches": ["<all_urls>"]
     }
   ],
-  "action": {
-    "default_popup": "popup.html",
-    "default_title": "Signify ISL Translator",
-    "default_icon": {
-      "16": "icons/signify-logo_16.png",
-      "48": "icons/signify-logo_48.png",
-      "128": "icons/signify-logo_128.png"
-    }
-  },
   "icons": {
-    "16": "icons/signify-logo_16.png",
-    "48": "icons/signify-logo_48.png",
-    "128": "icons/signify-logo_128.png"
-  },
-  "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'"
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
   }
 }

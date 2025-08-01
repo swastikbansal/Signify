@@ -1,226 +1,62 @@
-// Signify ISL Translator - Popup Script (Clean Version)
+document.addEventListener('DOMContentLoaded', function() {
+    const sentenceInput = document.getElementById('sentenceInput');
+    const showViewerBtn = document.getElementById('showViewer');
+    const hideViewerBtn = document.getElementById('hideViewer');
+    const statusDiv = document.getElementById('status');
 
-document.addEventListener('DOMContentLoaded', initializePopup);
-
-async function initializePopup() {
-    await loadSettings();
-    await loadStats();
-    checkCurrentTab();
-    setupEventListeners();
-    startStatusUpdates();
-}
-
-// Load user settings
-async function loadSettings() {
-    try {
-        const settings = await chrome.storage.sync.get([
-            'autoStart',
-            'showAvatar',
-            'highQuality',
-            'signifyEnabled'
-        ]);
-
-        // Update toggle states
-        updateToggle('autoStartToggle', settings.autoStart || false);
-        updateToggle('showAvatarToggle', settings.showAvatar !== false);
-        updateToggle('highQualityToggle', settings.highQuality !== false);
-        
-    } catch (error) {
-        console.error('Error loading settings:', error);
-    }
-}
-
-// Load usage statistics
-async function loadStats() {
-    try {
-        const stats = await chrome.storage.local.get([
-            'videosTranslated',
-            'wordsTranslated',
-            'totalUsageTime'
-        ]);
-
-        document.getElementById('videosTranslated').textContent = stats.videosTranslated || 0;
-        document.getElementById('wordsTranslated').textContent = stats.wordsTranslated || 0;
-        
-    } catch (error) {
-        console.error('Error loading stats:', error);
-    }
-}
-
-// Check current tab and update status
-async function checkCurrentTab() {
-    try {
-        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-        
-        if (tab.url.includes('youtube.com/watch')) {
-            updateStatus('YouTube Video Detected', 'Ready to translate sign language');
-            updateModelStatus('active', 'Avatar model ready');
-        } else if (tab.url.includes('youtube.com')) {
-            updateStatus('On YouTube', 'Navigate to a video to start translation');
-            updateModelStatus('inactive', 'Waiting for video...');
-        } else {
-            updateStatus('Not on YouTube', 'Please navigate to YouTube to use Signify');
-            updateModelStatus('inactive', 'YouTube required');
+    // Load saved sentence from storage
+    chrome.storage.local.get(['savedSentence'], function(result) {
+        if (result.savedSentence) {
+            sentenceInput.value = result.savedSentence;
         }
-    } catch (error) {
-        console.error('Error checking current tab:', error);
-        updateStatus('Error', 'Could not check current page');
-    }
-}
-
-// Setup event listeners
-function setupEventListeners() {
-    // Quick action buttons
-    document.getElementById('openYouTubeBtn').addEventListener('click', openYouTube);
-    document.getElementById('settingsBtn').addEventListener('click', toggleSettings);
-    document.getElementById('helpBtn').addEventListener('click', openHelp);
-    
-    // Setting toggles
-    document.getElementById('autoStartToggle').addEventListener('click', () => {
-        toggleSetting('autoStartToggle', 'autoStart');
     });
-    
-    document.getElementById('showAvatarToggle').addEventListener('click', () => {
-        toggleSetting('showAvatarToggle', 'showAvatar');
+
+    // Save sentence when typing
+    sentenceInput.addEventListener('input', function() {
+        chrome.storage.local.set({savedSentence: sentenceInput.value});
     });
-    
-    document.getElementById('highQualityToggle').addEventListener('click', () => {
-        toggleSetting('highQualityToggle', 'highQuality');
-    });
-}
 
-// Update status display
-function updateStatus(status, detail) {
-    document.getElementById('statusText').textContent = status;
-    document.getElementById('statusDetail').textContent = detail;
-}
-
-// Update model status
-function updateModelStatus(status, text) {
-    const dot = document.getElementById('modelStatusDot');
-    const statusText = document.getElementById('modelStatusText');
-    
-    dot.className = status === 'active' ? 'status-dot active' : 'status-dot';
-    statusText.textContent = text;
-}
-
-// Show/hide progress bar
-function showProgress(percentage) {
-    const progressBar = document.getElementById('progressBar');
-    const progressFill = document.getElementById('progressFill');
-    
-    progressBar.classList.remove('hidden');
-    progressFill.style.width = percentage + '%';
-}
-
-function hideProgress() {
-    const progressBar = document.getElementById('progressBar');
-    progressBar.classList.add('hidden');
-}
-
-// Update toggle state
-function updateToggle(toggleId, isActive) {
-    const toggle = document.getElementById(toggleId);
-    if (toggle) {
-        if (isActive) {
-            toggle.classList.add('active');
-        } else {
-            toggle.classList.remove('active');
+    // Show viewer
+    showViewerBtn.addEventListener('click', function() {
+        const sentence = sentenceInput.value.trim();
+        if (!sentence) {
+            statusDiv.textContent = 'Please enter a sentence first.';
+            return;
         }
-    }
-}
 
-// Toggle setting and save
-async function toggleSetting(toggleId, settingKey) {
-    const toggle = document.getElementById(toggleId);
-    const isActive = toggle.classList.contains('active');
-    
-    // Update UI
-    if (isActive) {
-        toggle.classList.remove('active');
-    } else {
-        toggle.classList.add('active');
-    }
-    
-    // Save to storage
-    try {
-        await chrome.storage.sync.set({ [settingKey]: !isActive });
-        console.log(`Setting ${settingKey} updated to:`, !isActive);
-    } catch (error) {
-        console.error(`Error updating ${settingKey}:`, error);
-    }
-}
-
-// Open YouTube
-function openYouTube() {
-    chrome.tabs.create({ url: 'https://www.youtube.com' });
-    window.close();
-}
-
-// Toggle settings display
-function toggleSettings() {
-    const settingsSection = document.getElementById('settingsSection');
-    const statsSection = document.getElementById('statsSection');
-    
-    if (settingsSection.classList.contains('hidden')) {
-        settingsSection.classList.remove('hidden');
-        statsSection.classList.add('hidden');
-        document.getElementById('settingsBtn').textContent = '📊 Statistics';
-    } else {
-        settingsSection.classList.add('hidden');
-        statsSection.classList.remove('hidden');
-        document.getElementById('settingsBtn').textContent = '⚙️ Settings';
-    }
-}
-
-// Open help page
-function openHelp() {
-    chrome.tabs.create({ 
-        url: 'https://github.com/your-repo/signify-help' 
+        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+            chrome.tabs.sendMessage(tabs[0].id, {
+                action: 'showViewer',
+                sentence: sentence
+            }, function(response) {
+                if (chrome.runtime.lastError) {
+                    statusDiv.textContent = 'Error: Could not inject viewer. Try refreshing the page.';
+                } else {
+                    statusDiv.textContent = 'Viewer shown! Processing sentence...';
+                }
+            });
+        });
     });
-    window.close();
-}
 
-// Start periodic status updates
-function startStatusUpdates() {
-    // Update status every 5 seconds
-    setInterval(async () => {
-        await checkCurrentTab();
-        await loadStats();
-    }, 5000);
-}
+    // Hide viewer
+    hideViewerBtn.addEventListener('click', function() {
+        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+            chrome.tabs.sendMessage(tabs[0].id, {
+                action: 'hideViewer'
+            }, function(response) {
+                if (chrome.runtime.lastError) {
+                    statusDiv.textContent = 'Error: Could not hide viewer.';
+                } else {
+                    statusDiv.textContent = 'Viewer hidden.';
+                }
+            });
+        });
+    });
 
-// Listen for messages from content script
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    switch (request.action) {
-        case 'updateStatus':
-            updateStatus(request.status, request.detail);
-            break;
-            
-        case 'updateModelStatus':
-            updateModelStatus(request.status, request.text);
-            break;
-            
-        case 'updateProgress':
-            showProgress(request.percentage);
-            break;
-            
-        case 'hideProgress':
-            hideProgress();
-            break;
-            
-        case 'updateStats':
-            if (request.videosTranslated !== undefined) {
-                document.getElementById('videosTranslated').textContent = request.videosTranslated;
-            }
-            if (request.wordsTranslated !== undefined) {
-                document.getElementById('wordsTranslated').textContent = request.wordsTranslated;
-            }
-            break;
-    }
-});
-
-// Handle popup close
-window.addEventListener('beforeunload', () => {
-    console.log('Popup closing');
+    // Listen for messages from content script
+    chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+        if (request.action === 'updateStatus') {
+            statusDiv.textContent = request.status;
+        }
+    });
 });

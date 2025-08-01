@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ISL Animation Viewer</title>
+    <style>
+        body { margin: 0; padding: 0; background: #2a2a2a; font-family: Arial, sans-serif; overflow: hidden; }
+        #container { position: relative; width: 100vw; height: 100vh; }
+        #canvas { display: block; }
+        #controls { position: absolute; top: 20px; left: 20px; background: rgba(0, 0, 0, 0.8); color: white; padding: 15px; border-radius: 10px; z-index: 100; max-width: 320px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        #controls h3 { margin: 0 0 10px 0; color: #fff; border-bottom: 1px solid #555; padding-bottom: 5px; }
+        label { display: block; margin-bottom: 5px; font-size: 14px; color: #ddd; }
+        input { padding: 10px; border: 1px solid #555; border-radius: 5px; background: #333; color: white; width: 100%; box-sizing: border-box; }
+        input:focus { outline: 2px solid #4CAF50; }
+        .search-hint { font-size: 11px; color: #aaa; margin-top: 8px; }
+        #loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 18px; text-align: center; z-index: 50; background: rgba(0,0,0,0.7); padding: 20px; border-radius: 10px; display: none; }
+        #info { position: absolute; bottom: 20px; left: 20px; background: rgba(0, 0, 0, 0.8); color: white; padding: 10px; border-radius: 5px; font-size: 14px; z-index: 100; }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="loading">Loading Animation...</div>
+        
+        <div id="controls">
+            <h3>ISL Sentence Viewer</h3>
+            <div class="control-group">
+                <label for="searchInput">Enter a sentence:</label>
+                <input type="text" id="searchInput" placeholder="e.g., happy boy drink">
+                <div class="search-hint">Plays animations for known words in sequence.</div>
+            </div>
+        </div>
+        
+        <div id="info">
+            <div id="status">Ready. Enter a sentence to begin.</div>
+        </div>
+        
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <!-- Three.js and related loaders -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <script>
+        class ISLViewer {
+            constructor() {
+                this.scene = new THREE.Scene();
+                this.scene.background = new THREE.Color(0x2a2a2a);
+                
+                this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                this.camera.position.set(0, 1.2, 2.5);
+                
+                this.renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas'), antialias: true });
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+                this.renderer.shadowMap.enabled = true;
+                this.renderer.outputEncoding = THREE.sRGBEncoding;
+
+                this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+                this.controls.enableDamping = true;
+                this.controls.target.set(0, 1, 0);
+
+                this.clock = new THREE.Clock();
+                this.mixer = null;
+                this.currentModel = null;
+                this.isPlayingSequence = false;
+
+                // IMPORTANT: Add all your .glb files to this list.
+                this.availableModels = [
+                    { name: 'default.glb', path: 'animation/default.glb' },
+                    { name: 'baby.glb', path: 'animation/baby.glb' },
+                    { name: 'book.glb', path: 'animation/book.glb' },
+                    { name: 'boy.glb', path: 'animation/boy.glb' },
+                    { name: 'cold.glb', path: 'animation/cold.glb' },
+                    { name: 'drink.glb', path: 'animation/drink.glb' },
+                    { name: 'happy.glb', path: 'animation/happy.glb' },
+                    { name: 'teacher.glb', path: 'animation/teacher.glb' },
+                    { name: 'work.glb', path: 'animation/work.glb' }
+                ];
+                
+                this.init();
+            }
+            
+            async init() {
+                this.setupLighting();
+                this.setupEventListeners();
+                await this.loadInitialModel();
+                this.animate();
+                window.addEventListener('resize', () => this.onWindowResize());
+            }
+            
+            setupLighting() {
+                this.scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+                const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+                dirLight.position.set(5, 10, 7.5);
+                dirLight.castShadow = true;
+                dirLight.shadow.mapSize.width = 2048;
+                dirLight.shadow.mapSize.height = 2048;
+                this.scene.add(dirLight);
+            }
+
+            async loadInitialModel() {
+                const defaultModel = this.availableModels.find(m => m.name === 'default.glb');
+                if (defaultModel) {
+                    await this.loadAndPlayAnimation(defaultModel.path, { loop: true });
+                }
+            }
+
+            async processSentence(sentence) {
+                if (this.isPlayingSequence) return;
+                this.isPlayingSequence = true;
+
+                try {
+                    const words = sentence.toLowerCase().split(/\s+/).filter(Boolean);
+                    const animationsToPlay = [];
+                    const skippedWords = [];
+
+                    for (const word of words) {
+                        const model = this.availableModels.find(m => m.name.toLowerCase() === `${word}.glb`);
+                        if (model) {
+                            animationsToPlay.push({ word, path: model.path });
+                        } else {
+                            skippedWords.push(word);
+                        }
+                    }
+
+                    const statusElem = document.getElementById('status');
+                    if (animationsToPlay.length === 0) {
+                        statusElem.textContent = `No animations found for "${sentence}".`;
+                        setTimeout(() => this.loadInitialModel(), 2000);
+                        return;
+                    }
+
+                    const skippedInfo = skippedWords.length > 0 ? `| Skipped: ${skippedWords.join(', ')}` : '';
+                    
+                    for (const [index, anim] of animationsToPlay.entries()) {
+                        statusElem.textContent = `Playing: ${anim.word} (${index + 1}/${animationsToPlay.length}) ${skippedInfo}`;
+                        await this.loadAndPlayAnimation(anim.path);
+                        // Optional short pause between animations for better pacing
+                        if (index < animationsToPlay.length - 1) {
+                            await new Promise(r => setTimeout(r, 250));
+                        }
+                    }
+                    
+                    statusElem.textContent = 'Sequence complete. Ready for next input.';
+                    await this.loadInitialModel();
+
+                } catch (error) {
+                    console.error('Error processing sentence:', error);
+                    document.getElementById('status').textContent = 'An error occurred during playback.';
+                } finally {
+                    this.isPlayingSequence = false;
+                }
+            }
+
+            loadAndPlayAnimation(modelPath, options = {}) {
+                return new Promise(async (resolve, reject) => {
+                    try {
+                        document.getElementById('loading').style.display = 'block';
+
+                        // Clean up previous model
+                        if (this.currentModel) this.scene.remove(this.currentModel);
+                        if (this.mixer) this.mixer.stopAllAction();
+
+                        const loader = new THREE.GLTFLoader();
+                        const gltf = await loader.loadAsync(modelPath);
+                        this.currentModel = gltf.scene;
+                        this.scene.add(this.currentModel);
+
+                        this.currentModel.traverse(child => {
+                            if (child.isMesh) {
+                                child.castShadow = true;
+                                child.receiveShadow = true;
+                            }
+                        });
+
+                        this.centerModel();
+                        document.getElementById('loading').style.display = 'none';
+
+                        if (gltf.animations && gltf.animations.length > 0) {
+                            this.mixer = new THREE.AnimationMixer(this.currentModel);
+                            const clip = gltf.animations[0];
+                            const action = this.mixer.clipAction(clip);
+                            
+                            // Play once and hold, unless looping is requested (for idle animation)
+                            if (options.loop) {
+                                action.setLoop(THREE.LoopRepeat);
+                            } else {
+                                action.setLoop(THREE.LoopOnce);
+                                action.clampWhenFinished = true;
+                                this.mixer.addEventListener('finished', () => resolve());
+                            }
+                            
+                            action.play();
+                            
+                            // If looping, we don't wait for it to finish, so we resolve immediately.
+                            if (options.loop) resolve();
+
+                        } else {
+                            // If model has no animation, wait 1 second before proceeding.
+                            setTimeout(resolve, 1000);
+                        }
+                    } catch (error) {
+                        console.error(`Failed to load model: ${modelPath}`, error);
+                        document.getElementById('loading').style.display = 'none';
+                        reject(error);
+                    }
+                });
+            }
+
+            centerModel() {
+                if (!this.currentModel) return;
+                const box = new THREE.Box3().setFromObject(this.currentModel);
+                const center = box.getCenter(new THREE.Vector3());
+                this.currentModel.position.sub(center); // Center the model
+                this.currentModel.position.y -= box.min.y; // Place on the ground
+                this.controls.target.set(0, box.getSize(new THREE.Vector3()).y / 2, 0); // Aim camera at torso
+                this.controls.update();
+            }
+            
+            setupEventListeners() {
+                let debounceTimeout;
+                document.getElementById('searchInput').addEventListener('input', (e) => {
+                    clearTimeout(debounceTimeout);
+                    const sentence = e.target.value.trim();
+                    if (sentence) {
+                        debounceTimeout = setTimeout(() => {
+                            this.processSentence(sentence);
+                        }, 600); // Wait for 600ms after user stops typing
+                    } else {
+                        // If input is cleared, return to the default model
+                        this.loadInitialModel();
+                    }
+                });
+            }
+            
+            animate() {
+                requestAnimationFrame(() => this.animate());
+                if (this.mixer) this.mixer.update(this.clock.getDelta());
+                this.controls.update();
+                this.renderer.render(this.scene, this.camera);
+            }
+            
+            onWindowResize() {
+                this.camera.aspect = window.innerWidth / window.innerHeight;
+                this.camera.updateProjectionMatrix();
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+        }
+        
+        window.addEventListener('load', () => new ISLViewer());
+    </script>
+</body>
+</html>
