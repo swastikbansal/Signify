@@ -3,9 +3,15 @@ import '/backend/backend.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import 'package:easy_debounce/easy_debounce.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:video_player/video_player.dart';
+import '/services/google_drive_service.dart';
 import 'isl_dict_model.dart';
 export 'isl_dict_model.dart';
 
@@ -29,8 +35,16 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
     _model.textController ??= TextEditingController()
       ..addListener(() {
         debugLogWidgetClass(_model);
-        // Trigger search when text changes
-        _model.searchSigns(_model.textController?.text ?? '');
+        // Trigger search when text changes with debouncing
+        EasyDebounce.debounce(
+          'searchDebouncer',
+          Duration(milliseconds: 500),
+          () async {
+            await _model.searchSigns(_model.textController?.text ?? '');
+            // Update UI after async search completes
+            safeSetState(() {});
+          },
+        );
       });
     _model.textFieldFocusNode ??= FocusNode();
   }
@@ -68,6 +82,13 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
   @override
   void didPushNext() {
     _model.isRouteVisible = false;
+  }
+
+  // Helper function for safe state updates
+  void safeSetState(VoidCallback fn) {
+    if (mounted) {
+      setState(fn);
+    }
   }
 
   @override
@@ -157,29 +178,25 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                                     style: FlutterFlowTheme.of(context)
                                         .headlineSmall
                                         .override(
-                                          fontFamily:
-                                              FlutterFlowTheme.of(context)
-                                                  .headlineSmallFamily,
+                                          fontFamily: FlutterFlowTheme.of(context).headlineSmallFamily,
                                           letterSpacing: 0.0,
                                           useGoogleFonts: GoogleFonts.asMap()
-                                              .containsKey(
-                                                  FlutterFlowTheme.of(context)
-                                                      .headlineSmallFamily),
+                                              .containsKey(FlutterFlowTheme.of(context).headlineSmallFamily),
                                         ),
                                   ),
                                   TextSpan(
-                                    text: islDictUsersRecord.displayName,
+                                    text: islDictUsersRecord.displayName.isNotEmpty 
+                                        ? islDictUsersRecord.displayName 
+                                        : currentUserDisplayName ?? 'User',
                                     style: FlutterFlowTheme.of(context)
                                         .headlineSmall
                                         .override(
-                                          fontFamily:
-                                              FlutterFlowTheme.of(context)
-                                                  .headlineSmallFamily,
+                                          fontFamily: FlutterFlowTheme.of(context).headlineSmallFamily,
+                                          color: FlutterFlowTheme.of(context).primary,
                                           letterSpacing: 0.0,
+                                          fontWeight: FontWeight.w600,
                                           useGoogleFonts: GoogleFonts.asMap()
-                                              .containsKey(
-                                                  FlutterFlowTheme.of(context)
-                                                      .headlineSmallFamily),
+                                              .containsKey(FlutterFlowTheme.of(context).headlineSmallFamily),
                                         ),
                                   ),
                                   TextSpan(
@@ -189,127 +206,74 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                                     style: FlutterFlowTheme.of(context)
                                         .headlineSmall
                                         .override(
-                                          fontFamily:
-                                              FlutterFlowTheme.of(context)
-                                                  .headlineSmallFamily,
+                                          fontFamily: FlutterFlowTheme.of(context).headlineSmallFamily,
                                           letterSpacing: 0.0,
                                           useGoogleFonts: GoogleFonts.asMap()
-                                              .containsKey(
-                                                  FlutterFlowTheme.of(context)
-                                                      .headlineSmallFamily),
+                                              .containsKey(FlutterFlowTheme.of(context).headlineSmallFamily),
                                         ),
                                   )
                                 ],
-                                style: FlutterFlowTheme.of(context)
-                                    .headlineSmall
-                                    .override(
-                                      fontFamily: FlutterFlowTheme.of(context)
-                                          .headlineSmallFamily,
-                                      letterSpacing: 1.0,
-                                      useGoogleFonts: GoogleFonts.asMap()
-                                          .containsKey(
-                                              FlutterFlowTheme.of(context)
-                                                  .headlineSmallFamily),
-                                      lineHeight: 1.0,
-                                    ),
                               ),
-                              textAlign: TextAlign.center,
                             ),
                             
                             // Description
-                            Row(
-                              mainAxisSize: MainAxisSize.max,
-                              children: [
-                                Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsetsDirectional.fromSTEB(
-                                        0.0, 0.0, 0.0, 8.0),
-                                    child: Text(
-                                      FFLocalizations.of(context).getText(
-                                        'tai0ovmf' /* Explore the Indian Sign Language dictionary */,
-                                      ),
-                                      style: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .override(
-                                            fontFamily:
-                                                FlutterFlowTheme.of(context)
-                                                    .bodyMediumFamily,
-                                            color: FlutterFlowTheme.of(context)
-                                                .secondaryText,
-                                            letterSpacing: 0.0,
-                                            useGoogleFonts: GoogleFonts.asMap()
-                                                .containsKey(
-                                                    FlutterFlowTheme.of(context)
-                                                        .bodyMediumFamily),
-                                          ),
-                                    ),
-                                  ),
+                            Padding(
+                              padding: EdgeInsetsDirectional.fromSTEB(
+                                  0.0, 8.0, 0.0, 24.0),
+                              child: Text(
+                                FFLocalizations.of(context).getText(
+                                  'tai0ovmf' /* Explore the Indian Sign Language dictionary */,
                                 ),
-                              ],
+                                style: FlutterFlowTheme.of(context)
+                                    .bodyMedium
+                                    .override(
+                                      fontFamily: FlutterFlowTheme.of(context).bodyMediumFamily,
+                                      color: FlutterFlowTheme.of(context).secondaryText,
+                                      letterSpacing: 0.0,
+                                      useGoogleFonts: GoogleFonts.asMap()
+                                          .containsKey(FlutterFlowTheme.of(context).bodyMediumFamily),
+                                    ),
+                              ),
                             ),
-
-                            // Search Field
-                            SizedBox(
+                            
+                            // Search Bar
+                            Container(
                               width: double.infinity,
                               child: TextFormField(
                                 controller: _model.textController,
                                 focusNode: _model.textFieldFocusNode,
                                 onChanged: (_) => EasyDebounce.debounce(
-                                  '_model.textController',
-                                  const Duration(milliseconds: 500),
-                                  () {
-                                    _model.searchSigns(_model.textController?.text ?? '');
-                                    safeSetState(() {});
-                                  },
+                                  'textController',
+                                  Duration(milliseconds: 500),
+                                  () => safeSetState(() {}),
                                 ),
                                 autofocus: false,
-                                autofillHints: const [AutofillHints.jobTitle],
-                                textCapitalization: TextCapitalization.words,
-                                textInputAction: TextInputAction.done,
                                 obscureText: false,
                                 decoration: InputDecoration(
-                                  isDense: false,
-                                  labelText:
-                                      FFLocalizations.of(context).getText(
-                                    '6ldvvr2l' /* Search */,
+                                  isDense: true,
+                                  labelStyle: FlutterFlowTheme.of(context).labelMedium.override(
+                                    fontFamily: FlutterFlowTheme.of(context).labelMediumFamily,
+                                    letterSpacing: 0.0,
+                                    useGoogleFonts: GoogleFonts.asMap()
+                                        .containsKey(FlutterFlowTheme.of(context).labelMediumFamily),
                                   ),
-                                  labelStyle: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .override(
-                                        fontFamily: FlutterFlowTheme.of(context)
-                                            .labelMediumFamily,
-                                        letterSpacing: 0.0,
-                                        useGoogleFonts: GoogleFonts.asMap()
-                                            .containsKey(
-                                                FlutterFlowTheme.of(context)
-                                                    .labelMediumFamily),
-                                      ),
-                                  hintText: FFLocalizations.of(context).getText(
-                                    'rkagcocl' /* Search to learn more */,
+                                  hintText: 'Search here',
+                                  hintStyle: FlutterFlowTheme.of(context).labelMedium.override(
+                                    fontFamily: FlutterFlowTheme.of(context).labelMediumFamily,
+                                    letterSpacing: 0.0,
+                                    useGoogleFonts: GoogleFonts.asMap()
+                                        .containsKey(FlutterFlowTheme.of(context).labelMediumFamily),
                                   ),
-                                  hintStyle: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .override(
-                                        fontFamily: FlutterFlowTheme.of(context)
-                                            .labelMediumFamily,
-                                        letterSpacing: 0.0,
-                                        useGoogleFonts: GoogleFonts.asMap()
-                                            .containsKey(
-                                                FlutterFlowTheme.of(context)
-                                                    .labelMediumFamily),
-                                      ),
                                   enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
-                                      color: FlutterFlowTheme.of(context)
-                                          .alternate,
+                                      color: FlutterFlowTheme.of(context).alternate,
                                       width: 1.0,
                                     ),
                                     borderRadius: BorderRadius.circular(12.0),
                                   ),
                                   focusedBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
-                                      color:
-                                          FlutterFlowTheme.of(context).primary,
+                                      color: FlutterFlowTheme.of(context).primary,
                                       width: 1.0,
                                     ),
                                     borderRadius: BorderRadius.circular(12.0),
@@ -329,938 +293,248 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                                     borderRadius: BorderRadius.circular(12.0),
                                   ),
                                   filled: true,
-                                  fillColor: FlutterFlowTheme.of(context)
-                                      .secondaryBackground,
-                                  contentPadding: const EdgeInsets.all(12.0),
-                                  hoverColor: FlutterFlowTheme.of(context)
-                                      .primaryBackground,
+                                  fillColor: FlutterFlowTheme.of(context).secondaryBackground,
+                                  contentPadding: EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 16.0, 16.0),
                                   prefixIcon: Icon(
-                                    Icons.menu_book_rounded,
-                                    color: FlutterFlowTheme.of(context)
-                                        .secondaryText,
-                                    size: 24.0,
+                                    Icons.search,
+                                    color: FlutterFlowTheme.of(context).secondaryText,
+                                    size: 20.0,
                                   ),
-                                  suffixIcon: _model
-                                          .textController!.text.isNotEmpty
-                                      ? InkWell(
-                                          onTap: () async {
-                                            _model.textController?.clear();
-                                            _model.searchSigns('');
-                                            safeSetState(() {});
-                                          },
-                                          child: Icon(
-                                            Icons.clear,
-                                            color: FlutterFlowTheme.of(context)
-                                                .secondaryText,
-                                            size: 24.0,
-                                          ),
-                                        )
-                                      : null,
                                 ),
-                                style: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .override(
-                                      fontFamily: FlutterFlowTheme.of(context)
-                                          .bodyMediumFamily,
-                                      letterSpacing: 0.0,
-                                      useGoogleFonts: GoogleFonts.asMap()
-                                          .containsKey(
-                                              FlutterFlowTheme.of(context)
-                                                  .bodyMediumFamily),
-                                    ),
-                                maxLines: 2,
-                                minLines: 1,
-                                cursorColor:
-                                    FlutterFlowTheme.of(context).primary,
-                                validator: _model.textControllerValidator
-                                    .asValidator(context),
+                                style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                  fontFamily: FlutterFlowTheme.of(context).bodyMediumFamily,
+                                  letterSpacing: 0.0,
+                                  useGoogleFonts: GoogleFonts.asMap()
+                                      .containsKey(FlutterFlowTheme.of(context).bodyMediumFamily),
+                                ),
+                                cursorColor: FlutterFlowTheme.of(context).primary,
+                                validator: _model.textControllerValidator.asValidator(context),
                               ),
                             ),
-
-                            const SizedBox(height: 24.0),
-
-                            // Daily Task Banner
+                            SizedBox(height: 24.0),
+                            
+                            /* // Daily Task Section - Commented out for now
                             GestureDetector(
-                              onTap: () {
-                                _model.startDailyTask();
-                                showDialog(
-                                  context: context,
-                                  builder: (context) => AlertDialog(
-                                    title: const Text('Daily Practice'),
-                                    content: Text('Start your daily learning session?\n\nGoal: Learn ${_model.dailyTask?.targetSigns ?? 5} signs today\nProgress: ${_model.dailyTask?.learnedToday ?? 0}/${_model.dailyTask?.targetSigns ?? 5} completed'),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () => Navigator.pop(context),
-                                        child: const Text('Later'),
-                                      ),
-                                      ElevatedButton(
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                          // Navigate to practice mode
-                                        },
-                                        child: const Text('Start Practice'),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
+                              onTap: () => _model.startDailyTask(),
                               child: Container(
                                 width: double.infinity,
-                                height: 140.0,
+                                height: 160.0,
                                 decoration: BoxDecoration(
-                                  color: FlutterFlowTheme.of(context).primary,
-                                  borderRadius: BorderRadius.circular(16.0),
-                                  image: const DecorationImage(
-                                    fit: BoxFit.cover,
-                                    image: AssetImage('assets/images/dailyTask.png'),
-                                  ),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(20.0),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        '${_model.dailyTask?.streakDays ?? 0}-day streak',
-                                        style: FlutterFlowTheme.of(context)
-                                            .bodyMedium
-                                            .override(
-                                              fontFamily: FlutterFlowTheme.of(context)
-                                                  .bodyMediumFamily,
-                                              color: Colors.white,
-                                              letterSpacing: 0.0,
-                                              useGoogleFonts: GoogleFonts.asMap()
-                                                  .containsKey(FlutterFlowTheme.of(context)
-                                                      .bodyMediumFamily),
-                                            ),
-                                      ),
-                                      Text(
-                                        _model.dailyTask?.title ?? 'Daily Practice',
-                                        style: FlutterFlowTheme.of(context)
-                                            .headlineSmall
-                                            .override(
-                                              fontFamily: FlutterFlowTheme.of(context)
-                                                  .headlineSmallFamily,
-                                              color: Colors.white,
-                                              letterSpacing: 0.0,
-                                              fontWeight: FontWeight.bold,
-                                              useGoogleFonts: GoogleFonts.asMap()
-                                                  .containsKey(FlutterFlowTheme.of(context)
-                                                      .headlineSmallFamily),
-                                            ),
-                                      ),
-                                      const SizedBox(height: 8.0),
-                                      Container(
-                                        width: 200.0,
-                                        height: 6.0,
-                                        decoration: BoxDecoration(
-                                          color: Colors.white.withOpacity(0.3),
-                                          borderRadius: BorderRadius.circular(3.0),
-                                        ),
-                                        child: FractionallySizedBox(
-                                          alignment: Alignment.centerLeft,
-                                          widthFactor: _model.getDailyTaskProgress(),
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius: BorderRadius.circular(3.0),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-
-                            const SizedBox(height: 32.0),
-
-                            // Categories Grid
-                            Text(
-                              'Categories',
-                              style: FlutterFlowTheme.of(context).titleLarge.override(
-                                fontFamily: FlutterFlowTheme.of(context).titleLargeFamily,
-                                letterSpacing: 0.0,
-                                useGoogleFonts: GoogleFonts.asMap()
-                                    .containsKey(FlutterFlowTheme.of(context).titleLargeFamily),
-                              ),
-                            ),
-
-                            const SizedBox(height: 16.0),
-
-                            GridView.count(
-                              physics: const NeverScrollableScrollPhysics(),
-                              shrinkWrap: true,
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 16.0,
-                              mainAxisSpacing: 16.0,
-                              childAspectRatio: 1.1,
-                              children: [
-                                // Alphabets Category
-                                GestureDetector(
-                                  onTap: () {
-                                    // Navigate to alphabets
-                                    _model.filterByCategory('alphabets');
-                                    safeSetState(() {});
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      gradient: const LinearGradient(
-                                        colors: [
-                                          Color(0xFFE1BEE7),
-                                          Color(0xFFCE93D8),
-                                        ],
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
-                                      ),
-                                      borderRadius: BorderRadius.circular(20.0),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: const Color(0xFFCE93D8).withOpacity(0.3),
-                                          offset: const Offset(0, 8),
-                                          blurRadius: 16.0,
-                                        ),
-                                      ],
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(20.0),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            'AZ',
-                                            style: FlutterFlowTheme.of(context)
-                                                .displaySmall
-                                                .override(
-                                                  fontFamily: FlutterFlowTheme.of(context).displaySmallFamily,
-                                                  color: const Color(0xFF7B1FA2),
-                                                  fontSize: 36.0,
-                                                  fontWeight: FontWeight.bold,
-                                                  letterSpacing: 0.0,
-                                                  useGoogleFonts: GoogleFonts.asMap()
-                                                      .containsKey(FlutterFlowTheme.of(context).displaySmallFamily),
-                                                ),
-                                          ),
-                                          const Spacer(),
-                                          Text(
-                                            'Alphabets',
-                                            style: FlutterFlowTheme.of(context)
-                                                .titleMedium
-                                                .override(
-                                                  fontFamily: FlutterFlowTheme.of(context).titleMediumFamily,
-                                                  color: const Color(0xFF4A148C),
-                                                  fontWeight: FontWeight.w600,
-                                                  letterSpacing: 0.0,
-                                                  useGoogleFonts: GoogleFonts.asMap()
-                                                      .containsKey(FlutterFlowTheme.of(context).titleMediumFamily),
-                                                ),
-                                          ),
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
-                                            decoration: BoxDecoration(
-                                              color: const Color(0xFF7B1FA2),
-                                              borderRadius: BorderRadius.circular(16.0),
-                                            ),
-                                            child: Text(
-                                              '12 / 100',
-                                              style: FlutterFlowTheme.of(context)
-                                                  .bodySmall
-                                                  .override(
-                                                    fontFamily: FlutterFlowTheme.of(context).bodySmallFamily,
-                                                    color: Colors.white,
-                                                    fontSize: 12.0,
-                                                    fontWeight: FontWeight.w600,
-                                                    letterSpacing: 0.0,
-                                                    useGoogleFonts: GoogleFonts.asMap()
-                                                        .containsKey(FlutterFlowTheme.of(context).bodySmallFamily),
-                                                  ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-
-                                // Numbers Category
-                                GestureDetector(
-                                  onTap: () {
-                                    // Navigate to numbers
-                                    _model.filterByCategory('numbers');
-                                    safeSetState(() {});
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      gradient: const LinearGradient(
-                                        colors: [
-                                          Color(0xFFFFF9C4),
-                                          Color(0xFFFFF176),
-                                        ],
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
-                                      ),
-                                      borderRadius: BorderRadius.circular(20.0),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: const Color(0xFFFFF176).withOpacity(0.3),
-                                          offset: const Offset(0, 8),
-                                          blurRadius: 16.0,
-                                        ),
-                                      ],
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(20.0),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Container(
-                                                width: 20.0,
-                                                height: 4.0,
-                                                decoration: BoxDecoration(
-                                                  color: const Color(0xFFE65100),
-                                                  borderRadius: BorderRadius.circular(2.0),
-                                                ),
-                                              ),
-                                              const SizedBox(height: 4.0),
-                                              Container(
-                                                width: 30.0,
-                                                height: 4.0,
-                                                decoration: BoxDecoration(
-                                                  color: const Color(0xFFE65100),
-                                                  borderRadius: BorderRadius.circular(2.0),
-                                                ),
-                                              ),
-                                              const SizedBox(height: 4.0),
-                                              Container(
-                                                width: 25.0,
-                                                height: 4.0,
-                                                decoration: BoxDecoration(
-                                                  color: const Color(0xFFE65100),
-                                                  borderRadius: BorderRadius.circular(2.0),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          const Spacer(),
-                                          Text(
-                                            'Numbers',
-                                            style: FlutterFlowTheme.of(context)
-                                                .titleMedium
-                                                .override(
-                                                  fontFamily: FlutterFlowTheme.of(context).titleMediumFamily,
-                                                  color: const Color(0xFFBF360C),
-                                                  fontWeight: FontWeight.w600,
-                                                  letterSpacing: 0.0,
-                                                  useGoogleFonts: GoogleFonts.asMap()
-                                                      .containsKey(FlutterFlowTheme.of(context).titleMediumFamily),
-                                                ),
-                                          ),
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
-                                            decoration: BoxDecoration(
-                                              color: const Color(0xFFE65100),
-                                              borderRadius: BorderRadius.circular(16.0),
-                                            ),
-                                            child: Text(
-                                              '12 / 100',
-                                              style: FlutterFlowTheme.of(context)
-                                                  .bodySmall
-                                                  .override(
-                                                    fontFamily: FlutterFlowTheme.of(context).bodySmallFamily,
-                                                    color: Colors.white,
-                                                    fontSize: 12.0,
-                                                    fontWeight: FontWeight.w600,
-                                                    letterSpacing: 0.0,
-                                                    useGoogleFonts: GoogleFonts.asMap()
-                                                        .containsKey(FlutterFlowTheme.of(context).bodySmallFamily),
-                                                  ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-
-                                // Family Category
-                                GestureDetector(
-                                  onTap: () {
-                                    // Navigate to family
-                                    _model.filterByCategory('family');
-                                    safeSetState(() {});
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      gradient: const LinearGradient(
-                                        colors: [
-                                          Color(0xFFE0F7FA),
-                                          Color(0xFF80DEEA),
-                                        ],
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
-                                      ),
-                                      borderRadius: BorderRadius.circular(20.0),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: const Color(0xFF80DEEA).withOpacity(0.3),
-                                          offset: const Offset(0, 8),
-                                          blurRadius: 16.0,
-                                        ),
-                                      ],
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(20.0),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          const Row(
-                                            children: [
-                                              Icon(
-                                                Icons.person,
-                                                color: Color(0xFF00695C),
-                                                size: 20.0,
-                                              ),
-                                              SizedBox(width: 4.0),
-                                              Icon(
-                                                Icons.person,
-                                                color: Color(0xFF00695C),
-                                                size: 20.0,
-                                              ),
-                                              SizedBox(width: 4.0),
-                                              Icon(
-                                                Icons.person,
-                                                color: Color(0xFF00695C),
-                                                size: 16.0,
-                                              ),
-                                            ],
-                                          ),
-                                          const Spacer(),
-                                          Text(
-                                            'Family',
-                                            style: FlutterFlowTheme.of(context)
-                                                .titleMedium
-                                                .override(
-                                                  fontFamily: FlutterFlowTheme.of(context).titleMediumFamily,
-                                                  color: const Color(0xFF004D40),
-                                                  fontWeight: FontWeight.w600,
-                                                  letterSpacing: 0.0,
-                                                  useGoogleFonts: GoogleFonts.asMap()
-                                                      .containsKey(FlutterFlowTheme.of(context).titleMediumFamily),
-                                                ),
-                                          ),
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
-                                            decoration: BoxDecoration(
-                                              color: const Color(0xFF00695C),
-                                              borderRadius: BorderRadius.circular(16.0),
-                                            ),
-                                            child: Text(
-                                              '8 / 50',
-                                              style: FlutterFlowTheme.of(context)
-                                                  .bodySmall
-                                                  .override(
-                                                    fontFamily: FlutterFlowTheme.of(context).bodySmallFamily,
-                                                    color: Colors.white,
-                                                    fontSize: 12.0,
-                                                    fontWeight: FontWeight.w600,
-                                                    letterSpacing: 0.0,
-                                                    useGoogleFonts: GoogleFonts.asMap()
-                                                        .containsKey(FlutterFlowTheme.of(context).bodySmallFamily),
-                                                  ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-
-                                // Books Category
-                                GestureDetector(
-                                  onTap: () {
-                                    // Navigate to books
-                                    _model.filterByCategory('books');
-                                    safeSetState(() {});
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      gradient: const LinearGradient(
-                                        colors: [
-                                          Color(0xFFE8F5E8),
-                                          Color(0xFFA5D6A7),
-                                        ],
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
-                                      ),
-                                      borderRadius: BorderRadius.circular(20.0),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: const Color(0xFFA5D6A7).withOpacity(0.3),
-                                          offset: const Offset(0, 8),
-                                          blurRadius: 16.0,
-                                        ),
-                                      ],
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(20.0),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Stack(
-                                            children: [
-                                              Container(
-                                                width: 30.0,
-                                                height: 24.0,
-                                                decoration: BoxDecoration(
-                                                  color: const Color(0xFF2E7D32),
-                                                  borderRadius: BorderRadius.circular(4.0),
-                                                ),
-                                              ),
-                                              Positioned(
-                                                left: 4.0,
-                                                child: Container(
-                                                  width: 30.0,
-                                                  height: 24.0,
-                                                  decoration: BoxDecoration(
-                                                    color: const Color(0xFF43A047),
-                                                    borderRadius: BorderRadius.circular(4.0),
-                                                  ),
-                                                ),
-                                              ),
-                                              Positioned(
-                                                left: 8.0,
-                                                child: Container(
-                                                  width: 30.0,
-                                                  height: 24.0,
-                                                  decoration: BoxDecoration(
-                                                    color: const Color(0xFF66BB6A),
-                                                    borderRadius: BorderRadius.circular(4.0),
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          const Spacer(),
-                                          Text(
-                                            'Books',
-                                            style: FlutterFlowTheme.of(context)
-                                                .titleMedium
-                                                .override(
-                                                  fontFamily: FlutterFlowTheme.of(context).titleMediumFamily,
-                                                  color: const Color(0xFF1B5E20),
-                                                  fontWeight: FontWeight.w600,
-                                                  letterSpacing: 0.0,
-                                                  useGoogleFonts: GoogleFonts.asMap()
-                                                      .containsKey(FlutterFlowTheme.of(context).titleMediumFamily),
-                                                ),
-                                          ),
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
-                                            decoration: BoxDecoration(
-                                              color: const Color(0xFF2E7D32),
-                                              borderRadius: BorderRadius.circular(16.0),
-                                            ),
-                                            child: Text(
-                                              '15 / 75',
-                                              style: FlutterFlowTheme.of(context)
-                                                  .bodySmall
-                                                  .override(
-                                                    fontFamily: FlutterFlowTheme.of(context).bodySmallFamily,
-                                                    color: Colors.white,
-                                                    fontSize: 12.0,
-                                                    fontWeight: FontWeight.w600,
-                                                    letterSpacing: 0.0,
-                                                    useGoogleFonts: GoogleFonts.asMap()
-                                                        .containsKey(FlutterFlowTheme.of(context).bodySmallFamily),
-                                                  ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-
-                            const SizedBox(height: 32.0),
-
-                            // Word of the Day Section
-                            Text(
-                              'Word of the Day',
-                              style: FlutterFlowTheme.of(context).titleLarge.override(
-                                fontFamily: FlutterFlowTheme.of(context).titleLargeFamily,
-                                letterSpacing: 0.0,
-                                useGoogleFonts: GoogleFonts.asMap()
-                                    .containsKey(FlutterFlowTheme.of(context).titleLargeFamily),
-                              ),
-                            ),
-
-                            const SizedBox(height: 16.0),
-
-                            GestureDetector(
-                              onTap: () {
-                                // Navigate to word details or show detailed view
-                                _model.viewWordOfTheDay();
-                                _showWordOfTheDayBottomSheet();
-                              },
-                              child: Container(
-                                width: double.infinity,
-                                padding: const EdgeInsets.all(20.0),
-                                decoration: BoxDecoration(
-                                  gradient: const LinearGradient(
-                                    colors: [
-                                      Color(0xFF667eea),
-                                      Color(0xFF764ba2),
-                                    ],
+                                  gradient: LinearGradient(
+                                    colors: [Color(0xFF8B5CF6), Color(0xFFA855F7)],
                                     begin: Alignment.topLeft,
                                     end: Alignment.bottomRight,
                                   ),
                                   borderRadius: BorderRadius.circular(20.0),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: const Color(0xFF667eea).withOpacity(0.3),
-                                      offset: const Offset(0, 8),
-                                      blurRadius: 20.0,
+                                      color: Color(0xFF8B5CF6).withOpacity(0.3),
+                                      offset: Offset(0, 8),
+                                      blurRadius: 16.0,
                                     ),
                                   ],
                                 ),
-                                child: Row(
+                                child: Stack(
                                   children: [
-                                    Expanded(
+                                    // Background decorative elements
+                                    Positioned(
+                                      right: -20,
+                                      bottom: -20,
+                                      child: Container(
+                                        width: 100,
+                                        height: 100,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withOpacity(0.1),
+                                          shape: BoxShape.circle,
+                                        ),
+                                      ),
+                                    ),
+                                    Positioned(
+                                      right: 40,
+                                      top: 20,
+                                      child: Container(
+                                        width: 20,
+                                        height: 20,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withOpacity(0.2),
+                                          shape: BoxShape.circle,
+                                        ),
+                                      ),
+                                    ),
+                                    // Content
+                                    Padding(
+                                      padding: EdgeInsets.all(20.0),
                                       child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
-                                            decoration: BoxDecoration(
-                                              color: Colors.white.withOpacity(0.2),
-                                              borderRadius: BorderRadius.circular(20.0),
-                                            ),
-                                            child: Text(
-                                              '${DateTime.now().day} ${_getMonthName(DateTime.now().month)}',
-                                              style: FlutterFlowTheme.of(context).bodySmall.override(
-                                                fontFamily: FlutterFlowTheme.of(context).bodySmallFamily,
-                                                color: Colors.white,
-                                                fontSize: 12.0,
-                                                fontWeight: FontWeight.w500,
-                                                letterSpacing: 0.0,
-                                                useGoogleFonts: GoogleFonts.asMap()
-                                                    .containsKey(FlutterFlowTheme.of(context).bodySmallFamily),
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(height: 12.0),
-                                          Text(
-                                            _model.wordOfTheDay?.word ?? 'Hello',
-                                            style: FlutterFlowTheme.of(context).headlineMedium.override(
-                                              fontFamily: FlutterFlowTheme.of(context).headlineMediumFamily,
-                                              color: Colors.white,
-                                              fontSize: 28.0,
-                                              fontWeight: FontWeight.bold,
-                                              letterSpacing: 0.0,
-                                              useGoogleFonts: GoogleFonts.asMap()
-                                                  .containsKey(FlutterFlowTheme.of(context).headlineMediumFamily),
-                                            ),
-                                          ),
-                                          const SizedBox(height: 8.0),
-                                          Text(
-                                            _model.wordOfTheDay?.meaning ?? 'A greeting used when meeting someone',
-                                            style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                              fontFamily: FlutterFlowTheme.of(context).bodyMediumFamily,
-                                              color: Colors.white.withOpacity(0.9),
-                                              fontSize: 14.0,
-                                              letterSpacing: 0.0,
-                                              useGoogleFonts: GoogleFonts.asMap()
-                                                  .containsKey(FlutterFlowTheme.of(context).bodyMediumFamily),
-                                            ),
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                          const SizedBox(height: 12.0),
                                           Row(
                                             children: [
-                                              Container(
-                                                padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.white.withOpacity(0.2),
-                                                  borderRadius: BorderRadius.circular(16.0),
-                                                ),
-                                                child: Row(
-                                                  mainAxisSize: MainAxisSize.min,
-                                                  children: [
-                                                    const Icon(
-                                                      Icons.play_arrow,
-                                                      color: Colors.white,
-                                                      size: 16.0,
-                                                    ),
-                                                    const SizedBox(width: 4.0),
-                                                    Text(
-                                                      'Watch Sign',
-                                                      style: FlutterFlowTheme.of(context).bodySmall.override(
-                                                        fontFamily: FlutterFlowTheme.of(context).bodySmallFamily,
-                                                        color: Colors.white,
-                                                        fontSize: 12.0,
-                                                        fontWeight: FontWeight.w500,
-                                                        letterSpacing: 0.0,
-                                                        useGoogleFonts: GoogleFonts.asMap()
-                                                            .containsKey(FlutterFlowTheme.of(context).bodySmallFamily),
-                                                      ),
-                                                    ),
-                                                  ],
+                                              Text(
+                                                '${_model.dailyTask?.streakDays ?? 10}-day streak',
+                                                style: FlutterFlowTheme.of(context).bodySmall.override(
+                                                  fontFamily: FlutterFlowTheme.of(context).bodySmallFamily,
+                                                  color: Colors.white.withOpacity(0.9),
+                                                  letterSpacing: 0.0,
+                                                  useGoogleFonts: GoogleFonts.asMap()
+                                                      .containsKey(FlutterFlowTheme.of(context).bodySmallFamily),
                                                 ),
                                               ),
-                                              const SizedBox(width: 8.0),
-                                              Container(
-                                                padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.white.withOpacity(0.2),
-                                                  borderRadius: BorderRadius.circular(16.0),
-                                                ),
-                                                child: Text(
-                                                  _model.wordOfTheDay?.category ?? 'Greetings',
-                                                  style: FlutterFlowTheme.of(context).bodySmall.override(
-                                                    fontFamily: FlutterFlowTheme.of(context).bodySmallFamily,
-                                                    color: Colors.white,
-                                                    fontSize: 12.0,
-                                                    fontWeight: FontWeight.w500,
-                                                    letterSpacing: 0.0,
-                                                    useGoogleFonts: GoogleFonts.asMap()
-                                                        .containsKey(FlutterFlowTheme.of(context).bodySmallFamily),
-                                                  ),
-                                                ),
+                                              SizedBox(width: 8.0),
+                                              Icon(
+                                                Icons.local_fire_department,
+                                                color: Colors.orange,
+                                                size: 16.0,
                                               ),
                                             ],
                                           ),
+                                          SizedBox(height: 8.0),
+                                          Text(
+                                            'Daily task',
+                                            style: FlutterFlowTheme.of(context).headlineSmall.override(
+                                              fontFamily: FlutterFlowTheme.of(context).headlineSmallFamily,
+                                              color: Colors.white,
+                                              letterSpacing: 0.0,
+                                              fontWeight: FontWeight.bold,
+                                              useGoogleFonts: GoogleFonts.asMap()
+                                                  .containsKey(FlutterFlowTheme.of(context).headlineSmallFamily),
+                                            ),
+                                          ),
+                                          Spacer(),
+                                          Container(
+                                            height: 45.0,
+                                            child: ElevatedButton.icon(
+                                              onPressed: () => _model.startDailyTask(),
+                                              icon: Icon(Icons.play_arrow, color: Colors.black),
+                                              label: Text(
+                                                'Start',
+                                                style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: Color(0xFFFACC15),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(25.0),
+                                                ),
+                                                padding: EdgeInsets.symmetric(horizontal: 24.0),
+                                              ),
+                                            ),
+                                          ),
                                         ],
-                                      ),
-                                    ),
-                                    const SizedBox(width: 16.0),
-                                    Container(
-                                      width: 80.0,
-                                      height: 80.0,
-                                      decoration: BoxDecoration(
-                                        color: Colors.white.withOpacity(0.15),
-                                        borderRadius: BorderRadius.circular(16.0),
-                                        border: Border.all(
-                                          color: Colors.white.withOpacity(0.3),
-                                          width: 2.0,
-                                        ),
-                                      ),
-                                      child: const Icon(
-                                        Icons.sign_language,
-                                        color: Colors.white,
-                                        size: 40.0,
                                       ),
                                     ),
                                   ],
                                 ),
                               ),
                             ),
-
-                            // Recently Viewed Section
-                            if (_model.recentlyViewedSigns.isNotEmpty) ...[
-                              const SizedBox(height: 32.0),
-                              Text(
-                                'Recently Viewed',
-                                style: FlutterFlowTheme.of(context).titleLarge.override(
-                                  fontFamily: FlutterFlowTheme.of(context).titleLargeFamily,
-                                  letterSpacing: 0.0,
-                                  useGoogleFonts: GoogleFonts.asMap()
-                                      .containsKey(FlutterFlowTheme.of(context).titleLargeFamily),
-                                ),
-                              ),
-                              const SizedBox(height: 16.0),
-                              SizedBox(
-                                height: 120.0,
-                                child: ListView.builder(
-                                  scrollDirection: Axis.horizontal,
-                                  itemCount: _model.recentlyViewedSigns.length,
-                                  itemBuilder: (context, index) {
-                                    final sign = _model.recentlyViewedSigns[index];
-                                    return GestureDetector(
-                                      onTap: () {
-                                        _model.viewSignDetails(sign);
-                                        _showSignDetailsBottomSheet(sign);
-                                      },
-                                      child: Container(
-                                        width: 100.0,
-                                        margin: const EdgeInsets.only(right: 12.0),
-                                        decoration: BoxDecoration(
-                                          color: FlutterFlowTheme.of(context).secondaryBackground,
-                                          borderRadius: BorderRadius.circular(12.0),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              blurRadius: 4.0,
-                                              color: Colors.black.withOpacity(0.1),
-                                              offset: const Offset(0.0, 2.0),
-                                            ),
-                                          ],
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: [
-                                              Icon(
-                                                Icons.sign_language,
-                                                size: 32.0,
-                                                color: FlutterFlowTheme.of(context).primary,
-                                              ),
-                                              const SizedBox(height: 8.0),
-                                              Text(
-                                                sign.word,
-                                                style: FlutterFlowTheme.of(context).bodySmall.override(
-                                                  fontFamily: FlutterFlowTheme.of(context).bodySmallFamily,
-                                                  fontSize: 12.0,
-                                                  fontWeight: FontWeight.w600,
-                                                  letterSpacing: 0.0,
-                                                  useGoogleFonts: GoogleFonts.asMap()
-                                                      .containsKey(FlutterFlowTheme.of(context).bodySmallFamily),
-                                                ),
-                                                textAlign: TextAlign.center,
-                                                maxLines: 2,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
-                            ],
-
+                            SizedBox(height: 32.0),
+                            */
+                            
                             // Search Results Section
-                            if (_model.textController!.text.isNotEmpty) ...[
-                              const SizedBox(height: 32.0),
+                            if (_model.textController?.text.isNotEmpty == true) ...[
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     'Search Results',
-                                    style: FlutterFlowTheme.of(context).titleLarge.override(
-                                      fontFamily: FlutterFlowTheme.of(context).titleLargeFamily,
+                                    style: FlutterFlowTheme.of(context).headlineSmall.override(
+                                      fontFamily: FlutterFlowTheme.of(context).headlineSmallFamily,
                                       letterSpacing: 0.0,
+                                      fontWeight: FontWeight.w600,
                                       useGoogleFonts: GoogleFonts.asMap()
-                                          .containsKey(FlutterFlowTheme.of(context).titleLargeFamily),
+                                          .containsKey(FlutterFlowTheme.of(context).headlineSmallFamily),
                                     ),
                                   ),
-                                  Text(
-                                    '${_model.filteredSigns.length} found',
-                                    style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                      fontFamily: FlutterFlowTheme.of(context).bodyMediumFamily,
-                                      color: FlutterFlowTheme.of(context).secondaryText,
-                                      letterSpacing: 0.0,
-                                      useGoogleFonts: GoogleFonts.asMap()
-                                          .containsKey(FlutterFlowTheme.of(context).bodyMediumFamily),
+                                  if (_model.isLoadingDriveVideos)
+                                    SizedBox(
+                                      width: 20.0,
+                                      height: 20.0,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2.0,
+                                        color: FlutterFlowTheme.of(context).primary,
+                                      ),
                                     ),
-                                  ),
                                 ],
                               ),
-                              const SizedBox(height: 16.0),
-                              if (_model.filteredSigns.isEmpty)
-                                Container(
-                                  width: double.infinity,
-                                  padding: const EdgeInsets.all(32.0),
-                                  child: Column(
-                                    children: [
-                                      Icon(
-                                        Icons.search_off,
-                                        size: 64.0,
-                                        color: FlutterFlowTheme.of(context).secondaryText,
-                                      ),
-                                      const SizedBox(height: 16.0),
-                                      Text(
-                                        'No signs found',
-                                        style: FlutterFlowTheme.of(context).titleMedium.override(
-                                          fontFamily: FlutterFlowTheme.of(context).titleMediumFamily,
-                                          color: FlutterFlowTheme.of(context).secondaryText,
-                                          letterSpacing: 0.0,
-                                          useGoogleFonts: GoogleFonts.asMap()
-                                              .containsKey(FlutterFlowTheme.of(context).titleMediumFamily),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 8.0),
-                                      Text(
-                                        'Try searching with different keywords',
-                                        style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                          fontFamily: FlutterFlowTheme.of(context).bodyMediumFamily,
-                                          color: FlutterFlowTheme.of(context).secondaryText,
-                                          letterSpacing: 0.0,
-                                          useGoogleFonts: GoogleFonts.asMap()
-                                              .containsKey(FlutterFlowTheme.of(context).bodyMediumFamily),
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ],
+                              SizedBox(height: 8.0),
+                              Text(
+                                _model.getSearchStatusMessage(),
+                                style: FlutterFlowTheme.of(context).bodySmall.override(
+                                  fontFamily: FlutterFlowTheme.of(context).bodySmallFamily,
+                                  color: FlutterFlowTheme.of(context).secondaryText,
+                                  letterSpacing: 0.0,
+                                  useGoogleFonts: GoogleFonts.asMap()
+                                      .containsKey(FlutterFlowTheme.of(context).bodySmallFamily),
+                                ),
+                              ),
+                              SizedBox(height: 16.0),
+                              
+                              // Local ISL Signs Results
+                              if (_model.filteredSigns.isNotEmpty) ...[
+                                Text(
+                                  'ISL Dictionary (${_model.filteredSigns.length})',
+                                  style: FlutterFlowTheme.of(context).titleMedium.override(
+                                    fontFamily: FlutterFlowTheme.of(context).titleMediumFamily,
+                                    color: FlutterFlowTheme.of(context).primary,
+                                    letterSpacing: 0.0,
+                                    fontWeight: FontWeight.w500,
+                                    useGoogleFonts: GoogleFonts.asMap()
+                                        .containsKey(FlutterFlowTheme.of(context).titleMediumFamily),
                                   ),
-                                )
-                              else
-                                ListView.builder(
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  shrinkWrap: true,
-                                  itemCount: _model.filteredSigns.length,
-                                  itemBuilder: (context, index) {
-                                    final sign = _model.filteredSigns[index];
-                                    return GestureDetector(
+                                ),
+                                SizedBox(height: 12.0),
+                                ...(_model.filteredSigns.take(5).map((sign) => 
+                                  Padding(
+                                    padding: EdgeInsets.only(bottom: 12.0),
+                                    child: GestureDetector(
                                       onTap: () {
-                                        _model.viewSignDetails(sign);
+                                        _model.addToRecentlyViewed(sign);
                                         _showSignDetailsBottomSheet(sign);
+                                        safeSetState(() {});
                                       },
                                       child: Container(
-                                        margin: const EdgeInsets.only(bottom: 12.0),
-                                        padding: const EdgeInsets.all(16.0),
+                                        padding: EdgeInsets.all(16.0),
                                         decoration: BoxDecoration(
                                           color: FlutterFlowTheme.of(context).secondaryBackground,
                                           borderRadius: BorderRadius.circular(12.0),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              blurRadius: 4.0,
-                                              color: Colors.black.withOpacity(0.1),
-                                              offset: const Offset(0.0, 2.0),
-                                            ),
-                                          ],
+                                          border: Border.all(
+                                            color: FlutterFlowTheme.of(context).alternate,
+                                            width: 1.0,
+                                          ),
                                         ),
                                         child: Row(
                                           children: [
                                             Container(
-                                              width: 60.0,
-                                              height: 60.0,
+                                              width: 40.0,
+                                              height: 40.0,
                                               decoration: BoxDecoration(
                                                 color: FlutterFlowTheme.of(context).primary.withOpacity(0.1),
                                                 borderRadius: BorderRadius.circular(8.0),
                                               ),
                                               child: Icon(
-                                                Icons.sign_language,
+                                                Icons.waving_hand,
                                                 color: FlutterFlowTheme.of(context).primary,
-                                                size: 32.0,
+                                                size: 20.0,
                                               ),
                                             ),
-                                            const SizedBox(width: 16.0),
+                                            SizedBox(width: 12.0),
                                             Expanded(
                                               child: Column(
                                                 crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
                                                     sign.word,
-                                                    style: FlutterFlowTheme.of(context).titleMedium.override(
-                                                      fontFamily: FlutterFlowTheme.of(context).titleMediumFamily,
-                                                      fontWeight: FontWeight.w600,
+                                                    style: FlutterFlowTheme.of(context).bodyLarge.override(
+                                                      fontFamily: FlutterFlowTheme.of(context).bodyLargeFamily,
+                                                      fontWeight: FontWeight.w500,
                                                       letterSpacing: 0.0,
                                                       useGoogleFonts: GoogleFonts.asMap()
-                                                          .containsKey(FlutterFlowTheme.of(context).titleMediumFamily),
+                                                          .containsKey(FlutterFlowTheme.of(context).bodyLargeFamily),
                                                     ),
                                                   ),
-                                                  const SizedBox(height: 4.0),
                                                   Text(
-                                                    sign.description,
+                                                    sign.category,
                                                     style: FlutterFlowTheme.of(context).bodySmall.override(
                                                       fontFamily: FlutterFlowTheme.of(context).bodySmallFamily,
                                                       color: FlutterFlowTheme.of(context).secondaryText,
@@ -1268,44 +542,6 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                                                       useGoogleFonts: GoogleFonts.asMap()
                                                           .containsKey(FlutterFlowTheme.of(context).bodySmallFamily),
                                                     ),
-                                                    maxLines: 2,
-                                                    overflow: TextOverflow.ellipsis,
-                                                  ),
-                                                  const SizedBox(height: 8.0),
-                                                  Row(
-                                                    children: [
-                                                      Container(
-                                                        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-                                                        decoration: BoxDecoration(
-                                                          color: FlutterFlowTheme.of(context).accent1,
-                                                          borderRadius: BorderRadius.circular(12.0),
-                                                        ),
-                                                        child: Text(
-                                                          sign.category.toUpperCase(),
-                                                          style: FlutterFlowTheme.of(context).bodySmall.override(
-                                                            fontFamily: FlutterFlowTheme.of(context).bodySmallFamily,
-                                                            color: FlutterFlowTheme.of(context).primary,
-                                                            fontSize: 10.0,
-                                                            fontWeight: FontWeight.w600,
-                                                            letterSpacing: 0.0,
-                                                            useGoogleFonts: GoogleFonts.asMap()
-                                                                .containsKey(FlutterFlowTheme.of(context).bodySmallFamily),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      const SizedBox(width: 8.0),
-                                                      Row(
-                                                        children: List.generate(3, (diffIndex) {
-                                                          return Icon(
-                                                            Icons.star,
-                                                            size: 12.0,
-                                                            color: diffIndex < sign.difficulty
-                                                                ? FlutterFlowTheme.of(context).warning
-                                                                : FlutterFlowTheme.of(context).secondaryText,
-                                                          );
-                                                        }),
-                                                      ),
-                                                    ],
                                                   ),
                                                 ],
                                               ),
@@ -1318,14 +554,344 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                                           ],
                                         ),
                                       ),
-                                    );
+                                    ),
+                                  ),
+                                ).toList()),
+                                SizedBox(height: 16.0),
+                              ],
+                              
+                              // Additional video results
+                              if (_model.driveVideos.isNotEmpty) ...[
+                                SizedBox(height: 12.0),
+                                ...(_model.driveVideos.take(5).map((video) => 
+                                  Padding(
+                                    padding: EdgeInsets.only(bottom: 12.0),
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        _model.addDriveVideoToRecentlyViewed(video);
+                                        _showDriveVideoBottomSheet(video);
+                                        safeSetState(() {});
+                                      },
+                                      child: Container(
+                                        padding: EdgeInsets.all(16.0),
+                                        decoration: BoxDecoration(
+                                          color: FlutterFlowTheme.of(context).secondaryBackground,
+                                          borderRadius: BorderRadius.circular(12.0),
+                                          border: Border.all(
+                                            color: Color(0xFF4285F4).withOpacity(0.3),
+                                            width: 1.0,
+                                          ),
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Container(
+                                              width: 40.0,
+                                              height: 40.0,
+                                              decoration: BoxDecoration(
+                                                gradient: LinearGradient(
+                                                  colors: [Color(0xFF4285F4), Color(0xFF34A853)],
+                                                  begin: Alignment.topLeft,
+                                                  end: Alignment.bottomRight,
+                                                ),
+                                                borderRadius: BorderRadius.circular(8.0),
+                                              ),
+                                              child: Icon(
+                                                Icons.play_arrow,
+                                                color: Colors.white,
+                                                size: 20.0,
+                                              ),
+                                            ),
+                                            SizedBox(width: 12.0),
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    _model.extractWordFromVideoName(video.name),
+                                                    style: FlutterFlowTheme.of(context).bodyLarge.override(
+                                                      fontFamily: FlutterFlowTheme.of(context).bodyLargeFamily,
+                                                      fontWeight: FontWeight.w500,
+                                                      letterSpacing: 0.0,
+                                                      useGoogleFonts: GoogleFonts.asMap()
+                                                          .containsKey(FlutterFlowTheme.of(context).bodyLargeFamily),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Container(
+                                              padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                                              decoration: BoxDecoration(
+                                                color: Color(0xFF4285F4).withOpacity(0.1),
+                                                borderRadius: BorderRadius.circular(12.0),
+                                              ),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Icon(
+                                                    Icons.play_circle_fill,
+                                                    color: Color(0xFF4285F4),
+                                                    size: 14.0,
+                                                  ),
+                                                  SizedBox(width: 4.0),
+                                                  Text(
+                                                    'Watch',
+                                                    style: FlutterFlowTheme.of(context).bodySmall.override(
+                                                      fontFamily: FlutterFlowTheme.of(context).bodySmallFamily,
+                                                      color: Color(0xFF4285F4),
+                                                      letterSpacing: 0.0,
+                                                      fontWeight: FontWeight.w500,
+                                                      useGoogleFonts: GoogleFonts.asMap()
+                                                          .containsKey(FlutterFlowTheme.of(context).bodySmallFamily),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ).toList()),
+                                SizedBox(height: 16.0),
+                              ],
+                              
+                              // No results message
+                              if (_model.filteredSigns.isEmpty && 
+                                  _model.driveVideos.isEmpty && 
+                                  !_model.isLoadingDriveVideos) ...[
+                                Container(
+                                  width: double.infinity,
+                                  padding: EdgeInsets.all(24.0),
+                                  decoration: BoxDecoration(
+                                    color: FlutterFlowTheme.of(context).secondaryBackground,
+                                    borderRadius: BorderRadius.circular(12.0),
+                                    border: Border.all(
+                                      color: FlutterFlowTheme.of(context).alternate,
+                                      width: 1.0,
+                                    ),
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      Icon(
+                                        Icons.search_off,
+                                        color: FlutterFlowTheme.of(context).secondaryText,
+                                        size: 48.0,
+                                      ),
+                                      SizedBox(height: 12.0),
+                                      Text(
+                                        'No results found',
+                                        style: FlutterFlowTheme.of(context).titleMedium.override(
+                                          fontFamily: FlutterFlowTheme.of(context).titleMediumFamily,
+                                          letterSpacing: 0.0,
+                                          useGoogleFonts: GoogleFonts.asMap()
+                                              .containsKey(FlutterFlowTheme.of(context).titleMediumFamily),
+                                        ),
+                                      ),
+                                      SizedBox(height: 8.0),
+                                      Text(
+                                        'Try a different search term or check your Google Drive configuration',
+                                        textAlign: TextAlign.center,
+                                        style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                          fontFamily: FlutterFlowTheme.of(context).bodyMediumFamily,
+                                          color: FlutterFlowTheme.of(context).secondaryText,
+                                          letterSpacing: 0.0,
+                                          useGoogleFonts: GoogleFonts.asMap()
+                                              .containsKey(FlutterFlowTheme.of(context).bodyMediumFamily),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(height: 16.0),
+                              ],
+                              
+                              SizedBox(height: 16.0),
+                            ],
+                            
+                            // Recently Viewed Section
+                            if (_model.recentlyViewedSigns.isNotEmpty) ...[
+                              Text(
+                                'Recently Viewed',
+                                style: FlutterFlowTheme.of(context).headlineSmall.override(
+                                  fontFamily: FlutterFlowTheme.of(context).headlineSmallFamily,
+                                  letterSpacing: 0.0,
+                                  fontWeight: FontWeight.w600,
+                                  useGoogleFonts: GoogleFonts.asMap()
+                                      .containsKey(FlutterFlowTheme.of(context).headlineSmallFamily),
+                                ),
+                              ),
+                              SizedBox(height: 16.0),
+                              ...(_model.recentlyViewedSigns.take(3).map((sign) => 
+                                Padding(
+                                  padding: EdgeInsets.only(bottom: 12.0),
+                                  child: GestureDetector(
+                                    onTap: () => _showSignDetailsBottomSheet(sign),
+                                    child: Container(
+                                      padding: EdgeInsets.all(16.0),
+                                      decoration: BoxDecoration(
+                                        color: FlutterFlowTheme.of(context).secondaryBackground,
+                                        borderRadius: BorderRadius.circular(12.0),
+                                        border: Border.all(
+                                          color: FlutterFlowTheme.of(context).alternate,
+                                          width: 1.0,
+                                        ),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Container(
+                                            width: 40.0,
+                                            height: 40.0,
+                                            decoration: BoxDecoration(
+                                              color: FlutterFlowTheme.of(context).primary.withOpacity(0.1),
+                                              borderRadius: BorderRadius.circular(8.0),
+                                            ),
+                                            child: Icon(
+                                              Icons.waving_hand,
+                                              color: FlutterFlowTheme.of(context).primary,
+                                              size: 20.0,
+                                            ),
+                                          ),
+                                          SizedBox(width: 12.0),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  sign.word,
+                                                  style: FlutterFlowTheme.of(context).bodyLarge.override(
+                                                    fontFamily: FlutterFlowTheme.of(context).bodyLargeFamily,
+                                                    fontWeight: FontWeight.w500,
+                                                    letterSpacing: 0.0,
+                                                    useGoogleFonts: GoogleFonts.asMap()
+                                                        .containsKey(FlutterFlowTheme.of(context).bodyLargeFamily),
+                                                  ),
+                                                ),
+                                                Text(
+                                                  sign.category,
+                                                  style: FlutterFlowTheme.of(context).bodySmall.override(
+                                                    fontFamily: FlutterFlowTheme.of(context).bodySmallFamily,
+                                                    color: FlutterFlowTheme.of(context).secondaryText,
+                                                    letterSpacing: 0.0,
+                                                    useGoogleFonts: GoogleFonts.asMap()
+                                                        .containsKey(FlutterFlowTheme.of(context).bodySmallFamily),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          Icon(
+                                            Icons.arrow_forward_ios,
+                                            color: FlutterFlowTheme.of(context).secondaryText,
+                                            size: 16.0,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ).toList()),
+                              SizedBox(height: 32.0),
+                            ],
+                            
+                            /* 
+                            // Categories Grid
+                            StaggeredGrid.count(
+                              crossAxisCount: 2,
+                              mainAxisSpacing: 16.0,
+                              crossAxisSpacing: 16.0,
+                              children: [
+                                // Alphabets
+                                _buildCategoryCard(
+                                  title: 'Alphabets',
+                                  progress: '12 / 100',
+                                  icon: Icons.sort_by_alpha,
+                                  backgroundColor: Color(0xFFE879F9),
+                                  onTap: () async {
+                                    await _model.filterByCategory('alphabets');
+                                    safeSetState(() {});
                                   },
                                 ),
-                            ],
-                          ]
-                              .divide(const SizedBox(height: 16.0))
-                              .addToStart(const SizedBox(height: 16.0))
-                              .addToEnd(const SizedBox(height: 36.0)),
+                                // Numbers
+                                _buildCategoryCard(
+                                  title: 'Numbers',
+                                  progress: '12 / 100',
+                                  icon: Icons.format_list_numbered,
+                                  backgroundColor: Color(0xFFFACC15),
+                                  onTap: () async {
+                                    await _model.filterByCategory('numbers');
+                                    safeSetState(() {});
+                                  },
+                                ),
+                                // Family
+                                _buildCategoryCard(
+                                  title: 'Family',
+                                  progress: '12 / 100',
+                                  icon: Icons.family_restroom,
+                                  backgroundColor: Color(0xFF7DD3FC),
+                                  onTap: () async {
+                                    await _model.filterByCategory('family');
+                                    safeSetState(() {});
+                                  },
+                                ),
+                                // Food
+                                _buildCategoryCard(
+                                  title: 'Food',
+                                  progress: '12 / 100',
+                                  icon: Icons.restaurant,
+                                  backgroundColor: Color(0xFF86EFAC),
+                                  onTap: () async {
+                                    await _model.filterByCategory('food');
+                                    safeSetState(() {});
+                                  },
+                                ),
+                                // Education
+                                _buildCategoryCard(
+                                  title: 'Education',
+                                  progress: '12 / 100',
+                                  icon: Icons.school,
+                                  backgroundColor: Color(0xFFFFB347),
+                                  onTap: () async {
+                                    await _model.filterByCategory('education');
+                                    safeSetState(() {});
+                                  },
+                                ),
+                                // Health
+                                _buildCategoryCard(
+                                  title: 'Health',
+                                  progress: '12 / 100',
+                                  icon: Icons.favorite,
+                                  backgroundColor: Color(0xFFE879F9),
+                                  onTap: () async {
+                                    await _model.filterByCategory('health');
+                                    safeSetState(() {});
+                                  },
+                                ),
+                                // Basic Phrases
+                                _buildCategoryCard(
+                                  title: 'Basic Phrases',
+                                  progress: '12 / 100',
+                                  icon: Icons.chat_bubble,
+                                  backgroundColor: Color(0xFF7DD3FC),
+                                  onTap: () async {
+                                    await _model.filterByCategory('basic_phrases');
+                                    safeSetState(() {});
+                                  },
+                                ),
+                                // Explore More
+                                _buildCategoryCard(
+                                  title: 'Explore More',
+                                  progress: '12 / 100',
+                                  icon: Icons.explore,
+                                  backgroundColor: Color(0xFFFACC15),
+                                  onTap: () => _showWordOfTheDayBottomSheet(),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 32.0),
+                            */
+                          ],
                         ),
                       ),
                     ),
@@ -1361,7 +927,7 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    sign.word,
+                    sign?.word ?? 'Sign',
                     style: FlutterFlowTheme.of(context).headlineSmall,
                   ),
                   IconButton(
@@ -1395,7 +961,7 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
               ),
               const SizedBox(height: 16.0),
               Text(
-                sign.description,
+                sign?.description ?? 'Sign description',
                 style: FlutterFlowTheme.of(context).bodyMedium,
                 textAlign: TextAlign.center,
               ),
@@ -1406,7 +972,7 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                     child: ElevatedButton(
                       onPressed: () {
                         Navigator.pop(context);
-                        _model.markSignAsLearned(sign.id);
+                        _model.markSignAsLearned(sign?.id ?? '');
                         safeSetState(() {});
                       },
                       style: ElevatedButton.styleFrom(
@@ -1421,11 +987,11 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                   const SizedBox(width: 12.0),
                   IconButton(
                     onPressed: () {
-                      _model.toggleFavorite(sign.id);
+                      _model.toggleFavorite(sign?.id ?? '');
                       safeSetState(() {});
                     },
                     icon: Icon(
-                      sign.isFavorite ? Icons.favorite : Icons.favorite_border,
+                      (sign?.isFavorite ?? false) ? Icons.favorite : Icons.favorite_border,
                       color: Colors.red,
                     ),
                   ),
@@ -1454,219 +1020,684 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
-        height: MediaQuery.of(context).size.height * 0.6,
+        height: MediaQuery.of(context).size.height * 0.85,
         decoration: BoxDecoration(
           color: FlutterFlowTheme.of(context).secondaryBackground,
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(20.0),
-            topRight: Radius.circular(20.0),
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(28.0),
+            topRight: Radius.circular(28.0),
           ),
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Handle bar
-              Center(
-                child: Container(
-                  width: 40.0,
-                  height: 4.0,
-                  decoration: BoxDecoration(
-                    color: FlutterFlowTheme.of(context).secondaryText,
-                    borderRadius: BorderRadius.circular(2.0),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20.0),
-              
-              // Header
-              Row(
+        child: Column(
+          children: [
+            // Handle bar and header
+            Container(
+              padding: EdgeInsets.all(20.0),
+              child: Column(
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
+                    width: 40.0,
+                    height: 4.0,
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF667eea), Color(0xFF764ba2)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(20.0),
-                    ),
-                    child: Text(
-                      'Word of the Day',
-                      style: FlutterFlowTheme.of(context).bodySmall.override(
-                        fontFamily: FlutterFlowTheme.of(context).bodySmallFamily,
-                        color: Colors.white,
-                        fontSize: 12.0,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.0,
-                        useGoogleFonts: GoogleFonts.asMap()
-                            .containsKey(FlutterFlowTheme.of(context).bodySmallFamily),
-                      ),
+                      color: FlutterFlowTheme.of(context).secondaryText.withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(2.0),
                     ),
                   ),
-                  const Spacer(),
-                  Text(
-                    '${DateTime.now().day} ${_getMonthName(DateTime.now().month)}',
-                    style: FlutterFlowTheme.of(context).bodyMedium.override(
-                      fontFamily: FlutterFlowTheme.of(context).bodyMediumFamily,
-                      color: FlutterFlowTheme.of(context).secondaryText,
-                      letterSpacing: 0.0,
-                      useGoogleFonts: GoogleFonts.asMap()
-                          .containsKey(FlutterFlowTheme.of(context).bodyMediumFamily),
-                    ),
-                  ),
-                ],
-              ),
-              
-              const SizedBox(height: 24.0),
-              
-              // Word display
-              Center(
-                child: Container(
-                  width: 150.0,
-                  height: 150.0,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF667eea), Color(0xFF764ba2)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(20.0),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF667eea).withOpacity(0.3),
-                        offset: const Offset(0, 8),
-                        blurRadius: 20.0,
+                  SizedBox(height: 20.0),
+                  Row(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [Color(0xFF667eea), Color(0xFF764ba2)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(16.0),
+                        ),
+                        child: Text(
+                          'Word of the Day',
+                          style: FlutterFlowTheme.of(context).labelMedium.override(
+                            fontFamily: FlutterFlowTheme.of(context).labelMediumFamily,
+                            color: Colors.white,
+                            letterSpacing: 0.0,
+                            fontWeight: FontWeight.w500,
+                            useGoogleFonts: GoogleFonts.asMap()
+                                .containsKey(FlutterFlowTheme.of(context).labelMediumFamily),
+                          ),
+                        ),
+                      ),
+                      Spacer(),
+                      IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: Icon(
+                          Icons.close,
+                          color: FlutterFlowTheme.of(context).secondaryText,
+                        ),
                       ),
                     ],
                   ),
-                  child: const Icon(
-                    Icons.sign_language,
-                    color: Colors.white,
-                    size: 80.0,
-                  ),
-                ),
-              ),
-              
-              const SizedBox(height: 24.0),
-              
-              // Word details
-              Center(
-                child: Text(
-                  _model.wordOfTheDay?.word ?? 'Hello',
-                  style: FlutterFlowTheme.of(context).displaySmall.override(
-                    fontFamily: FlutterFlowTheme.of(context).displaySmallFamily,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.0,
-                    useGoogleFonts: GoogleFonts.asMap()
-                        .containsKey(FlutterFlowTheme.of(context).displaySmallFamily),
-                  ),
-                ),
-              ),
-              
-              const SizedBox(height: 12.0),
-              
-              Center(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                  decoration: BoxDecoration(
-                    color: FlutterFlowTheme.of(context).primary.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(20.0),
-                  ),
-                  child: Text(
-                    _model.wordOfTheDay?.category ?? 'Greetings',
-                    style: FlutterFlowTheme.of(context).bodyMedium.override(
-                      fontFamily: FlutterFlowTheme.of(context).bodyMediumFamily,
-                      color: FlutterFlowTheme.of(context).primary,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.0,
-                      useGoogleFonts: GoogleFonts.asMap()
-                          .containsKey(FlutterFlowTheme.of(context).bodyMediumFamily),
-                    ),
-                  ),
-                ),
-              ),
-              
-              const SizedBox(height: 20.0),
-              
-              // Meaning
-              Text(
-                'Meaning',
-                style: FlutterFlowTheme.of(context).titleMedium.override(
-                  fontFamily: FlutterFlowTheme.of(context).titleMediumFamily,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.0,
-                  useGoogleFonts: GoogleFonts.asMap()
-                      .containsKey(FlutterFlowTheme.of(context).titleMediumFamily),
-                ),
-              ),
-              
-              const SizedBox(height: 8.0),
-              
-              Text(
-                _model.wordOfTheDay?.meaning ?? 'A greeting used when meeting someone for the first time or when acknowledging their presence.',
-                style: FlutterFlowTheme.of(context).bodyMedium.override(
-                  fontFamily: FlutterFlowTheme.of(context).bodyMediumFamily,
-                  color: FlutterFlowTheme.of(context).secondaryText,
-                  letterSpacing: 0.0,
-                  useGoogleFonts: GoogleFonts.asMap()
-                      .containsKey(FlutterFlowTheme.of(context).bodyMediumFamily),
-                ),
-              ),
-              
-              const Spacer(),
-              
-              // Action buttons
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        // Play sign video
-                      },
-                      icon: const Icon(Icons.play_arrow, size: 20.0),
-                      label: const Text('Watch Sign'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: FlutterFlowTheme.of(context).primary,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16.0),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12.0),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12.0),
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () {
-                        // Add to favorites
-                        _model.toggleFavoriteWordOfTheDay();
-                        Navigator.pop(context);
-                      },
-                      icon: Icon(
-                        _model.wordOfTheDay?.isFavorite == true 
-                          ? Icons.favorite 
-                          : Icons.favorite_border,
-                        size: 20.0,
-                      ),
-                      label: const Text('Favorite'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: FlutterFlowTheme.of(context).primary,
-                        side: BorderSide(color: FlutterFlowTheme.of(context).primary),
-                        padding: const EdgeInsets.symmetric(vertical: 16.0),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12.0),
-                        ),
-                      ),
-                    ),
-                  ),
                 ],
               ),
-            ],
+            ),
+            
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    // Main word display with animation container
+                    Center(
+                      child: Container(
+                        width: 200.0,
+                        height: 200.0,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [Color(0xFF667eea), Color(0xFF764ba2)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(24.0),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color(0xFF667eea).withOpacity(0.4),
+                              offset: Offset(0, 12),
+                              blurRadius: 24.0,
+                            ),
+                          ],
+                        ),
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.waving_hand,
+                                color: Colors.white,
+                                size: 64.0,
+                              ),
+                              SizedBox(height: 8.0),
+                              Text(
+                                'ISL',
+                                style: FlutterFlowTheme.of(context).titleMedium.override(
+                                  fontFamily: FlutterFlowTheme.of(context).titleMediumFamily,
+                                  color: Colors.white,
+                                  letterSpacing: 0.0,
+                                  fontWeight: FontWeight.bold,
+                                  useGoogleFonts: GoogleFonts.asMap()
+                                      .containsKey(FlutterFlowTheme.of(context).titleMediumFamily),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    
+                    SizedBox(height: 32.0),
+                    
+                    // Word details
+                    Center(
+                      child: Column(
+                        children: [
+                          Text(
+                            _model.wordOfTheDay?.word ?? 'Hello',
+                            style: FlutterFlowTheme.of(context).displayMedium.override(
+                              fontFamily: FlutterFlowTheme.of(context).displayMediumFamily,
+                              fontSize: 48.0,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.0,
+                              useGoogleFonts: GoogleFonts.asMap()
+                                  .containsKey(FlutterFlowTheme.of(context).displayMediumFamily),
+                            ),
+                          ),
+                          SizedBox(height: 12.0),
+                          Container(
+                            padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
+                            decoration: BoxDecoration(
+                              color: FlutterFlowTheme.of(context).primary.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(20.0),
+                              border: Border.all(
+                                color: FlutterFlowTheme.of(context).primary.withOpacity(0.3),
+                                width: 1.0,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.category,
+                                  color: FlutterFlowTheme.of(context).primary,
+                                  size: 16.0,
+                                ),
+                                SizedBox(width: 6.0),
+                                Text(
+                                  _model.wordOfTheDay?.category ?? 'Greetings',
+                                  style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                    fontFamily: FlutterFlowTheme.of(context).bodyMediumFamily,
+                                    color: FlutterFlowTheme.of(context).primary,
+                                    letterSpacing: 0.0,
+                                    fontWeight: FontWeight.w500,
+                                    useGoogleFonts: GoogleFonts.asMap()
+                                        .containsKey(FlutterFlowTheme.of(context).bodyMediumFamily),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    
+                    SizedBox(height: 32.0),
+                    
+                    // Meaning section
+                    Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.all(20.0),
+                      margin: EdgeInsets.symmetric(horizontal: 20.0),
+                      decoration: BoxDecoration(
+                        color: FlutterFlowTheme.of(context).primaryBackground,
+                        borderRadius: BorderRadius.circular(16.0),
+                        border: Border.all(
+                          color: FlutterFlowTheme.of(context).alternate,
+                          width: 1.0,
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.lightbulb_outline,
+                                color: FlutterFlowTheme.of(context).primary,
+                                size: 20.0,
+                              ),
+                              SizedBox(width: 8.0),
+                              Text(
+                                'Meaning',
+                                style: FlutterFlowTheme.of(context).titleMedium.override(
+                                  fontFamily: FlutterFlowTheme.of(context).titleMediumFamily,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 0.0,
+                                  useGoogleFonts: GoogleFonts.asMap()
+                                      .containsKey(FlutterFlowTheme.of(context).titleMediumFamily),
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 12.0),
+                          Text(
+                            _model.wordOfTheDay?.description ?? 'A greeting sign used to acknowledge someone',
+                            style: FlutterFlowTheme.of(context).bodyMedium.override(
+                              fontFamily: FlutterFlowTheme.of(context).bodyMediumFamily,
+                              letterSpacing: 0.0,
+                              lineHeight: 1.5,
+                              useGoogleFonts: GoogleFonts.asMap()
+                                  .containsKey(FlutterFlowTheme.of(context).bodyMediumFamily),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    
+                    SizedBox(height: 24.0),
+                    
+                    // Action buttons
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 20.0),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: () {
+                                Navigator.pop(context);
+                                _model.markSignAsLearned(_model.wordOfTheDay?.id ?? '');
+                                safeSetState(() {});
+                              },
+                              icon: Icon(Icons.play_arrow),
+                              label: Text('Practice Now'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: FlutterFlowTheme.of(context).primary,
+                                foregroundColor: Colors.white,
+                                padding: EdgeInsets.symmetric(vertical: 16.0),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12.0),
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 12.0),
+                          Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: FlutterFlowTheme.of(context).alternate,
+                                width: 1.0,
+                              ),
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                            child: IconButton(
+                              onPressed: () {
+                                _model.toggleFavorite(_model.wordOfTheDay?.id ?? '');
+                                safeSetState(() {});
+                              },
+                              icon: Icon(
+                                _model.wordOfTheDay?.isFavorite ?? false
+                                    ? Icons.favorite
+                                    : Icons.favorite_border,
+                                color: Colors.red,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    
+                    SizedBox(height: 20.0),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showDriveVideoBottomSheet(dynamic video) {
+    // Initialize video when modal opens
+    if (video?.name != null) {
+      final wordName = _model.extractWordFromVideoName(video.name);
+      
+      // Use improved initialization with fallback
+      _model.initializeVideoWithFallback(wordName);
+    }
+    
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setModalState) => Container(
+          height: MediaQuery.of(context).size.height * 0.7,
+          decoration: BoxDecoration(
+            color: FlutterFlowTheme.of(context).secondaryBackground,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20.0),
+              topRight: Radius.circular(20.0),
+            ),
           ),
+          child: Padding(
+            padding: EdgeInsets.all(20.0),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      _model.extractWordFromVideoName(video?.name ?? 'Video'),
+                      style: FlutterFlowTheme.of(context).headlineSmall,
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        _model.disposeVideo();
+                        Navigator.pop(context);
+                      },
+                      icon: Icon(Icons.close),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 16.0),
+                Expanded(
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Color(0xFF4285F4), Color(0xFF34A853)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(16.0),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16.0),
+                      child: Stack(
+                        children: [
+                          // Video player or placeholder
+                          if (_model.isVideoInitialized && _model.videoController != null)
+                            Center(
+                              child: AspectRatio(
+                                aspectRatio: _model.videoController!.value.aspectRatio,
+                                child: VideoPlayer(_model.videoController!),
+                              ),
+                            )
+                          else if (_model.isVideoLoading())
+                            Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  CircularProgressIndicator(
+                                    color: Colors.white,
+                                  ),
+                                  SizedBox(height: 16.0),
+                                  Text(
+                                    'Loading video...',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16.0,
+                                    ),
+                                  ),
+                                  if (kDebugMode)
+                                    Padding(
+                                      padding: EdgeInsets.only(top: 8.0),
+                                      child: Text(
+                                        'Using demo video for testing',
+                                        style: TextStyle(
+                                          color: Colors.white.withOpacity(0.8),
+                                          fontSize: 12.0,
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            )
+                          else
+                            // Fallback UI when video fails to load
+                            Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.all(20.0),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.3),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(
+                                      Icons.play_arrow,
+                                      size: 60.0,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  SizedBox(height: 16.0),
+                                  Text(
+                                    'Video not available locally',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16.0,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  SizedBox(height: 8.0),
+                                  Text(
+                                    'Tap to simulate playback',
+                                    style: TextStyle(
+                                      color: Colors.white.withOpacity(0.8),
+                                      fontSize: 14.0,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          
+                          // Play/Pause overlay button
+                          Positioned.fill(
+                            child: GestureDetector(
+                              onTap: () {
+                                if (_model.isVideoInitialized) {
+                                  _model.toggleVideoPlayback();
+                                  setModalState(() {});
+                                } else {
+                                  // Fallback: show snackbar for demo
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('Playing ${_model.extractWordFromVideoName(video?.name ?? '')} sign video...'),
+                                      backgroundColor: FlutterFlowTheme.of(context).primary,
+                                      duration: Duration(seconds: 2),
+                                    ),
+                                  );
+                                }
+                              },
+                              child: Container(
+                                color: Colors.transparent,
+                                child: _model.isVideoInitialized && !_model.isVideoPlaying
+                                    ? Center(
+                                        child: Container(
+                                          padding: EdgeInsets.all(16.0),
+                                          decoration: BoxDecoration(
+                                            color: Colors.black.withOpacity(0.5),
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: Icon(
+                                            Icons.play_arrow,
+                                            size: 40.0,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      )
+                                    : SizedBox.shrink(),
+                              ),
+                            ),
+                          ),
+                          
+                          // Video controls overlay
+                          if (_model.isVideoInitialized)
+                            Positioned(
+                              bottom: 16.0,
+                              left: 16.0,
+                              right: 16.0,
+                              child: Container(
+                                padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.7),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.videocam,
+                                      color: Colors.white,
+                                      size: 20.0,
+                                    ),
+                                    SizedBox(width: 8.0),
+                                    Expanded(
+                                      child: Text(
+                                        'ISL Sign Video',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 14.0,
+                                        ),
+                                      ),
+                                    ),
+                                    Text(
+                                      '${_model.getVideoPosition()} / ${_model.getVideoDuration()}',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12.0,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )
+                          else
+                            // Default controls for non-video content
+                            Positioned(
+                              bottom: 16.0,
+                              left: 16.0,
+                              right: 16.0,
+                              child: Container(
+                                padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.5),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.videocam,
+                                      color: Colors.white,
+                                      size: 20.0,
+                                    ),
+                                    SizedBox(width: 8.0),
+                                    Expanded(
+                                      child: Text(
+                                        'ISL Sign Video',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 14.0,
+                                        ),
+                                      ),
+                                    ),
+                                    Text(
+                                      '0:30',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12.0,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 16.0),
+                Text(
+                  _model.extractWordFromVideoName(video?.name ?? ''),
+                  style: FlutterFlowTheme.of(context).titleMedium.override(
+                    fontFamily: FlutterFlowTheme.of(context).titleMediumFamily,
+                    letterSpacing: 0.0,
+                    fontWeight: FontWeight.w600,
+                    useGoogleFonts: GoogleFonts.asMap()
+                        .containsKey(FlutterFlowTheme.of(context).titleMediumFamily),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 8.0),
+                SizedBox(height: 16.0),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          _model.markDriveVideoAsLearned(video);
+                          _model.disposeVideo();
+                          safeSetState(() {});
+                          // Show success message
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Added to learned signs! Daily task progress updated.'),
+                              backgroundColor: FlutterFlowTheme.of(context).primary,
+                            ),
+                          );
+                        },
+                        icon: Icon(Icons.check_circle, color: Colors.white),
+                        label: Text(
+                          'Mark as Learned',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFF34A853),
+                          padding: EdgeInsets.symmetric(vertical: 16.0),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _formatFileSize(int? size) {
+    if (size == null) return 'Unknown size';
+    if (size < 1024) return '${size}B';
+    if (size < 1024 * 1024) return '${(size / 1024).toStringAsFixed(1)}KB';
+    if (size < 1024 * 1024 * 1024) return '${(size / (1024 * 1024)).toStringAsFixed(1)}MB';
+    return '${(size / (1024 * 1024 * 1024)).toStringAsFixed(1)}GB';
+  }
+
+  String _formatDate(DateTime? date) {
+    if (date == null) return 'Unknown date';
+    return '${date.day}/${date.month}/${date.year}';
+  }
+
+  // Helper method to build category cards
+  Widget _buildCategoryCard({
+    required String title,
+    required String progress,
+    required IconData icon,
+    required Color backgroundColor,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 120.0,
+        padding: EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          borderRadius: BorderRadius.circular(16.0),
+          boxShadow: [
+            BoxShadow(
+              color: backgroundColor.withOpacity(0.3),
+              offset: Offset(0, 4),
+              blurRadius: 8.0,
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(
+              icon,
+              color: Colors.black.withOpacity(0.8),
+              size: 28.0,
+            ),
+            Spacer(),
+            Text(
+              title,
+              style: FlutterFlowTheme.of(context).titleSmall.override(
+                fontFamily: FlutterFlowTheme.of(context).titleSmallFamily,
+                color: Colors.black,
+                letterSpacing: 0.0,
+                fontWeight: FontWeight.w600,
+                useGoogleFonts: GoogleFonts.asMap()
+                    .containsKey(FlutterFlowTheme.of(context).titleSmallFamily),
+              ),
+            ),
+            SizedBox(height: 4.0),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(12.0),
+              ),
+              child: Text(
+                progress,
+                style: FlutterFlowTheme.of(context).bodySmall.override(
+                  fontFamily: FlutterFlowTheme.of(context).bodySmallFamily,
+                  color: Colors.black.withOpacity(0.8),
+                  letterSpacing: 0.0,
+                  fontSize: 11.0,
+                  fontWeight: FontWeight.w500,
+                  useGoogleFonts: GoogleFonts.asMap()
+                      .containsKey(FlutterFlowTheme.of(context).bodySmallFamily),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

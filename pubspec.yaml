@@ -143,10 +143,12 @@ dependencies:
   http_parser: ^4.0.2
   speech_to_text: 7.0.0
   xml: 6.5.0
+  dart_jsonwebtoken: ^3.2.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.0
+  http: ^1.2.2
 
   crypto: any
   http: any
