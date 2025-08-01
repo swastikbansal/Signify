@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Signigy-ISL Animation Viewer",
+  "name": "Signify-ISL Animation Viewer",
   "version": "1.0.0",
   "description": "View Indian Sign Language animations on any webpage",
   "permissions": [
@@ -14,7 +14,7 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["content.js"],
+      "js": ["three.min.js", "GLTFLoader.js", "OrbitControls.js", "content.js"],
       "css": ["styles.css"],
       "run_at": "document_end"
     }

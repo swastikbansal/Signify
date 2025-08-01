@@ -79,145 +79,35 @@ class ISLExtensionViewer {
     }
 
     async loadThreeJS() {
-        // Check if Three.js and its components are already loaded
-        if (window.THREE && window.THREE.GLTFLoader && window.THREE.OrbitControls) {
-            console.log('Three.js already loaded');
-            return;
+        // Since THREE.js files are now loaded via manifest.json, just verify they're available
+        console.log('Checking Three.js availability...');
+        
+        // Wait a bit for all scripts to load
+        let attempts = 0;
+        const maxAttempts = 50;
+        
+        while (attempts < maxAttempts) {
+            if (window.THREE && window.THREE.GLTFLoader && window.THREE.OrbitControls) {
+                console.log('Three.js libraries are available');
+                return;
+            }
+            
+            await new Promise(resolve => setTimeout(resolve, 100));
+            attempts++;
         }
-
-        const loadScript = (src) => {
-            return new Promise((resolve, reject) => {
-                // Remove any existing script with the same src
-                const existingScript = document.querySelector(`script[src="${src}"]`);
-                if (existingScript) {
-                    existingScript.remove();
-                }
-
-                const script = document.createElement('script');
-                script.src = src;
-                script.type = 'text/javascript';
-                script.async = false;
-                
-                script.onload = () => {
-                    console.log('Script loaded:', src);
-                    setTimeout(resolve, 100);
-                };
-                
-                script.onerror = (error) => {
-                    console.error('Script failed to load:', src, error);
-                    reject(new Error(`Failed to load script: ${src}`));
-                };
-                
-                document.head.appendChild(script);
-            });
-        };
-
-        try {
-            // Try multiple CDN sources for Three.js
-            const threeCDNs = [
-                'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
-                'https://unpkg.com/three@0.128.0/build/three.min.js',
-                'https://cdn.skypack.dev/three@0.128.0'
-            ];
-
-            // Load Three.js core first
-            if (!window.THREE) {
-                let threeLoaded = false;
-                for (const cdn of threeCDNs) {
-                    try {
-                        await loadScript(cdn);
-                        // Wait for THREE to be available
-                        for (let i = 0; i < 30; i++) {
-                            if (window.THREE) {
-                                threeLoaded = true;
-                                break;
-                            }
-                            await new Promise(resolve => setTimeout(resolve, 100));
-                        }
-                        if (threeLoaded) break;
-                    } catch (error) {
-                        console.warn(`Failed to load Three.js from ${cdn}, trying next...`);
-                        continue;
-                    }
-                }
-                
-                if (!window.THREE) {
-                    throw new Error('Failed to load THREE.js from all CDN sources');
-                }
-            }
-            
-            // Load GLTFLoader
-            if (!window.THREE.GLTFLoader) {
-                const gltfCDNs = [
-                    'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js',
-                    'https://unpkg.com/three@0.128.0/examples/js/loaders/GLTFLoader.js'
-                ];
-                
-                let gltfLoaded = false;
-                for (const cdn of gltfCDNs) {
-                    try {
-                        await loadScript(cdn);
-                        // Wait for GLTFLoader to be available
-                        for (let i = 0; i < 30; i++) {
-                            if (window.THREE.GLTFLoader) {
-                                gltfLoaded = true;
-                                break;
-                            }
-                            await new Promise(resolve => setTimeout(resolve, 100));
-                        }
-                        if (gltfLoaded) break;
-                    } catch (error) {
-                        console.warn(`Failed to load GLTFLoader from ${cdn}, trying next...`);
-                        continue;
-                    }
-                }
-            }
-            
-            // Load OrbitControls
-            if (!window.THREE.OrbitControls) {
-                const controlsCDNs = [
-                    'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js',
-                    'https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js'
-                ];
-                
-                let controlsLoaded = false;
-                for (const cdn of controlsCDNs) {
-                    try {
-                        await loadScript(cdn);
-                        // Wait for OrbitControls to be available
-                        for (let i = 0; i < 30; i++) {
-                            if (window.THREE.OrbitControls) {
-                                controlsLoaded = true;
-                                break;
-                            }
-                            await new Promise(resolve => setTimeout(resolve, 100));
-                        }
-                        if (controlsLoaded) break;
-                    } catch (error) {
-                        console.warn(`Failed to load OrbitControls from ${cdn}, trying next...`);
-                        continue;
-                    }
-                }
-            }
-            
-            // Final verification with detailed logging
-            console.log('Three.js loading check:', {
-                THREE: !!window.THREE,
-                GLTFLoader: !!window.THREE?.GLTFLoader,
-                OrbitControls: !!window.THREE?.OrbitControls,
-                GLTFLoaderType: typeof window.THREE?.GLTFLoader,
-                OrbitControlsType: typeof window.THREE?.OrbitControls
-            });
-            
-            if (!window.THREE || !window.THREE.GLTFLoader || !window.THREE.OrbitControls) {
-                throw new Error('Some Three.js components failed to load properly.');
-            }
-            
-            console.log('Three.js libraries loaded successfully');
-        } catch (error) {
-            console.error('Error loading Three.js libraries:', error);
-            throw error;
+        
+        // Final check with detailed logging
+        console.log('Three.js availability check:', {
+            THREE: !!window.THREE,
+            GLTFLoader: !!window.THREE?.GLTFLoader,
+            OrbitControls: !!window.THREE?.OrbitControls
+        });
+        
+        if (!window.THREE || !window.THREE.GLTFLoader || !window.THREE.OrbitControls) {
+            throw new Error('Three.js components are not available. Make sure all scripts are loaded via manifest.json');
         }
+        
+        console.log('Three.js libraries loaded successfully');
     }
 
     async initThreeJS() {
