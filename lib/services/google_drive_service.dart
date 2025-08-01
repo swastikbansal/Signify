@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'google_drive_config.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class GoogleDriveVideo {
   final String id;
@@ -155,7 +154,7 @@ class GoogleDriveService {
         'iss': serviceAccount['client_email'],
         'scope': 'https://www.googleapis.com/auth/drive.readonly',
         'aud': 'https://oauth2.googleapis.com/token',
-        'exp': DateTime.now().add(Duration(hours: 1)).millisecondsSinceEpoch ~/ 1000,
+        'exp': DateTime.now().add(const Duration(hours: 1)).millisecondsSinceEpoch ~/ 1000,
         'iat': DateTime.now().millisecondsSinceEpoch ~/ 1000,
       });
 
@@ -203,18 +202,18 @@ class GoogleDriveService {
       }
       
       // If we have a target folder, search in it and its subfolders
-      if (GoogleDriveConfig.targetFolderId != null && GoogleDriveConfig.targetFolderId!.isNotEmpty) {
+      if (GoogleDriveConfig.targetFolderId.isNotEmpty) {
         if (kDebugMode) {
           print('🎯 Target folder configured: ${GoogleDriveConfig.targetFolderId}');
         }
         
         // First, verify the folder exists and is accessible
-        if (await _verifyFolderAccess(GoogleDriveConfig.targetFolderId!, accessToken)) {
+        if (await _verifyFolderAccess(GoogleDriveConfig.targetFolderId, accessToken)) {
           if (kDebugMode) {
             print('✅ Target folder verified, searching within it...');
           }
           // Search directly in the folder first (since user mentioned no subfolders)
-          return await _searchInFolderDirectly(query, GoogleDriveConfig.targetFolderId!, accessToken);
+          return await _searchInFolderDirectly(query, GoogleDriveConfig.targetFolderId, accessToken);
         } else {
           if (kDebugMode) {
             print('⚠️ Target folder not accessible, falling back to global search');

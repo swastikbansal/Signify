@@ -3,11 +3,6 @@ import '/flutter_flow/flutter_flow_util.dart';
 import 'isl_dict_widget.dart' show IslDictWidget;
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 import '/services/google_drive_service.dart';
 import '/services/google_drive_config.dart';
@@ -136,7 +131,7 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
   void initState(BuildContext context) {
     debugLogWidgetClass(this);
     _initializeData();
-    
+
     // Test Google Drive configuration
     if (kDebugMode) {
       GoogleDriveService.testConfiguration();
@@ -153,23 +148,20 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
   // Required override methods for FlutterFlowModel
   @override
   WidgetClassDebugData toWidgetClassDebugData() => WidgetClassDebugData(
-    widgetParameters: debugGeneratorVariables,
-    backendQueries: debugBackendQueries,
-    componentStates: widgetBuilderComponents.map(
-      (key, value) => MapEntry(key, value.toWidgetClassDebugData()),
-    ),
-  );
+        widgetParameters: debugGeneratorVariables,
+        backendQueries: debugBackendQueries,
+        componentStates: widgetBuilderComponents.map(
+          (key, value) => MapEntry(key, value.toWidgetClassDebugData()),
+        ),
+      );
 
-  @override
-  Map<String, FlutterFlowModel> get widgetBuilderComponents => 
+  Map<String, FlutterFlowModel> get widgetBuilderComponents =>
       <String, FlutterFlowModel>{};
 
-  @override
-  Map<String, DebugDataField> get debugGeneratorVariables => 
+  Map<String, DebugDataField> get debugGeneratorVariables =>
       <String, DebugDataField>{};
 
-  @override
-  Map<String, DebugDataField> get debugBackendQueries => 
+  Map<String, DebugDataField> get debugBackendQueries =>
       <String, DebugDataField>{};
 
   // Initialize mock data (replace with actual backend calls)
@@ -361,7 +353,8 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
 
   void _initializeRecentlyViewed() {
     // Get recently viewed signs (from local storage or backend)
-    recentlyViewedSigns = allSigns.where((sign) => sign.viewCount > 0).take(4).toList();
+    recentlyViewedSigns =
+        allSigns.where((sign) => sign.viewCount > 0).take(4).toList();
   }
 
   void _initializeWordOfTheDay() {
@@ -369,7 +362,8 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
     wordOfTheDay = WordOfTheDay(
       id: 'wotd_happy',
       word: 'Happy',
-      description: 'A feeling of joy, pleasure, or contentment. Used to express positive emotions.',
+      description:
+          'A feeling of joy, pleasure, or contentment. Used to express positive emotions.',
       category: 'Emotions',
       videoUrl: 'assets/videos/happy.mp4',
       imageUrl: 'assets/images/happy.png',
@@ -381,18 +375,24 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
   // Enhanced search functionality with Google Drive integration
   Future<void> searchSigns(String query) async {
     if (query.isEmpty) {
-      filteredSigns = selectedCategory == 'all' 
-          ? List.from(allSigns) 
-          : allSigns.where((sign) => sign.category == selectedCategory).toList();
+      filteredSigns = selectedCategory == 'all'
+          ? List.from(allSigns)
+          : allSigns
+              .where((sign) => sign.category == selectedCategory)
+              .toList();
       driveVideos.clear();
       driveSearchError = null;
     } else {
       // Search local signs
       filteredSigns = allSigns.where((sign) {
-        final matchesQuery = sign.word.toLowerCase().contains(query.toLowerCase()) ||
-                           sign.description.toLowerCase().contains(query.toLowerCase()) ||
-                           sign.tags.any((tag) => tag.toLowerCase().contains(query.toLowerCase()));
-        final matchesCategory = selectedCategory == 'all' || sign.category == selectedCategory;
+        final matchesQuery = sign.word
+                .toLowerCase()
+                .contains(query.toLowerCase()) ||
+            sign.description.toLowerCase().contains(query.toLowerCase()) ||
+            sign.tags
+                .any((tag) => tag.toLowerCase().contains(query.toLowerCase()));
+        final matchesCategory =
+            selectedCategory == 'all' || sign.category == selectedCategory;
         return matchesQuery && matchesCategory;
       }).toList();
 
@@ -409,7 +409,7 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
       print(' Google Drive configured: ${GoogleDriveService.isConfigured()}');
       GoogleDriveService.testConfiguration();
     }
-    
+
     if (!GoogleDriveService.isConfigured()) {
       driveSearchError = 'Google Drive not configured';
       if (kDebugMode) {
@@ -420,7 +420,7 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
 
     isLoadingDriveVideos = true;
     driveSearchError = null;
-    
+
     try {
       if (kDebugMode) {
         print('📡 Calling GoogleDriveService.searchVideos...');
@@ -451,23 +451,24 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
     if (kDebugMode) {
       print('🧪 Testing Google Drive access...');
     }
-    
+
     if (!GoogleDriveService.isConfigured()) {
       if (kDebugMode) {
         print('❌ Google Drive not configured');
       }
       return;
     }
-    
+
     try {
       // Test with a simple search for any video files
       final testResults = await GoogleDriveService.searchVideos('');
       if (kDebugMode) {
-        print('✅ Google Drive test successful. Found ${testResults.length} total videos');
+        print(
+            '✅ Google Drive test successful. Found ${testResults.length} total videos');
         for (var video in testResults.take(5)) {
           print('📹 Sample video: ${video.name}');
         }
-        
+
         // Test specifically for 'happy'
         final happyResults = await GoogleDriveService.searchVideos('happy');
         print('🔍 Search for "happy": ${happyResults.length} results');
@@ -488,29 +489,29 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
       print('🧪 MANUAL TEST: Starting Google Drive access test...');
       print('📂 Target folder ID: ${GoogleDriveConfig.targetFolderId}');
     }
-    
+
     try {
       // Test basic configuration
       GoogleDriveService.testConfiguration();
-      
+
       // Test if service is configured
       final isConfigured = GoogleDriveService.isConfigured();
       if (kDebugMode) {
         print('🔧 Is configured: $isConfigured');
       }
-      
+
       if (!isConfigured) {
         if (kDebugMode) {
           print('❌ Service not configured, aborting test');
         }
         return;
       }
-      
+
       // Test search for any videos
       if (kDebugMode) {
         print('🔍 Testing search for any videos...');
       }
-      
+
       final allVideos = await GoogleDriveService.searchVideos('');
       if (kDebugMode) {
         print('📹 Found ${allVideos.length} total videos');
@@ -518,12 +519,12 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
           print('  - ${video.name} (${video.id})');
         }
       }
-      
+
       // Test search for specific word
       if (kDebugMode) {
         print('🔍 Testing search for "happy"...');
       }
-      
+
       final happyVideos = await GoogleDriveService.searchVideos('happy');
       if (kDebugMode) {
         print('😊 Found ${happyVideos.length} videos for "happy"');
@@ -531,15 +532,14 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
           print('  - ${video.name} (${video.id})');
         }
       }
-      
+
       // Update the UI with results
       driveVideos = happyVideos;
       driveSearchError = null;
-      
+
       if (kDebugMode) {
         print('✅ Manual test completed successfully');
       }
-      
     } catch (e) {
       if (kDebugMode) {
         print('❌ Manual test failed: $e');
@@ -563,7 +563,7 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
     final totalResults = getTotalSearchResults();
     final localCount = filteredSigns.length;
     final driveCount = driveVideos.length;
-    
+
     if (kDebugMode) {
       print('🔍 Search Status Debug:');
       print('  - Local signs: $localCount');
@@ -572,24 +572,24 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
       print('  - Drive search error: $driveSearchError');
       print('  - Is loading Drive videos: $isLoadingDriveVideos');
     }
-    
+
     if (totalResults == 0) {
       if (driveSearchError != null) {
         return 'No results found. Drive error: $driveSearchError';
       }
       return 'No results found. Try different keywords.';
     }
-    
+
     String message = '';
     if (localCount > 0) {
       message += 'Found $localCount local sign${localCount == 1 ? '' : 's'}';
     }
-    
+
     if (driveCount > 0) {
       if (message.isNotEmpty) message += ' and ';
       message += '$driveCount Drive video${driveCount == 1 ? '' : 's'}';
     }
-    
+
     // DEBUG: Force check what isConfigured returns
     final isConfigured = GoogleDriveService.isConfigured();
     if (kDebugMode) {
@@ -597,20 +597,21 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
       print('🔍 DEBUG: driveCount: $driveCount');
       print('🔍 DEBUG: driveSearchError: $driveSearchError');
     }
-    
+
     // Check if Google Drive is configured
     if (!isConfigured) {
       if (driveCount > 0) {
-        message += ' (Demo mode - configure real Google Drive API for actual results)';
+        message +=
+            ' (Demo mode - configure real Google Drive API for actual results)';
       } else if (localCount == 0) {
         message = 'No local results found. Google Drive not configured.';
       }
     }
-    
+
     if (driveSearchError != null && driveSearchError!.isNotEmpty) {
       message += ' (Drive search error: $driveSearchError)';
     }
-    
+
     return message;
   }
 
@@ -626,7 +627,7 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
     // Filter signs that start with the specific letter
     filteredSigns = allSigns.where((sign) {
       return sign.word.toLowerCase().startsWith(letter.toLowerCase()) ||
-             sign.category.toLowerCase() == 'alphabets';
+          sign.category.toLowerCase() == 'alphabets';
     }).toList();
   }
 
@@ -636,8 +637,8 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
     // Filter signs related to the specific number
     filteredSigns = allSigns.where((sign) {
       return sign.word.contains(number) ||
-             sign.category.toLowerCase() == 'numbers' ||
-             sign.tags.any((tag) => tag.contains(number));
+          sign.category.toLowerCase() == 'numbers' ||
+          sign.tags.any((tag) => tag.contains(number));
     }).toList();
   }
 
@@ -669,17 +670,19 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
         viewCount: currentSign.viewCount,
         isFavorite: !currentSign.isFavorite,
       );
-      
+
       allSigns[signIndex] = updatedSign;
-      
+
       // Update filtered signs if it contains this sign
-      final filteredIndex = filteredSigns.indexWhere((sign) => sign.id == signId);
+      final filteredIndex =
+          filteredSigns.indexWhere((sign) => sign.id == signId);
       if (filteredIndex != -1) {
         filteredSigns[filteredIndex] = updatedSign;
       }
-      
+
       // Update recently viewed if it contains this sign
-      final recentIndex = recentlyViewedSigns.indexWhere((sign) => sign.id == signId);
+      final recentIndex =
+          recentlyViewedSigns.indexWhere((sign) => sign.id == signId);
       if (recentIndex != -1) {
         recentlyViewedSigns[recentIndex] = updatedSign;
       }
@@ -697,10 +700,11 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
         streakDays: dailyTask!.streakDays,
         isCompleted: dailyTask!.learnedToday + 1 >= dailyTask!.targetSigns,
         targetSigns: dailyTask!.targetSigns,
-        learnedToday: (dailyTask!.learnedToday + 1).clamp(0, dailyTask!.targetSigns),
+        learnedToday:
+            (dailyTask!.learnedToday + 1).clamp(0, dailyTask!.targetSigns),
       );
     }
-    
+
     // Mark the sign as learned (you could add a learned property to ISLSign in the future)
     // For now, we'll just increment the view count to show it's been interacted with
     final signIndex = allSigns.indexWhere((sign) => sign.id == signId);
@@ -719,17 +723,19 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
         viewCount: currentSign.viewCount + 1,
         isFavorite: currentSign.isFavorite,
       );
-      
+
       allSigns[signIndex] = updatedSign;
-      
+
       // Update filtered signs if it contains this sign
-      final filteredIndex = filteredSigns.indexWhere((sign) => sign.id == signId);
+      final filteredIndex =
+          filteredSigns.indexWhere((sign) => sign.id == signId);
       if (filteredIndex != -1) {
         filteredSigns[filteredIndex] = updatedSign;
       }
-      
+
       // Update recently viewed if it contains this sign
-      final recentIndex = recentlyViewedSigns.indexWhere((sign) => sign.id == signId);
+      final recentIndex =
+          recentlyViewedSigns.indexWhere((sign) => sign.id == signId);
       if (recentIndex != -1) {
         recentlyViewedSigns[recentIndex] = updatedSign;
       }
@@ -744,13 +750,15 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
   // Get progress for category
   double getCategoryProgress(String categoryId) {
     final category = categories.firstWhere((cat) => cat.id == categoryId);
-    return category.signCount > 0 ? category.learnedCount / category.signCount : 0.0;
+    return category.signCount > 0
+        ? category.learnedCount / category.signCount
+        : 0.0;
   }
 
   // Get daily task progress
   double getDailyTaskProgress() {
-    return dailyTask != null && dailyTask!.targetSigns > 0 
-        ? (dailyTask!.learnedToday / dailyTask!.targetSigns).clamp(0.0, 1.0) 
+    return dailyTask != null && dailyTask!.targetSigns > 0
+        ? (dailyTask!.learnedToday / dailyTask!.targetSigns).clamp(0.0, 1.0)
         : 0.0;
   }
 
@@ -792,7 +800,7 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
     if (wordOfTheDay != null) {
       // Mark as learned and update daily task progress
       markSignAsLearned(wordOfTheDay!.id);
-      
+
       // Update word of the day status
       wordOfTheDay = WordOfTheDay(
         id: wordOfTheDay!.id,
@@ -870,12 +878,16 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
   // Extract word from video name (helper method)
   String extractWordFromVideoName(String videoName) {
     // Remove file extension and clean up the name
-    String cleanName = videoName.replaceAll(RegExp(r'\.(mp4|avi|mov|wmv)$'), '');
+    String cleanName =
+        videoName.replaceAll(RegExp(r'\.(mp4|avi|mov|wmv)$'), '');
     // Replace underscores/dashes with spaces and capitalize
     cleanName = cleanName.replaceAll(RegExp(r'[_\-]'), ' ');
-    return cleanName.split(' ').map((word) => 
-      word.isNotEmpty ? word[0].toUpperCase() + word.substring(1).toLowerCase() : ''
-    ).join(' ');
+    return cleanName
+        .split(' ')
+        .map((word) => word.isNotEmpty
+            ? word[0].toUpperCase() + word.substring(1).toLowerCase()
+            : '')
+        .join(' ');
   }
 
   // Video player methods
@@ -889,7 +901,7 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
       if (kDebugMode) {
         print('🎬 Attempting to initialize video: $videoUrl');
       }
-      
+
       // Check if it's a local asset or network URL
       if (videoUrl.startsWith('assets/')) {
         videoController = VideoPlayerController.asset(videoUrl);
@@ -900,14 +912,15 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
       await videoController!.initialize();
       isVideoInitialized = true;
       isVideoPlaying = false;
-      
+
       // Listen to video completion
       videoController!.addListener(() {
-        if (videoController!.value.position >= videoController!.value.duration) {
+        if (videoController!.value.position >=
+            videoController!.value.duration) {
           isVideoPlaying = false;
         }
       });
-      
+
       if (kDebugMode) {
         print('✅ Video initialized successfully: $videoUrl');
         print('📱 Video duration: ${videoController!.value.duration}');
@@ -918,10 +931,11 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
       isVideoPlaying = false;
       if (kDebugMode) {
         print('❌ Failed to initialize video: $e');
-        print('💡 This is normal if video assets are not yet added to the project');
+        print(
+            '💡 This is normal if video assets are not yet added to the project');
         print('💡 Video files should be placed in: assets/videos/');
       }
-      
+
       // Clean up the controller since initialization failed
       if (videoController != null) {
         try {
@@ -954,40 +968,42 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
     if (kDebugMode) {
       print('🔍 Looking for video: $videoName');
     }
-    
+
     // Step 1: Try to find the video in Google Drive first (since user is authenticated)
     if (GoogleDriveService.isConfigured()) {
       try {
         if (kDebugMode) {
           print('� Searching Google Drive for: $videoName');
         }
-        
+
         // Search for the specific video in Google Drive
         final driveResults = await GoogleDriveService.searchVideos(videoName);
-        
+
         if (driveResults.isNotEmpty) {
           // Find the best match (exact word match preferred)
           GoogleDriveVideo? bestMatch;
-          
+
           // Look for exact match first
           for (final video in driveResults) {
-            final videoWord = extractWordFromVideoName(video.name).toLowerCase();
+            final videoWord =
+                extractWordFromVideoName(video.name).toLowerCase();
             if (videoWord == videoName.toLowerCase()) {
               bestMatch = video;
               break;
             }
           }
-          
+
           // If no exact match, use the first result
           bestMatch ??= driveResults.first;
-          
+
           if (kDebugMode) {
             print('✅ Found Google Drive video: ${bestMatch.name}');
             print('🎬 Drive video URL: ${bestMatch.webViewLink}');
           }
-          
+
           // Get the direct video URL for streaming
-          final streamUrl = await GoogleDriveService.getVideoStreamUrl(bestMatch.id);
+          final streamUrl =
+              await GoogleDriveService.getVideoStreamUrl(bestMatch.id);
           if (streamUrl != null) {
             await initializeVideo(streamUrl);
             if (isVideoInitialized) {
@@ -998,7 +1014,7 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
             }
           }
         }
-        
+
         if (kDebugMode) {
           print('⚠️ No matching video found in Google Drive for: $videoName');
         }
@@ -1008,22 +1024,23 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
         }
       }
     }
-    
+
     // Step 2: Try local asset as fallback
     String localAssetPath = 'assets/videos/${videoName.toLowerCase()}.mp4';
-    
+
     if (kDebugMode) {
       print('🔍 Checking for local video asset: $localAssetPath');
     }
-    
+
     await initializeVideo(localAssetPath);
-    
+
     // Step 3: If both failed, show appropriate message
     if (!isVideoInitialized) {
       if (kDebugMode) {
         print('💡 No video found for: $videoName');
         print('📝 Checked: Google Drive and local assets');
-        print('📝 To add videos: Upload to Google Drive or place in assets/videos/');
+        print(
+            '📝 To add videos: Upload to Google Drive or place in assets/videos/');
       }
     }
   }
@@ -1072,7 +1089,7 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
       final duration = videoController!.value.duration;
       final minutes = duration.inMinutes;
       final seconds = duration.inSeconds % 60;
-      return '${minutes}:${seconds.toString().padLeft(2, '0')}';
+      return '$minutes:${seconds.toString().padLeft(2, '0')}';
     }
     return '0:30'; // Default fallback
   }
@@ -1083,7 +1100,7 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
       final position = videoController!.value.position;
       final minutes = position.inMinutes;
       final seconds = position.inSeconds % 60;
-      return '${minutes}:${seconds.toString().padLeft(2, '0')}';
+      return '$minutes:${seconds.toString().padLeft(2, '0')}';
     }
     return '0:00';
   }

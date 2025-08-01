@@ -22,7 +22,7 @@ class GoogleDriveConfig {
 
   // Optional: Specify a specific folder ID in Google Drive to search within
   // If empty, it will search all accessible files
-  static const String? targetFolderId = '1AX-cUvTzVOpIhQmkUQyXwFCX67vWm_wU'; // ISL Dictionary folder
+  static const String targetFolderId = '1AX-cUvTzVOpIhQmkUQyXwFCX67vWm_wU'; // ISL Dictionary folder
   // static const String? targetFolderId = null; // Temporarily disabled to test global search
 
   

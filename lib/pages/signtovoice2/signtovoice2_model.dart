@@ -107,7 +107,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   // API related state
   String _apiUrl =
       // 'http://192.168.29.42:5000/predict';
-      'http://10.187.170.248:5000/process_frame';
+      'http://192.168.42.166:5000/process_frame';
   bool _isApiEnabled = true;
   int _lastApiCallTime = 0;
   static const int _apiCallInterval =

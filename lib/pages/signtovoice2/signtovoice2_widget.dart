@@ -31,6 +31,9 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
   bool isGlowActive = false;
   bool isSpeakerOn = false; // Add speaker toggle state
 
+  // ScrollController for auto-scroll functionality
+  late ScrollController _textFieldScrollController;
+
   @override
   void initState() {
     super.initState();
@@ -93,12 +96,17 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
       curve: Curves.easeInOutQuart,
     ));
 
-    // Listen to text changes to trigger glow animation
+    // Initialize scroll controller for auto-scroll functionality
+    _textFieldScrollController = ScrollController();
+
+    // Listen to text changes to trigger glow animation and auto-scroll
     _model.textController?.addListener(() {
       final currentText = _model.textController?.text ?? '';
       if (currentText.isNotEmpty && !isGlowActive) {
         _triggerGlowAnimation();
       }
+      // Auto-scroll to bottom when text changes
+      _autoScrollToBottom();
     });
 
     // Listen to model state changes to trigger animation on pose detection
@@ -118,6 +126,9 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
             _triggerGlowAnimation();
           }
 
+          // Auto-scroll when state changes (new words added programmatically)
+          _autoScrollToBottom();
+
           safeSetState(() {});
         }
       } catch (e) {
@@ -131,7 +142,36 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
     _model.dispose();
     _glowController.dispose();
     _movingLineController.dispose();
+    _textFieldScrollController.dispose();
     super.dispose();
+  }
+
+  // Method to auto-scroll to bottom like ChatGPT
+  void _autoScrollToBottom() {
+    if (!_textFieldScrollController.hasClients) {
+      return;
+    }
+
+    // Use a small delay to ensure the text field has been updated and rendered
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && _textFieldScrollController.hasClients) {
+        // Check if we need to scroll (if there's content beyond the current view)
+        final currentScrollPosition =
+            _textFieldScrollController.position.pixels;
+        final maxScrollExtent =
+            _textFieldScrollController.position.maxScrollExtent;
+
+        // Only scroll if we're not already at the bottom or if there's new content
+        if (maxScrollExtent > 0 &&
+            (maxScrollExtent - currentScrollPosition) > 10) {
+          _textFieldScrollController.animateTo(
+            maxScrollExtent,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOutCubic,
+          );
+        }
+      }
+    });
   }
 
   // Method to start continuous glow animation for API processing
@@ -304,57 +344,66 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                             horizontal: 20.0,
                             vertical: 16.0,
                           ),
-                          child: TextFormField(
-                            controller: _model.textController,
-                            focusNode: _model.textFieldFocusNode,
-                            autofocus: false,
-                            readOnly: true,
-                            textCapitalization: TextCapitalization.sentences,
-                            obscureText: false,
-                            decoration: InputDecoration(
-                              hintText: _model.isTranslating
-                                  ? 'Translating...'
-                                  : 'Translated Text Appear Here',
-                              hintStyle: FlutterFlowTheme.of(context)
+                          child: Scrollbar(
+                            controller: _textFieldScrollController,
+                            thumbVisibility: false, // Only show when scrolling
+                            trackVisibility: false,
+                            thickness: 4.0,
+                            radius: const Radius.circular(2.0),
+                            child: TextFormField(
+                              controller: _model.textController,
+                              focusNode: _model.textFieldFocusNode,
+                              scrollController: _textFieldScrollController,
+                              autofocus: false,
+                              readOnly: true,
+                              textCapitalization: TextCapitalization.sentences,
+                              obscureText: false,
+                              decoration: InputDecoration(
+                                hintText: _model.isTranslating
+                                    ? 'Translating...'
+                                    : 'Translated Text Appear Here',
+                                hintStyle: FlutterFlowTheme.of(context)
+                                    .bodyMedium
+                                    .override(
+                                      fontFamily: FlutterFlowTheme.of(context)
+                                          .bodyMediumFamily,
+                                      color: _model.isTranslating
+                                          ? const Color(0xFFFAB317)
+                                          : FlutterFlowTheme.of(context)
+                                              .secondaryText,
+                                      fontSize: 16.0,
+                                      letterSpacing: 0.0,
+                                      useGoogleFonts: GoogleFonts.asMap()
+                                          .containsKey(
+                                              FlutterFlowTheme.of(context)
+                                                  .bodyMediumFamily),
+                                    ),
+                                enabledBorder: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                                errorBorder: InputBorder.none,
+                                focusedErrorBorder: InputBorder.none,
+                                isDense: true,
+                                contentPadding: EdgeInsets.zero,
+                              ),
+                              style: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .override(
                                     fontFamily: FlutterFlowTheme.of(context)
                                         .bodyMediumFamily,
-                                    color: _model.isTranslating
-                                        ? const Color(0xFFFAB317)
-                                        : FlutterFlowTheme.of(context)
-                                            .secondaryText,
                                     fontSize: 16.0,
                                     letterSpacing: 0.0,
                                     useGoogleFonts: GoogleFonts.asMap()
                                         .containsKey(
                                             FlutterFlowTheme.of(context)
                                                 .bodyMediumFamily),
+                                    lineHeight: 1.4,
                                   ),
-                              enabledBorder: InputBorder.none,
-                              focusedBorder: InputBorder.none,
-                              errorBorder: InputBorder.none,
-                              focusedErrorBorder: InputBorder.none,
-                              isDense: true,
-                              contentPadding: EdgeInsets.zero,
+                              textAlign: TextAlign.start,
+                              maxLines: 6, // Allow expansion up to 6 lines
+                              minLines: 1,
+                              keyboardType: TextInputType.multiline,
+                              cursorColor: FlutterFlowTheme.of(context).primary,
                             ),
-                            style: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .override(
-                                  fontFamily: FlutterFlowTheme.of(context)
-                                      .bodyMediumFamily,
-                                  fontSize: 16.0,
-                                  letterSpacing: 0.0,
-                                  useGoogleFonts: GoogleFonts.asMap()
-                                      .containsKey(FlutterFlowTheme.of(context)
-                                          .bodyMediumFamily),
-                                  lineHeight: 1.4,
-                                ),
-                            textAlign: TextAlign.start,
-                            maxLines: 6, // Allow expansion up to 10 lines
-                            minLines: 1,
-                            keyboardType: TextInputType.multiline,
-                            cursorColor: FlutterFlowTheme.of(context).primary,
                           ),
                         ),
 
