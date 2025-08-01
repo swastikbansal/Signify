@@ -121,17 +121,21 @@ class ISLExtensionViewer {
         this.scene = new THREE.Scene();
         this.scene.background = new THREE.Color(0x2a2a2a);
         
-        this.camera = new THREE.PerspectiveCamera(75, 400 / 250, 0.1, 1000);
-        this.camera.position.set(0, 1.2, 2.5);
+        // Closer framing from knee to head with tighter field of view
+        this.camera = new THREE.PerspectiveCamera(45, 320 / 350, 0.1, 1000);
+        this.camera.position.set(0, 1.3, 1.8);
         
         this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: true });
-        this.renderer.setSize(400, 250);
+        this.renderer.setSize(320, 350);
         this.renderer.shadowMap.enabled = true;
         this.renderer.outputEncoding = THREE.sRGBEncoding;
 
         this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
         this.controls.enableDamping = true;
-        this.controls.target.set(0, 1, 0);
+        this.controls.target.set(0, 1.1, 0);
+        this.controls.enableZoom = true;
+        this.controls.zoomSpeed = 0.5;
+        this.controls.enablePan = false; // Disable panning to keep avatar centered
 
         this.clock = new THREE.Clock();
         
@@ -365,11 +369,31 @@ class ISLExtensionViewer {
 
     centerModel() {
         if (!this.currentModel) return;
+        
+        // Get the bounding box of the model
         const box = new THREE.Box3().setFromObject(this.currentModel);
         const center = box.getCenter(new THREE.Vector3());
-        this.currentModel.position.sub(center);
-        this.currentModel.position.y -= box.min.y;
-        this.controls.target.set(0, box.getSize(new THREE.Vector3()).y / 2, 0);
+        const size = box.getSize(new THREE.Vector3());
+        
+        // Center the model horizontally
+        this.currentModel.position.x = -center.x;
+        this.currentModel.position.z = -center.z;
+        
+        // Position the model so knees are at the bottom of the frame
+        // Assume knees are at about 30% of the avatar height from the bottom
+        const kneeHeight = size.y * 0.3;
+        this.currentModel.position.y = -box.min.y - kneeHeight;
+        
+        // Scale the model to show from knee to head properly
+        // We want the knee-to-head portion (70% of avatar) to fill the frame
+        const visibleHeight = size.y * 0.7; // From knee to head
+        if (visibleHeight > 2.0) {
+            const scale = 2.0 / visibleHeight;
+            this.currentModel.scale.setScalar(scale);
+        }
+        
+        // Focus camera on upper torso/chest level for sign language gestures
+        this.controls.target.set(0, size.y * 0.4, 0);
         this.controls.update();
     }
 
@@ -386,10 +410,10 @@ class ISLExtensionViewer {
 
     onWindowResize() {
         if (!this.camera || !this.renderer) return;
-        // Keep the viewer size fixed
-        this.camera.aspect = 400 / 250;
+        // Keep the viewer size fixed with new dimensions
+        this.camera.aspect = 320 / 350;
         this.camera.updateProjectionMatrix();
-        this.renderer.setSize(400, 250);
+        this.renderer.setSize(320, 350);
     }
 
     showViewer() {
