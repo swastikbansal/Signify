@@ -149,7 +149,8 @@ class _Account4WidgetState extends State<Account4Widget>
             body: SafeArea(
               top: true,
               child: Padding(
-                padding: const EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
+                padding:
+                    const EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
                 child: SingleChildScrollView(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -254,7 +255,8 @@ class _Account4WidgetState extends State<Account4Widget>
                                     context.pushNamed(
                                       'editProfile',
                                       extra: <String, dynamic>{
-                                        kTransitionInfoKey: const TransitionInfo(
+                                        kTransitionInfoKey:
+                                            const TransitionInfo(
                                           hasTransition: true,
                                           transitionType:
                                               PageTransitionType.fade,
@@ -275,10 +277,12 @@ class _Account4WidgetState extends State<Account4Widget>
                                     width:
                                         MediaQuery.sizeOf(context).width * 0.5,
                                     height: 46.0,
-                                    padding: const EdgeInsetsDirectional.fromSTEB(
-                                        0.0, 0.0, 0.0, 0.0),
-                                    iconPadding: const EdgeInsetsDirectional.fromSTEB(
-                                        0.0, 0.0, 0.0, 0.0),
+                                    padding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            0.0, 0.0, 0.0, 0.0),
+                                    iconPadding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            0.0, 0.0, 0.0, 0.0),
                                     color: FlutterFlowTheme.of(context)
                                         .primaryBackground,
                                     textStyle: FlutterFlowTheme.of(context)
@@ -408,11 +412,8 @@ class _Account4WidgetState extends State<Account4Widget>
                                                     child: Padding(
                                                       padding:
                                                           const EdgeInsetsDirectional
-                                                              .fromSTEB(
-                                                                  0.0,
-                                                                  0.0,
-                                                                  8.0,
-                                                                  0.0),
+                                                              .fromSTEB(0.0,
+                                                              0.0, 8.0, 0.0),
                                                       child: Icon(
                                                         Icons.nights_stay,
                                                         color:
@@ -537,11 +538,8 @@ class _Account4WidgetState extends State<Account4Widget>
                                                     child: Padding(
                                                       padding:
                                                           const EdgeInsetsDirectional
-                                                              .fromSTEB(
-                                                                  8.0,
-                                                                  2.0,
-                                                                  0.0,
-                                                                  0.0),
+                                                              .fromSTEB(8.0,
+                                                              2.0, 0.0, 0.0),
                                                       child: Icon(
                                                         Icons.wb_sunny_rounded,
                                                         color:
@@ -678,7 +676,7 @@ class _Account4WidgetState extends State<Account4Widget>
                                       mainAxisSize: MainAxisSize.max,
                                       children: [
                                         Icon(
-                                          Icons.gesture,
+                                          Icons.sign_language_outlined,
                                           color: FlutterFlowTheme.of(context)
                                               .primary,
                                           size: 24.0,
@@ -1058,7 +1056,7 @@ class _Account4WidgetState extends State<Account4Widget>
                     ]
                         .divide(const SizedBox(height: 24.0))
                         .addToStart(const SizedBox(height: 16.0))
-                        .addToEnd(const SizedBox(height: 36.0)),
+                        .addToEnd(const SizedBox(height: 30.0)),
                   ),
                 ),
               ),

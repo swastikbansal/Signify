@@ -714,7 +714,7 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
                                     cameraTarget:
                                         '0m 1.6m 0m', // Focus on upper chest area
                                     cameraOrbit:
-                                        '0deg 100deg -8m', // Much closer for bigger avatar
+                                        '0deg 100deg -1m', // Much closer for bigger avatar
                                   )
                                 : const Center(
                                     child: Text(
