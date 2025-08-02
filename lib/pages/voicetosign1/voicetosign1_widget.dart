@@ -673,8 +673,24 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
       child: Scaffold(
         key: scaffoldKey,
         backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+        appBar: AppBar(
+          backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+          automaticallyImplyLeading: false,
+          elevation: 0,
+          title: Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              'Signify',
+              style: GoogleFonts.spaceGrotesk(
+                fontSize: 28,
+                fontWeight: FontWeight.w600,
+                color: FlutterFlowTheme.of(context).primaryText,
+              ),
+            ),
+          ),
+        ),
         body: SafeArea(
-          top: true,
+          top: false,
           child: Column(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.end,
@@ -1008,8 +1024,8 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
                                 child: Tooltip(
                                   message: 'Attach image or document',
                                   decoration: BoxDecoration(
-                                    color: FlutterFlowTheme.of(context)
-                                        .alternate,
+                                    color:
+                                        FlutterFlowTheme.of(context).alternate,
                                     borderRadius: BorderRadius.circular(8.0),
                                     boxShadow: [
                                       BoxShadow(
@@ -1075,8 +1091,8 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
                                       ? 'Stop voice recognition'
                                       : 'Start voice recognition',
                                   decoration: BoxDecoration(
-                                    color: FlutterFlowTheme.of(context)
-                                        .alternate,
+                                    color:
+                                        FlutterFlowTheme.of(context).alternate,
                                     borderRadius: BorderRadius.circular(8.0),
                                     boxShadow: [
                                       BoxShadow(
@@ -1149,8 +1165,8 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
                                 child: Tooltip(
                                   message: 'Send message for sign animation',
                                   decoration: BoxDecoration(
-                                    color: FlutterFlowTheme.of(context)
-                                        .alternate,
+                                    color:
+                                        FlutterFlowTheme.of(context).alternate,
                                     borderRadius: BorderRadius.circular(8.0),
                                     boxShadow: [
                                       BoxShadow(
@@ -1206,7 +1222,8 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
                   ],
                 ),
               ),
-            ].addToEnd(const SizedBox(height: 12.0)), // Reduced from 24.0 to 12.0
+            ].addToEnd(
+                const SizedBox(height: 12.0)), // Reduced from 24.0 to 12.0
           ),
         ),
       ),
@@ -1244,7 +1261,8 @@ class MovingLinePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     const borderRadius = 16.0; // Match sign to voice page border radius
     final rect = Rect.fromLTWH(0, 0, size.width, size.height);
-    final rrect = RRect.fromRectAndRadius(rect, const Radius.circular(borderRadius));
+    final rrect =
+        RRect.fromRectAndRadius(rect, const Radius.circular(borderRadius));
 
     // Calculate the total perimeter path
     final path = Path()..addRRect(rrect);
