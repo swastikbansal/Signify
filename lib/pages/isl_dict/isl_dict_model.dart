@@ -375,26 +375,13 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
   // Enhanced search functionality with Google Drive integration
   Future<void> searchSigns(String query) async {
     if (query.isEmpty) {
-      filteredSigns = selectedCategory == 'all'
-          ? List.from(allSigns)
-          : allSigns
-              .where((sign) => sign.category == selectedCategory)
-              .toList();
+      // Clear both local and drive results when no query
+      filteredSigns.clear();
       driveVideos.clear();
       driveSearchError = null;
     } else {
-      // Search local signs
-      filteredSigns = allSigns.where((sign) {
-        final matchesQuery = sign.word
-                .toLowerCase()
-                .contains(query.toLowerCase()) ||
-            sign.description.toLowerCase().contains(query.toLowerCase()) ||
-            sign.tags
-                .any((tag) => tag.toLowerCase().contains(query.toLowerCase()));
-        final matchesCategory =
-            selectedCategory == 'all' || sign.category == selectedCategory;
-        return matchesQuery && matchesCategory;
-      }).toList();
+      // Only search Google Drive videos - no local signs
+      filteredSigns.clear(); // Don't show local signs in search results
 
       // Search Google Drive videos
       await searchDriveVideos(query);
@@ -548,47 +535,36 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
     }
   }
 
-  // Get total search results count
+  // Get total search results count (only Drive videos now)
   int getTotalSearchResults() {
-    return filteredSigns.length + driveVideos.length;
+    return driveVideos.length;
   }
 
-  // Check if any results found
+  // Check if any results found (only Drive videos now)
   bool hasSearchResults() {
-    return filteredSigns.isNotEmpty || driveVideos.isNotEmpty;
+    return driveVideos.isNotEmpty;
   }
 
-  // Get search status message
+  // Get search status message (only for Drive videos now)
   String getSearchStatusMessage() {
-    final totalResults = getTotalSearchResults();
-    final localCount = filteredSigns.length;
     final driveCount = driveVideos.length;
 
     if (kDebugMode) {
       print('🔍 Search Status Debug:');
-      print('  - Local signs: $localCount');
       print('  - Drive videos: $driveCount');
-      print('  - Total results: $totalResults');
       print('  - Drive search error: $driveSearchError');
       print('  - Is loading Drive videos: $isLoadingDriveVideos');
     }
 
-    if (totalResults == 0) {
+    if (driveCount == 0) {
       if (driveSearchError != null) {
         return 'No results found. Drive error: $driveSearchError';
       }
-      return 'No results found. Try different keywords.';
+      return 'No sign language videos found. Try different keywords.';
     }
 
-    String message = '';
-    if (localCount > 0) {
-      message += 'Found $localCount local sign${localCount == 1 ? '' : 's'}';
-    }
-
-    if (driveCount > 0) {
-      if (message.isNotEmpty) message += ' and ';
-      message += '$driveCount Drive video${driveCount == 1 ? '' : 's'}';
-    }
+    String message =
+        'Found $driveCount sign language video${driveCount == 1 ? '' : 's'}';
 
     // DEBUG: Force check what isConfigured returns
     final isConfigured = GoogleDriveService.isConfigured();
@@ -603,8 +579,8 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
       if (driveCount > 0) {
         message +=
             ' (Demo mode - configure real Google Drive API for actual results)';
-      } else if (localCount == 0) {
-        message = 'No local results found. Google Drive not configured.';
+      } else {
+        message = 'Google Drive not configured for video search.';
       }
     }
 

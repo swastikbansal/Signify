@@ -259,7 +259,11 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                                 onChanged: (_) => EasyDebounce.debounce(
                                   'textController',
                                   const Duration(milliseconds: 500),
-                                  () => safeSetState(() {}),
+                                  () async {
+                                    await _model.searchSigns(
+                                        _model.textController?.text ?? '');
+                                    safeSetState(() {});
+                                  },
                                 ),
                                 autofocus: false,
                                 obscureText: false,
@@ -601,10 +605,10 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                               ),
                               const SizedBox(height: 16.0),
 
-                              // Local ISL Signs Results
-                              if (_model.filteredSigns.isNotEmpty) ...[
+                              // Only show Google Drive video results - no local signs
+                              if (_model.driveVideos.isNotEmpty) ...[
                                 Text(
-                                  'ISL Dictionary (${_model.filteredSigns.length})',
+                                  'Sign Language Videos (${_model.driveVideos.length})',
                                   style: FlutterFlowTheme.of(context)
                                       .titleMedium
                                       .override(
@@ -620,129 +624,6 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                                                     .titleMediumFamily),
                                       ),
                                 ),
-                                const SizedBox(height: 12.0),
-                                ...(_model.filteredSigns
-                                    .take(5)
-                                    .map(
-                                      (sign) => Padding(
-                                        padding:
-                                            const EdgeInsets.only(bottom: 12.0),
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            _model.addToRecentlyViewed(sign);
-                                            _showSignDetailsBottomSheet(sign);
-                                            safeSetState(() {});
-                                          },
-                                          child: Container(
-                                            padding: const EdgeInsets.all(16.0),
-                                            decoration: BoxDecoration(
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .secondaryBackground,
-                                              borderRadius:
-                                                  BorderRadius.circular(12.0),
-                                              border: Border.all(
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .alternate,
-                                                width: 1.0,
-                                              ),
-                                            ),
-                                            child: Row(
-                                              children: [
-                                                Container(
-                                                  width: 40.0,
-                                                  height: 40.0,
-                                                  decoration: BoxDecoration(
-                                                    color: FlutterFlowTheme.of(
-                                                            context)
-                                                        .primary
-                                                        .withOpacity(0.1),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            8.0),
-                                                  ),
-                                                  child: Icon(
-                                                    Icons.waving_hand,
-                                                    color: FlutterFlowTheme.of(
-                                                            context)
-                                                        .primary,
-                                                    size: 20.0,
-                                                  ),
-                                                ),
-                                                const SizedBox(width: 12.0),
-                                                Expanded(
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Text(
-                                                        sign.word,
-                                                        style:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .bodyLarge
-                                                                .override(
-                                                                  fontFamily: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyLargeFamily,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500,
-                                                                  letterSpacing:
-                                                                      0.0,
-                                                                  useGoogleFonts: GoogleFonts
-                                                                          .asMap()
-                                                                      .containsKey(
-                                                                          FlutterFlowTheme.of(context)
-                                                                              .bodyLargeFamily),
-                                                                ),
-                                                      ),
-                                                      Text(
-                                                        sign.category,
-                                                        style:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .bodySmall
-                                                                .override(
-                                                                  fontFamily: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodySmallFamily,
-                                                                  color: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .secondaryText,
-                                                                  letterSpacing:
-                                                                      0.0,
-                                                                  useGoogleFonts: GoogleFonts
-                                                                          .asMap()
-                                                                      .containsKey(
-                                                                          FlutterFlowTheme.of(context)
-                                                                              .bodySmallFamily),
-                                                                ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                Icon(
-                                                  Icons.arrow_forward_ios,
-                                                  color: FlutterFlowTheme.of(
-                                                          context)
-                                                      .secondaryText,
-                                                  size: 16.0,
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                    .toList()),
-                                const SizedBox(height: 16.0),
-                              ],
-
-                              // Additional video results
-                              if (_model.driveVideos.isNotEmpty) ...[
                                 const SizedBox(height: 12.0),
                                 ...(_model.driveVideos
                                     .take(5)
@@ -895,8 +776,7 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                               ],
 
                               // No results message
-                              if (_model.filteredSigns.isEmpty &&
-                                  _model.driveVideos.isEmpty &&
+                              if (_model.driveVideos.isEmpty &&
                                   !_model.isLoadingDriveVideos) ...[
                                 Container(
                                   width: double.infinity,
@@ -1532,12 +1412,16 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
   }
 
   void _showDriveVideoBottomSheet(dynamic video) {
-    // Initialize video when modal opens
+    // Initialize video when modal opens - but don't await it to avoid blocking UI
     if (video?.name != null) {
       final wordName = _model.extractWordFromVideoName(video.name);
-
-      // Use improved initialization with fallback
-      _model.initializeVideoWithFallback(wordName);
+      // Initialize video asynchronously
+      _model.initializeVideoWithFallback(wordName).then((_) {
+        // Update the modal state after video initialization
+        if (mounted) {
+          safeSetState(() {});
+        }
+      });
     }
 
     showModalBottomSheet(
@@ -1561,16 +1445,41 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      _model.extractWordFromVideoName(video?.name ?? 'Video'),
-                      style: FlutterFlowTheme.of(context).headlineSmall,
+                    Expanded(
+                      child: Text(
+                        _model.extractWordFromVideoName(video?.name ?? 'Video'),
+                        style:
+                            FlutterFlowTheme.of(context).headlineSmall.override(
+                                  fontFamily: FlutterFlowTheme.of(context)
+                                      .headlineSmallFamily,
+                                  letterSpacing: 0.0,
+                                  fontWeight: FontWeight.w600,
+                                  useGoogleFonts: GoogleFonts.asMap()
+                                      .containsKey(FlutterFlowTheme.of(context)
+                                          .headlineSmallFamily),
+                                ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                    IconButton(
-                      onPressed: () {
-                        _model.disposeVideo();
-                        Navigator.pop(context);
-                      },
-                      icon: const Icon(Icons.close),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: FlutterFlowTheme.of(context).secondaryBackground,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: FlutterFlowTheme.of(context).alternate,
+                          width: 1.0,
+                        ),
+                      ),
+                      child: IconButton(
+                        onPressed: () {
+                          _model.disposeVideo();
+                          Navigator.pop(context);
+                        },
+                        icon: Icon(
+                          Icons.close,
+                          color: FlutterFlowTheme.of(context).secondaryText,
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -1579,12 +1488,14 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                   child: Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF4285F4), Color(0xFF34A853)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
+                      // Use app's primary background color
+                      color: FlutterFlowTheme.of(context).primaryBackground,
                       borderRadius: BorderRadius.circular(16.0),
+                      // Add subtle border for better definition
+                      border: Border.all(
+                        color: FlutterFlowTheme.of(context).alternate,
+                        width: 1.0,
+                      ),
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(16.0),
@@ -1605,14 +1516,15 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  const CircularProgressIndicator(
-                                    color: Colors.white,
+                                  CircularProgressIndicator(
+                                    color: FlutterFlowTheme.of(context).primary,
                                   ),
                                   const SizedBox(height: 16.0),
-                                  const Text(
+                                  Text(
                                     'Loading video...',
                                     style: TextStyle(
-                                      color: Colors.white,
+                                      color: FlutterFlowTheme.of(context)
+                                          .primaryText,
                                       fontSize: 16.0,
                                     ),
                                   ),
@@ -1622,7 +1534,8 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                                       child: Text(
                                         'Using demo video for testing',
                                         style: TextStyle(
-                                          color: Colors.white.withOpacity(0.8),
+                                          color: FlutterFlowTheme.of(context)
+                                              .secondaryText,
                                           fontSize: 12.0,
                                         ),
                                       ),
@@ -1639,29 +1552,34 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                                   Container(
                                     padding: const EdgeInsets.all(20.0),
                                     decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.3),
+                                      color: FlutterFlowTheme.of(context)
+                                          .primary
+                                          .withOpacity(0.1),
                                       shape: BoxShape.circle,
                                     ),
-                                    child: const Icon(
+                                    child: Icon(
                                       Icons.play_arrow,
                                       size: 60.0,
-                                      color: Colors.white,
+                                      color:
+                                          FlutterFlowTheme.of(context).primary,
                                     ),
                                   ),
                                   const SizedBox(height: 16.0),
-                                  const Text(
-                                    'Video not available locally',
+                                  Text(
+                                    'Tap to play video',
                                     style: TextStyle(
-                                      color: Colors.white,
+                                      color: FlutterFlowTheme.of(context)
+                                          .primaryText,
                                       fontSize: 16.0,
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
                                   const SizedBox(height: 8.0),
                                   Text(
-                                    'Tap to simulate playback',
+                                    'Sign language demonstration',
                                     style: TextStyle(
-                                      color: Colors.white.withOpacity(0.8),
+                                      color: FlutterFlowTheme.of(context)
+                                          .secondaryText,
                                       fontSize: 14.0,
                                     ),
                                   ),
@@ -1669,24 +1587,43 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                               ),
                             ),
 
-                          // Play/Pause overlay button
+                          // Single tap to play/pause
                           Positioned.fill(
                             child: GestureDetector(
-                              onTap: () {
+                              onTap: () async {
                                 if (_model.isVideoInitialized) {
                                   _model.toggleVideoPlayback();
                                   setModalState(() {});
                                 } else {
-                                  // Fallback: show snackbar for demo
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                          'Playing ${_model.extractWordFromVideoName(video?.name ?? '')} sign video...'),
-                                      backgroundColor:
-                                          FlutterFlowTheme.of(context).primary,
-                                      duration: const Duration(seconds: 2),
-                                    ),
-                                  );
+                                  // Try to initialize video if it's not initialized yet
+                                  if (video?.name != null) {
+                                    final wordName = _model
+                                        .extractWordFromVideoName(video.name);
+                                    await _model
+                                        .initializeVideoWithFallback(wordName);
+                                    if (_model.isVideoInitialized) {
+                                      _model.playVideo();
+                                    }
+                                    setModalState(() {});
+                                  } else {
+                                    // Fallback: show snackbar for demo
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                            'Playing ${_model.extractWordFromVideoName(video?.name ?? '')} sign video...'),
+                                        backgroundColor:
+                                            FlutterFlowTheme.of(context)
+                                                .alternate,
+                                        duration: const Duration(seconds: 2),
+                                        behavior: SnackBarBehavior.floating,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10.0),
+                                        ),
+                                        margin: const EdgeInsets.all(16.0),
+                                      ),
+                                    );
+                                  }
                                 }
                               },
                               child: Container(
@@ -1764,31 +1701,28 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                                 padding: const EdgeInsets.symmetric(
                                     vertical: 8.0, horizontal: 12.0),
                                 decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.5),
+                                  color: FlutterFlowTheme.of(context)
+                                      .primaryText
+                                      .withOpacity(0.8),
                                   borderRadius: BorderRadius.circular(8.0),
                                 ),
-                                child: const Row(
+                                child: Row(
                                   children: [
                                     Icon(
                                       Icons.videocam,
-                                      color: Colors.white,
+                                      color: FlutterFlowTheme.of(context)
+                                          .primaryBackground,
                                       size: 20.0,
                                     ),
-                                    SizedBox(width: 8.0),
+                                    const SizedBox(width: 8.0),
                                     Expanded(
                                       child: Text(
                                         'ISL Sign Video',
                                         style: TextStyle(
-                                          color: Colors.white,
+                                          color: FlutterFlowTheme.of(context)
+                                              .primaryBackground,
                                           fontSize: 14.0,
                                         ),
-                                      ),
-                                    ),
-                                    Text(
-                                      '0:30',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 12.0,
                                       ),
                                     ),
                                   ],
@@ -1800,21 +1734,35 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                     ),
                   ),
                 ),
-                const SizedBox(height: 16.0),
+                const SizedBox(height: 24.0),
+                // Word title with better styling
                 Text(
                   _model.extractWordFromVideoName(video?.name ?? ''),
-                  style: FlutterFlowTheme.of(context).titleMedium.override(
+                  style: FlutterFlowTheme.of(context).titleLarge.override(
                         fontFamily:
-                            FlutterFlowTheme.of(context).titleMediumFamily,
+                            FlutterFlowTheme.of(context).titleLargeFamily,
                         letterSpacing: 0.0,
                         fontWeight: FontWeight.w600,
                         useGoogleFonts: GoogleFonts.asMap().containsKey(
-                            FlutterFlowTheme.of(context).titleMediumFamily),
+                            FlutterFlowTheme.of(context).titleLargeFamily),
                       ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 8.0),
-                const SizedBox(height: 16.0),
+                // Subtitle
+                Text(
+                  'Indian Sign Language',
+                  style: FlutterFlowTheme.of(context).labelMedium.override(
+                        fontFamily:
+                            FlutterFlowTheme.of(context).labelMediumFamily,
+                        color: FlutterFlowTheme.of(context).secondaryText,
+                        letterSpacing: 0.0,
+                        useGoogleFonts: GoogleFonts.asMap().containsKey(
+                            FlutterFlowTheme.of(context).labelMediumFamily),
+                      ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24.0),
                 Row(
                   children: [
                     Expanded(
@@ -1827,25 +1775,40 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                           // Show success message
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: const Text(
-                                  'Added to learned signs! Daily task progress updated.'),
+                              content: Text(
+                                'Added to learned signs! Daily task progress updated.',
+                                style: TextStyle(
+                                  color:
+                                      FlutterFlowTheme.of(context).primaryText,
+                                ),
+                              ),
                               backgroundColor:
-                                  FlutterFlowTheme.of(context).primary,
+                                  FlutterFlowTheme.of(context).alternate,
+                              behavior: SnackBarBehavior.floating,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                              margin: const EdgeInsets.all(16.0),
                             ),
                           );
                         },
                         icon:
-                            const Icon(Icons.check_circle, color: Colors.white),
+                            const Icon(Icons.check_circle, color: Colors.black),
                         label: const Text(
                           'Mark as Learned',
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(color: Colors.black),
                         ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF34A853),
+                          backgroundColor: FlutterFlowTheme.of(context).success,
+                          foregroundColor: Colors.black,
                           padding: const EdgeInsets.symmetric(vertical: 16.0),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12.0),
                           ),
+                          elevation: 2.0,
+                          shadowColor: FlutterFlowTheme.of(context)
+                              .success
+                              .withOpacity(0.3),
                         ),
                       ),
                     ),
@@ -1863,8 +1826,9 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
     if (size == null) return 'Unknown size';
     if (size < 1024) return '${size}B';
     if (size < 1024 * 1024) return '${(size / 1024).toStringAsFixed(1)}KB';
-    if (size < 1024 * 1024 * 1024)
+    if (size < 1024 * 1024 * 1024) {
       return '${(size / (1024 * 1024)).toStringAsFixed(1)}MB';
+    }
     return '${(size / (1024 * 1024 * 1024)).toStringAsFixed(1)}GB';
   }
 
