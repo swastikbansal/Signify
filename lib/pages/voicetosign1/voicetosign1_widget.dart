@@ -11,7 +11,6 @@ import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:model_viewer_plus/model_viewer_plus.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'dart:async';
 import 'voicetosign1_model.dart';
 export 'voicetosign1_model.dart';
@@ -51,9 +50,8 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
   bool isProcessingImage = false;
   bool isMovingLineActive = false; // For the moving line animation
 
-  // OCR variables
+  // OCR variables - using SafeImageProcessor instead of direct TextRecognizer
   final ImagePicker _imagePicker = ImagePicker();
-  final TextRecognizer _textRecognizer = TextRecognizer();
 
   @override
   void initState() {
@@ -118,7 +116,6 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
   void dispose() {
     _model.dispose();
     _movingLineController.dispose();
-    _textRecognizer.close();
     SafeImageProcessor.instance.dispose();
     super.dispose();
   }
@@ -194,17 +191,24 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
     try {
       debugPrint('📷 Starting camera...');
 
+      // Add pre-camera delay to ensure proper initialization
+      await Future.delayed(const Duration(milliseconds: 300));
+
       final XFile? pickedFile = await _imagePicker.pickImage(
         source: ImageSource.camera,
-        maxWidth: 1200,
-        maxHeight: 1200,
-        imageQuality: 70,
+        maxWidth: 1080, // Reduced from 1200 for better stability
+        maxHeight: 1080, // Reduced from 1200 for better stability
+        imageQuality: 60, // Reduced from 70 for smaller file size
       );
 
       if (pickedFile == null) {
         debugPrint('❌ No photo taken');
         return;
       }
+
+      // Add post-camera delay to ensure proper file handling
+      await Future.delayed(const Duration(milliseconds: 300));
+      debugPrint('📱 Camera capture completed, processing...');
 
       await _processImageSafely(pickedFile, isFromCamera: true);
     } catch (e) {

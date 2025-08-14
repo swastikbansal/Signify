@@ -29,6 +29,12 @@ class SafeImageProcessor {
       print(
           '🔄 Starting safe image processing ${isFromCamera ? '(CAMERA)' : '(GALLERY)'}...');
 
+      // ULTRA-SAFE CAMERA HANDLING - Add delay to prevent camera conflicts
+      if (isFromCamera) {
+        await Future.delayed(const Duration(milliseconds: 500));
+        print('📱 Camera image stabilized, processing...');
+      }
+
       // Create file reference with immediate null safety
       processedFile = File(imageFile.path);
 
@@ -48,10 +54,10 @@ class SafeImageProcessor {
       print(
           '📏 Original file size: ${(fileSize / 1024 / 1024).toStringAsFixed(2)}MB');
 
-      // More conservative limits for camera images to prevent restarts
+      // ULTRA-CONSERVATIVE limits for camera images to prevent restarts
       final maxSize = isFromCamera
-          ? 3 * 1024 * 1024
-          : 5 * 1024 * 1024; // 3MB for camera, 5MB for gallery
+          ? 2 * 1024 * 1024
+          : 5 * 1024 * 1024; // 2MB for camera, 5MB for gallery
 
       if (fileSize > maxSize) {
         print(
@@ -68,22 +74,26 @@ class SafeImageProcessor {
       try {
         final InputImage inputImage = InputImage.fromFile(processedFile);
 
-        // Add timeout for OCR to prevent hanging
+        // Add shorter timeout for camera images to prevent hanging
+        final timeoutDuration = isFromCamera
+            ? const Duration(seconds: 5)
+            : const Duration(seconds: 8);
+
         final recognizedText =
             await _textRecognizer.processImage(inputImage).timeout(
-                  const Duration(seconds: 10),
-                  onTimeout: () => throw TimeoutException(
-                      'OCR timeout', const Duration(seconds: 10)),
+                  timeoutDuration,
+                  onTimeout: () =>
+                      throw TimeoutException('OCR timeout', timeoutDuration),
                 );
 
-        extractedText = recognizedText.text.trim() ?? '';
+        extractedText = recognizedText.text.trim();
         print(
             '✅ OCR completed successfully! Text length: ${extractedText.length}');
 
-        // Force garbage collection after OCR for camera images
+        // Additional memory management for camera images
         if (isFromCamera) {
-          await Future.delayed(const Duration(milliseconds: 100));
-          print('♻️ Camera image processing with memory cleanup');
+          await Future.delayed(const Duration(milliseconds: 200));
+          print('♻️ Camera image OCR with memory cleanup');
         }
       } catch (ocrError) {
         print('⚠️ OCR failed safely: $ocrError');
@@ -111,6 +121,13 @@ class SafeImageProcessor {
     } finally {
       // Ultra-conservative cleanup
       processedFile = null;
+
+      // Additional cleanup for camera images
+      if (isFromCamera) {
+        await Future.delayed(const Duration(milliseconds: 200));
+        print('📸 Camera image processing cleanup completed');
+      }
+
       print('📸 Image processing completed safely');
     }
   }
