@@ -4,6 +4,8 @@ import 'package:tutorial_coach_mark/tutorial_coach_mark.dart'
 import 'voicetosign1_widget.dart' show Voicetosign1Widget;
 import 'package:flutter/material.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
+import '/services/supabase_animation_service.dart';
+import '/services/voice_to_sign_animator.dart';
 
 class Voicetosign1Model extends FlutterFlowModel<Voicetosign1Widget> {
   ///  Local state fields for this page.
@@ -53,6 +55,15 @@ class Voicetosign1Model extends FlutterFlowModel<Voicetosign1Widget> {
   String currentPartialText =
       ''; // Store the current partial text being processed
 
+  // Animation integration variables
+  List<AnimationData> _animationQueue = [];
+  List<String> _wordQueue = [];
+  String inputSentence = '';
+
+  // Getters for animation state
+  List<AnimationData> get animationQueue => _animationQueue;
+  List<String> get wordQueue => _wordQueue;
+
   final Map<String, DebugDataField> debugGeneratorVariables = {};
   final Map<String, DebugDataField> debugBackendQueries = {};
   final Map<String, FlutterFlowModel> widgetBuilderComponents = {};
@@ -73,6 +84,54 @@ class Voicetosign1Model extends FlutterFlowModel<Voicetosign1Widget> {
     }
     // Clear speech variables
     clearSpeechText();
+    // Dispose voice-to-sign animator
+    VoiceToSignAnimator.instance.dispose();
+  }
+
+  // Enhanced voice-to-sign integration methods
+  void updateInputSentence(String newValue) {
+    inputSentence = newValue;
+    debugLogWidgetClass(this);
+
+    // Use enhanced voice-to-sign integration for real-time processing
+    VoiceToSignAnimator.instance.processSpeechForAnimation(
+      speechText: newValue,
+      onAnimationsReady: (animations, words) {
+        _animationQueue = animations;
+        _wordQueue = words;
+        debugLogWidgetClass(this);
+      },
+      onNoAnimations: () {
+        _animationQueue.clear();
+        _wordQueue.clear();
+        debugLogWidgetClass(this);
+      },
+    );
+  }
+
+  // Process final speech text for animation
+  Future<void> processFinalSpeechForAnimation(String finalText) async {
+    await VoiceToSignAnimator.instance.processFinalSpeech(
+      finalText: finalText,
+      onAnimationsReady: (animations, words) {
+        _animationQueue = animations;
+        _wordQueue = words;
+        debugLogWidgetClass(this);
+      },
+      onNoAnimations: () {
+        _animationQueue.clear();
+        _wordQueue.clear();
+        debugLogWidgetClass(this);
+      },
+    );
+  }
+
+  // Clear animation state
+  void clearAnimations() {
+    _animationQueue.clear();
+    _wordQueue.clear();
+    VoiceToSignAnimator.instance.reset();
+    debugLogWidgetClass(this);
   }
 
   // Initialize speech recognition

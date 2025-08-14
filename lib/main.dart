@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
@@ -16,7 +15,14 @@ import 'index.dart';
 // Performance optimization services
 import 'services/performance_cache_manager.dart';
 import 'services/memory_optimizer.dart';
-import 'widgets/performance_monitor.dart';
+import 'services/network_optimizer.dart';
+import 'services/database_optimizer.dart';
+import 'services/background_task_optimizer.dart';
+
+// Security and state management
+import 'config/app_config.dart';
+import 'services/app_state_manager.dart';
+import 'services/error_recovery_service.dart';
 
 import 'dart:async';
 import 'package:easy_debounce/easy_debounce.dart';
@@ -93,17 +99,13 @@ Stack trace: ${filteredStackTrace.join("\n")}''';
     EasyDebounce.cancel('508f3c74205c87928b71f49040062e732f9c20b0');
   });
 
-  // Initialize Supabase for loading 3D ISL Animations
-  await Supabase.initialize(
-    url: 'https://qqyqwtoxjhgashwxyidg.supabase.co',
-    anonKey:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFxeXF3dG94amhnYXNod3h5aWRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM2MjE5NjIsImV4cCI6MjA2OTE5Nzk2Mn0.IOB5ocrqZPKU6luezwhmLGXUkKgks9w0AM7X2-onI-c',
-  );
+  // Initialize Supabase for loading 3D ISL Animations with error recovery
+  await _initializeSupabaseWithRetry();
 
   runApp(const MyApp());
 }
 
-/// Initialize performance optimization services
+/// Initialize performance optimization services - simplified
 Future<void> _initializePerformanceServices() async {
   try {
     // Initialize memory optimizer
@@ -112,16 +114,45 @@ Future<void> _initializePerformanceServices() async {
     // Initialize cache manager
     PerformanceCacheManager.instance.initialize();
 
-    // Add memory pressure listener for automatic cache cleanup
-    MemoryOptimizer.instance.addMemoryPressureListener(() {
-      PerformanceCacheManager.instance.clearAll();
-      print('🧹 Caches cleared due to memory pressure');
-    });
+    // Initialize remaining optimizers (instant performance achieved with new system)
+    NetworkOptimizer.instance.initialize();
+    DatabaseOptimizer.instance.initialize();
+    BackgroundTaskOptimizer.instance.initialize();
 
-    print('🚀 Performance services initialized successfully');
+    // Disable aggressive memory pressure handling that causes app restarts during image capture
+    // MemoryOptimizer.instance.addMemoryPressureListener(() {
+    //   PerformanceCacheManager.instance.clearAll();
+    //   NetworkOptimizer.instance.clearCache();
+    //   DatabaseOptimizer.instance.clearQueryCache();
+    //   // Using safe image processor now - no cache clearing needed
+    //   print('🧹 Basic caches cleared due to memory pressure');
+    // });
+
+    print('🚀 Basic performance services initialized successfully');
   } catch (e) {
     print('⚠️ Error initializing performance services: $e');
   }
+}
+
+/// Initialize Supabase with error recovery
+Future<void> _initializeSupabaseWithRetry() async {
+  return ErrorRecoveryService.instance.handleWithRetry(
+    operationKey: 'supabase_init',
+    operation: () async {
+      await Supabase.initialize(
+        url: AppConfig.supabaseUrl,
+        anonKey: AppConfig.supabaseAnonKey,
+      );
+      print('✅ Supabase initialized successfully');
+    },
+    onError: (error) {
+      print('❌ Failed to initialize Supabase: $error');
+      AppStateManager.instance.setError('Failed to initialize services');
+    },
+    onMaxRetriesReached: () {
+      print('🚨 Critical: Supabase initialization failed after all retries');
+    },
+  );
 }
 
 class MyApp extends StatefulWidget {
@@ -195,9 +226,16 @@ class _MyAppState extends State<MyApp> {
   void dispose() {
     authUserSub.cancel();
 
-    // Dispose performance services
-    MemoryOptimizer.instance.dispose();
+    // Dispose all performance services in correct order
+    BackgroundTaskOptimizer.instance.dispose();
+    DatabaseOptimizer.instance.dispose();
+    NetworkOptimizer.instance.dispose();
+    // Removed animation and image optimizers - using instant system now
     PerformanceCacheManager.instance.dispose();
+    MemoryOptimizer.instance.dispose();
+
+    // Dispose error recovery service
+    ErrorRecoveryService.instance.dispose();
 
     super.dispose();
   }
@@ -214,83 +252,81 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return PerformanceMonitor(
-      showDebugInfo: kDebugMode,
-      child: MaterialApp.router(
-        title: 'Signify',
-        // Disable debug banner for better performance
-        debugShowCheckedModeBanner: false,
-        localizationsDelegates: const [
-          FFLocalizationsDelegate(),
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-          FallbackMaterialLocalizationDelegate(),
-          FallbackCupertinoLocalizationDelegate(),
-        ],
-        locale: _locale,
-        supportedLocales: const [
-          Locale('en'),
-          Locale('hi'),
-          Locale('bn'),
-          Locale('mr'),
-          Locale('te'),
-          Locale('gu'),
-          Locale('pa'),
-          Locale('kn'),
-        ],
-        theme: ThemeData(
-          brightness: Brightness.light,
-          // Optimized scrollbar theme
-          scrollbarTheme: ScrollbarThemeData(
-            thumbVisibility: WidgetStateProperty.all(false),
-            interactive: true,
-            radius: const Radius.circular(50.0),
-            thumbColor: WidgetStateProperty.resolveWith((states) {
-              if (states.contains(WidgetState.dragged)) {
-                return const Color(0xff000000);
-              }
-              if (states.contains(WidgetState.hovered)) {
-                return const Color(0xfff3f3f3);
-              }
+    // Temporarily disable PerformanceMonitor to fix image/animation issues
+    return MaterialApp.router(
+      title: 'Signify',
+      // Disable debug banner for better performance
+      debugShowCheckedModeBanner: false,
+      localizationsDelegates: const [
+        FFLocalizationsDelegate(),
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        FallbackMaterialLocalizationDelegate(),
+        FallbackCupertinoLocalizationDelegate(),
+      ],
+      locale: _locale,
+      supportedLocales: const [
+        Locale('en'),
+        Locale('hi'),
+        Locale('bn'),
+        Locale('mr'),
+        Locale('te'),
+        Locale('gu'),
+        Locale('pa'),
+        Locale('kn'),
+      ],
+      theme: ThemeData(
+        brightness: Brightness.light,
+        // Optimized scrollbar theme
+        scrollbarTheme: ScrollbarThemeData(
+          thumbVisibility: WidgetStateProperty.all(false),
+          interactive: true,
+          radius: const Radius.circular(50.0),
+          thumbColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.dragged)) {
               return const Color(0xff000000);
-            }),
-          ),
-          // Performance optimization: reduce animation durations
-          pageTransitionsTheme: const PageTransitionsTheme(
-            builders: {
-              TargetPlatform.android: CupertinoPageTransitionsBuilder(),
-              TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-            },
-          ),
+            }
+            if (states.contains(WidgetState.hovered)) {
+              return const Color(0xfff3f3f3);
+            }
+            return const Color(0xff000000);
+          }),
         ),
-        darkTheme: ThemeData(
-          brightness: Brightness.dark,
-          scrollbarTheme: ScrollbarThemeData(
-            thumbVisibility: WidgetStateProperty.all(false),
-            interactive: true,
-            radius: const Radius.circular(50.0),
-            thumbColor: WidgetStateProperty.resolveWith((states) {
-              if (states.contains(WidgetState.dragged)) {
-                return const Color(0xffffffff);
-              }
-              if (states.contains(WidgetState.hovered)) {
-                return const Color(0xff1c1c1c);
-              }
-              return const Color(0xffffffff);
-            }),
-          ),
-          // Performance optimization: reduce animation durations
-          pageTransitionsTheme: const PageTransitionsTheme(
-            builders: {
-              TargetPlatform.android: CupertinoPageTransitionsBuilder(),
-              TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-            },
-          ),
+        // Performance optimization: reduce animation durations
+        pageTransitionsTheme: const PageTransitionsTheme(
+          builders: {
+            TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+            TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+          },
         ),
-        themeMode: _themeMode,
-        routerConfig: _router,
       ),
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+        scrollbarTheme: ScrollbarThemeData(
+          thumbVisibility: WidgetStateProperty.all(false),
+          interactive: true,
+          radius: const Radius.circular(50.0),
+          thumbColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.dragged)) {
+              return const Color(0xffffffff);
+            }
+            if (states.contains(WidgetState.hovered)) {
+              return const Color(0xff1c1c1c);
+            }
+            return const Color(0xffffffff);
+          }),
+        ),
+        // Performance optimization: reduce animation durations
+        pageTransitionsTheme: const PageTransitionsTheme(
+          builders: {
+            TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+            TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+          },
+        ),
+      ),
+      themeMode: _themeMode,
+      routerConfig: _router,
     );
   }
 }

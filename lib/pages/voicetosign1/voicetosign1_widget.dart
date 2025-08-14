@@ -2,6 +2,8 @@ import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 // import '/walkthroughs/signify_screen_1.dart'; // Commented out to disable walkthrough
 import '/services/supabase_animation_service.dart';
+import '/services/safe_image_processor.dart';
+import '/services/instant_animation_player.dart'; // Use instant animation player
 // import 'package:tutorial_coach_mark/tutorial_coach_mark.dart'
 //     show TutorialCoachMark; // Commented out to disable walkthrough
 import 'package:flutter/material.dart';
@@ -11,7 +13,6 @@ import 'package:model_viewer_plus/model_viewer_plus.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'dart:async';
-import 'dart:io';
 import 'voicetosign1_model.dart';
 export 'voicetosign1_model.dart';
 
@@ -27,28 +28,27 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
   late Voicetosign1Model _model;
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
-  // API-based animation system
+  // API-based seamless animation system
   final List<AnimationData> _animationQueue = [];
   final List<String> _wordQueue = [];
 
   final String defaultAnimation = 'assets/models/model.glb';
   String? currentAnimation;
-  Timer? animationTimer;
-  String inputSentence = '';
-  late AnimationController _fadeController;
-  late AnimationController _loadingController;
-  late AnimationController _movingLineController;
-  late Animation<double> _movingLineAnimation;
   String? currentWord;
+  String inputSentence = '';
   bool isPlayingSequence = false;
   bool voiceTrigger = false; // Local state for microphone toggle
-  bool isLoadingAnimations = false; // New loading state for API calls
 
-  // Image handling variables
+  // Animation controllers for moving line animation (Claude AI style)
+  late AnimationController _movingLineController;
+  late Animation<double> _movingLineAnimation;
+
+  // Seamless animation player key for rebuilding
+  Key _animationPlayerKey = UniqueKey();
+
+  // Image handling variables - use paths instead of File objects for safety
   List<String> uploadedImagePaths = [];
-  List<File> uploadedImages = [];
   bool isProcessingImage = false;
-  bool isLoadingAnimation = false;
   bool isMovingLineActive = false; // For the moving line animation
 
   // OCR variables
@@ -100,40 +100,26 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
     // Optionally log dynamic vocabulary info for debugging
     _logVocabularyInfo();
 
-    _fadeController = AnimationController(
-      vsync: this,
-      duration: const Duration(
-          milliseconds: 200), // Faster fade duration for seamless transitions
-    )..forward();
-
-    _loadingController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1500),
-    );
-
-    // Moving line animation controller (Google-like faster)
+    // Moving line animation controller (Claude AI style)
     _movingLineController = AnimationController(
       vsync: this,
-      duration: const Duration(
-          milliseconds: 1200), // Faster - reduced from 2000ms to 1200ms
+      duration: const Duration(milliseconds: 1200), // Fast like Google/Claude
     );
     _movingLineAnimation = Tween<double>(
       begin: 0.0,
       end: 1.0,
     ).animate(CurvedAnimation(
       parent: _movingLineController,
-      curve: Curves.easeInOutQuart, // More Google-like smooth curve
+      curve: Curves.easeInOutQuart, // Smooth curve like Claude
     ));
   }
 
   @override
   void dispose() {
     _model.dispose();
-    animationTimer?.cancel();
-    _fadeController.dispose();
-    _loadingController.dispose();
     _movingLineController.dispose();
     _textRecognizer.close();
+    SafeImageProcessor.instance.dispose();
     super.dispose();
   }
 
@@ -185,9 +171,9 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
 
       final XFile? pickedFile = await _imagePicker.pickImage(
         source: ImageSource.gallery,
-        maxWidth: 1800,
-        maxHeight: 1800,
-        imageQuality: 80,
+        maxWidth: 1200,
+        maxHeight: 1200,
+        imageQuality: 70,
       );
 
       if (pickedFile == null) {
@@ -195,15 +181,12 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
         return;
       }
 
-      await _processImage(pickedFile);
+      await _processImageSafely(pickedFile, isFromCamera: false);
     } catch (e) {
       debugPrint('❌ Error picking image: $e');
       setState(() {
         isProcessingImage = false;
-        isLoadingAnimation = false;
       });
-      _loadingController.stop();
-      _loadingController.reset();
     }
   }
 
@@ -213,9 +196,9 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
 
       final XFile? pickedFile = await _imagePicker.pickImage(
         source: ImageSource.camera,
-        maxWidth: 1800,
-        maxHeight: 1800,
-        imageQuality: 80,
+        maxWidth: 1200,
+        maxHeight: 1200,
+        imageQuality: 70,
       );
 
       if (pickedFile == null) {
@@ -223,77 +206,76 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
         return;
       }
 
-      await _processImage(pickedFile);
+      await _processImageSafely(pickedFile, isFromCamera: true);
     } catch (e) {
       debugPrint('❌ Error taking photo: $e');
       setState(() {
         isProcessingImage = false;
-        isLoadingAnimation = false;
       });
-      _loadingController.stop();
-      _loadingController.reset();
     }
   }
 
-  Future<void> _processImage(XFile pickedFile) async {
+  Future<void> _processImageSafely(XFile pickedFile,
+      {bool isFromCamera = false}) async {
     setState(() {
       isProcessingImage = true;
-      isLoadingAnimation = true;
     });
 
-    // Start loading animation
-    _loadingController.repeat();
+    debugPrint(
+        '🔄 Processing ${isFromCamera ? 'camera' : 'gallery'} image safely...');
 
-    debugPrint('🔄 Processing image with OCR...');
+    try {
+      // Use safe image processor with camera flag
+      final result = await SafeImageProcessor.instance.processImageSafely(
+        imageFile: pickedFile,
+        maxWidth: 1200,
+        maxHeight: 1200,
+        imageQuality: 70,
+        isFromCamera: isFromCamera, // Pass camera flag for special handling
+      );
 
-    // Create File from XFile
-    final File imageFile = File(pickedFile.path);
+      if (result['success'] == true) {
+        final String extractedText = result['text'] ?? '';
+        final String imagePath = result['imagePath'];
 
-    // Perform OCR
-    final InputImage inputImage = InputImage.fromFile(imageFile);
-    final RecognizedText recognizedText =
-        await _textRecognizer.processImage(inputImage);
+        debugPrint(
+            '✅ Safe processing completed! Text: ${extractedText.length} chars');
 
-    String extractedText = recognizedText.text.trim();
-    debugPrint('✅ OCR completed! Extracted text: $extractedText');
+        setState(() {
+          // Add extracted text to the text field if any
+          if (extractedText.isNotEmpty) {
+            if (_model.textController!.text.isNotEmpty) {
+              _model.textController!.text += ' $extractedText';
+            } else {
+              _model.textController!.text = extractedText;
+            }
+            inputSentence = _model.textController!.text;
+            // Use enhanced voice-to-sign integration for OCR text
+            _model.updateInputSentence(inputSentence);
+          }
 
-    if (extractedText.isNotEmpty) {
+          // Add image path for preview (safer than File objects)
+          uploadedImagePaths.add(imagePath);
+
+          isProcessingImage = false;
+        });
+
+        debugPrint(
+            '✅ Image safely processed and added. Total: ${uploadedImagePaths.length}');
+      } else {
+        debugPrint('⚠️ Image processing failed safely');
+        setState(() {
+          isProcessingImage = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('❌ Error in safe image processing: $e');
       setState(() {
-        // Add extracted text to the text field
-        if (_model.textController!.text.isNotEmpty) {
-          _model.textController!.text += ' $extractedText';
-        } else {
-          _model.textController!.text = extractedText;
-        }
-        inputSentence = _model.textController!.text;
-
-        // Add the actual image for preview
-        uploadedImages.add(imageFile);
-        uploadedImagePaths.add(pickedFile.path);
-
         isProcessingImage = false;
-        isLoadingAnimation = false;
-      });
-
-      // Don't trigger animation immediately, wait for send button
-      debugPrint('✅ Text extracted and added to text field: $extractedText');
-    } else {
-      debugPrint('⚠️ No text detected in image');
-      setState(() {
-        // Still add image even if no text detected
-        uploadedImages.add(imageFile);
-        uploadedImagePaths.add(pickedFile.path);
-        isProcessingImage = false;
-        isLoadingAnimation = false;
       });
     }
 
-    // Stop loading animation
-    _loadingController.stop();
-    _loadingController.reset();
-
-    debugPrint(
-        '🖼️ Image added to preview. Total images: ${uploadedImagePaths.length}');
+    debugPrint('📸 Image processing completed safely');
   }
 
   void _showImagePickerBottomSheet() {
@@ -446,27 +428,9 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
     );
   }
 
-  void _startLoadingAnimation() {
-    setState(() {
-      isLoadingAnimation = true;
-    });
-    _loadingController.repeat();
-  }
-
-  void _stopLoadingAnimation() {
-    setState(() {
-      isLoadingAnimation = false;
-    });
-    _loadingController.stop();
-    _loadingController.reset();
-  }
-
   void _handleSendAction() async {
     if (inputSentence.isEmpty) {
-      // Stop loading animation
-      _stopLoadingAnimation();
-
-      // Play the default animation if no input
+      // Play the default animation if no input - NO loading states
       setState(() {
         _animationQueue.clear();
         _wordQueue.clear();
@@ -478,18 +442,12 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
       return;
     }
 
-    animationTimer?.cancel(); // Cancel any ongoing animation sequence
-
-    // Start moving line animation first (like Google's)
+    // Start Claude-style moving line animation first
     setState(() {
       isMovingLineActive = true;
-      isLoadingAnimations = true; // Show API loading state
     });
 
     _movingLineController.forward().then((_) {
-      // After moving line animation, start loading animation
-      _startLoadingAnimation();
-
       // Reset moving line for next time
       _movingLineController.reset();
       setState(() {
@@ -497,12 +455,12 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
       });
     });
 
-    debugPrint('📤 Send button pressed!');
-    debugPrint('📝 Current text: ${inputSentence.trim()}');
+    debugPrint('⚡ INSTANT Send button pressed!');
+    debugPrint('⚡ INSTANT processing text: ${inputSentence.trim()}');
     debugPrint('🖼️ Images to clear: ${uploadedImagePaths.length}');
 
     try {
-      // Parse sentence word by word for API processing
+      // Parse sentence word by word for INSTANT API processing
       List<String> words = inputSentence
           .toLowerCase()
           .trim()
@@ -511,13 +469,13 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
           .where((word) => word.isNotEmpty)
           .toList();
 
-      debugPrint('🔍 Processing words: $words');
+      debugPrint('⚡ Processing words INSTANTLY: $words');
 
-      // Fetch animations from Supabase API with metadata
+      // Ultra-fast animations from Supabase API
       final animationsData =
           await SupabaseAnimationService.getBatchAnimationsWithMetadata(words);
 
-      // Filter successful animations and prepare queue
+      // Filter successful animations and prepare queue INSTANTLY
       _animationQueue.clear();
       _wordQueue.clear();
 
@@ -526,7 +484,7 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
           _animationQueue.add(animationsData[i]);
           _wordQueue.add(words[i]);
           debugPrint(
-              '✅ Found animation for: ${words[i]} (${animationsData[i].metadata.duration}ms)');
+              '⚡ INSTANT animation ready: ${words[i]} (${animationsData[i].metadata.duration}ms)');
         } else {
           debugPrint('❌ No animation for: ${words[i]}');
           // Dynamic word suggestions for missing words
@@ -535,19 +493,19 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
       }
 
       setState(() {
-        isPlayingSequence = true;
-        isLoadingAnimations = false;
+        isPlayingSequence = true; // NO loading states
       });
 
       if (_animationQueue.isNotEmpty) {
-        // Start predictive loading for better performance
-        if (_animationQueue.isNotEmpty) {
-          SupabaseAnimationService.preloadRelatedWords(
-              _animationQueue.first.metadata.word);
-        }
+        // NO preloading delays - instant performance like HandTalk
+        await InstantAnimationCache.ultraPreload(_animationQueue);
 
-        debugPrint('Playing animations for words in order: $_wordQueue');
-        _playNextAnimationFromAPI();
+        // Start predictive loading for better performance
+        SupabaseAnimationService.preloadRelatedWords(
+            _animationQueue.first.metadata.word);
+
+        debugPrint('⚡ Starting INSTANT animation sequence for: $_wordQueue');
+        _startSeamlessAnimationSequence();
       } else {
         debugPrint(
             'No animations found for any words. Playing default animation.');
@@ -560,77 +518,46 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
     } catch (e) {
       debugPrint('❌ Error loading animations from API: $e');
       setState(() {
-        isLoadingAnimations = false;
         currentAnimation = defaultAnimation;
         isPlayingSequence = false;
       });
     }
 
-    // Clear text and images after sending with a small delay for smooth UX
-    Future.delayed(const Duration(milliseconds: 500), () {
-      setState(() {
-        _model.textController!.clear();
-        inputSentence = '';
-        uploadedImagePaths.clear();
-        uploadedImages.clear(); // Also clear the actual image files
-      });
-      debugPrint('🧹 Cleared text field and images after sending');
+    // Clear text and images INSTANTLY with no delays
+    setState(() {
+      _model.textController!.clear();
+      inputSentence = '';
+      uploadedImagePaths.clear();
+      // Clear animation state when clearing input
+      _model.clearAnimations();
+    });
+    debugPrint('⚡ INSTANTLY cleared text field and images');
+  }
 
-      // Stop loading animation after clearing
-      _stopLoadingAnimation();
+  void _startSeamlessAnimationSequence() {
+    setState(() {
+      isPlayingSequence = true; // NO loading states for instant performance
+      // Create new player key to rebuild the instant player
+      _animationPlayerKey = UniqueKey();
     });
   }
 
-  void _playNextAnimationFromAPI() {
-    if (_animationQueue.isEmpty || _wordQueue.isEmpty) {
-      // Sequence finished, return to default animation
-      setState(() {
-        currentAnimation = defaultAnimation;
-        currentWord = null;
-        isPlayingSequence = false;
-      });
-      debugPrint(
-          'Animation sequence completed. Returning to default animation.');
-      return;
-    }
-
-    // Get the next animation data and word
-    AnimationData nextAnimationData = _animationQueue.removeAt(0);
-    String nextWord = _wordQueue.removeAt(0);
-
+  void _onAnimationSequenceComplete() {
+    debugPrint('✅ Seamless animation sequence completed');
     setState(() {
-      currentAnimation = nextAnimationData.url; // Use URL from API
-      currentWord = nextWord;
+      currentAnimation = defaultAnimation;
+      currentWord = null;
+      isPlayingSequence = false;
+      _animationQueue.clear();
+      _wordQueue.clear();
     });
+  }
 
-    // Use precise duration from API metadata for HandTalk-level timing
-    int duration = nextAnimationData.metadata.duration;
-
-    debugPrint(
-        'Now playing: $nextWord (${nextAnimationData.url}) for ${duration}ms');
-
-    // Preload next animation for seamless transition
-    if (_animationQueue.isNotEmpty) {
-      // The next animation URL is already cached, so ModelViewer will load it instantly
-      debugPrint('🚀 Next animation preloaded for seamless transition');
-    }
-
-    // Set a timer to play the next animation with optimized timing for smooth transitions
-    animationTimer = Timer(Duration(milliseconds: duration - 10), () {
-      // Reduced overlap for smoother transition
-      if (_animationQueue.isNotEmpty) {
-        _playNextAnimationFromAPI();
-      } else {
-        // Sequence finished, return to default immediately
-        setState(() {
-          currentAnimation = defaultAnimation;
-          currentWord = null;
-          isPlayingSequence = false;
-        });
-        debugPrint(
-            'Animation sequence completed. Returned to default animation.');
-      }
+  void _onCurrentWordChange(String word) {
+    setState(() {
+      currentWord = word;
     });
+    debugPrint('🎯 Now playing: $word');
   }
 
   @override
@@ -708,72 +635,33 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
                       Expanded(
                         child: Stack(
                           children: [
-                            // Main animation viewer
-                            currentAnimation != null
-                                ? ModelViewer(
-                                    key: ValueKey(currentAnimation),
-                                    src: currentAnimation!,
+                            // Instant animation player or default ModelViewer
+                            isPlayingSequence && _animationQueue.isNotEmpty
+                                ? InstantAnimationPlayer(
+                                    key: _animationPlayerKey,
+                                    defaultAnimation: defaultAnimation,
+                                    animationQueue: List.from(
+                                        _animationQueue), // Copy to avoid modification issues
+                                    wordQueue: List.from(_wordQueue),
+                                    onSequenceComplete:
+                                        _onAnimationSequenceComplete,
+                                    onWordChange: _onCurrentWordChange,
+                                  )
+                                : ModelViewer(
+                                    key: ValueKey(
+                                        currentAnimation ?? defaultAnimation),
+                                    src: currentAnimation ?? defaultAnimation,
                                     autoPlay: true,
                                     autoRotate: false,
                                     cameraControls: false,
                                     backgroundColor: Colors.transparent,
-                                    //                                     Perfect! I've adjusted the camera settings to make the avatar much bigger and properly positioned:
-
-                                    // cameraTarget: Changed from '0m 2.2m 0m' to '0m 1.6m 0m' - This brings the focus point down to the upper chest area instead of being too high, so you'll see more of the body including some leg portion.
-
-                                    // cameraOrbit: Changed from '0deg 90deg 1.2m' to '0deg 80deg 1.0m' - This:
-
-                                    // Brings the camera even closer (1.0m instead of 1.2m) to make the avatar much bigger and fill more screen space
-                                    // Adjusts the angle to 80 degrees for a better viewing angle that shows the upper body and hands clearly
-                                    // Ensures the avatar takes up more of the available space while keeping the focus on sign language gestures
-                                    // Now the avatar should appear much larger, filling more of the screen space, with the upper body and hands clearly visible for sign language, while still showing some of the lower body/legs as you requested.
                                     cameraTarget:
                                         '0m 1.6m 0m', // Focus on upper chest area
                                     cameraOrbit:
                                         '0deg 100deg -1m', // Much closer for bigger avatar
-                                  )
-                                : const Center(
-                                    child: Text(
-                                      'No animation playing',
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          color: Color(0xFFFAB317)),
-                                    ),
                                   ),
 
-                            // API Loading overlay (HandTalk-style)
-                            if (isLoadingAnimations)
-                              Positioned.fill(
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.black.withOpacity(0.3),
-                                    borderRadius: BorderRadius.circular(12.0),
-                                  ),
-                                  child: const Center(
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        CircularProgressIndicator(
-                                          valueColor:
-                                              AlwaysStoppedAnimation<Color>(
-                                            Color(0xFFFAB317),
-                                          ),
-                                          strokeWidth: 3.0,
-                                        ),
-                                        SizedBox(height: 12.0),
-                                        Text(
-                                          'Loading animations...',
-                                          style: TextStyle(
-                                            color: Color(0xFFFAB317),
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
+                            // NO loading overlays for instant HandTalk-like performance
 
                             // Word tag overlay removed as requested by user
                           ],
@@ -808,7 +696,7 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
                 ),
                 child: Stack(
                   children: [
-                    // Moving line animation overlay
+                    // Moving line animation overlay (Claude AI style)
                     if (isMovingLineActive)
                       Positioned.fill(
                         child: AnimatedBuilder(
@@ -825,7 +713,8 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
                               child: CustomPaint(
                                 painter: MovingLinePainter(
                                   progress: _movingLineAnimation.value,
-                                  color: const Color(0xFFFAB317),
+                                  color: const Color(
+                                      0xFFFAB317), // Yellow like Claude
                                   strokeWidth: 3.0,
                                 ),
                               ),
@@ -870,7 +759,7 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
                                   height: 60.0,
                                   child: ListView.builder(
                                     scrollDirection: Axis.horizontal,
-                                    itemCount: uploadedImages.length,
+                                    itemCount: uploadedImagePaths.length,
                                     itemBuilder: (context, index) {
                                       return Container(
                                         margin:
@@ -880,40 +769,17 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
                                             ClipRRect(
                                               borderRadius:
                                                   BorderRadius.circular(8.0),
-                                              child: Image.file(
-                                                uploadedImages[index],
+                                              child: SafeImagePreview(
+                                                imagePath:
+                                                    uploadedImagePaths[index],
                                                 width: 60.0,
                                                 height: 60.0,
-                                                fit: BoxFit.cover,
-                                              ),
-                                            ),
-                                            Positioned(
-                                              top: -4.0,
-                                              right: -4.0,
-                                              child: Container(
-                                                decoration: BoxDecoration(
-                                                  color: FlutterFlowTheme.of(
-                                                          context)
-                                                      .error,
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          12.0),
-                                                ),
-                                                child: InkWell(
-                                                  onTap: () {
-                                                    setState(() {
-                                                      uploadedImages
-                                                          .removeAt(index);
-                                                      uploadedImagePaths
-                                                          .removeAt(index);
-                                                    });
-                                                  },
-                                                  child: const Icon(
-                                                    Icons.close,
-                                                    color: Colors.white,
-                                                    size: 16.0,
-                                                  ),
-                                                ),
+                                                onRemove: () {
+                                                  setState(() {
+                                                    uploadedImagePaths
+                                                        .removeAt(index);
+                                                  });
+                                                },
                                               ),
                                             ),
                                           ],
@@ -988,6 +854,8 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
                             onChanged: (text) {
                               setState(() {
                                 inputSentence = text;
+                                // Use enhanced voice-to-sign integration for typed text
+                                _model.updateInputSentence(text);
                               });
                             },
                             validator: _model.textControllerValidator
@@ -1125,10 +993,19 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
                                               _model.textController!.text =
                                                   recognizedText;
                                               inputSentence = recognizedText;
+                                              // Use enhanced voice-to-sign integration
+                                              _model.updateInputSentence(
+                                                  recognizedText);
                                             });
                                           });
                                         } else {
                                           _model.stopListening();
+                                          // Process final text when user stops speaking
+                                          if (inputSentence.isNotEmpty) {
+                                            _model
+                                                .processFinalSpeechForAnimation(
+                                                    inputSentence);
+                                          }
                                         }
                                       },
                                       child: SizedBox(

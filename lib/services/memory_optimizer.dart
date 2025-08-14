@@ -13,37 +13,39 @@ class MemoryOptimizer {
   final List<VoidCallback> _memoryPressureListeners = [];
   final List<WeakReference<Disposable>> _disposables = [];
 
-  static const Duration MEMORY_CHECK_INTERVAL = Duration(seconds: 30);
-  static const int MEMORY_WARNING_THRESHOLD_MB = 150; // MB
-  static const int MEMORY_CRITICAL_THRESHOLD_MB = 200; // MB
+  static const Duration MEMORY_CHECK_INTERVAL =
+      Duration(minutes: 5); // Much less frequent
+  static const int MEMORY_WARNING_THRESHOLD_MB = 300; // Increased threshold
+  static const int MEMORY_CRITICAL_THRESHOLD_MB = 400; // Increased threshold
 
-  /// Initialize memory monitoring
+  /// Initialize memory monitoring - disabled aggressive monitoring
   Future<void> initialize() async {
-    // Start memory monitoring
-    _memoryMonitorTimer =
-        Timer.periodic(MEMORY_CHECK_INTERVAL, (_) => _checkMemoryUsage());
+    // Disable memory monitoring during image capture to prevent app restarts
+    // _memoryMonitorTimer =
+    //     Timer.periodic(MEMORY_CHECK_INTERVAL, (_) => _checkMemoryUsage());
 
-    // Listen to system memory warnings
-    SystemChannels.lifecycle.setMessageHandler(_handleLifecycleMessage);
+    // Don't listen to lifecycle messages during image capture
+    // SystemChannels.lifecycle.setMessageHandler(_handleLifecycleMessage);
 
-    print('🧠 MemoryOptimizer initialized');
+    print(
+        '🧠 MemoryOptimizer initialized (monitoring disabled for image capture compatibility)');
   }
 
-  /// Handle app lifecycle changes for memory optimization
-  Future<String?> _handleLifecycleMessage(String? message) async {
-    switch (message) {
-      case 'AppLifecycleState.paused':
-        await _optimizeMemoryOnPause();
-        break;
-      case 'AppLifecycleState.resumed':
-        await _optimizeMemoryOnResume();
-        break;
-      case 'AppLifecycleState.detached':
-        await _cleanupOnDetach();
-        break;
-    }
-    return null;
-  }
+  /// Handle app lifecycle changes for memory optimization - DISABLED
+  // Future<String?> _handleLifecycleMessage(String? message) async {
+  //   switch (message) {
+  //     case 'AppLifecycleState.paused':
+  //       await _optimizeMemoryOnPause();
+  //       break;
+  //     case 'AppLifecycleState.resumed':
+  //       await _optimizeMemoryOnResume();
+  //       break;
+  //     case 'AppLifecycleState.detached':
+  //       await _cleanupOnDetach();
+  //       break;
+  //   }
+  //   return null;
+  // }
 
   /// Register a disposable resource for automatic cleanup
   void registerDisposable(Disposable disposable) {
@@ -60,98 +62,99 @@ class MemoryOptimizer {
     _memoryPressureListeners.remove(listener);
   }
 
-  /// Force memory cleanup
+  /// Force memory cleanup - made much less aggressive
   Future<void> forceCleanup() async {
-    print('🧹 Starting forced memory cleanup...');
+    print('🧹 Starting gentle memory cleanup...');
 
-    // Clean up disposed references
+    // Only clean up weak references, don't trigger aggressive cleanup
     _cleanupWeakReferences();
 
-    // Trigger garbage collection
-    await _triggerGC();
+    // Don't trigger garbage collection during image processing
+    // await _triggerGC();
 
-    // Notify listeners
-    for (final listener in _memoryPressureListeners) {
-      try {
-        listener();
-      } catch (e) {
-        print('Error in memory pressure listener: $e');
-      }
-    }
+    // Don't notify listeners during image capture to prevent app restart
+    // for (final listener in _memoryPressureListeners) {
+    //   try {
+    //     listener();
+    //   } catch (e) {
+    //     print('Error in memory pressure listener: $e');
+    //   }
+    // }
 
-    print('✅ Forced memory cleanup completed');
+    print('✅ Gentle memory cleanup completed');
   }
 
-  /// Check current memory usage
-  Future<void> _checkMemoryUsage() async {
-    try {
-      // This is a simplified memory check - in production you'd use more sophisticated methods
-      final currentMemory = await _getCurrentMemoryUsageMB();
-
-      if (currentMemory > MEMORY_CRITICAL_THRESHOLD_MB) {
-        print('🚨 Critical memory usage: ${currentMemory}MB');
-        await forceCleanup();
-      } else if (currentMemory > MEMORY_WARNING_THRESHOLD_MB) {
-        print('⚠️ High memory usage: ${currentMemory}MB');
-        await _gentleCleanup();
-      }
-    } catch (e) {
-      print('Error checking memory usage: $e');
-    }
+  /// Get memory statistics without triggering cleanup
+  Map<String, dynamic> getMemoryStats() {
+    return {
+      'disposablesCount': _disposables.length,
+      'memoryListenersCount': _memoryPressureListeners.length,
+      'monitoringEnabled': _memoryMonitorTimer?.isActive ?? false,
+    };
   }
 
-  /// Get approximate memory usage (simplified implementation)
-  Future<double> _getCurrentMemoryUsageMB() async {
-    // This is a placeholder - actual implementation would use platform channels
-    // to get real memory usage from native code
-    return 100.0; // Placeholder value
-  }
+  /// Check current memory usage - DISABLED
+  // Future<void> _checkMemoryUsage() async {
+  //   try {
+  //     // This is a simplified memory check - in production you'd use more sophisticated methods
+  //     final currentMemory = await _getCurrentMemoryUsageMB();
+  //
+  //     if (currentMemory > MEMORY_CRITICAL_THRESHOLD_MB) {
+  //       print('🚨 Critical memory usage: ${currentMemory}MB');
+  //       await forceCleanup();
+  //     } else if (currentMemory > MEMORY_WARNING_THRESHOLD_MB) {
+  //       print('⚠️ High memory usage: ${currentMemory}MB');
+  //       await _gentleCleanup();
+  //     }
+  //   } catch (e) {
+  //     print('Error checking memory usage: $e');
+  //   }
+  // }
 
-  /// Gentle cleanup for memory pressure
-  Future<void> _gentleCleanup() async {
-    _cleanupWeakReferences();
+  /// Get approximate memory usage (simplified implementation) - DISABLED
+  // Future<double> _getCurrentMemoryUsageMB() async {
+  //   return 100.0; // Placeholder value
+  // }
 
-    // Notify some listeners (not all to avoid performance impact)
-    final listenersToNotify = _memoryPressureListeners.take(3);
-    for (final listener in listenersToNotify) {
-      try {
-        listener();
-      } catch (e) {
-        print('Error in gentle cleanup listener: $e');
-      }
-    }
-  }
+  /// Gentle cleanup for memory pressure - DISABLED
+  // Future<void> _gentleCleanup() async {
+  //   _cleanupWeakReferences();
+  //   final listenersToNotify = _memoryPressureListeners.take(3);
+  //   for (final listener in listenersToNotify) {
+  //     try {
+  //       listener();
+  //     } catch (e) {
+  //       print('Error in gentle cleanup listener: $e');
+  //     }
+  //   }
+  // }
 
-  /// Cleanup when app is paused
-  Future<void> _optimizeMemoryOnPause() async {
-    print('📱 App paused - optimizing memory...');
+  /// Cleanup when app is paused - DISABLED
+  // Future<void> _optimizeMemoryOnPause() async {
+  //   print('📱 App paused - optimizing memory...');
+  //   _cleanupWeakReferences();
+  //   await _triggerGC();
+  //   for (final listener in _memoryPressureListeners) {
+  //     try {
+  //       listener();
+  //     } catch (e) {
+  //       print('Error in pause cleanup listener: $e');
+  //     }
+  //   }
+  // }
 
-    // More aggressive cleanup when app is not visible
-    _cleanupWeakReferences();
-    await _triggerGC();
+  /// Optimize when app resumes - DISABLED
+  // Future<void> _optimizeMemoryOnResume() async {
+  //   print('📱 App resumed - performing light cleanup...');
+  //   _cleanupWeakReferences();
+  // }
 
-    // Notify all listeners
-    for (final listener in _memoryPressureListeners) {
-      try {
-        listener();
-      } catch (e) {
-        print('Error in pause cleanup listener: $e');
-      }
-    }
-  }
-
-  /// Optimize when app resumes
-  Future<void> _optimizeMemoryOnResume() async {
-    print('📱 App resumed - performing light cleanup...');
-    _cleanupWeakReferences();
-  }
-
-  /// Cleanup when app is detached
-  Future<void> _cleanupOnDetach() async {
-    print('📱 App detached - performing full cleanup...');
-    await forceCleanup();
-    dispose();
-  }
+  /// Cleanup when app is detached - DISABLED
+  // Future<void> _cleanupOnDetach() async {
+  //   print('📱 App detached - performing full cleanup...');
+  //   await forceCleanup();
+  //   dispose();
+  // }
 
   /// Clean up weak references that are no longer valid
   void _cleanupWeakReferences() {
@@ -164,14 +167,12 @@ class MemoryOptimizer {
     });
   }
 
-  /// Trigger garbage collection
-  Future<void> _triggerGC() async {
-    // Force garbage collection in debug mode
-    if (kDebugMode) {
-      // This is more of a hint to the garbage collector
-      await Future.delayed(const Duration(milliseconds: 10));
-    }
-  }
+  /// Trigger garbage collection - DISABLED
+  // Future<void> _triggerGC() async {
+  //   if (kDebugMode) {
+  //     await Future.delayed(const Duration(milliseconds: 10));
+  //   }
+  // }
 
   /// Create memory-optimized timer that cleans up automatically
   Timer createOptimizedTimer(Duration duration, VoidCallback callback) {

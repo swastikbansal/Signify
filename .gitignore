@@ -1,17 +1,13 @@
 # Flutter/Dart/Pub related
 .dart_tool/
-
 .packages
-
 .pub-cache/
 .gradle
 .local_plugins
 .flutter-plugins-dependencies
 .local
 .flutter-plugins
-
 .pub/
-
 build/
 
 ios/Flutter/Flutter.framework
@@ -55,7 +51,3 @@ ios/.metadata
 *.swp
 *.lock
 *.DS_Store
-
-# Environment files
-.env
-.env.*
