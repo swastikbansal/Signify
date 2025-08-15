@@ -1,11 +1,7 @@
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-// import '/walkthroughs/signify_screen_2.dart'; // Commented out to disable walkthrough
 import 'signtovoice2_model.dart';
 export 'signtovoice2_model.dart';
-// import 'skeleton_overlay.dart'; // Import our skeleton overlay
-// import 'package:tutorial_coach_mark/tutorial_coach_mark.dart'
-//     show TutorialCoachMark; // Commented out to disable walkthrough
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';

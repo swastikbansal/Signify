@@ -9,6 +9,7 @@ import 'package:tutorial_coach_mark/tutorial_coach_mark.dart'
     show TutorialCoachMark;
 import 'package:camera/camera.dart';
 import 'dart:convert';
+import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:translator/translator.dart';
@@ -75,25 +76,14 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
       PerformanceCacheManager.instance;
 
   // Store coordinate data
-  final List<List<Map<String, dynamic>>> _handLandmarks = [];
-  final List<List<Map<String, dynamic>>> _poseLandmarks = [];
-  String _lastUpdateTime = '';
-
-  // Enhanced coordinate storage for API
-  List<double>? _leftHandCoords;
-  List<double>? _rightHandCoords;
-  List<double>? _poseCoords;
-  List<String>? _handLabels; // To store hand labels (Left/Right)
+  String _lastUpdateTime = ''; // Removed landmark & pose data
 
   // Prediction history for debug
   final List<String> _predictionHistory = [];
 
   // Sentence building state
   final List<String> _currentSentence = [];
-  String _lastPrediction = "";
-  int _lastPredictionTime = 0;
-  static const int _wordCooldownMs =
-      2000; // 2 seconds cooldown between same words
+  // Removed duplicate suppression state for simplified always-append behavior
 
   List<String> get predictionHistory => _predictionHistory;
 
@@ -105,17 +95,30 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   List<String> get sentenceWords => List.from(_currentSentence);
 
   // API related state
-  String _apiUrl =
-      // 'http://192.168.29.42:5000/predict';
-      'http://192.168.42.166:5000/process_frame';
+  String _apiUrl = 'http://192.168.29.168:5000/process_frame';
   bool _isApiEnabled = true;
   int _lastApiCallTime = 0;
-  static const int _apiCallInterval =
-      100; // Minimum interval between API calls (ms)
+  static const int _apiCallInterval = 200; // Faster polling (~5-6 FPS target if server keeps up)
+
+  // Simplified fixed encoding parameters
+  // Encoding parameters (match prior working setup)
+
+  static const int _jpegQuality = 80; // Better quality for sign language
+
+  bool _apiInFlight = false; // Ensure only one request at a time
+  // Removed frame_index usage to match previous API expectations
+  
+  // Enhanced HTTP client with connection pooling
+  late final http.Client _httpClient;
+
+  void _initializeHttpClient() {
+    _httpClient = http.Client();
+    // Note: Dart's http.Client automatically handles connection pooling
+    // and keep-alive connections when using the same client instance
+  }
 
   // Skeleton overlay state
-  bool _isSkeletonOverlayEnabled = true;
-  bool _useCoordinateTransformation = true;
+  // Removed skeleton overlay & coordinate transformation flags
 
   // Text-to-Speech state
   FlutterTts? _flutterTts;
@@ -169,23 +172,8 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
     'ur-IN': 'ur',
   };
 
-  List<List<Map<String, dynamic>>> get handLandmarks => _handLandmarks;
-
-  List<List<Map<String, dynamic>>> get poseLandmarks => _poseLandmarks;
-
+  // Removed landmark getters
   String get lastUpdateTime => _lastUpdateTime;
-
-  List<double>? get leftHandCoords => _leftHandCoords;
-
-  List<double>? get rightHandCoords => _rightHandCoords;
-
-  List<double>? get poseCoords => _poseCoords;
-
-  List<String>? get handLabels => _handLabels;
-
-  bool get isSkeletonOverlayEnabled => _isSkeletonOverlayEnabled;
-
-  bool get useCoordinateTransformation => _useCoordinateTransformation;
 
   // TTS getters
   bool get isTtsInitialized => _isTtsInitialized;
@@ -475,19 +463,8 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   // Sentence management methods
   void _addWordToSentence(String word) async {
     if (word.trim().isEmpty) return;
-
-    String cleanWord = word.trim().toLowerCase();
-    int currentTime = DateTime.now().millisecondsSinceEpoch;
-
-    // Avoid duplicate words within cooldown period
-    if (_lastPrediction == cleanWord &&
-        currentTime - _lastPredictionTime < _wordCooldownMs) {
-      return;
-    }
-
+    // Always append word (duplicate suppression removed for simplicity)
     _currentSentence.add(word.trim());
-    _lastPrediction = cleanWord;
-    _lastPredictionTime = currentTime;
 
     print('Added word to sentence: "$word" -> "${_currentSentence.join(' ')}"');
 
@@ -598,90 +575,18 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   void initState(BuildContext context) {
     debugLogWidgetClass(this);
 
+    // Initialize HTTP client with connection pooling
+    _initializeHttpClient();
+
     // Initialize TTS
     initializeTts();
   }
 
   // Enhanced coordinate extraction method similar to Python implementation
-  void _extractAndProcessCoordinates() {
-    try {
-      // Reset coordinate data
-      _leftHandCoords = null;
-      _rightHandCoords = null;
-      _poseCoords = null;
-      _handLabels = null;
-
-      // Extract hand coordinates more efficiently
-      if (_handLandmarks.isNotEmpty) {
-        List<String> labels = [];
-
-        for (int i = 0; i < _handLandmarks.length; i++) {
-          List<Map<String, dynamic>> hand = _handLandmarks[i];
-
-          // Extract coordinates as flat list [x1, y1, z1, x2, y2, z2, ...]
-          List<double> coords = [];
-          for (var landmark in hand) {
-            coords.add((landmark['x'] as num).toDouble());
-            coords.add((landmark['y'] as num).toDouble());
-            coords.add((landmark['z'] as num).toDouble());
-          }
-
-          // Determine hand label based on position or use index-based labeling
-          // For better hand detection, we can use landmark positions to determine left/right
-          String handLabel = _determineHandLabel(hand, i);
-          labels.add(handLabel);
-
-          if (handLabel == "Left") {
-            _leftHandCoords = coords;
-          } else {
-            _rightHandCoords = coords;
-          }
-        }
-        _handLabels = labels;
-      }
-
-      // Extract pose coordinates
-      if (_poseLandmarks.isNotEmpty && _poseLandmarks[0].isNotEmpty) {
-        List<double> coords = [];
-        for (var landmark in _poseLandmarks[0]) {
-          coords.add((landmark['x'] as num).toDouble());
-          coords.add((landmark['y'] as num).toDouble());
-          coords.add((landmark['z'] as num).toDouble());
-        }
-        _poseCoords = coords;
-      }
-
-      // Coordinates are extracted for local overlay only
-      // Video frames are now sent to API instead of coordinates
-    } catch (e) {
-      print('Error extracting coordinates: $e');
-    }
-  }
+  // (Removed landmark extraction & labeling logic)
 
   // Improved hand label determination
-  String _determineHandLabel(List<Map<String, dynamic>> hand, int handIndex) {
-    try {
-      // Use landmark positions to determine left/right hand
-      // Landmark 0 is wrist, landmark 9 is middle finger MCP
-      if (hand.length > 9) {
-        double wristX = (hand[0]['x'] as num).toDouble();
-        double middleFingerX = (hand[9]['x'] as num).toDouble();
-
-        // If middle finger is to the right of wrist, it's likely a right hand
-        // This is a simplified heuristic and may need adjustment based on camera orientation
-        if (middleFingerX > wristX) {
-          return "Right";
-        } else {
-          return "Left";
-        }
-      }
-    } catch (e) {
-      print('Error determining hand label: $e');
-    }
-
-    // Fallback to index-based labeling
-    return handIndex == 0 ? "Left" : "Right";
-  }
+  // (Removed hand label helper)
 
   // Convert CameraImage to JPEG bytes for API transmission
   Future<Uint8List?> _convertCameraImageToJpeg(CameraImage image) async {
@@ -692,19 +597,25 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
         // Handle YUV420 format (most common on Android)
         convertedImage = _convertYUV420toImage(image);
       } else if (image.format.group == ImageFormatGroup.bgra8888) {
-        // Handle BGRA8888 format (common on iOS)
+        // Handle BGRA8888 format (common on iOS and our preferred format)
         convertedImage = img.Image.fromBytes(
           image.width,
           image.height,
           image.planes[0].bytes,
         );
+      } else if (image.format.group == ImageFormatGroup.jpeg) {
+        // Handle native JPEG - use directly but with quality control
+        print('Using native JPEG: ${image.planes[0].bytes.length} bytes');
+        return image.planes[0].bytes;
       } else {
         print('Unsupported image format: ${image.format.group}');
         return null;
       }
 
-      // Encode to JPEG with compression
-      final jpegBytes = img.encodeJpg(convertedImage, quality: 85);
+      // Encode to JPEG with consistent quality
+      final jpegBytes = img.encodeJpg(convertedImage, quality: _jpegQuality);
+      print(
+          'JPEG encoded: ${jpegBytes.length} bytes (${convertedImage.width}x${convertedImage.height}) q=$_jpegQuality');
       return Uint8List.fromList(jpegBytes);
     } catch (e) {
       print('Error converting camera image to JPEG: $e');
@@ -754,6 +665,9 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   // Add connection pooling and retry logic
   Future<void> _sendFrameToApi(CameraImage image) async {
     try {
+      if (_apiInFlight) {
+        return; // Drop frame if a request is already in flight
+      }
       // Throttle API calls to prevent overwhelming the server
       int currentTime = DateTime.now().millisecondsSinceEpoch;
       if (currentTime - _lastApiCallTime < _apiCallInterval) {
@@ -761,15 +675,20 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
       }
       _lastApiCallTime = currentTime;
 
+      _apiInFlight = true;
+
       // Convert camera image to JPEG
       final jpegBytes = await _convertCameraImageToJpeg(image);
       if (jpegBytes == null) {
         print('Failed to convert camera image to JPEG');
+        _apiInFlight = false;
         return;
       }
 
-      // Create multipart request
+      // Create multipart request with enhanced connection pooling
       var request = http.MultipartRequest('POST', Uri.parse(_apiUrl));
+      request.headers['Connection'] = 'keep-alive';
+      request.headers['Keep-Alive'] = 'timeout=30, max=100';
 
       // Add the image file
       request.files.add(
@@ -781,7 +700,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
         ),
       );
 
-      // Add additional metadata if needed
+      // Add additional metadata (wall clock + monotonic frame index)
       request.fields['timestamp'] = currentTime.toString();
       request.fields['camera_type'] = isFrontCamera ? 'front' : 'back';
       request.fields['width'] = image.width.toString();
@@ -789,12 +708,27 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
 
       print('Sending frame to API: ${jpegBytes.length} bytes');
 
-      // Send the request
-      final response = await request.send();
+      // Send the request with timeout using persistent client
+      http.StreamedResponse response;
+      final sendStart = DateTime.now();
+      try {
+        response =
+            await _httpClient.send(request).timeout(const Duration(seconds: 2));
+      } on TimeoutException catch (_) {
+        print('Frame API call timed out after 2s');
+        _errorMessage = 'API timeout';
+        _notifyStateChange();
+        return;
+      }
+
+      final elapsed = DateTime.now().difference(sendStart).inMilliseconds;
       final responseString = await response.stream.bytesToString();
+      print(
+          'API responded in ${elapsed}ms status=${response.statusCode} len=${responseString.length}');
 
       if (response.statusCode == 200) {
         print('Frame API call successful: $responseString');
+        // (Adaptive encoding removed – fixed size/quality used)
 
         // Parse the JSON response
         try {
@@ -857,8 +791,12 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
           _notifyStateChange();
         }
       });
+    } finally {
+      _apiInFlight = false;
     }
   }
+
+  // (Adaptive encoding removed – using fixed parameters)
 
   // Method to update API URL
   void setApiUrl(String url) {
@@ -881,16 +819,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   }
 
   // Method to toggle skeleton overlay
-  void setSkeletonOverlayEnabled(bool enabled) {
-    _isSkeletonOverlayEnabled = enabled;
-    _notifyStateChange();
-  }
-
-  // Method to toggle coordinate transformation
-  void setUseCoordinateTransformation(bool enabled) {
-    _useCoordinateTransformation = enabled;
-    _notifyStateChange();
-  }
+  // (Removed skeleton overlay & coordinate transformation methods)
 
   // Method to get API status
   bool get isApiEnabled => _isApiEnabled;
@@ -922,48 +851,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   bool get hasSentence => _currentSentence.isNotEmpty;
 
   // Method to force coordinate extraction (useful for testing)
-  void forceCoordinateExtraction() {
-    _extractAndProcessCoordinates();
-  }
-
-  // Method to get coordinate extraction status
-  Map<String, dynamic> getCoordinateStatus() {
-    return {
-      'hasLeftHand': _leftHandCoords != null,
-      'hasRightHand': _rightHandCoords != null,
-      'hasPose': _poseCoords != null,
-      'leftHandPoints': _leftHandCoords?.length ?? 0,
-      'rightHandPoints': _rightHandCoords?.length ?? 0,
-      'posePoints': _poseCoords?.length ?? 0,
-      'handLabels': _handLabels,
-      'lastUpdate': _lastUpdateTime,
-    };
-  }
-
-  // Debug method to print coordinate alignment information
-  void debugCoordinateAlignment() {
-    print('=== Coordinate Alignment Debug ===');
-    print('Camera Type: ${isFrontCamera ? "Front" : "Back"}');
-    print(
-        'Camera Aspect Ratio: ${cameraAspectRatio?.toStringAsFixed(3) ?? "Unknown"}');
-    print('Use Coordinate Transformation: $_useCoordinateTransformation');
-    print('Skeleton Overlay Enabled: $_isSkeletonOverlayEnabled');
-
-    if (_handLandmarks.isNotEmpty) {
-      final firstHand = _handLandmarks[0];
-      if (firstHand.isNotEmpty) {
-        final wrist = firstHand[0];
-        print(
-            'Sample Wrist Coordinate: x=${wrist['x']}, y=${wrist['y']}, z=${wrist['z']}');
-      }
-    }
-
-    if (_cameraController != null) {
-      print('Camera Resolution: ${_cameraController!.value.previewSize}');
-      print('Camera Description: ${_cameraController!.description}');
-    }
-    print('================================');
-  }
+  // (Removed coordinate status & debug alignment utilities)
 
   Future<void> _initializeCamera() async {
     try {
@@ -978,12 +866,28 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
 
         _cameraController = CameraController(
           camera,
-          ResolutionPreset.medium,
+          ResolutionPreset.medium, // Back to medium for better performance
           enableAudio: false,
-          imageFormatGroup: ImageFormatGroup.bgra8888,
+          imageFormatGroup:
+              ImageFormatGroup.bgra8888, // Back to BGRA8888 for compatibility
         );
 
         await _cameraController!.initialize();
+
+        // Set high quality camera settings after initialization
+        try {
+          await _cameraController!.setFlashMode(FlashMode.off);
+          await _cameraController!.setFocusMode(FocusMode.auto);
+          await _cameraController!.setExposureMode(ExposureMode.auto);
+
+          // Additional quality settings for better image capture
+          await _cameraController!.lockCaptureOrientation();
+
+          // Set exposure compensation for better lighting (optional)
+          // await _cameraController!.setExposureOffset(0.0);
+        } catch (e) {
+          print('Advanced camera settings not available: $e');
+        }
 
         // Start image stream for camera processing
         if (_isDetecting) {
@@ -995,10 +899,13 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
         _isCameraInitialized = true;
         _notifyStateChange();
         print(
-            'Front camera initialized successfully: ${_cameraController!.description.name}');
+            'Medium-quality camera initialized successfully: ${_cameraController!.description.name}');
         print('Camera is front: $isFrontCamera');
+        print('Camera resolution: ${_cameraController!.value.previewSize}');
         print(
             'Camera aspect ratio: ${cameraAspectRatio?.toStringAsFixed(3) ?? "Unknown"}');
+        print('Image format: ${ImageFormatGroup.bgra8888}');
+        print('Resolution preset: Medium');
       }
     } catch (e) {
       print('Error initializing camera: $e');
@@ -1009,20 +916,21 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   }
 
   // Add frame throttling variables
-  int _lastProcessedFrame = 0;
-  static const int FRAME_SKIP_COUNT = 3; // Process every 2nd frame (was 3)
-  bool _isProcessingFrame = false;
+  // Simplified frame processing: drop frames while API request converting/sending
+  bool _isProcessingFrame = false; // retained for watchdog safety
 
   void _processCameraImage(CameraImage image) {
     if (_isDetecting && _isInitialized && !_isProcessingFrame) {
       try {
-        // Frame throttling - only process every 2nd frame to prevent memory issues
-        _lastProcessedFrame++;
-        if (_lastProcessedFrame % FRAME_SKIP_COUNT != 0) {
-          return;
-        }
-
-        _isProcessingFrame = true;
+        // Only process if no request in flight
+        if (_apiInFlight) return; // Drop frame silently
+        _isProcessingFrame = true; // Mark for watchdog
+        Timer(const Duration(seconds: 5), () {
+          if (_isProcessingFrame) {
+            _isProcessingFrame = false;
+            debugPrint('Processing watchdog reset flag after 5s');
+          }
+        });
 
         // Debug logging (only occasionally to avoid spam)
         if (DateTime.now().millisecondsSinceEpoch % 1000 < 100) {
@@ -1032,12 +940,12 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
 
         // Send frame to API for prediction instead of local processing
         if (_isApiEnabled) {
-          _sendFrameToApi(image).then((_) {
-            _isProcessingFrame = false; // Reset flag when processing completes
-          }).catchError((e) {
-            print('Error sending frame to API: $e');
-            _isProcessingFrame = false; // Reset flag on error too
-          });
+          _sendFrameToApi(image)
+              .timeout(const Duration(seconds: 5))
+              .catchError((e) => print('Frame send error: $e'))
+              .whenComplete(() => _isProcessingFrame = false);
+        } else {
+          _isProcessingFrame = false;
         }
       } catch (e) {
         print('Error in image processing: $e');
@@ -1052,7 +960,8 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
     }
   }
 
-  Future<void> _disposeCamera() async {
+  // Simplified camera dispose helper (replaces removed _disposeCamera)
+  Future<void> _disposeActiveCamera() async {
     try {
       if (_cameraController != null) {
         if (_cameraController!.value.isStreamingImages) {
@@ -1063,14 +972,15 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
       }
       _isCameraInitialized = false;
       _isCameraOn = false;
-      _isProcessingFrame = false; // Reset processing flag
-      _lastProcessedFrame = 0; // Reset frame counter
+      _isProcessingFrame = false;
       _notifyStateChange();
-      print('Camera disposed and memory cleaned up');
+      print('Camera disposed');
     } catch (e) {
       print('Error disposing camera: $e');
     }
   }
+
+  // (Simplified dispose cleanup)
 
   Future<void> toggleDetection() async {
     try {
@@ -1081,7 +991,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
         _errorMessage = '';
 
         // Dispose camera
-        await _disposeCamera();
+        await _disposeActiveCamera();
       } else {
         // Set detection flag first
         _isDetecting = true;
@@ -1102,7 +1012,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
           _errorMessage = 'Start detection error: $e';
           _isDetecting = false;
           _isInitialized = false; // Add this line
-          await _disposeCamera();
+          await _disposeActiveCamera();
           print('Error starting detection: $e');
         }
       }
@@ -1114,7 +1024,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
       _errorMessage = 'Toggle error: $e';
       _lastUpdateTime = '';
 
-      await _disposeCamera();
+      await _disposeActiveCamera();
       _notifyStateChange();
     }
   }
@@ -1127,22 +1037,19 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
         _flutterTts!.stop();
         _flutterTts = null;
       }
+      // Close persistent HTTP client
+      _httpClient.close();
 
       // Clear all caches and coordinate data for memory optimization
       _predictionHistory.clear();
       _currentSentence.clear();
-      _handLandmarks.clear();
-      _poseLandmarks.clear();
-      _leftHandCoords = null;
-      _rightHandCoords = null;
-      _poseCoords = null;
-      _handLabels = null;
+      // Landmark data already removed
 
       // Dispose cache manager - use the performance cache manager
       _cacheManager.clearAll();
 
       // Dispose camera
-      _disposeCamera();
+      _disposeActiveCamera();
 
       signifyScreen2Controller?.finish();
       textFieldFocusNode?.dispose();

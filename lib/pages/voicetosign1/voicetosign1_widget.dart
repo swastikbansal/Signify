@@ -57,6 +57,7 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
   void initState() {
     super.initState();
     _model = createModel(context, () => Voicetosign1Model());
+    // Logging minimized – verbose helper removed
 
     // On page load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {
@@ -96,7 +97,7 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
     SupabaseAnimationService.preloadCoreVocabulary();
 
     // Optionally log dynamic vocabulary info for debugging
-    _logVocabularyInfo();
+    _logVocabularyInfo(); // Will internally respect minimal logging
 
     // Moving line animation controller (Claude AI style)
     _movingLineController = AnimationController(
@@ -123,48 +124,26 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
   // Dynamic vocabulary info logging - showcases API capabilities
   Future<void> _logVocabularyInfo() async {
     try {
-      final totalWords = await SupabaseAnimationService.getTotalWordCount();
-      final categories =
-          await SupabaseAnimationService.getAvailableCategories();
-      final popularWords =
-          await SupabaseAnimationService.getPopularWords(limit: 5);
-
-      debugPrint('📊 Dynamic Vocabulary Info:');
-      debugPrint('  Total words available: $totalWords');
-      debugPrint('  Categories: ${categories.join(", ")}');
-      debugPrint('  Popular words: ${popularWords.join(", ")}');
-      debugPrint(
-          '🚀 Fully scalable - add words via Supabase without code changes!');
-    } catch (e) {
-      debugPrint('⚠️ Could not fetch vocabulary info: $e');
-    }
+      // Keep this silent unless needed for diagnostics
+      await SupabaseAnimationService.getTotalWordCount();
+    } catch (_) {}
   }
 
-  // Dynamic word suggestions for unknown words - showcases search capabilities
+  // Minimal similar word suggestion (silent)
   Future<void> _suggestSimilarWords(String unknownWord) async {
     try {
-      // Search for partial matches
       final suggestions =
           await SupabaseAnimationService.searchWords(unknownWord, limit: 3);
-
-      if (suggestions.isNotEmpty) {
-        debugPrint(
-            '💡 Suggestions for "$unknownWord": ${suggestions.join(", ")}');
-      } else {
-        // If no partial matches, suggest popular words
-        final popular =
-            await SupabaseAnimationService.getPopularWords(limit: 3);
-        debugPrint('💡 Try these popular words instead: ${popular.join(", ")}');
+      if (suggestions.isEmpty) {
+        await SupabaseAnimationService.getPopularWords(limit: 3);
       }
-    } catch (e) {
-      debugPrint('⚠️ Could not fetch suggestions for $unknownWord: $e');
-    }
+    } catch (_) {}
   }
 
   // Image handling methods
   Future<void> _pickImage() async {
     try {
-      debugPrint('📸 Starting image picker...');
+      // Intentionally minimal logging
 
       final XFile? pickedFile = await _imagePicker.pickImage(
         source: ImageSource.gallery,
@@ -174,13 +153,11 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
       );
 
       if (pickedFile == null) {
-        debugPrint('❌ No image selected');
         return;
       }
 
       await _processImageSafely(pickedFile, isFromCamera: false);
     } catch (e) {
-      debugPrint('❌ Error picking image: $e');
       setState(() {
         isProcessingImage = false;
       });
@@ -189,7 +166,7 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
 
   Future<void> _takePhoto() async {
     try {
-      debugPrint('📷 Starting camera...');
+      // Minimal logging for camera capture
 
       // Add pre-camera delay to ensure proper initialization
       await Future.delayed(const Duration(milliseconds: 300));
@@ -202,17 +179,15 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
       );
 
       if (pickedFile == null) {
-        debugPrint('❌ No photo taken');
         return;
       }
 
       // Add post-camera delay to ensure proper file handling
       await Future.delayed(const Duration(milliseconds: 300));
-      debugPrint('📱 Camera capture completed, processing...');
+      // Silent after capture
 
       await _processImageSafely(pickedFile, isFromCamera: true);
     } catch (e) {
-      debugPrint('❌ Error taking photo: $e');
       setState(() {
         isProcessingImage = false;
       });
@@ -225,8 +200,7 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
       isProcessingImage = true;
     });
 
-    debugPrint(
-        '🔄 Processing ${isFromCamera ? 'camera' : 'gallery'} image safely...');
+    // Silent image processing
 
     try {
       // Use safe image processor with camera flag
@@ -241,9 +215,6 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
       if (result['success'] == true) {
         final String extractedText = result['text'] ?? '';
         final String imagePath = result['imagePath'];
-
-        debugPrint(
-            '✅ Safe processing completed! Text: ${extractedText.length} chars');
 
         setState(() {
           // Add extracted text to the text field if any
@@ -264,22 +235,17 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
           isProcessingImage = false;
         });
 
-        debugPrint(
-            '✅ Image safely processed and added. Total: ${uploadedImagePaths.length}');
+        // Success silent
       } else {
-        debugPrint('⚠️ Image processing failed safely');
         setState(() {
           isProcessingImage = false;
         });
       }
     } catch (e) {
-      debugPrint('❌ Error in safe image processing: $e');
       setState(() {
         isProcessingImage = false;
       });
     }
-
-    debugPrint('📸 Image processing completed safely');
   }
 
   void _showImagePickerBottomSheet() {
@@ -442,7 +408,6 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
         currentWord = null;
         isPlayingSequence = false;
       });
-      debugPrint('No sentence provided. Playing default animation.');
       return;
     }
 
@@ -459,9 +424,7 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
       });
     });
 
-    debugPrint('⚡ INSTANT Send button pressed!');
-    debugPrint('⚡ INSTANT processing text: ${inputSentence.trim()}');
-    debugPrint('🖼️ Images to clear: ${uploadedImagePaths.length}');
+    // Suppressed noisy send diagnostics
 
     try {
       // Parse sentence word by word for INSTANT API processing
@@ -473,7 +436,7 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
           .where((word) => word.isNotEmpty)
           .toList();
 
-      debugPrint('⚡ Processing words INSTANTLY: $words');
+      // Silent list of words
 
       // Ultra-fast animations from Supabase API
       final animationsData =
@@ -487,10 +450,7 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
         if (i < animationsData.length && animationsData[i].url != null) {
           _animationQueue.add(animationsData[i]);
           _wordQueue.add(words[i]);
-          debugPrint(
-              '⚡ INSTANT animation ready: ${words[i]} (${animationsData[i].metadata.duration}ms)');
         } else {
-          debugPrint('❌ No animation for: ${words[i]}');
           // Dynamic word suggestions for missing words
           _suggestSimilarWords(words[i]);
         }
@@ -508,11 +468,8 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
         SupabaseAnimationService.preloadRelatedWords(
             _animationQueue.first.metadata.word);
 
-        debugPrint('⚡ Starting INSTANT animation sequence for: $_wordQueue');
         _startSeamlessAnimationSequence();
       } else {
-        debugPrint(
-            'No animations found for any words. Playing default animation.');
         setState(() {
           currentAnimation = defaultAnimation;
           currentWord = null;
@@ -520,7 +477,6 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
         });
       }
     } catch (e) {
-      debugPrint('❌ Error loading animations from API: $e');
       setState(() {
         currentAnimation = defaultAnimation;
         isPlayingSequence = false;
@@ -535,7 +491,6 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
       // Clear animation state when clearing input
       _model.clearAnimations();
     });
-    debugPrint('⚡ INSTANTLY cleared text field and images');
   }
 
   void _startSeamlessAnimationSequence() {
@@ -547,7 +502,6 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
   }
 
   void _onAnimationSequenceComplete() {
-    debugPrint('✅ Seamless animation sequence completed');
     setState(() {
       currentAnimation = defaultAnimation;
       currentWord = null;
@@ -561,7 +515,6 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
     setState(() {
       currentWord = word;
     });
-    debugPrint('🎯 Now playing: $word');
   }
 
   @override
