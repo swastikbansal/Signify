@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
@@ -32,8 +33,12 @@ void main() async {
   GoRouter.optionURLReflectsImperativeAPIs = true;
   usePathUrlStrategy();
 
-  // Initialize performance services first
-  await _initializePerformanceServices();
+  // Initialize performance services only in release mode to avoid debug conflicts
+  if (kReleaseMode) {
+    await _initializePerformanceServices();
+  } else {
+    print('🔧 Debug mode: Skipping aggressive performance optimizations');
+  }
 
   await initFirebase();
 
@@ -41,8 +46,16 @@ void main() async {
 
   await FFLocalizations.initialize();
 
+  // Simplified error handling for debug mode to prevent blank pages
   final originalErrorWidgetBuilder = ErrorWidget.builder;
   ErrorWidget.builder = (FlutterErrorDetails details) {
+    // In debug mode, use default error handling to see actual errors
+    if (kDebugMode) {
+      print('🐛 Debug Error: ${details.exceptionAsString()}');
+      return originalErrorWidgetBuilder(details);
+    }
+    
+    // Only use custom error handling in release mode
     try {
       final match = RegExp(
               r'The relevant error-causing widget was:\s+([a-zA-Z0-9]+)(.|\n)*When the exception was thrown, this was the stack:((.|\n)*)')
@@ -52,21 +65,6 @@ void main() async {
       }
       final widgetName = match.group(1);
       final stackTrace = match.group(3)!;
-
-      // The stack trace usually is very long, and most of it is entirely
-      // irrelevant for troubleshooting, e.g.:
-      //
-      // dart-sdk/lib/_internal/js_dev_runtime/private/ddc_runtime/errors.dart 251:49  throw_
-      // dart-sdk/lib/_internal/js_dev_runtime/private/ddc_runtime/errors.dart 29:3    assertFailed
-      // packages/flutter/src/widgets/text.dart 378:14                                 new
-      // packages/debug_screen_test/home_page/home_page_widget.dart 51:15              build
-      // packages/flutter/src/widgets/framework.dart 4870:27                           build
-      // packages/flutter/src/widgets/framework.dart 4754:15                           performRebuild
-      // packages/flutter/src/widgets/framework.dart 4928:11                           performRebuild
-      // packages/flutter/src/widgets/framework.dart 4477:5                            rebuild
-      // <a long long list of internal libraries>
-      //
-      // We truncate everything after project-specific code.
 
       final filteredStackTrace = <String>[];
       var foundProjectTraces = false;
@@ -94,8 +92,9 @@ Stack trace: ${filteredStackTrace.join("\n")}''';
     }
   };
 
-  /// Optimized debounce cleanup - reduced frequency to improve performance
-  Timer.periodic(const Duration(seconds: 5), (timer) {
+  /// Optimized debounce cleanup - reduced frequency in debug mode to prevent conflicts
+  const cleanupDuration = kDebugMode ? const Duration(seconds: 10) : const Duration(seconds: 5);
+  Timer.periodic(cleanupDuration, (timer) {
     EasyDebounce.cancel('508f3c74205c87928b71f49040062e732f9c20b0');
   });
 
@@ -105,9 +104,18 @@ Stack trace: ${filteredStackTrace.join("\n")}''';
   runApp(const MyApp());
 }
 
-/// Initialize performance optimization services - simplified
+/// Initialize performance optimization services - disabled in debug mode
 Future<void> _initializePerformanceServices() async {
   try {
+    // In debug mode, use minimal performance services to avoid conflicts
+    if (kDebugMode) {
+      print('🔧 Debug mode: Using minimal performance optimization');
+      // Only initialize basic memory optimizer without aggressive monitoring
+      await MemoryOptimizer.instance.initialize();
+      return;
+    }
+
+    // Full performance optimization for release mode
     // Initialize memory optimizer
     await MemoryOptimizer.instance.initialize();
 
@@ -119,16 +127,7 @@ Future<void> _initializePerformanceServices() async {
     DatabaseOptimizer.instance.initialize();
     BackgroundTaskOptimizer.instance.initialize();
 
-    // Disable aggressive memory pressure handling that causes app restarts during image capture
-    // MemoryOptimizer.instance.addMemoryPressureListener(() {
-    //   PerformanceCacheManager.instance.clearAll();
-    //   NetworkOptimizer.instance.clearCache();
-    //   DatabaseOptimizer.instance.clearQueryCache();
-    //   // Using safe image processor now - no cache clearing needed
-    //   print('🧹 Basic caches cleared due to memory pressure');
-    // });
-
-    print('🚀 Basic performance services initialized successfully');
+    print('🚀 Full performance services initialized for release mode');
   } catch (e) {
     print('⚠️ Error initializing performance services: $e');
   }
@@ -226,12 +225,16 @@ class _MyAppState extends State<MyApp> {
   void dispose() {
     authUserSub.cancel();
 
-    // Dispose all performance services in correct order
-    BackgroundTaskOptimizer.instance.dispose();
-    DatabaseOptimizer.instance.dispose();
-    NetworkOptimizer.instance.dispose();
-    // Removed animation and image optimizers - using instant system now
-    PerformanceCacheManager.instance.dispose();
+    // Only dispose performance services if they were initialized (release mode)
+    if (kReleaseMode) {
+      // Dispose all performance services in correct order
+      BackgroundTaskOptimizer.instance.dispose();
+      DatabaseOptimizer.instance.dispose();
+      NetworkOptimizer.instance.dispose();
+      PerformanceCacheManager.instance.dispose();
+    }
+    
+    // Always dispose memory optimizer (minimal in debug mode)
     MemoryOptimizer.instance.dispose();
 
     // Dispose error recovery service
@@ -252,7 +255,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    // Temporarily disable PerformanceMonitor to fix image/animation issues
+    // Disable PerformanceMonitor in debug mode to prevent blank page issues
     return MaterialApp.router(
       title: 'Signify',
       // Disable debug banner for better performance

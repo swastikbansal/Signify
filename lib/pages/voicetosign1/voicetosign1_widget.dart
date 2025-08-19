@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:model_viewer_plus/model_viewer_plus.dart';
@@ -142,6 +143,13 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
 
   Future<void> _takePhoto() async {
     try {
+      // Debug mode: Additional protection against camera conflicts
+      if (kDebugMode) {
+        print('📸 Debug mode: Starting camera capture with extra protection');
+        // Longer delay in debug mode to prevent conflicts
+        await Future.delayed(const Duration(milliseconds: 500));
+      }
+
       // Minimal logging for camera capture
 
       // Add pre-camera delay to ensure proper initialization
@@ -155,7 +163,16 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
       );
 
       if (pickedFile == null) {
+        if (kDebugMode) {
+          print('📸 Debug mode: Camera capture cancelled by user');
+        }
         return;
+      }
+
+      // Debug mode: Additional post-camera stabilization
+      if (kDebugMode) {
+        print('📸 Debug mode: Camera capture completed, stabilizing...');
+        await Future.delayed(const Duration(milliseconds: 500));
       }
 
       // Add post-camera delay to ensure proper file handling
@@ -164,9 +181,23 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
 
       await _processImageSafely(pickedFile, isFromCamera: true);
     } catch (e) {
+      if (kDebugMode) {
+        print('❌ Debug mode: Camera error caught safely: $e');
+      }
       setState(() {
         isProcessingImage = false;
       });
+
+      // Show user-friendly error in debug mode
+      if (kDebugMode && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Camera temporarily unavailable in debug mode'),
+            backgroundColor: Colors.orange,
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
     }
   }
 
@@ -176,7 +207,11 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
       isProcessingImage = true;
     });
 
-    // Silent image processing
+    // Debug mode: Extra logging and protection
+    if (kDebugMode) {
+      print(
+          '🖼️ Debug mode: Processing ${isFromCamera ? 'camera' : 'gallery'} image safely');
+    }
 
     try {
       // Use safe image processor with camera flag
@@ -211,16 +246,43 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
           isProcessingImage = false;
         });
 
-        // Success silent
+        // Debug mode: Success logging
+        if (kDebugMode) {
+          print('✅ Debug mode: Image processed successfully');
+          if (extractedText.isNotEmpty) {
+            print(
+                '📝 Debug mode: Extracted text: "${extractedText.substring(0, extractedText.length.clamp(0, 50))}..."');
+          }
+        }
       } else {
         setState(() {
           isProcessingImage = false;
         });
+
+        if (kDebugMode) {
+          print('⚠️ Debug mode: Image processing returned failure');
+        }
       }
     } catch (e) {
+      if (kDebugMode) {
+        print('❌ Debug mode: Image processing error caught: $e');
+      }
+
       setState(() {
         isProcessingImage = false;
       });
+
+      // Show user-friendly error in debug mode
+      if (kDebugMode && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content:
+                Text('Image processing temporarily unavailable in debug mode'),
+            backgroundColor: Colors.orange,
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
     }
   }
 
