@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:camera/camera.dart';
+import 'dart:ui' as ui;
 
 class Signtovoice2Widget extends StatefulWidget {
   const Signtovoice2Widget({super.key});
@@ -280,313 +281,357 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                     ),
             ),
 
-            // Floating control panel positioned above bottom nav - Claude AI style
+            // Floating control panel positioned above bottom nav - Claude AI style with acrylic transparency
             Positioned(
               bottom:
                   16.0, // Position just above bottom nav bar (optimal spacing)
               left: 8.0,
               right: 8.0,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: FlutterFlowTheme.of(context).secondaryBackground,
-                  borderRadius: BorderRadius.circular(16.0),
-                  border: Border.all(
-                    color: FlutterFlowTheme.of(context).alternate,
-                    width: 1.0,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Stack(
-                  children: [
-                    // Moving line animation overlay (Google Assistant-like)
-                    if (isGlowActive)
-                      Positioned.fill(
-                        child: AnimatedBuilder(
-                          animation: _movingLineAnimation,
-                          builder: (context, child) {
-                            return Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(16.0),
-                                border: Border.all(
-                                  color: Colors.transparent,
-                                  width: 2.0,
-                                ),
-                              ),
-                              child: CustomPaint(
-                                painter: MovingLinePainter(
-                                  progress: _movingLineAnimation.value,
-                                  color: const Color(
-                                      0xFFFAB317), // App yellow color
-                                  strokeWidth: 3.0,
-                                ),
-                              ),
-                            );
-                          },
-                        ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16.0),
+                child: BackdropFilter(
+                  filter: ui.ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      // Acrylic glass effect with transparency like Windows/Grok AI
+                      color: FlutterFlowTheme.of(context)
+                          .secondaryBackground
+                          .withOpacity(0.90),
+                      borderRadius: BorderRadius.circular(16.0),
+                      border: Border.all(
+                        // Subtle glass-like border with opacity
+                        color: FlutterFlowTheme.of(context)
+                            .alternate
+                            .withOpacity(0.6),
+                        width: 1.0,
                       ),
-                    // Main content
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Text field area (full width like Claude AI)
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20.0,
-                            vertical: 16.0,
-                          ),
-                          child: Scrollbar(
-                            controller: _textFieldScrollController,
-                            thumbVisibility: false, // Only show when scrolling
-                            trackVisibility: false,
-                            thickness: 4.0,
-                            radius: const Radius.circular(2.0),
-                            child: TextFormField(
-                              controller: _model.textController,
-                              focusNode: _model.textFieldFocusNode,
-                              scrollController: _textFieldScrollController,
-                              autofocus: false,
-                              readOnly: true,
-                              textCapitalization: TextCapitalization.sentences,
-                              obscureText: false,
-                              decoration: InputDecoration(
-                                hintText: _model.isTranslating
-                                    ? 'Translating...'
-                                    : 'Translated Text Appear Here',
-                                hintStyle: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .override(
-                                      fontFamily: FlutterFlowTheme.of(context)
-                                          .bodyMediumFamily,
-                                      color: _model.isTranslating
-                                          ? const Color(0xFFFAB317)
-                                          : FlutterFlowTheme.of(context)
-                                              .secondaryText,
-                                      fontSize: 16.0,
-                                      letterSpacing: 0.0,
-                                      useGoogleFonts: GoogleFonts.asMap()
-                                          .containsKey(
-                                              FlutterFlowTheme.of(context)
-                                                  .bodyMediumFamily),
-                                    ),
-                                enabledBorder: InputBorder.none,
-                                focusedBorder: InputBorder.none,
-                                errorBorder: InputBorder.none,
-                                focusedErrorBorder: InputBorder.none,
-                                isDense: true,
-                                contentPadding: EdgeInsets.zero,
-                              ),
-                              style: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .override(
-                                    fontFamily: FlutterFlowTheme.of(context)
-                                        .bodyMediumFamily,
-                                    fontSize: 16.0,
-                                    letterSpacing: 0.0,
-                                    useGoogleFonts: GoogleFonts.asMap()
-                                        .containsKey(
-                                            FlutterFlowTheme.of(context)
-                                                .bodyMediumFamily),
-                                    lineHeight: 1.4,
-                                  ),
-                              textAlign: TextAlign.start,
-                              maxLines: 6, // Allow expansion up to 6 lines
-                              minLines: 1,
-                              keyboardType: TextInputType.multiline,
-                              cursorColor: FlutterFlowTheme.of(context).primary,
-                            ),
-                          ),
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          // Modern glassmorphism gradient
+                          FlutterFlowTheme.of(context)
+                              .secondaryBackground
+                              .withOpacity(0.9),
+                          FlutterFlowTheme.of(context)
+                              .secondaryBackground
+                              .withOpacity(0.7),
+                        ],
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 20,
+                          offset: const Offset(0, 8),
+                          spreadRadius: -2,
                         ),
-
-                        // Button row below text field (Claude AI style)
-                        Container(
-                          padding: const EdgeInsets.only(
-                            left: 16.0,
-                            right: 16.0,
-                            bottom: 16.0,
-                          ),
-                          child: Row(
-                            children: [
-                              // Modern Android-style scrollable language dropdown
-                              Container(
-                                margin: const EdgeInsets.only(right: 12.0),
-                                child: Tooltip(
-                                  message:
-                                      'Select language for text-to-speech output',
-                                  decoration: BoxDecoration(
-                                    color:
-                                        FlutterFlowTheme.of(context).alternate,
-                                    borderRadius: BorderRadius.circular(8.0),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.1),
-                                        blurRadius: 4.0,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ],
-                                  ),
-                                  textStyle: TextStyle(
-                                    color: FlutterFlowTheme.of(context)
-                                        .primaryText,
-                                    fontSize: 12.0,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                  preferBelow: false,
-                                  showDuration: const Duration(seconds: 2),
-                                  child: ModernDropDown(
-                                    value: _model.availableLanguages[
-                                            _model.selectedLanguage] ??
-                                        'English (US)',
-                                    options: _model.availableLanguages.values
-                                        .toList(),
-                                    onChanged: (val) async {
-                                      // Find the language code for the selected language name
-                                      String? selectedCode;
-                                      _model.availableLanguages
-                                          .forEach((code, name) {
-                                        if (name == val) {
-                                          selectedCode = code;
-                                        }
-                                      });
-
-                                      if (selectedCode != null) {
-                                        await _model
-                                            .setTtsLanguage(selectedCode!);
-                                        safeSetState(() {});
-                                        print(
-                                            'TTS Language changed to: $selectedCode ($val)');
-                                      }
-                                    },
-                                    width: 110.0,
-                                    height: 36.0,
-                                  ),
-                                ), // Removed walkthrough functionality
-                                // .addWalkthrough(
-                                //   dropDownB9wm9jo8,
-                                //   _model.signifyScreen2Controller,
-                                // ),
-                              ),
-
-                              // Speaker toggle button with TTS state
-                              Container(
-                                margin: const EdgeInsets.only(right: 8.0),
-                                child: Tooltip(
-                                  message: _model.ttsToggleState
-                                      ? 'Turn off text-to-speech'
-                                      : 'Turn on text-to-speech',
-                                  decoration: BoxDecoration(
-                                    color:
-                                        FlutterFlowTheme.of(context).alternate,
-                                    borderRadius: BorderRadius.circular(8.0),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.1),
-                                        blurRadius: 4.0,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ],
-                                  ),
-                                  textStyle: TextStyle(
-                                    color: FlutterFlowTheme.of(context)
-                                        .primaryText,
-                                    fontSize: 12.0,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                  preferBelow: false,
-                                  showDuration: const Duration(seconds: 2),
-                                  child: Material(
-                                    color: Colors.transparent,
-                                    child: InkWell(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                      onTap: () async {
-                                        await _model.toggleTts();
-                                        safeSetState(() {});
-                                      },
-                                      child: SizedBox(
-                                        width: 42.0,
-                                        height: 42.0,
-                                        child: Icon(
-                                          _model.ttsToggleState
-                                              ? Icons.volume_up_rounded
-                                              : Icons.volume_off_rounded,
-                                          color: _model.ttsToggleState
-                                              ? const Color(0xFFFAB317)
-                                              : FlutterFlowTheme.of(context)
-                                                  .secondaryText,
-                                          size: 24.0,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-
-                              const Spacer(),
-
-                              // Camera toggle button (no border)
-                              Container(
-                                margin: const EdgeInsets.only(right: 8.0),
-                                child: Tooltip(
-                                  message: _model.isDetecting
-                                      ? 'Stop sign detection'
-                                      : 'Start sign detection',
-                                  decoration: BoxDecoration(
-                                    color:
-                                        FlutterFlowTheme.of(context).alternate,
-                                    borderRadius: BorderRadius.circular(8.0),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.1),
-                                        blurRadius: 4.0,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ],
-                                  ),
-                                  textStyle: TextStyle(
-                                    color: FlutterFlowTheme.of(context)
-                                        .primaryText,
-                                    fontSize: 12.0,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                  preferBelow: false,
-                                  showDuration: const Duration(seconds: 2),
-                                  child: Material(
-                                    color: Colors.transparent,
-                                    child: InkWell(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                      onTap: () async {
-                                        await _model.toggleDetection();
-                                        safeSetState(() {});
-                                      },
-                                      child: SizedBox(
-                                        width: 42.0,
-                                        height: 42.0,
-                                        child: Icon(
-                                          _model.isDetecting
-                                              ? Icons.stop_rounded
-                                              : Icons.camera_alt_rounded,
-                                          color: _model.isDetecting
-                                              ? const Color(0xFFFAB317)
-                                              : FlutterFlowTheme.of(context)
-                                                  .secondaryText,
-                                          size: 24.0,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ), // Removed walkthrough functionality
-                            ],
-                          ),
+                        BoxShadow(
+                          color: Colors.white.withOpacity(0.05),
+                          blurRadius: 6,
+                          offset: const Offset(0, -1),
                         ),
                       ],
                     ),
-                  ],
+                    child: Stack(
+                      children: [
+                        // Moving line animation overlay (Google Assistant-like)
+                        if (isGlowActive)
+                          Positioned.fill(
+                            child: AnimatedBuilder(
+                              animation: _movingLineAnimation,
+                              builder: (context, child) {
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(16.0),
+                                    border: Border.all(
+                                      color: Colors.transparent,
+                                      width: 2.0,
+                                    ),
+                                  ),
+                                  child: CustomPaint(
+                                    painter: MovingLinePainter(
+                                      progress: _movingLineAnimation.value,
+                                      color: const Color(
+                                          0xFFFAB317), // App yellow color
+                                      strokeWidth: 3.0,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        // Main content
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // Text field area (full width like Claude AI)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20.0,
+                                vertical: 16.0,
+                              ),
+                              child: Scrollbar(
+                                controller: _textFieldScrollController,
+                                thumbVisibility:
+                                    false, // Only show when scrolling
+                                trackVisibility: false,
+                                thickness: 4.0,
+                                radius: const Radius.circular(2.0),
+                                child: TextFormField(
+                                  controller: _model.textController,
+                                  focusNode: _model.textFieldFocusNode,
+                                  scrollController: _textFieldScrollController,
+                                  autofocus: false,
+                                  readOnly: true,
+                                  textCapitalization:
+                                      TextCapitalization.sentences,
+                                  obscureText: false,
+                                  decoration: InputDecoration(
+                                    hintText: _model.isTranslating
+                                        ? 'Translating...'
+                                        : 'Translated Text Appear Here',
+                                    hintStyle: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .override(
+                                          fontFamily:
+                                              FlutterFlowTheme.of(context)
+                                                  .bodyMediumFamily,
+                                          color: _model.isTranslating
+                                              ? const Color(0xFFFAB317)
+                                              : FlutterFlowTheme.of(context)
+                                                  .secondaryText,
+                                          fontSize: 16.0,
+                                          letterSpacing: 0.0,
+                                          useGoogleFonts: GoogleFonts.asMap()
+                                              .containsKey(
+                                                  FlutterFlowTheme.of(context)
+                                                      .bodyMediumFamily),
+                                        ),
+                                    enabledBorder: InputBorder.none,
+                                    focusedBorder: InputBorder.none,
+                                    errorBorder: InputBorder.none,
+                                    focusedErrorBorder: InputBorder.none,
+                                    isDense: true,
+                                    contentPadding: EdgeInsets.zero,
+                                  ),
+                                  style: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .override(
+                                        fontFamily: FlutterFlowTheme.of(context)
+                                            .bodyMediumFamily,
+                                        fontSize: 16.0,
+                                        letterSpacing: 0.0,
+                                        useGoogleFonts: GoogleFonts.asMap()
+                                            .containsKey(
+                                                FlutterFlowTheme.of(context)
+                                                    .bodyMediumFamily),
+                                        lineHeight: 1.4,
+                                      ),
+                                  textAlign: TextAlign.start,
+                                  maxLines: 6, // Allow expansion up to 6 lines
+                                  minLines: 1,
+                                  keyboardType: TextInputType.multiline,
+                                  cursorColor:
+                                      FlutterFlowTheme.of(context).primary,
+                                ),
+                              ),
+                            ),
+
+                            // Button row below text field (Claude AI style)
+                            Container(
+                              padding: const EdgeInsets.only(
+                                left: 16.0,
+                                right: 16.0,
+                                bottom: 12.0,
+                              ),
+                              child: Row(
+                                children: [
+                                  // Modern Android-style scrollable language dropdown
+                                  Container(
+                                    margin: const EdgeInsets.only(right: 12.0),
+                                    child: Tooltip(
+                                      message:
+                                          'Select language for text-to-speech output',
+                                      decoration: BoxDecoration(
+                                        color: FlutterFlowTheme.of(context)
+                                            .alternate,
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color:
+                                                Colors.black.withOpacity(0.1),
+                                            blurRadius: 4.0,
+                                            offset: const Offset(0, 2),
+                                          ),
+                                        ],
+                                      ),
+                                      textStyle: TextStyle(
+                                        color: FlutterFlowTheme.of(context)
+                                            .primaryText,
+                                        fontSize: 12.0,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                      preferBelow: false,
+                                      showDuration: const Duration(seconds: 2),
+                                      child: ModernDropDown(
+                                        value: _model.availableLanguages[
+                                                _model.selectedLanguage] ??
+                                            'English (US)',
+                                        options: _model
+                                            .availableLanguages.values
+                                            .toList(),
+                                        onChanged: (val) async {
+                                          // Find the language code for the selected language name
+                                          String? selectedCode;
+                                          _model.availableLanguages
+                                              .forEach((code, name) {
+                                            if (name == val) {
+                                              selectedCode = code;
+                                            }
+                                          });
+
+                                          if (selectedCode != null) {
+                                            await _model
+                                                .setTtsLanguage(selectedCode!);
+                                            safeSetState(() {});
+                                            print(
+                                                'TTS Language changed to: $selectedCode ($val)');
+                                          }
+                                        },
+                                        width: 110.0,
+                                        height: 36.0,
+                                      ),
+                                    ), // Removed walkthrough functionality
+                                    // .addWalkthrough(
+                                    //   dropDownB9wm9jo8,
+                                    //   _model.signifyScreen2Controller,
+                                    // ),
+                                  ),
+
+                                  // Speaker toggle button with TTS state
+                                  Container(
+                                    margin: const EdgeInsets.only(right: 8.0),
+                                    child: Tooltip(
+                                      message: _model.ttsToggleState
+                                          ? 'Turn off text-to-speech'
+                                          : 'Turn on text-to-speech',
+                                      decoration: BoxDecoration(
+                                        color: FlutterFlowTheme.of(context)
+                                            .alternate,
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color:
+                                                Colors.black.withOpacity(0.1),
+                                            blurRadius: 4.0,
+                                            offset: const Offset(0, 2),
+                                          ),
+                                        ],
+                                      ),
+                                      textStyle: TextStyle(
+                                        color: FlutterFlowTheme.of(context)
+                                            .primaryText,
+                                        fontSize: 12.0,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                      preferBelow: false,
+                                      showDuration: const Duration(seconds: 2),
+                                      child: Material(
+                                        color: Colors.transparent,
+                                        child: InkWell(
+                                          borderRadius:
+                                              BorderRadius.circular(8.0),
+                                          onTap: () async {
+                                            await _model.toggleTts();
+                                            safeSetState(() {});
+                                          },
+                                          child: SizedBox(
+                                            width: 42.0,
+                                            height: 42.0,
+                                            child: Icon(
+                                              _model.ttsToggleState
+                                                  ? Icons.volume_up_rounded
+                                                  : Icons.volume_off_rounded,
+                                              color: _model.ttsToggleState
+                                                  ? const Color(0xFFFAB317)
+                                                  : FlutterFlowTheme.of(context)
+                                                      .secondaryText,
+                                              size: 24.0,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+
+                                  const Spacer(),
+
+                                  // Camera toggle button (no border)
+                                  Container(
+                                    margin: const EdgeInsets.only(right: 8.0),
+                                    child: Tooltip(
+                                      message: _model.isDetecting
+                                          ? 'Stop sign detection'
+                                          : 'Start sign detection',
+                                      decoration: BoxDecoration(
+                                        color: FlutterFlowTheme.of(context)
+                                            .alternate,
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color:
+                                                Colors.black.withOpacity(0.1),
+                                            blurRadius: 4.0,
+                                            offset: const Offset(0, 2),
+                                          ),
+                                        ],
+                                      ),
+                                      textStyle: TextStyle(
+                                        color: FlutterFlowTheme.of(context)
+                                            .primaryText,
+                                        fontSize: 12.0,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                      preferBelow: false,
+                                      showDuration: const Duration(seconds: 2),
+                                      child: Material(
+                                        color: Colors.transparent,
+                                        child: InkWell(
+                                          borderRadius:
+                                              BorderRadius.circular(8.0),
+                                          onTap: () async {
+                                            await _model.toggleDetection();
+                                            safeSetState(() {});
+                                          },
+                                          child: SizedBox(
+                                            width: 42.0,
+                                            height: 42.0,
+                                            child: Icon(
+                                              _model.isDetecting
+                                                  ? Icons.stop_rounded
+                                                  : Icons.camera_alt_rounded,
+                                              color: _model.isDetecting
+                                                  ? const Color(0xFFFAB317)
+                                                  : FlutterFlowTheme.of(context)
+                                                      .secondaryText,
+                                              size: 24.0,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ), // Removed walkthrough functionality
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -818,93 +863,148 @@ class _ModernDropDownState extends State<ModernDropDown>
               top:
                   offset.dy - dropdownHeight - 4, // Position above with 4px gap
               width: size.width,
-              child: Material(
-                elevation: 8,
+              child: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                color: FlutterFlowTheme.of(context).secondaryBackground,
-                shadowColor: Colors.black26,
-                child: Container(
-                  constraints: const BoxConstraints(
-                    maxHeight: 200, // Scrollable if more than 5 items (40 each)
-                  ),
-                  decoration: BoxDecoration(
+                child: BackdropFilter(
+                  filter: ui.ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
+                  child: Material(
+                    elevation:
+                        0, // Remove elevation since we have acrylic effect
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: FlutterFlowTheme.of(context).alternate,
-                      width: 1,
-                    ),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Scrollbar(
-                      thumbVisibility: widget.options.length > 5,
-                      child: ListView.separated(
-                        padding: EdgeInsets.zero,
-                        shrinkWrap: true,
-                        itemCount: widget.options.length,
-                        separatorBuilder: (context, index) => Divider(
-                          height: 1,
-                          color: FlutterFlowTheme.of(context).alternate,
+                    color: Colors.transparent,
+                    child: Container(
+                      constraints: const BoxConstraints(
+                        maxHeight:
+                            200, // Scrollable if more than 5 items (40 each)
+                      ),
+                      decoration: BoxDecoration(
+                        // Acrylic glass effect matching the main container
+                        color: FlutterFlowTheme.of(context)
+                            .secondaryBackground
+                            .withOpacity(0.88),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: FlutterFlowTheme.of(context)
+                              .alternate
+                              .withOpacity(0.4),
+                          width: 1,
                         ),
-                        itemBuilder: (context, index) {
-                          final option = widget.options[index];
-                          final isSelected = option == widget.value;
-
-                          return InkWell(
-                            onTap: () {
-                              widget.onChanged(option);
-                              _collapseDropdown();
-                            },
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 150),
-                              height: 40,
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 12),
-                              color: isSelected
-                                  ? FlutterFlowTheme.of(context)
-                                      .accent1
-                                      .withOpacity(0.1)
-                                  : Colors.transparent,
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      option,
-                                      style: FlutterFlowTheme.of(context)
-                                          .bodySmall
-                                          .override(
-                                            fontFamily:
-                                                FlutterFlowTheme.of(context)
-                                                    .bodySmallFamily,
-                                            color: isSelected
-                                                ? FlutterFlowTheme.of(context)
-                                                    .primary
-                                                : FlutterFlowTheme.of(context)
-                                                    .primaryText,
-                                            fontSize: 12.0,
-                                            letterSpacing: 0.0,
-                                            fontWeight: isSelected
-                                                ? FontWeight.w600
-                                                : FontWeight.w500,
-                                            useGoogleFonts: GoogleFonts.asMap()
-                                                .containsKey(
-                                                    FlutterFlowTheme.of(context)
-                                                        .bodySmallFamily),
-                                          ),
-                                    ),
-                                  ),
-                                  if (isSelected)
-                                    Icon(
-                                      Icons.check_rounded,
-                                      size: 16,
-                                      color:
-                                          FlutterFlowTheme.of(context).primary,
-                                    ),
-                                ],
-                              ),
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            // Glassmorphism gradient for dropdown
+                            FlutterFlowTheme.of(context)
+                                .secondaryBackground
+                                .withOpacity(0.92),
+                            FlutterFlowTheme.of(context)
+                                .secondaryBackground
+                                .withOpacity(0.82),
+                          ],
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.12),
+                            blurRadius: 20,
+                            offset: const Offset(0, 6),
+                            spreadRadius: -2,
+                          ),
+                          BoxShadow(
+                            color: Colors.white.withOpacity(0.05),
+                            blurRadius: 6,
+                            offset: const Offset(0, -1),
+                          ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Scrollbar(
+                          thumbVisibility: widget.options.length > 5,
+                          child: ListView.separated(
+                            padding: EdgeInsets.zero,
+                            shrinkWrap: true,
+                            itemCount: widget.options.length,
+                            separatorBuilder: (context, index) => Divider(
+                              height: 1,
+                              color: FlutterFlowTheme.of(context).alternate,
                             ),
-                          );
-                        },
+                            itemBuilder: (context, index) {
+                              final option = widget.options[index];
+                              final isSelected = option == widget.value;
+
+                              return InkWell(
+                                onTap: () {
+                                  widget.onChanged(option);
+                                  _collapseDropdown();
+                                },
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 150),
+                                  height: 40,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 12),
+                                  decoration: BoxDecoration(
+                                    // Subtle acrylic highlight for selected item
+                                    color: isSelected
+                                        ? FlutterFlowTheme.of(context)
+                                            .primary
+                                            .withOpacity(0.08)
+                                        : Colors.transparent,
+                                    borderRadius: BorderRadius.circular(6),
+                                    border: isSelected
+                                        ? Border.all(
+                                            color: FlutterFlowTheme.of(context)
+                                                .primary
+                                                .withOpacity(0.2),
+                                            width: 1,
+                                          )
+                                        : null,
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          option,
+                                          style: FlutterFlowTheme.of(context)
+                                              .bodySmall
+                                              .override(
+                                                fontFamily:
+                                                    FlutterFlowTheme.of(context)
+                                                        .bodySmallFamily,
+                                                color: isSelected
+                                                    ? FlutterFlowTheme.of(
+                                                            context)
+                                                        .primary
+                                                    : FlutterFlowTheme.of(
+                                                            context)
+                                                        .primaryText,
+                                                fontSize: 12.0,
+                                                letterSpacing: 0.0,
+                                                fontWeight: isSelected
+                                                    ? FontWeight.w600
+                                                    : FontWeight.w500,
+                                                useGoogleFonts: GoogleFonts
+                                                        .asMap()
+                                                    .containsKey(
+                                                        FlutterFlowTheme.of(
+                                                                context)
+                                                            .bodySmallFamily),
+                                              ),
+                                        ),
+                                      ),
+                                      if (isSelected)
+                                        Icon(
+                                          Icons.check_rounded,
+                                          size: 16,
+                                          color: FlutterFlowTheme.of(context)
+                                              .primary,
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -927,60 +1027,89 @@ class _ModernDropDownState extends State<ModernDropDown>
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: _toggleDropdown,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
-        width: widget.width,
-        height: widget.height,
-        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
-        decoration: BoxDecoration(
-          color: FlutterFlowTheme.of(context).primaryBackground,
-          borderRadius: BorderRadius.circular(10.0),
-          border: Border.all(
-            color: _isExpanded
-                ? FlutterFlowTheme.of(context).primary
-                : FlutterFlowTheme.of(context).alternate,
-            width: _isExpanded ? 2.0 : 1.0,
-          ),
-          boxShadow: [
-            if (_isExpanded)
-              BoxShadow(
-                color: FlutterFlowTheme.of(context).primary.withOpacity(0.1),
-                blurRadius: 4,
-                offset: const Offset(0, 2),
-              ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Text(
-                widget.value,
-                style: FlutterFlowTheme.of(context).bodySmall.override(
-                      fontFamily: FlutterFlowTheme.of(context).bodySmallFamily,
-                      color: FlutterFlowTheme.of(context).primaryText,
-                      fontSize: 12.0,
-                      letterSpacing: 0.0,
-                      fontWeight: FontWeight.w500,
-                      useGoogleFonts: GoogleFonts.asMap().containsKey(
-                          FlutterFlowTheme.of(context).bodySmallFamily),
-                    ),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            AnimatedRotation(
-              turns: _isExpanded ? 0.5 : 0.0,
-              duration: const Duration(milliseconds: 200),
-              child: Icon(
-                Icons.keyboard_arrow_down_rounded,
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(10.0),
+      child: BackdropFilter(
+        filter: ui.ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
+        child: GestureDetector(
+          onTap: _toggleDropdown,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 150),
+            width: widget.width,
+            height: widget.height,
+            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+            decoration: BoxDecoration(
+              // Acrylic glass effect matching the main container
+              color:
+                  FlutterFlowTheme.of(context).secondaryBackground.withOpacity(
+                        _isExpanded ? 0.85 : 0.75,
+                      ),
+              borderRadius: BorderRadius.circular(10.0),
+              border: Border.all(
                 color: _isExpanded
                     ? FlutterFlowTheme.of(context).primary
-                    : FlutterFlowTheme.of(context).secondaryText,
-                size: 16.0,
+                    : FlutterFlowTheme.of(context).alternate.withOpacity(0.4),
+                width: _isExpanded ? 2.0 : 1.0,
               ),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  // Glassmorphism gradient matching main container
+                  FlutterFlowTheme.of(context)
+                      .secondaryBackground
+                      .withOpacity(_isExpanded ? 0.9 : 0.8),
+                  FlutterFlowTheme.of(context)
+                      .secondaryBackground
+                      .withOpacity(_isExpanded ? 0.7 : 0.6),
+                ],
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(_isExpanded ? 0.15 : 0.08),
+                  blurRadius: _isExpanded ? 12 : 8,
+                  offset: const Offset(0, 2),
+                  spreadRadius: _isExpanded ? -1 : -2,
+                ),
+                BoxShadow(
+                  color: Colors.white.withOpacity(_isExpanded ? 0.08 : 0.04),
+                  blurRadius: 4,
+                  offset: const Offset(0, -1),
+                ),
+              ],
             ),
-          ],
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    widget.value,
+                    style: FlutterFlowTheme.of(context).bodySmall.override(
+                          fontFamily:
+                              FlutterFlowTheme.of(context).bodySmallFamily,
+                          color: FlutterFlowTheme.of(context).primaryText,
+                          fontSize: 12.0,
+                          letterSpacing: 0.0,
+                          fontWeight: FontWeight.w500,
+                          useGoogleFonts: GoogleFonts.asMap().containsKey(
+                              FlutterFlowTheme.of(context).bodySmallFamily),
+                        ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                AnimatedRotation(
+                  turns: _isExpanded ? 0.5 : 0.0,
+                  duration: const Duration(milliseconds: 200),
+                  child: Icon(
+                    Icons.keyboard_arrow_down_rounded,
+                    color: _isExpanded
+                        ? FlutterFlowTheme.of(context).primary
+                        : FlutterFlowTheme.of(context).secondaryText,
+                    size: 16.0,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

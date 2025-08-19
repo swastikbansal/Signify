@@ -1,11 +1,13 @@
-import '/flutter_flow/flutter_flow_icon_button.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
-import '/flutter_flow/flutter_flow_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import '/flutter_flow/flutter_flow_icon_button.dart';
+import '/flutter_flow/flutter_flow_theme.dart';
+import '/flutter_flow/flutter_flow_util.dart';
 import 'app_settings_model.dart';
+
 export 'app_settings_model.dart';
 
 class AppSettingsWidget extends StatefulWidget {
@@ -199,8 +201,8 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                                   Switch(
                                     value: _model.switchValue1!,
                                     onChanged: (newValue) async {
-                                      safeSetState(() =>
-                                          _model.switchValue1 = newValue);
+                                      safeSetState(
+                                          () => _model.switchValue1 = newValue);
                                       if (newValue) {
                                         HapticFeedback.mediumImpact();
                                       }
@@ -279,8 +281,8 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                                   Switch(
                                     value: _model.switchValue2!,
                                     onChanged: (newValue) async {
-                                      safeSetState(() =>
-                                          _model.switchValue2 = newValue);
+                                      safeSetState(
+                                          () => _model.switchValue2 = newValue);
                                       if (newValue) {
                                         HapticFeedback.heavyImpact();
                                       }
@@ -358,8 +360,8 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                                   Switch(
                                     value: _model.switchValue3!,
                                     onChanged: (newValue) async {
-                                      safeSetState(() =>
-                                          _model.switchValue3 = newValue);
+                                      safeSetState(
+                                          () => _model.switchValue3 = newValue);
                                       if (newValue) {
                                         HapticFeedback.heavyImpact();
                                       }
@@ -599,7 +601,7 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(8.0),
                                 child: Image.asset(
-                                  'assets/images/New_.png',
+                                  'assets/images/error_image.png',
                                   width: 70.0,
                                   height: 70.0,
                                   fit: BoxFit.cover,
@@ -614,8 +616,9 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Padding(
-                                      padding: const EdgeInsetsDirectional.fromSTEB(
-                                          0.0, 0.0, 0.0, 2.0),
+                                      padding:
+                                          const EdgeInsetsDirectional.fromSTEB(
+                                              0.0, 0.0, 0.0, 2.0),
                                       child: Text(
                                         FFLocalizations.of(context).getText(
                                           'b5rf4hn9' /* Developer */,
@@ -848,7 +851,9 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                       ),
                     ),
                   ),
-                ].divide(const SizedBox(height: 16.0)).around(const SizedBox(height: 16.0)),
+                ]
+                    .divide(const SizedBox(height: 16.0))
+                    .around(const SizedBox(height: 16.0)),
               ),
             ),
           ),

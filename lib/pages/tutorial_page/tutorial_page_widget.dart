@@ -1,10 +1,11 @@
-import '/flutter_flow/flutter_flow_theme.dart';
-import '/flutter_flow/flutter_flow_util.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lottie/lottie.dart';
+
+import '/flutter_flow/flutter_flow_theme.dart';
+import '/flutter_flow/flutter_flow_util.dart';
 import 'tutorial_page_model.dart';
+
 export 'tutorial_page_model.dart';
 
 class TutorialPageWidget extends StatefulWidget {
@@ -333,19 +334,14 @@ class _TutorialPageWidgetState extends State<TutorialPageWidget>
                                   color: FlutterFlowTheme.of(context).alternate,
                                 ),
                               ),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.max,
-                                children: [
-                                  Expanded(
-                                    child: Lottie.asset(
-                                      'assets/jsons/man_using_devices_animation.json',
-                                      width: 300.0,
-                                      height: 500.0,
-                                      fit: BoxFit.contain,
-                                      animate: true,
-                                    ),
-                                  ),
-                                ],
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(12.0),
+                                child: Image.asset(
+                                  'assets/images/vtos.png',
+                                  width: double.infinity,
+                                  height: 500.0,
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                             ),
                             Padding(
@@ -413,17 +409,14 @@ class _TutorialPageWidgetState extends State<TutorialPageWidget>
                                   color: FlutterFlowTheme.of(context).alternate,
                                 ),
                               ),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.max,
-                                children: [
-                                  Lottie.asset(
-                                    'assets/jsons/camera_picture_click_on_tap_animation.json',
-                                    width: 300.0,
-                                    height: 500.0,
-                                    fit: BoxFit.contain,
-                                    animate: true,
-                                  ),
-                                ],
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(12.0),
+                                child: Image.asset(
+                                  'assets/images/stov.png',
+                                  width: double.infinity,
+                                  height: 500.0,
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                             ),
                             Padding(
@@ -450,79 +443,6 @@ class _TutorialPageWidgetState extends State<TutorialPageWidget>
                               child: Text(
                                 FFLocalizations.of(context).getText(
                                   '4y185xg0' /* Bridge the gap effortlessly. U... */,
-                                ),
-                                textAlign: TextAlign.center,
-                                style: FlutterFlowTheme.of(context)
-                                    .labelMedium
-                                    .override(
-                                      fontFamily: FlutterFlowTheme.of(context)
-                                          .labelMediumFamily,
-                                      letterSpacing: 0.0,
-                                      useGoogleFonts: GoogleFonts.asMap()
-                                          .containsKey(
-                                              FlutterFlowTheme.of(context)
-                                                  .labelMediumFamily),
-                                    ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Material(
-                      color: Colors.transparent,
-                      elevation: 2.0,
-                      child: Container(
-                        width: double.infinity,
-                        height: double.infinity,
-                        decoration: BoxDecoration(
-                          color: FlutterFlowTheme.of(context).primaryBackground,
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.max,
-                          children: [
-                            Container(
-                              width: double.infinity,
-                              height: 500.0,
-                              decoration: BoxDecoration(
-                                color: FlutterFlowTheme.of(context).alternate,
-                                borderRadius: BorderRadius.circular(12.0),
-                                border: Border.all(
-                                  color: FlutterFlowTheme.of(context).alternate,
-                                ),
-                              ),
-                              child: Lottie.asset(
-                                'assets/jsons/peace_of_mind_girl_animation.json',
-                                width: 300.0,
-                                height: 500.0,
-                                fit: BoxFit.contain,
-                                animate: true,
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsetsDirectional.fromSTEB(
-                                  0.0, 8.0, 0.0, 4.0),
-                              child: Text(
-                                FFLocalizations.of(context).getText(
-                                  '9ywo7g4u' /* Education Page - Learn, Explor... */,
-                                ),
-                                textAlign: TextAlign.center,
-                                style: FlutterFlowTheme.of(context)
-                                    .titleMedium
-                                    .override(
-                                      fontFamily: 'Space Grotesk',
-                                      letterSpacing: 0.0,
-                                      useGoogleFonts: GoogleFonts.asMap()
-                                          .containsKey('Space Grotesk'),
-                                    ),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsetsDirectional.fromSTEB(
-                                  8.0, 0.0, 8.0, 0.0),
-                              child: Text(
-                                FFLocalizations.of(context).getText(
-                                  '0bpzmox1' /* Empower your ISL journey! The ... */,
                                 ),
                                 textAlign: TextAlign.center,
                                 style: FlutterFlowTheme.of(context)
@@ -637,94 +557,20 @@ class _TutorialPageWidgetState extends State<TutorialPageWidget>
                               width: double.infinity,
                               height: 500.0,
                               decoration: BoxDecoration(
-                                color: FlutterFlowTheme.of(context)
-                                    .secondaryBackground,
-                                borderRadius: BorderRadius.circular(12.0),
-                                border: Border.all(
-                                  color: FlutterFlowTheme.of(context).alternate,
-                                ),
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(8.0),
-                                child: Image.network(
-                                  'https://images.unsplash.com/photo-1527525443983-6e60c75fff46?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHw4fHxjb21tdW5pdHl8ZW58MHx8fHwxNzMzODM1NzQzfDA&ixlib=rb-4.0.3&q=80&w=1080',
-                                  width: double.infinity,
-                                  height: 500.0,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsetsDirectional.fromSTEB(
-                                  0.0, 8.0, 0.0, 4.0),
-                              child: Text(
-                                FFLocalizations.of(context).getText(
-                                  '59u04bhi' /* Community Page - Be Part of th... */,
-                                ),
-                                textAlign: TextAlign.center,
-                                style: FlutterFlowTheme.of(context)
-                                    .titleMedium
-                                    .override(
-                                      fontFamily: 'Space Grotesk',
-                                      letterSpacing: 0.0,
-                                      useGoogleFonts: GoogleFonts.asMap()
-                                          .containsKey('Space Grotesk'),
-                                    ),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsetsDirectional.fromSTEB(
-                                  8.0, 0.0, 8.0, 0.0),
-                              child: Text(
-                                FFLocalizations.of(context).getText(
-                                  '7e858c66' /* Join a community of ISL enthus... */,
-                                ),
-                                textAlign: TextAlign.center,
-                                style: FlutterFlowTheme.of(context)
-                                    .labelMedium
-                                    .override(
-                                      fontFamily: FlutterFlowTheme.of(context)
-                                          .labelMediumFamily,
-                                      letterSpacing: 0.0,
-                                      useGoogleFonts: GoogleFonts.asMap()
-                                          .containsKey(
-                                              FlutterFlowTheme.of(context)
-                                                  .labelMediumFamily),
-                                    ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Material(
-                      color: Colors.transparent,
-                      elevation: 2.0,
-                      child: Container(
-                        width: double.infinity,
-                        height: double.infinity,
-                        decoration: BoxDecoration(
-                          color: FlutterFlowTheme.of(context).primaryBackground,
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.max,
-                          children: [
-                            Container(
-                              width: double.infinity,
-                              height: 500.0,
-                              decoration: BoxDecoration(
                                 color: FlutterFlowTheme.of(context).alternate,
                                 borderRadius: BorderRadius.circular(12.0),
                                 border: Border.all(
                                   color: FlutterFlowTheme.of(context).alternate,
                                 ),
                               ),
-                              child: Lottie.asset(
-                                'assets/jsons/mobile_device_animation.json',
-                                width: 300.0,
-                                height: 500.0,
-                                fit: BoxFit.contain,
-                                animate: true,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(12.0),
+                                child: Image.asset(
+                                  'assets/images/account.png',
+                                  width: double.infinity,
+                                  height: 500.0,
+                                  fit: BoxFit.contain,
+                                ),
                               ),
                             ),
                             Padding(
@@ -1008,8 +854,10 @@ class _TutorialPageWidgetState extends State<TutorialPageWidget>
                     enableInfiniteScroll: true,
                     scrollDirection: Axis.horizontal,
                     autoPlay: true,
-                    autoPlayAnimationDuration: const Duration(milliseconds: 800),
-                    autoPlayInterval: const Duration(milliseconds: (800 + 2000)),
+                    autoPlayAnimationDuration:
+                        const Duration(milliseconds: 800),
+                    autoPlayInterval:
+                        const Duration(milliseconds: (800 + 2000)),
                     autoPlayCurve: Curves.linear,
                     pauseAutoPlayInFiniteScroll: false,
                     onPageChanged: (index, _) =>

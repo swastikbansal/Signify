@@ -1,15 +1,17 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:lottie/lottie.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart'
+    as smooth_page_indicator;
+
 import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart'
-    as smooth_page_indicator;
-import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:lottie/lottie.dart';
 import 'onboarding_page_model.dart';
+
 export 'onboarding_page_model.dart';
 
 class OnboardingPageWidget extends StatefulWidget {
@@ -670,11 +672,10 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                                       options: FFButtonOptions(
                                         width: double.infinity,
                                         height: 50.0,
-                                        padding: const EdgeInsetsDirectional.fromSTEB(
-                                            0.0, 0.0, 0.0, 0.0),
-                                        iconPadding:
-                                            const EdgeInsetsDirectional.fromSTEB(
-                                                0.0, 0.0, 0.0, 0.0),
+                                        padding: const EdgeInsetsDirectional
+                                            .fromSTEB(0.0, 0.0, 0.0, 0.0),
+                                        iconPadding: const EdgeInsetsDirectional
+                                            .fromSTEB(0.0, 0.0, 0.0, 0.0),
                                         color: FlutterFlowTheme.of(context)
                                             .secondaryBackground,
                                         textStyle: FlutterFlowTheme.of(context)
@@ -731,7 +732,8 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                                     ),
                                     onPressed: () async {
                                       await _model.pageViewController?.nextPage(
-                                        duration: const Duration(milliseconds: 300),
+                                        duration:
+                                            const Duration(milliseconds: 300),
                                         curve: Curves.ease,
                                       );
                                     },
@@ -822,9 +824,8 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                                         width: double.infinity,
                                         height: 50.0,
                                         padding: const EdgeInsets.all(0.0),
-                                        iconPadding:
-                                            const EdgeInsetsDirectional.fromSTEB(
-                                                0.0, 0.0, 0.0, 0.0),
+                                        iconPadding: const EdgeInsetsDirectional
+                                            .fromSTEB(0.0, 0.0, 0.0, 0.0),
                                         color: FlutterFlowTheme.of(context)
                                             .secondaryBackground,
                                         textStyle: FlutterFlowTheme.of(context)
@@ -881,7 +882,8 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                                     ),
                                     onPressed: () async {
                                       await _model.pageViewController?.nextPage(
-                                        duration: const Duration(milliseconds: 300),
+                                        duration:
+                                            const Duration(milliseconds: 300),
                                         curve: Curves.ease,
                                       );
                                     },
@@ -965,11 +967,10 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                                       options: FFButtonOptions(
                                         width: double.infinity,
                                         height: 50.0,
-                                        padding: const EdgeInsetsDirectional.fromSTEB(
-                                            0.0, 0.0, 0.0, 0.0),
-                                        iconPadding:
-                                            const EdgeInsetsDirectional.fromSTEB(
-                                                0.0, 0.0, 0.0, 0.0),
+                                        padding: const EdgeInsetsDirectional
+                                            .fromSTEB(0.0, 0.0, 0.0, 0.0),
+                                        iconPadding: const EdgeInsetsDirectional
+                                            .fromSTEB(0.0, 0.0, 0.0, 0.0),
                                         color: FlutterFlowTheme.of(context)
                                             .secondaryBackground,
                                         textStyle: FlutterFlowTheme.of(context)
@@ -1026,7 +1027,8 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                                     ),
                                     onPressed: () async {
                                       await _model.pageViewController?.nextPage(
-                                        duration: const Duration(milliseconds: 300),
+                                        duration:
+                                            const Duration(milliseconds: 300),
                                         curve: Curves.ease,
                                       );
                                     },
@@ -1116,11 +1118,10 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                                       options: FFButtonOptions(
                                         width: double.infinity,
                                         height: 50.0,
-                                        padding: const EdgeInsetsDirectional.fromSTEB(
-                                            0.0, 0.0, 0.0, 0.0),
-                                        iconPadding:
-                                            const EdgeInsetsDirectional.fromSTEB(
-                                                0.0, 0.0, 0.0, 0.0),
+                                        padding: const EdgeInsetsDirectional
+                                            .fromSTEB(0.0, 0.0, 0.0, 0.0),
+                                        iconPadding: const EdgeInsetsDirectional
+                                            .fromSTEB(0.0, 0.0, 0.0, 0.0),
                                         color: FlutterFlowTheme.of(context)
                                             .secondaryBackground,
                                         textStyle: FlutterFlowTheme.of(context)
@@ -1177,7 +1178,8 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                                     ),
                                     onPressed: () async {
                                       await _model.pageViewController?.nextPage(
-                                        duration: const Duration(milliseconds: 300),
+                                        duration:
+                                            const Duration(milliseconds: 300),
                                         curve: Curves.ease,
                                       );
                                     },
@@ -1274,8 +1276,9 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                                   height: 50.0,
                                   padding: const EdgeInsetsDirectional.fromSTEB(
                                       0.0, 0.0, 0.0, 0.0),
-                                  iconPadding: const EdgeInsetsDirectional.fromSTEB(
-                                      0.0, 0.0, 0.0, 0.0),
+                                  iconPadding:
+                                      const EdgeInsetsDirectional.fromSTEB(
+                                          0.0, 0.0, 0.0, 0.0),
                                   color: FlutterFlowTheme.of(context).primary,
                                   textStyle: FlutterFlowTheme.of(context)
                                       .titleSmall
@@ -1317,7 +1320,8 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
               Align(
                 alignment: const AlignmentDirectional(0.0, 1.0),
                 child: Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 36.0),
+                  padding:
+                      const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 56.0),
                   child: smooth_page_indicator.SmoothPageIndicator(
                     controller: _model.pageViewController ??=
                         PageController(initialPage: 0)

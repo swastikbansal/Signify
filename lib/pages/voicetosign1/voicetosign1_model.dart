@@ -1,6 +1,4 @@
 import '/flutter_flow/flutter_flow_util.dart';
-import 'package:tutorial_coach_mark/tutorial_coach_mark.dart'
-    show TutorialCoachMark;
 import 'voicetosign1_widget.dart' show Voicetosign1Widget;
 import 'package:flutter/material.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
@@ -40,8 +38,6 @@ class Voicetosign1Model extends FlutterFlowModel<Voicetosign1Widget> {
 
   ///  State fields for stateful widgets in this page.
 
-  TutorialCoachMark? signifyScreen1Controller;
-
   // State field(s) for TextField widget.
   FocusNode? textFieldFocusNode;
   TextEditingController? textController;
@@ -76,7 +72,6 @@ class Voicetosign1Model extends FlutterFlowModel<Voicetosign1Widget> {
 
   @override
   void dispose() {
-    signifyScreen1Controller?.finish();
     textFieldFocusNode?.dispose();
     textController?.dispose();
     if (isListening) {

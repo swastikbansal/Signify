@@ -5,8 +5,6 @@ import 'signtovoice2_widget.dart' show Signtovoice2Widget;
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
 import 'package:http_parser/http_parser.dart';
-import 'package:tutorial_coach_mark/tutorial_coach_mark.dart'
-    show TutorialCoachMark;
 import 'package:camera/camera.dart';
 import 'dart:convert';
 import 'dart:async';
@@ -16,8 +14,6 @@ import 'package:translator/translator.dart';
 
 class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   ///  State fields for stateful widgets in this page.
-
-  TutorialCoachMark? signifyScreen2Controller;
 
   // API-based sign detection state
   bool _isDetecting = false;
@@ -1051,7 +1047,6 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
       // Dispose camera
       _disposeActiveCamera();
 
-      signifyScreen2Controller?.finish();
       textFieldFocusNode?.dispose();
       textController?.dispose();
 

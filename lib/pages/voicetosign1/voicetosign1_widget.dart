@@ -1,18 +1,18 @@
+import 'dart:async';
+import 'dart:ui' as ui;
+
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:model_viewer_plus/model_viewer_plus.dart';
+
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-// import '/walkthroughs/signify_screen_1.dart'; // Commented out to disable walkthrough
-import '/services/supabase_animation_service.dart';
+import '/services/instant_animation_player.dart';
 import '/services/safe_image_processor.dart';
-import '/services/instant_animation_player.dart'; // Use instant animation player
-// import 'package:tutorial_coach_mark/tutorial_coach_mark.dart'
-//     show TutorialCoachMark; // Commented out to disable walkthrough
-import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:model_viewer_plus/model_viewer_plus.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:async';
+import '/services/supabase_animation_service.dart';
 import 'voicetosign1_model.dart';
+
 export 'voicetosign1_model.dart';
 
 class Voicetosign1Widget extends StatefulWidget {
@@ -58,30 +58,6 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
     super.initState();
     _model = createModel(context, () => Voicetosign1Model());
     // Logging minimized – verbose helper removed
-
-    // On page load action.
-    SchedulerBinding.instance.addPostFrameCallback((_) async {
-      // Commented out walkthrough trigger to disable tutorial
-      /*
-      if (dateTimeFormat(
-            "relative",
-            currentUserDocument?.loggedinTime,
-            locale: FFLocalizations.of(context).languageCode,
-          ) ==
-          dateTimeFormat(
-            "relative",
-            getCurrentTimestamp,
-            locale: FFLocalizations.of(context).languageCode,
-          )) {
-        safeSetState(() =>
-            _model.signifyScreen1Controller = createPageWalkthrough(context));
-        _model.signifyScreen1Controller?.show(context: context);
-        return;
-      } else {
-        return;
-      }
-      */
-    });
 
     _model.textController ??= TextEditingController()
       ..addListener(() {
@@ -575,508 +551,529 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
         ),
         body: SafeArea(
           top: false,
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.end,
+          child: Stack(
             children: [
-              Expanded(
-                child: Container(
-                  width: double.infinity, // Full width
-                  height: double.infinity, // Full height
-                  decoration: BoxDecoration(
-                    color: FlutterFlowTheme.of(context).primaryBackground,
-                    borderRadius: BorderRadius.circular(12.0),
-                  ),
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child: Stack(
-                          children: [
-                            // Instant animation player or default ModelViewer
-                            isPlayingSequence && _animationQueue.isNotEmpty
-                                ? InstantAnimationPlayer(
-                                    key: _animationPlayerKey,
-                                    defaultAnimation: defaultAnimation,
-                                    animationQueue: List.from(
-                                        _animationQueue), // Copy to avoid modification issues
-                                    wordQueue: List.from(_wordQueue),
-                                    onSequenceComplete:
-                                        _onAnimationSequenceComplete,
-                                    onWordChange: _onCurrentWordChange,
-                                  )
-                                : ModelViewer(
-                                    key: ValueKey(
-                                        currentAnimation ?? defaultAnimation),
-                                    src: currentAnimation ?? defaultAnimation,
-                                    autoPlay: true,
-                                    autoRotate: false,
-                                    cameraControls: false,
-                                    backgroundColor: Colors.transparent,
-                                    cameraTarget:
-                                        '0m 1.6m 0m', // Focus on upper chest area
-                                    cameraOrbit:
-                                        '0deg 100deg -1m', // Much closer for bigger avatar
-                                  ),
-
-                            // NO loading overlays for instant HandTalk-like performance
-
-                            // Word tag overlay removed as requested by user
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-
-              // Modern unified input container with Claude-like design
+              // Full screen animation container
               Container(
-                margin: const EdgeInsets.symmetric(
-                    horizontal: 8.0,
-                    vertical: 4.0), // Reduced horizontal margin for more space
+                width: double.infinity,
+                height: double.infinity,
                 decoration: BoxDecoration(
-                  color: FlutterFlowTheme.of(context)
-                      .secondaryBackground, // Changed to secondary background
-                  borderRadius: BorderRadius.circular(16.0),
-                  border: Border.all(
-                    color: FlutterFlowTheme.of(context)
-                        .alternate, // Alternate border color
-                    width: 1.0,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
+                  color: FlutterFlowTheme.of(context).primaryBackground,
                 ),
                 child: Stack(
                   children: [
-                    // Moving line animation overlay (Claude AI style)
-                    if (isMovingLineActive)
-                      Positioned.fill(
-                        child: AnimatedBuilder(
-                          animation: _movingLineAnimation,
-                          builder: (context, child) {
-                            return Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(16.0),
-                                border: Border.all(
-                                  color: Colors.transparent,
-                                  width: 2.0,
-                                ),
-                              ),
-                              child: CustomPaint(
-                                painter: MovingLinePainter(
-                                  progress: _movingLineAnimation.value,
-                                  color: const Color(
-                                      0xFFFAB317), // Yellow like Claude
-                                  strokeWidth: 3.0,
-                                ),
-                              ),
-                            );
-                          },
+                    // Instant animation player or default ModelViewer - now full screen
+                    isPlayingSequence && _animationQueue.isNotEmpty
+                        ? InstantAnimationPlayer(
+                            key: _animationPlayerKey,
+                            defaultAnimation: defaultAnimation,
+                            animationQueue: List.from(_animationQueue),
+                            // Copy to avoid modification issues
+                            wordQueue: List.from(_wordQueue),
+                            onSequenceComplete: _onAnimationSequenceComplete,
+                            onWordChange: _onCurrentWordChange,
+                          )
+                        : ModelViewer(
+                            key: ValueKey(currentAnimation ?? defaultAnimation),
+                            src: currentAnimation ?? defaultAnimation,
+                            autoPlay: true,
+                            autoRotate: false,
+                            cameraControls: true,
+                            // Enable interactive camera controls
+                            backgroundColor: Colors.transparent,
+                            cameraTarget: '0m 1.2m 0.1m',
+                            // Focus higher - shifts avatar upwards in view
+                            cameraOrbit: '0deg 90deg 1.6m',
+                            // Much closer view, avatar looking straight forward
+                            minCameraOrbit: 'auto 45deg 1.0m',
+                            // Very close zoom - almost face level
+                            maxCameraOrbit: 'auto 110deg 6m',
+                            // Far zoom but closer than before
+                            minFieldOfView: '20deg',
+                            // Narrower field of view for more zoom
+                            maxFieldOfView: '65deg',
+                            // Reduced max field of view
+                            fieldOfView: '35deg',
+                            // Tighter default field of view for closer look
+                            disablePan: false,
+                            // Enable panning: drag with 2 fingers (mobile) or Ctrl+drag (desktop)
+                            disableTap: true,
+                            // Enable tap to focus: tap on model parts to center camera there
+                            disableZoom: false,
+                            // Enable zoom: pinch gesture (mobile) or scroll wheel (desktop)
+                          ),
+
+                    // NO loading overlays for instant HandTalk-like performance
+
+                    // Word tag overlay removed as requested by user
+                  ],
+                ),
+              ),
+
+              // Floating input container positioned at bottom
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 12,
+                child:
+                    // Modern unified input container with Claude-like design and acrylic transparency
+                    ClipRRect(
+                  borderRadius: BorderRadius.circular(16.0),
+                  child: BackdropFilter(
+                    filter: ui.ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 8.0,
+                          vertical:
+                              4.0), // Reduced horizontal margin for more space
+                      decoration: BoxDecoration(
+                        // Modern glassmorphism with acrylic transparency effect
+                        color: FlutterFlowTheme.of(context)
+                            .secondaryBackground
+                            .withOpacity(0.90),
+                        // More transparency for glass effect
+                        borderRadius: BorderRadius.circular(16.0),
+                        border: Border.all(
+                          // Softer glass-like border with reduced opacity
+                          color: FlutterFlowTheme.of(context)
+                              .alternate
+                              .withOpacity(0.6), // More transparent border
+                          width: 1.0,
                         ),
                       ),
-                    // Main content
-                    Column(
-                      children: [
-                        // Image preview section
-                        if (uploadedImagePaths.isNotEmpty)
-                          Container(
-                            padding: const EdgeInsets.only(
-                              left: 16.0,
-                              right: 16.0,
-                              top: 12.0,
-                              bottom: 8.0,
+                      child: Stack(
+                        children: [
+                          // Moving line animation overlay (Claude AI style)
+                          if (isMovingLineActive)
+                            Positioned.fill(
+                              child: AnimatedBuilder(
+                                animation: _movingLineAnimation,
+                                builder: (context, child) {
+                                  return Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(16.0),
+                                      border: Border.all(
+                                        color: Colors.transparent,
+                                        width: 2.0,
+                                      ),
+                                    ),
+                                    child: CustomPaint(
+                                      painter: MovingLinePainter(
+                                        progress: _movingLineAnimation.value,
+                                        color: const Color(
+                                            0xFFFAB317), // Yellow like Claude
+                                        strokeWidth: 3.0,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
                             ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Images (${uploadedImagePaths.length}):',
+                          // Main content
+                          Column(
+                            children: [
+                              // Image preview section
+                              if (uploadedImagePaths.isNotEmpty)
+                                Container(
+                                  padding: const EdgeInsets.only(
+                                    left: 16.0,
+                                    right: 16.0,
+                                    top: 8.0,
+                                    bottom: 2.0,
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const SizedBox(height: 8.0),
+                                      SizedBox(
+                                        height: 60.0,
+                                        child: ListView.builder(
+                                          scrollDirection: Axis.horizontal,
+                                          itemCount: uploadedImagePaths.length,
+                                          itemBuilder: (context, index) {
+                                            return Container(
+                                              margin: const EdgeInsets.only(
+                                                  right: 8.0),
+                                              child: Stack(
+                                                children: [
+                                                  ClipRRect(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8.0),
+                                                    child: SafeImagePreview(
+                                                      imagePath:
+                                                          uploadedImagePaths[
+                                                              index],
+                                                      width: 60.0,
+                                                      height: 60.0,
+                                                      onRemove: () {
+                                                        setState(() {
+                                                          uploadedImagePaths
+                                                              .removeAt(index);
+                                                        });
+                                                      },
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8.0),
+                                      Container(
+                                        height: 1.0,
+                                        color: FlutterFlowTheme.of(context)
+                                            .alternate
+                                            .withOpacity(0.5),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+                              // Text field area (full width like Claude AI)
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20.0,
+                                  vertical: 16.0,
+                                ),
+                                child: TextFormField(
+                                  controller: _model.textController,
+                                  focusNode: _model.textFieldFocusNode,
+                                  autofocus: false,
+                                  textCapitalization:
+                                      TextCapitalization.sentences,
+                                  obscureText: false,
+                                  decoration: InputDecoration(
+                                    hintText: 'Type message',
+                                    hintStyle: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .override(
+                                          fontFamily:
+                                              FlutterFlowTheme.of(context)
+                                                  .bodyMediumFamily,
+                                          color: FlutterFlowTheme.of(context)
+                                              .secondaryText,
+                                          fontSize: 16.0,
+                                          letterSpacing: 0.0,
+                                          useGoogleFonts: GoogleFonts.asMap()
+                                              .containsKey(
+                                                  FlutterFlowTheme.of(context)
+                                                      .bodyMediumFamily),
+                                        ),
+                                    enabledBorder: InputBorder.none,
+                                    focusedBorder: InputBorder.none,
+                                    errorBorder: InputBorder.none,
+                                    focusedErrorBorder: InputBorder.none,
+                                    isDense: true,
+                                    contentPadding: EdgeInsets.zero,
+                                  ),
                                   style: FlutterFlowTheme.of(context)
-                                      .bodySmall
+                                      .bodyMedium
                                       .override(
                                         fontFamily: FlutterFlowTheme.of(context)
-                                            .bodySmallFamily,
-                                        color: FlutterFlowTheme.of(context)
-                                            .secondaryText,
-                                        fontSize: 12.0,
+                                            .bodyMediumFamily,
+                                        fontSize: 16.0,
                                         letterSpacing: 0.0,
                                         useGoogleFonts: GoogleFonts.asMap()
                                             .containsKey(
                                                 FlutterFlowTheme.of(context)
-                                                    .bodySmallFamily),
+                                                    .bodyMediumFamily),
+                                        lineHeight: 1.4,
                                       ),
+                                  textAlign: TextAlign.start,
+                                  maxLines: 4,
+                                  minLines: 1,
+                                  keyboardType: TextInputType.multiline,
+                                  cursorColor:
+                                      FlutterFlowTheme.of(context).primary,
+                                  onChanged: (text) {
+                                    setState(() {
+                                      inputSentence = text;
+                                      // Use enhanced voice-to-sign integration for typed text
+                                      _model.updateInputSentence(text);
+                                    });
+                                  },
+                                  validator: _model.textControllerValidator
+                                      .asValidator(context),
                                 ),
-                                const SizedBox(height: 8.0),
-                                SizedBox(
-                                  height: 60.0,
-                                  child: ListView.builder(
-                                    scrollDirection: Axis.horizontal,
-                                    itemCount: uploadedImagePaths.length,
-                                    itemBuilder: (context, index) {
-                                      return Container(
-                                        margin:
-                                            const EdgeInsets.only(right: 8.0),
-                                        child: Stack(
-                                          children: [
-                                            ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(8.0),
-                                              child: SafeImagePreview(
-                                                imagePath:
-                                                    uploadedImagePaths[index],
-                                                width: 60.0,
-                                                height: 60.0,
-                                                onRemove: () {
-                                                  setState(() {
-                                                    uploadedImagePaths
-                                                        .removeAt(index);
-                                                  });
-                                                },
+                              ),
+                              // Button row below text field (Claude AI style)
+                              Container(
+                                padding: const EdgeInsets.only(
+                                  top: 8.0,
+                                  left: 16.0,
+                                  right: 16.0,
+                                  bottom: 12.0,
+                                ),
+                                child: Row(
+                                  children: [
+                                    // Add image/attachment button (Claude AI style)
+                                    Container(
+                                      margin: const EdgeInsets.only(right: 8.0),
+                                      decoration: BoxDecoration(
+                                        color: isProcessingImage
+                                            ? const Color(
+                                                0xFFFAB317) // Yellow when active
+                                            : Colors.transparent,
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                        border: isProcessingImage
+                                            ? null
+                                            : Border.all(
+                                                color:
+                                                    FlutterFlowTheme.of(context)
+                                                        .secondaryText
+                                                        .withOpacity(0.2),
+                                                width: 1.0,
                                               ),
+                                      ),
+                                      child: Tooltip(
+                                        message: 'Attach image or document',
+                                        decoration: BoxDecoration(
+                                          color: FlutterFlowTheme.of(context)
+                                              .alternate,
+                                          borderRadius:
+                                              BorderRadius.circular(8.0),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color:
+                                                  Colors.black.withOpacity(0.1),
+                                              blurRadius: 4.0,
+                                              offset: const Offset(0, 2),
                                             ),
                                           ],
                                         ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                                const SizedBox(height: 8.0),
-                                Container(
-                                  height: 1.0,
-                                  color: FlutterFlowTheme.of(context)
-                                      .alternate
-                                      .withOpacity(0.5),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                        // Text field area (full width like Claude AI)
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20.0,
-                            vertical: 16.0,
-                          ),
-                          child: TextFormField(
-                            controller: _model.textController,
-                            focusNode: _model.textFieldFocusNode,
-                            autofocus: false,
-                            textCapitalization: TextCapitalization.sentences,
-                            obscureText: false,
-                            decoration: InputDecoration(
-                              hintText: 'Type message',
-                              hintStyle: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .override(
-                                    fontFamily: FlutterFlowTheme.of(context)
-                                        .bodyMediumFamily,
-                                    color: FlutterFlowTheme.of(context)
-                                        .secondaryText,
-                                    fontSize: 16.0,
-                                    letterSpacing: 0.0,
-                                    useGoogleFonts: GoogleFonts.asMap()
-                                        .containsKey(
-                                            FlutterFlowTheme.of(context)
-                                                .bodyMediumFamily),
-                                  ),
-                              enabledBorder: InputBorder.none,
-                              focusedBorder: InputBorder.none,
-                              errorBorder: InputBorder.none,
-                              focusedErrorBorder: InputBorder.none,
-                              isDense: true,
-                              contentPadding: EdgeInsets.zero,
-                            ),
-                            style: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .override(
-                                  fontFamily: FlutterFlowTheme.of(context)
-                                      .bodyMediumFamily,
-                                  fontSize: 16.0,
-                                  letterSpacing: 0.0,
-                                  useGoogleFonts: GoogleFonts.asMap()
-                                      .containsKey(FlutterFlowTheme.of(context)
-                                          .bodyMediumFamily),
-                                  lineHeight: 1.4,
-                                ),
-                            textAlign: TextAlign.start,
-                            maxLines: null,
-                            minLines: 1,
-                            keyboardType: TextInputType.multiline,
-                            cursorColor: FlutterFlowTheme.of(context).primary,
-                            onChanged: (text) {
-                              setState(() {
-                                inputSentence = text;
-                                // Use enhanced voice-to-sign integration for typed text
-                                _model.updateInputSentence(text);
-                              });
-                            },
-                            validator: _model.textControllerValidator
-                                .asValidator(context),
-                          ),
-                        ),
-                        // Button row below text field (Claude AI style)
-                        Container(
-                          padding: const EdgeInsets.only(
-                            left: 16.0,
-                            right: 16.0,
-                            bottom: 16.0,
-                          ),
-                          child: Row(
-                            children: [
-                              // Add image/attachment button (Claude AI style)
-                              Container(
-                                margin: const EdgeInsets.only(right: 8.0),
-                                decoration: BoxDecoration(
-                                  color: isProcessingImage
-                                      ? const Color(
-                                          0xFFFAB317) // Yellow when active
-                                      : Colors.transparent,
-                                  borderRadius: BorderRadius.circular(8.0),
-                                  border: isProcessingImage
-                                      ? null
-                                      : Border.all(
+                                        textStyle: TextStyle(
                                           color: FlutterFlowTheme.of(context)
-                                              .secondaryText
-                                              .withOpacity(0.2),
-                                          width: 1.0,
+                                              .primaryText,
+                                          fontSize: 12.0,
+                                          fontWeight: FontWeight.w500,
                                         ),
-                                ),
-                                child: Tooltip(
-                                  message: 'Attach image or document',
-                                  decoration: BoxDecoration(
-                                    color:
-                                        FlutterFlowTheme.of(context).alternate,
-                                    borderRadius: BorderRadius.circular(8.0),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.1),
-                                        blurRadius: 4.0,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ],
-                                  ),
-                                  textStyle: TextStyle(
-                                    color: FlutterFlowTheme.of(context)
-                                        .primaryText,
-                                    fontSize: 12.0,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                  preferBelow: false,
-                                  showDuration: const Duration(seconds: 2),
-                                  child: Material(
-                                    color: Colors.transparent,
-                                    child: InkWell(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                      onTap: isProcessingImage
-                                          ? null
-                                          : _showImagePickerBottomSheet,
-                                      child: SizedBox(
-                                        width: 32.0,
-                                        height: 32.0,
-                                        child: Icon(
-                                          Icons.attach_file,
-                                          color: isProcessingImage
-                                              ? Colors.black
-                                              : FlutterFlowTheme.of(context)
-                                                  .secondaryText,
-                                          size: 18.0,
+                                        preferBelow: false,
+                                        showDuration:
+                                            const Duration(seconds: 2),
+                                        child: Material(
+                                          color: Colors.transparent,
+                                          child: InkWell(
+                                            borderRadius:
+                                                BorderRadius.circular(8.0),
+                                            onTap: isProcessingImage
+                                                ? null
+                                                : _showImagePickerBottomSheet,
+                                            child: SizedBox(
+                                              width: 32.0,
+                                              height: 32.0,
+                                              child: Icon(
+                                                Icons.attach_file,
+                                                color: isProcessingImage
+                                                    ? Colors.black
+                                                    : FlutterFlowTheme.of(
+                                                            context)
+                                                        .secondaryText,
+                                                size: 18.0,
+                                              ),
+                                            ),
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ),
-                              ),
-                              const Spacer(),
+                                    const Spacer(),
 
-                              // Microphone button (Claude AI style) - moved next to send button
-                              Container(
-                                margin: const EdgeInsets.only(right: 4.0),
-                                decoration: BoxDecoration(
-                                  color: voiceTrigger
-                                      ? const Color(
-                                          0xFFFAB317) // Yellow when active
-                                      : Colors.transparent,
-                                  borderRadius: BorderRadius.circular(8.0),
-                                  border: voiceTrigger
-                                      ? null
-                                      : Border.all(
+                                    // Microphone button (Claude AI style) - moved next to send button
+                                    Container(
+                                      margin: const EdgeInsets.only(right: 4.0),
+                                      decoration: BoxDecoration(
+                                        color: voiceTrigger
+                                            ? const Color(
+                                                0xFFFAB317) // Yellow when active
+                                            : Colors.transparent,
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                        border: voiceTrigger
+                                            ? null
+                                            : Border.all(
+                                                color:
+                                                    FlutterFlowTheme.of(context)
+                                                        .primaryBackground
+                                                        .withOpacity(0.2),
+                                                width: 1.0,
+                                              ),
+                                      ),
+                                      child: Tooltip(
+                                        message: voiceTrigger
+                                            ? 'Stop voice recognition'
+                                            : 'Start voice recognition',
+                                        decoration: BoxDecoration(
                                           color: FlutterFlowTheme.of(context)
-                                              .primaryBackground
-                                              .withOpacity(0.2),
-                                          width: 1.0,
+                                              .alternate,
+                                          borderRadius:
+                                              BorderRadius.circular(8.0),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color:
+                                                  Colors.black.withOpacity(0.1),
+                                              blurRadius: 4.0,
+                                              offset: const Offset(0, 2),
+                                            ),
+                                          ],
                                         ),
-                                ),
-                                child: Tooltip(
-                                  message: voiceTrigger
-                                      ? 'Stop voice recognition'
-                                      : 'Start voice recognition',
-                                  decoration: BoxDecoration(
-                                    color:
-                                        FlutterFlowTheme.of(context).alternate,
-                                    borderRadius: BorderRadius.circular(8.0),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.1),
-                                        blurRadius: 4.0,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ],
-                                  ),
-                                  textStyle: TextStyle(
-                                    color: FlutterFlowTheme.of(context)
-                                        .primaryText,
-                                    fontSize: 12.0,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                  preferBelow: false,
-                                  showDuration: const Duration(seconds: 2),
-                                  child: Material(
-                                    color: Colors.transparent,
-                                    child: InkWell(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                      onTap: () async {
-                                        setState(() {
-                                          voiceTrigger = !voiceTrigger;
-                                        });
-                                        if (voiceTrigger) {
-                                          _model
-                                              .startListening((recognizedText) {
-                                            setState(() {
-                                              _model.textController!.text =
-                                                  recognizedText;
-                                              inputSentence = recognizedText;
-                                              // Use enhanced voice-to-sign integration
-                                              _model.updateInputSentence(
-                                                  recognizedText);
-                                            });
-                                          });
-                                        } else {
-                                          _model.stopListening();
-                                          // Process final text when user stops speaking
-                                          if (inputSentence.isNotEmpty) {
-                                            _model
-                                                .processFinalSpeechForAnimation(
-                                                    inputSentence);
-                                          }
-                                        }
-                                      },
-                                      child: SizedBox(
-                                        width: 32.0,
-                                        height: 32.0,
-                                        child: Icon(
-                                          voiceTrigger
-                                              ? Icons.mic
-                                              : Icons.mic_none,
-                                          color: voiceTrigger
-                                              ? Colors.black
-                                              : FlutterFlowTheme.of(context)
-                                                  .secondaryText,
-                                          size: 18.0,
+                                        textStyle: TextStyle(
+                                          color: FlutterFlowTheme.of(context)
+                                              .primaryText,
+                                          fontSize: 12.0,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                        preferBelow: false,
+                                        showDuration:
+                                            const Duration(seconds: 2),
+                                        child: Material(
+                                          color: Colors.transparent,
+                                          child: InkWell(
+                                            borderRadius:
+                                                BorderRadius.circular(8.0),
+                                            onTap: () async {
+                                              setState(() {
+                                                voiceTrigger = !voiceTrigger;
+                                              });
+                                              if (voiceTrigger) {
+                                                _model.startListening(
+                                                    (recognizedText) {
+                                                  setState(() {
+                                                    _model.textController!
+                                                        .text = recognizedText;
+                                                    inputSentence =
+                                                        recognizedText;
+                                                    // Use enhanced voice-to-sign integration
+                                                    _model.updateInputSentence(
+                                                        recognizedText);
+                                                  });
+                                                });
+                                              } else {
+                                                _model.stopListening();
+                                                // Process final text when user stops speaking
+                                                if (inputSentence.isNotEmpty) {
+                                                  _model
+                                                      .processFinalSpeechForAnimation(
+                                                          inputSentence);
+                                                }
+                                              }
+                                            },
+                                            child: SizedBox(
+                                              width: 32.0,
+                                              height: 32.0,
+                                              child: Icon(
+                                                voiceTrigger
+                                                    ? Icons.mic
+                                                    : Icons.mic_none,
+                                                color: voiceTrigger
+                                                    ? Colors.black
+                                                    : FlutterFlowTheme.of(
+                                                            context)
+                                                        .secondaryText,
+                                                size: 18.0,
+                                              ),
+                                            ),
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ),
-                              ),
 
-                              // Send button (Claude AI style with arrow up)
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: (inputSentence.trim().isNotEmpty ||
-                                          uploadedImagePaths.isNotEmpty)
-                                      ? const Color(
-                                          0xFFFAB317) // Yellow when active
-                                      : FlutterFlowTheme.of(context)
-                                          .secondaryText
-                                          .withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                                child: Tooltip(
-                                  message: 'Send message for sign animation',
-                                  decoration: BoxDecoration(
-                                    color:
-                                        FlutterFlowTheme.of(context).alternate,
-                                    borderRadius: BorderRadius.circular(8.0),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.1),
-                                        blurRadius: 4.0,
-                                        offset: const Offset(0, 2),
+                                    // Send button (Claude AI style with arrow up)
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        color: (inputSentence
+                                                    .trim()
+                                                    .isNotEmpty ||
+                                                uploadedImagePaths.isNotEmpty)
+                                            ? const Color(
+                                                0xFFFAB317) // Yellow when active
+                                            : FlutterFlowTheme.of(context)
+                                                .secondaryText
+                                                .withOpacity(0.1),
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
                                       ),
-                                    ],
-                                  ),
-                                  textStyle: TextStyle(
-                                    color: FlutterFlowTheme.of(context)
-                                        .primaryText,
-                                    fontSize: 12.0,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                  preferBelow: false,
-                                  showDuration: const Duration(seconds: 2),
-                                  child: Material(
-                                    color: Colors.transparent,
-                                    child: InkWell(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                      onTap: (inputSentence.trim().isNotEmpty ||
-                                              uploadedImagePaths.isNotEmpty)
-                                          ? () {
-                                              _handleSendAction();
-                                            }
-                                          : null,
-                                      child: SizedBox(
-                                        width: 32.0,
-                                        height: 32.0,
-                                        child: Icon(
-                                          Icons.arrow_upward_rounded,
-                                          color: (inputSentence
-                                                      .trim()
-                                                      .isNotEmpty ||
-                                                  uploadedImagePaths.isNotEmpty)
-                                              ? Colors
-                                                  .black // Black icon when active
-                                              : FlutterFlowTheme.of(context)
-                                                  .secondaryText,
-                                          size: 18.0,
+                                      child: Tooltip(
+                                        message:
+                                            'Send message for sign animation',
+                                        decoration: BoxDecoration(
+                                          color: FlutterFlowTheme.of(context)
+                                              .alternate,
+                                          borderRadius:
+                                              BorderRadius.circular(8.0),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color:
+                                                  Colors.black.withOpacity(0.1),
+                                              blurRadius: 4.0,
+                                              offset: const Offset(0, 2),
+                                            ),
+                                          ],
+                                        ),
+                                        textStyle: TextStyle(
+                                          color: FlutterFlowTheme.of(context)
+                                              .primaryText,
+                                          fontSize: 12.0,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                        preferBelow: false,
+                                        showDuration:
+                                            const Duration(seconds: 2),
+                                        child: Material(
+                                          color: Colors.transparent,
+                                          child: InkWell(
+                                            borderRadius:
+                                                BorderRadius.circular(8.0),
+                                            onTap: (inputSentence
+                                                        .trim()
+                                                        .isNotEmpty ||
+                                                    uploadedImagePaths
+                                                        .isNotEmpty)
+                                                ? () {
+                                                    _handleSendAction();
+                                                  }
+                                                : null,
+                                            child: SizedBox(
+                                              width: 32.0,
+                                              height: 32.0,
+                                              child: Icon(
+                                                Icons.arrow_upward_rounded,
+                                                color: (inputSentence
+                                                            .trim()
+                                                            .isNotEmpty ||
+                                                        uploadedImagePaths
+                                                            .isNotEmpty)
+                                                    ? Colors
+                                                        .black // Black icon when active
+                                                    : FlutterFlowTheme.of(
+                                                            context)
+                                                        .secondaryText,
+                                                size: 18.0,
+                                              ),
+                                            ),
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
+                                  ],
                                 ),
                               ),
                             ],
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ].addToEnd(
-                const SizedBox(height: 12.0)), // Reduced from 24.0 to 12.0
+              ), // Close Positioned widget
+            ],
           ),
         ),
       ),
     );
   }
-
-  // Commented out walkthrough functionality to disable tutorial
-  /*
-  TutorialCoachMark createPageWalkthrough(BuildContext context) =>
-      TutorialCoachMark(
-        targets: createWalkthroughTargets(context),
-        onFinish: () async {
-          safeSetState(() => _model.signifyScreen1Controller = null);
-        },
-        onSkip: () {
-          return true;
-        },
-      );
-  */
 }
 
 // Custom painter for the moving line animation (like Google's)

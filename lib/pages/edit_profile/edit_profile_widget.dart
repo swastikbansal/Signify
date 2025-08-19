@@ -597,7 +597,9 @@ class _EditProfileWidgetState extends State<EditProfileWidget>
                             ),
                             focusNode: _model.textFieldFocusNode4,
                             autofocus: false,
-                            autofillHints: const [AutofillHints.telephoneNumber],
+                            autofillHints: const [
+                              AutofillHints.telephoneNumber
+                            ],
                             textInputAction: TextInputAction.next,
                             obscureText: false,
                             decoration: InputDecoration(
@@ -1040,7 +1042,7 @@ class _EditProfileWidgetState extends State<EditProfileWidget>
                   ),
                 ]
                     .addToStart(const SizedBox(height: 16.0))
-                    .addToEnd(const SizedBox(height: 46.0)),
+                    .addToEnd(const SizedBox(height: 56.0)),
               ),
             ),
           ),
