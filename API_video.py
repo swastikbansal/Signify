@@ -6,16 +6,13 @@ import pickle
 import numpy as np
 from utils import Utils
 from matplotlib import pyplot as plt
-import os 
-import json
-import datetime
 import mediapipe as mp
 import cv2
-import base64
 import threading
 from queue import Queue
+import warnings
 
-import time
+warnings.filterwarnings("ignore")
 
 app = Flask(__name__)
 
@@ -24,7 +21,7 @@ frame_queue = Queue(maxsize=10)
 
 # Global variables for frame accumulation
 accumulated_probs = None
-frame_count = 0
+frame_count:int = 0
 
 
 def calulating_percentage(avg, all_classes):
@@ -77,7 +74,7 @@ hands = mp_hands.Hands(max_num_hands=2, min_detection_confidence=0.5, min_tracki
 pose = mp_pose.Pose(min_detection_confidence=0.7, min_tracking_confidence=0.7)
 
 # Initialize Utils with axes for palm orientation
-axes = {
+axes: dict = {
         "x": np.array([1, 0, 0]),
         "-x": np.array([-1, 0, 0]),
         "y": np.array([0, 1, 0]),
@@ -96,7 +93,7 @@ def display_frames():
     while True:
         try:
             img = frame_queue.get()
-            if img is None:  # Signal to exit
+            if img is None:
                 break
             
             cv2.imshow("Live Stream", img)
@@ -113,9 +110,7 @@ def process_image(img):
     
     pred = None
     left_probs, right_probs, pose_probs = None, None, None
-    
-    # To improve performance, optionally mark the image as not writeable to
-    # pass by reference.
+
     img.flags.writeable = False
     img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     res_pose = pose.process(img_rgb)
@@ -205,6 +200,10 @@ def process_image(img):
 
     return {"prediction": pred} if pred else {"message": "Collecting frames", "frame_count": frame_count}, img
 
+@app.route('/')
+def home():
+    return "<h1>Signify API</h1>"
+
 @app.route('/process_frame', methods=['POST'])
 def process_video_frame():
     """Receive a video frame, display it, and return a prediction."""
@@ -290,11 +289,11 @@ if __name__ == '__main__':
 
     print("Starting prediction API server...")
     print("Endpoints available:")
-    print("- POST /process_frame - Send video frame (multipart) for prediction and display")
+    print("- POST /process_frame - Process received frame and return predictions")
     print("- POST /reset - Reset frame accumulation")
     print("- GET /health - Health check")
     print("Press 'q' in the 'Live Stream' window to quit.")
     
     # use_reloader=False is important for threads
-    app.run(host='192.168.29.42', port=5000, debug=False, threaded=True, use_reloader=False)
+    app.run(host='0.0.0.0', port=5000, debug=True, threaded=True)
 
