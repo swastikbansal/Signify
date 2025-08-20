@@ -5,6 +5,7 @@ import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '/pages/customs_signs/custom_signs_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -91,6 +92,63 @@ class _Account4WidgetState extends State<Account4Widget>
         ?.parentModelCallback
         ?.call(_model);
 
+    // Debug mode: Simple safety check for currentUserReference
+    if (kDebugMode && currentUserReference == null) {
+      return Scaffold(
+        backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+        appBar: AppBar(
+          backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+          automaticallyImplyLeading: false,
+          title: Text(
+            'Account (Debug Mode)',
+            style: FlutterFlowTheme.of(context).headlineMedium.override(
+                  fontFamily: 'Space Grotesk',
+                  letterSpacing: 0.0,
+                  useGoogleFonts:
+                      GoogleFonts.asMap().containsKey('Space Grotesk'),
+                ),
+          ),
+          centerTitle: false,
+          elevation: 0.0,
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.account_circle_outlined,
+                size: 80,
+                color: FlutterFlowTheme.of(context).secondaryText,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Debug Mode: Please sign in',
+                style: FlutterFlowTheme.of(context).titleMedium,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              FFButtonWidget(
+                onPressed: () async {
+                  context.pushNamed('authPage');
+                },
+                text: 'Sign In',
+                options: FFButtonOptions(
+                  width: 160,
+                  height: 44,
+                  padding: EdgeInsets.zero,
+                  color: FlutterFlowTheme.of(context).primary,
+                  textStyle: FlutterFlowTheme.of(context).titleSmall.override(
+                        color: Colors.white,
+                      ),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return StreamBuilder<UsersRecord>(
       stream: UsersRecord.getDocument(currentUserReference!),
       builder: (context, snapshot) {
@@ -156,170 +214,155 @@ class _Account4WidgetState extends State<Account4Widget>
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color:
-                                FlutterFlowTheme.of(context).primaryBackground,
-                            borderRadius: BorderRadius.circular(16.0),
-                          ),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    width: 120.0,
-                                    height: 120.0,
-                                    decoration: BoxDecoration(
-                                      color: FlutterFlowTheme.of(context)
-                                          .primaryBackground,
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                        color: FlutterFlowTheme.of(context)
-                                            .primary,
-                                        width: 2.0,
-                                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: FlutterFlowTheme.of(context).primaryBackground,
+                          borderRadius: BorderRadius.circular(16.0),
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisSize: MainAxisSize.max,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Container(
+                                  width: 120.0,
+                                  height: 120.0,
+                                  decoration: BoxDecoration(
+                                    color: FlutterFlowTheme.of(context)
+                                        .primaryBackground,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color:
+                                          FlutterFlowTheme.of(context).primary,
+                                      width: 2.0,
                                     ),
-                                    child: ClipRRect(
-                                      borderRadius:
-                                          BorderRadius.circular(100.0),
-                                      child: Image.network(
-                                        account4UsersRecord.photoUrl,
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(100.0),
+                                    child: Image.network(
+                                      account4UsersRecord.photoUrl,
+                                      width: 120.0,
+                                      height: 120.0,
+                                      fit: BoxFit.contain,
+                                      errorBuilder:
+                                          (context, error, stackTrace) =>
+                                              Image.asset(
+                                        'assets/images/error_image.png',
                                         width: 120.0,
                                         height: 120.0,
                                         fit: BoxFit.contain,
-                                        errorBuilder:
-                                            (context, error, stackTrace) =>
-                                                Image.asset(
-                                          'assets/images/error_image.png',
-                                          width: 120.0,
-                                          height: 120.0,
-                                          fit: BoxFit.contain,
-                                        ),
                                       ),
                                     ),
-                                  ),
-                                  Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        account4UsersRecord.displayName,
-                                        style: FlutterFlowTheme.of(context)
-                                            .titleMedium
-                                            .override(
-                                              fontFamily:
-                                                  FlutterFlowTheme.of(context)
-                                                      .titleMediumFamily,
-                                              letterSpacing: 0.0,
-                                              useGoogleFonts: GoogleFonts
-                                                      .asMap()
-                                                  .containsKey(
-                                                      FlutterFlowTheme.of(
-                                                              context)
-                                                          .titleMediumFamily),
-                                            ),
-                                      ),
-                                      Text(
-                                        account4UsersRecord.email,
-                                        style: FlutterFlowTheme.of(context)
-                                            .labelMedium
-                                            .override(
-                                              fontFamily:
-                                                  FlutterFlowTheme.of(context)
-                                                      .labelMediumFamily,
-                                              letterSpacing: 0.0,
-                                              useGoogleFonts: GoogleFonts
-                                                      .asMap()
-                                                  .containsKey(
-                                                      FlutterFlowTheme.of(
-                                                              context)
-                                                          .labelMediumFamily),
-                                            ),
-                                      ),
-                                    ].divide(const SizedBox(height: 2.0)),
-                                  ),
-                                ].divide(const SizedBox(width: 12.0)),
-                              ),
-                              Align(
-                                alignment: const AlignmentDirectional(0.0, 0.0),
-                                child: FFButtonWidget(
-                                  onPressed: () async {
-                                    context.pushNamed(
-                                      'editProfile',
-                                      extra: <String, dynamic>{
-                                        kTransitionInfoKey:
-                                            const TransitionInfo(
-                                          hasTransition: true,
-                                          transitionType:
-                                              PageTransitionType.fade,
-                                        ),
-                                      },
-                                    );
-                                  },
-                                  text: FFLocalizations.of(context).getText(
-                                    '21xcr52d' /* Edit Profile */,
-                                  ),
-                                  icon: FaIcon(
-                                    FontAwesomeIcons.edit,
-                                    color: FlutterFlowTheme.of(context)
-                                        .primaryText,
-                                    size: 20.0,
-                                  ),
-                                  options: FFButtonOptions(
-                                    width:
-                                        MediaQuery.sizeOf(context).width * 0.5,
-                                    height: 46.0,
-                                    padding:
-                                        const EdgeInsetsDirectional.fromSTEB(
-                                            0.0, 0.0, 0.0, 0.0),
-                                    iconPadding:
-                                        const EdgeInsetsDirectional.fromSTEB(
-                                            0.0, 0.0, 0.0, 0.0),
-                                    color: FlutterFlowTheme.of(context)
-                                        .primaryBackground,
-                                    textStyle: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .override(
-                                          fontFamily:
-                                              FlutterFlowTheme.of(context)
-                                                  .bodyMediumFamily,
-                                          color: FlutterFlowTheme.of(context)
-                                              .primaryText,
-                                          letterSpacing: 0.0,
-                                          useGoogleFonts: GoogleFonts.asMap()
-                                              .containsKey(
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyMediumFamily),
-                                        ),
-                                    elevation: 0.0,
-                                    borderSide: BorderSide(
-                                      color: FlutterFlowTheme.of(context)
-                                          .alternate,
-                                      width: 1.0,
-                                    ),
-                                    borderRadius: BorderRadius.circular(12.0),
-                                    hoverColor: FlutterFlowTheme.of(context)
-                                        .primaryBackground,
-                                    hoverBorderSide: BorderSide(
-                                      color:
-                                          FlutterFlowTheme.of(context).primary,
-                                      width: 1.0,
-                                    ),
-                                    hoverTextColor: FlutterFlowTheme.of(context)
-                                        .primaryText,
                                   ),
                                 ),
+                                Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      account4UsersRecord.displayName,
+                                      style: FlutterFlowTheme.of(context)
+                                          .titleMedium
+                                          .override(
+                                            fontFamily:
+                                                FlutterFlowTheme.of(context)
+                                                    .titleMediumFamily,
+                                            letterSpacing: 0.0,
+                                            useGoogleFonts: GoogleFonts.asMap()
+                                                .containsKey(
+                                                    FlutterFlowTheme.of(context)
+                                                        .titleMediumFamily),
+                                          ),
+                                    ),
+                                    Text(
+                                      account4UsersRecord.email,
+                                      style: FlutterFlowTheme.of(context)
+                                          .labelMedium
+                                          .override(
+                                            fontFamily:
+                                                FlutterFlowTheme.of(context)
+                                                    .labelMediumFamily,
+                                            letterSpacing: 0.0,
+                                            useGoogleFonts: GoogleFonts.asMap()
+                                                .containsKey(
+                                                    FlutterFlowTheme.of(context)
+                                                        .labelMediumFamily),
+                                          ),
+                                    ),
+                                  ].divide(const SizedBox(height: 2.0)),
+                                ),
+                              ].divide(const SizedBox(width: 12.0)),
+                            ),
+                            Align(
+                              alignment: const AlignmentDirectional(0.0, 0.0),
+                              child: FFButtonWidget(
+                                onPressed: () async {
+                                  context.pushNamed(
+                                    'editProfile',
+                                    extra: <String, dynamic>{
+                                      kTransitionInfoKey: const TransitionInfo(
+                                        hasTransition: true,
+                                        transitionType: PageTransitionType.fade,
+                                      ),
+                                    },
+                                  );
+                                },
+                                text: FFLocalizations.of(context).getText(
+                                  '21xcr52d' /* Edit Profile */,
+                                ),
+                                icon: FaIcon(
+                                  FontAwesomeIcons.edit,
+                                  color:
+                                      FlutterFlowTheme.of(context).primaryText,
+                                  size: 20.0,
+                                ),
+                                options: FFButtonOptions(
+                                  width: MediaQuery.sizeOf(context).width * 0.5,
+                                  height: 46.0,
+                                  padding: const EdgeInsetsDirectional.fromSTEB(
+                                      0.0, 0.0, 0.0, 0.0),
+                                  iconPadding:
+                                      const EdgeInsetsDirectional.fromSTEB(
+                                          0.0, 0.0, 0.0, 0.0),
+                                  color: FlutterFlowTheme.of(context)
+                                      .primaryBackground,
+                                  textStyle: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .override(
+                                        fontFamily: FlutterFlowTheme.of(context)
+                                            .bodyMediumFamily,
+                                        color: FlutterFlowTheme.of(context)
+                                            .primaryText,
+                                        letterSpacing: 0.0,
+                                        useGoogleFonts: GoogleFonts.asMap()
+                                            .containsKey(
+                                                FlutterFlowTheme.of(context)
+                                                    .bodyMediumFamily),
+                                      ),
+                                  elevation: 0.0,
+                                  borderSide: BorderSide(
+                                    color:
+                                        FlutterFlowTheme.of(context).alternate,
+                                    width: 1.0,
+                                  ),
+                                  borderRadius: BorderRadius.circular(12.0),
+                                  hoverColor: FlutterFlowTheme.of(context)
+                                      .primaryBackground,
+                                  hoverBorderSide: BorderSide(
+                                    color: FlutterFlowTheme.of(context).primary,
+                                    width: 1.0,
+                                  ),
+                                  hoverTextColor:
+                                      FlutterFlowTheme.of(context).primaryText,
+                                ),
                               ),
-                            ].divide(const SizedBox(height: 24.0)),
-                          ),
+                            ),
+                          ].divide(const SizedBox(height: 24.0)),
                         ),
                       ),
                       Container(

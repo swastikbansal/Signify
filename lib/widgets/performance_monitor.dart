@@ -28,8 +28,9 @@ class _PerformanceMonitorState extends State<PerformanceMonitor> {
   void initState() {
     super.initState();
 
-    if (widget.showDebugInfo) {
-      // Monitor frame performance
+    // Disable performance monitoring in debug mode to prevent conflicts
+    if (widget.showDebugInfo && kReleaseMode) {
+      // Monitor frame performance only in release mode
       SchedulerBinding.instance.addTimingsCallback(_onFrameTimings);
 
       // Update memory info periodically
@@ -46,8 +47,8 @@ class _PerformanceMonitorState extends State<PerformanceMonitor> {
         _droppedFrames++;
         print('🚨 Frame drop detected: ${timing.totalSpan.inMilliseconds}ms');
 
-        // Trigger aggressive cleanup on frame drops
-        if (_droppedFrames % 5 == 0) {
+        // Reduce aggressive cleanup in debug mode to prevent conflicts
+        if (_droppedFrames % 10 == 0 && kReleaseMode) {
           _triggerCleanup();
         }
       }
@@ -96,7 +97,7 @@ class _PerformanceMonitorState extends State<PerformanceMonitor> {
 
   @override
   void dispose() {
-    if (widget.showDebugInfo) {
+    if (widget.showDebugInfo && kReleaseMode) {
       SchedulerBinding.instance.removeTimingsCallback(_onFrameTimings);
     }
     super.dispose();
@@ -104,6 +105,11 @@ class _PerformanceMonitorState extends State<PerformanceMonitor> {
 
   @override
   Widget build(BuildContext context) {
+    // In debug mode, return child directly without performance monitoring
+    if (kDebugMode) {
+      return widget.child;
+    }
+    
     return Stack(
       children: [
         widget.child,

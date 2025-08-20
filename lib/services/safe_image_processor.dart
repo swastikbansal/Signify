@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 
@@ -12,7 +13,26 @@ class SafeImageProcessor {
 
   SafeImageProcessor._();
 
-  final TextRecognizer _textRecognizer = TextRecognizer();
+  TextRecognizer? _textRecognizer;
+  bool _isInitialized = false;
+
+  /// Initialize text recognizer safely
+  Future<void> _ensureInitialized() async {
+    if (!_isInitialized || _textRecognizer == null) {
+      try {
+        _textRecognizer = TextRecognizer();
+        _isInitialized = true;
+        if (kDebugMode) {
+          print('🔤 TextRecognizer initialized safely');
+        }
+      } catch (e) {
+        if (kDebugMode) {
+          print('❌ Failed to initialize TextRecognizer: $e');
+        }
+        _isInitialized = false;
+      }
+    }
+  }
 
   /// Process image safely with ultra-conservative memory management
   Future<Map<String, dynamic>> processImageSafely({
@@ -72,6 +92,24 @@ class SafeImageProcessor {
 
       // Ultra-safe OCR processing with additional safeguards
       try {
+        // Ensure TextRecognizer is properly initialized
+        await _ensureInitialized();
+
+        // Skip OCR in debug mode if TextRecognizer failed to initialize
+        if (kDebugMode && (_textRecognizer == null || !_isInitialized)) {
+          print('⚠️ Debug mode: Skipping OCR due to initialization failure');
+          return {
+            'success': true,
+            'text': '',
+            'imagePath': imageFile.path,
+            'message': 'Image added (OCR skipped in debug mode)'
+          };
+        }
+
+        if (_textRecognizer == null) {
+          throw Exception('TextRecognizer not initialized');
+        }
+
         final InputImage inputImage = InputImage.fromFile(processedFile);
 
         // Add shorter timeout for camera images to prevent hanging
@@ -80,7 +118,7 @@ class SafeImageProcessor {
             : const Duration(seconds: 8);
 
         final recognizedText =
-            await _textRecognizer.processImage(inputImage).timeout(
+            await _textRecognizer!.processImage(inputImage).timeout(
                   timeoutDuration,
                   onTimeout: () =>
                       throw TimeoutException('OCR timeout', timeoutDuration),
@@ -145,9 +183,16 @@ class SafeImageProcessor {
   /// Clean up safely
   void dispose() {
     try {
-      _textRecognizer.close();
+      _textRecognizer?.close();
+      _textRecognizer = null;
+      _isInitialized = false;
+      if (kDebugMode) {
+        print('🔤 TextRecognizer disposed safely');
+      }
     } catch (e) {
-      print('Error disposing text recognizer: $e');
+      if (kDebugMode) {
+        print('Error disposing text recognizer: $e');
+      }
     }
   }
 }

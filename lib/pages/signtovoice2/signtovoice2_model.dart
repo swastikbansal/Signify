@@ -1,16 +1,18 @@
+import 'dart:async';
+import 'dart:convert';
+
+import 'package:camera/camera.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_tts/flutter_tts.dart';
+import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
+import 'package:image/image.dart' as img;
+import 'package:translator/translator.dart';
+
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/form_field_controller.dart';
 import '/services/performance_cache_manager.dart';
 import 'signtovoice2_widget.dart' show Signtovoice2Widget;
-import 'package:flutter/material.dart';
-import 'package:image/image.dart' as img;
-import 'package:http_parser/http_parser.dart';
-import 'package:camera/camera.dart';
-import 'dart:convert';
-import 'dart:async';
-import 'package:http/http.dart' as http;
-import 'package:flutter_tts/flutter_tts.dart';
-import 'package:translator/translator.dart';
 
 class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   ///  State fields for stateful widgets in this page.
@@ -161,18 +163,28 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
 
   // TTS getters
   bool get isTtsInitialized => _isTtsInitialized;
+
   bool get isSpeaking => _isSpeaking;
+
   String get selectedLanguage => _selectedLanguage;
+
   Map<String, String> get availableLanguages => Map.from(_availableLanguages);
+
   double get speechRate => _speechRate;
+
   double get speechVolume => _speechVolume;
+
   double get speechPitch => _speechPitch;
+
   bool get autoSpeakEnabled => _autoSpeakEnabled;
+
   bool get ttsToggleState => _ttsToggleState;
 
   // Translation getters
   bool get translationEnabled => _translationEnabled;
+
   bool get isTranslating => _isTranslating;
+
   void resetState() {
     _errorMessage = '';
     _isInitialized = false;
@@ -566,12 +578,6 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
     initializeTts();
   }
 
-  // Enhanced coordinate extraction method similar to Python implementation
-  // (Removed landmark extraction & labeling logic)
-
-  // Improved hand label determination
-  // (Removed hand label helper)
-
   // Convert CameraImage to JPEG bytes for API transmission
   Future<Uint8List?> _convertCameraImageToJpeg(CameraImage image) async {
     try {
@@ -583,9 +589,9 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
       } else if (image.format.group == ImageFormatGroup.bgra8888) {
         // Handle BGRA8888 format (common on iOS and our preferred format)
         convertedImage = img.Image.fromBytes(
-          image.width,
-          image.height,
-          image.planes[0].bytes,
+          width: image.width,
+          height: image.height,
+          bytes: image.planes[0].bytes.buffer,
         );
       } else if (image.format.group == ImageFormatGroup.jpeg) {
         // Handle native JPEG - use directly but with quality control
@@ -619,7 +625,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
     final uPlane = image.planes[1];
     final vPlane = image.planes[2];
 
-    final convertedImage = img.Image(width, height);
+    final convertedImage = img.Image(width: width, height: height);
 
     for (int y = 0; y < height; y++) {
       for (int x = 0; x < width; x++) {
@@ -638,7 +644,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
                 .clamp(0, 255);
         final int b = (yValue + 1.772 * (uValue - 128)).round().clamp(0, 255);
 
-        convertedImage.setPixel(x, y, img.getColor(r, g, b));
+        convertedImage.setPixel(x, y, img.ColorRgb8(r, g, b));
       }
     }
 
@@ -851,7 +857,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
 
         _cameraController = CameraController(
           camera,
-          ResolutionPreset.medium, // Back to medium for better performance
+          ResolutionPreset.medium, // Sets the resolution of the camera
           enableAudio: false,
           imageFormatGroup:
               ImageFormatGroup.bgra8888, // Back to BGRA8888 for compatibility

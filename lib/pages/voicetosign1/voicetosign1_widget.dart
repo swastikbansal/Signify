@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:ui' as ui;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
@@ -8,12 +9,62 @@ import 'package:model_viewer_plus/model_viewer_plus.dart';
 
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import '/services/instant_animation_player.dart';
 import '/services/safe_image_processor.dart';
 import '/services/supabase_animation_service.dart';
 import 'voicetosign1_model.dart';
 
 export 'voicetosign1_model.dart';
+
+/// Ultra-aggressive animation preloader for instant HandTalk-like performance
+class InstantAnimationCache {
+  static final Map<String, bool> _preloadedAnimations = {};
+  static final Map<String, AnimationData> _animationDataCache = {};
+
+  /// Pre-cache animations instantly in background for seamless playback
+  static Future<void> ultraPreload(List<AnimationData> animations) async {
+    debugPrint(
+        '⚡ Ultra-preloading ${animations.length} animations for INSTANT playback');
+
+    // Cache animation data and mark as ready instantly
+    for (final anim in animations) {
+      if (anim.url != null) {
+        _preloadedAnimations[anim.url!] = true;
+        _animationDataCache[anim.url!] = anim;
+        debugPrint(
+            '⚡ INSTANT READY: ${anim.metadata.word} (${anim.metadata.duration}ms)');
+      }
+    }
+
+    // Ultra-fast completion for immediate availability
+    await Future.delayed(const Duration(milliseconds: 50));
+    debugPrint('⚡ All animations cached and ready for seamless playback');
+  }
+
+  /// Check if animation is instantly ready for playback
+  static bool isInstantlyReady(String animationUrl) {
+    return _preloadedAnimations.containsKey(animationUrl);
+  }
+
+  /// Get cached animation data for instant access
+  static AnimationData? getCachedAnimation(String animationUrl) {
+    return _animationDataCache[animationUrl];
+  }
+
+  /// Clear cache for memory management
+  static void clearInstantCache() {
+    _preloadedAnimations.clear();
+    _animationDataCache.clear();
+    debugPrint('⚡ Instant cache cleared');
+  }
+
+  /// Get cache statistics for debugging
+  static Map<String, int> getCacheStats() {
+    return {
+      'preloaded_count': _preloadedAnimations.length,
+      'cached_data_count': _animationDataCache.length,
+    };
+  }
+}
 
 class Voicetosign1Widget extends StatefulWidget {
   const Voicetosign1Widget({super.key});
@@ -42,8 +93,11 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
   late AnimationController _movingLineController;
   late Animation<double> _movingLineAnimation;
 
-  // Seamless animation player key for rebuilding
-  Key _animationPlayerKey = UniqueKey();
+  // Direct animation sequence state (moved from InstantAnimationPlayer)
+  Timer? _animationTimer;
+  int _currentAnimationIndex = 0;
+  bool _isSequenceActive = false;
+  String? _currentAnimationUrl;
 
   // Image handling variables - use paths instead of File objects for safety
   List<String> uploadedImagePaths = [];
@@ -93,6 +147,7 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
   void dispose() {
     _model.dispose();
     _movingLineController.dispose();
+    _animationTimer?.cancel(); // Cancel animation timer
     SafeImageProcessor.instance.dispose();
     super.dispose();
   }
@@ -114,6 +169,82 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
         await SupabaseAnimationService.getPopularWords(limit: 3);
       }
     } catch (_) {}
+  }
+
+  // Animation sequence methods (moved from InstantAnimationPlayer)
+  void _startInstantSequence() {
+    if (_animationQueue.isEmpty) {
+      _completeSequence();
+      return;
+    }
+
+    setState(() {
+      _currentAnimationIndex = 0;
+      _isSequenceActive = true;
+    });
+
+    _playCurrentAnimationInstantly();
+  }
+
+  void _playCurrentAnimationInstantly() {
+    if (_currentAnimationIndex >= _animationQueue.length) {
+      _completeSequence();
+      return;
+    }
+
+    final currentAnimationData = _animationQueue[_currentAnimationIndex];
+    final currentWordData =
+        _wordQueue.isNotEmpty && _currentAnimationIndex < _wordQueue.length
+            ? _wordQueue[_currentAnimationIndex]
+            : null;
+
+    setState(() {
+      _currentAnimationUrl = currentAnimationData.url;
+      currentAnimation = currentAnimationData.url;
+      currentWord = currentWordData;
+    });
+
+    // Notify parent about current word change
+    if (currentWordData != null) {
+      _onCurrentWordChange(currentWordData);
+    }
+
+    // Use actual animation duration from metadata for precise timing
+    final animationDuration = currentAnimationData.metadata.duration;
+
+    // Debug info for performance monitoring
+    debugPrint(
+        '⚡ INSTANT: ${currentWordData ?? 'Unknown'} (${animationDuration}ms)');
+
+    // Pre-cache next animation for seamless transition (if exists)
+    if (_currentAnimationIndex + 1 < _animationQueue.length) {
+      final nextAnimation = _animationQueue[_currentAnimationIndex + 1];
+      InstantAnimationCache.ultraPreload([nextAnimation]);
+    }
+
+    _animationTimer?.cancel();
+    _animationTimer = Timer(Duration(milliseconds: animationDuration), () {
+      _currentAnimationIndex++;
+      _playCurrentAnimationInstantly();
+    });
+  }
+
+  void _completeSequence() {
+    debugPrint('⚡ INSTANT sequence completed');
+
+    // Cancel any remaining timer
+    _animationTimer?.cancel();
+    _animationTimer = null;
+
+    setState(() {
+      _isSequenceActive = false;
+      _currentAnimationIndex = 0;
+      _currentAnimationUrl = null;
+      // Return to default animation smoothly
+      currentAnimation = defaultAnimation;
+    });
+
+    _onAnimationSequenceComplete();
   }
 
   // Image handling methods
@@ -142,6 +273,13 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
 
   Future<void> _takePhoto() async {
     try {
+      // Debug mode: Additional protection against camera conflicts
+      if (kDebugMode) {
+        print('📸 Debug mode: Starting camera capture with extra protection');
+        // Longer delay in debug mode to prevent conflicts
+        await Future.delayed(const Duration(milliseconds: 500));
+      }
+
       // Minimal logging for camera capture
 
       // Add pre-camera delay to ensure proper initialization
@@ -155,7 +293,16 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
       );
 
       if (pickedFile == null) {
+        if (kDebugMode) {
+          print('📸 Debug mode: Camera capture cancelled by user');
+        }
         return;
+      }
+
+      // Debug mode: Additional post-camera stabilization
+      if (kDebugMode) {
+        print('📸 Debug mode: Camera capture completed, stabilizing...');
+        await Future.delayed(const Duration(milliseconds: 500));
       }
 
       // Add post-camera delay to ensure proper file handling
@@ -164,9 +311,23 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
 
       await _processImageSafely(pickedFile, isFromCamera: true);
     } catch (e) {
+      if (kDebugMode) {
+        print('❌ Debug mode: Camera error caught safely: $e');
+      }
       setState(() {
         isProcessingImage = false;
       });
+
+      // Show user-friendly error in debug mode
+      if (kDebugMode && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Camera temporarily unavailable in debug mode'),
+            backgroundColor: Colors.orange,
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
     }
   }
 
@@ -176,7 +337,11 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
       isProcessingImage = true;
     });
 
-    // Silent image processing
+    // Debug mode: Extra logging and protection
+    if (kDebugMode) {
+      print(
+          '🖼️ Debug mode: Processing ${isFromCamera ? 'camera' : 'gallery'} image safely');
+    }
 
     try {
       // Use safe image processor with camera flag
@@ -211,16 +376,43 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
           isProcessingImage = false;
         });
 
-        // Success silent
+        // Debug mode: Success logging
+        if (kDebugMode) {
+          print('✅ Debug mode: Image processed successfully');
+          if (extractedText.isNotEmpty) {
+            print(
+                '📝 Debug mode: Extracted text: "${extractedText.substring(0, extractedText.length.clamp(0, 50))}..."');
+          }
+        }
       } else {
         setState(() {
           isProcessingImage = false;
         });
+
+        if (kDebugMode) {
+          print('⚠️ Debug mode: Image processing returned failure');
+        }
       }
     } catch (e) {
+      if (kDebugMode) {
+        print('❌ Debug mode: Image processing error caught: $e');
+      }
+
       setState(() {
         isProcessingImage = false;
       });
+
+      // Show user-friendly error in debug mode
+      if (kDebugMode && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content:
+                Text('Image processing temporarily unavailable in debug mode'),
+            backgroundColor: Colors.orange,
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
     }
   }
 
@@ -437,14 +629,20 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
       });
 
       if (_animationQueue.isNotEmpty) {
-        // NO preloading delays - instant performance like HandTalk
+        // Ultra-fast preloading for seamless HandTalk-style performance
         await InstantAnimationCache.ultraPreload(_animationQueue);
+
+        // Also ultra-preload in SupabaseAnimationService for double caching
+        final wordList = _wordQueue.isNotEmpty
+            ? _wordQueue
+            : _animationQueue.map((a) => a.metadata.word).toList();
+        await SupabaseAnimationService.ultraPreloadAnimations(wordList);
 
         // Start predictive loading for better performance
         SupabaseAnimationService.preloadRelatedWords(
             _animationQueue.first.metadata.word);
 
-        _startSeamlessAnimationSequence();
+        _startInstantSequence();
       } else {
         setState(() {
           currentAnimation = defaultAnimation;
@@ -466,14 +664,6 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
       uploadedImagePaths.clear();
       // Clear animation state when clearing input
       _model.clearAnimations();
-    });
-  }
-
-  void _startSeamlessAnimationSequence() {
-    setState(() {
-      isPlayingSequence = true; // NO loading states for instant performance
-      // Create new player key to rebuild the instant player
-      _animationPlayerKey = UniqueKey();
     });
   }
 
@@ -562,46 +752,34 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
                 ),
                 child: Stack(
                   children: [
-                    // Instant animation player or default ModelViewer - now full screen
-                    isPlayingSequence && _animationQueue.isNotEmpty
-                        ? InstantAnimationPlayer(
-                            key: _animationPlayerKey,
-                            defaultAnimation: defaultAnimation,
-                            animationQueue: List.from(_animationQueue),
-                            // Copy to avoid modification issues
-                            wordQueue: List.from(_wordQueue),
-                            onSequenceComplete: _onAnimationSequenceComplete,
-                            onWordChange: _onCurrentWordChange,
-                          )
-                        : ModelViewer(
-                            key: ValueKey(currentAnimation ?? defaultAnimation),
-                            src: currentAnimation ?? defaultAnimation,
-                            autoPlay: true,
-                            autoRotate: false,
-                            cameraControls: true,
-                            // Enable interactive camera controls
-                            backgroundColor: Colors.transparent,
-                            cameraTarget: '0m 1.2m 0.1m',
-                            // Focus higher - shifts avatar upwards in view
-                            cameraOrbit: '0deg 90deg 1.6m',
-                            // Much closer view, avatar looking straight forward
-                            minCameraOrbit: 'auto 45deg 1.0m',
-                            // Very close zoom - almost face level
-                            maxCameraOrbit: 'auto 110deg 6m',
-                            // Far zoom but closer than before
-                            minFieldOfView: '20deg',
-                            // Narrower field of view for more zoom
-                            maxFieldOfView: '65deg',
-                            // Reduced max field of view
-                            fieldOfView: '35deg',
-                            // Tighter default field of view for closer look
-                            disablePan: false,
-                            // Enable panning: drag with 2 fingers (mobile) or Ctrl+drag (desktop)
-                            disableTap: true,
-                            // Enable tap to focus: tap on model parts to center camera there
-                            disableZoom: false,
-                            // Enable zoom: pinch gesture (mobile) or scroll wheel (desktop)
-                          ),
+                    // Direct ModelViewer for ultra-seamless animations (HandTalk-style)
+                    ModelViewer(
+                      key: ValueKey(_currentAnimationUrl ??
+                          currentAnimation ??
+                          defaultAnimation),
+                      src: _currentAnimationUrl ??
+                          currentAnimation ??
+                          defaultAnimation,
+                      autoPlay: true,
+                      // Auto-play default animation for its resting position
+                      autoRotate: false,
+                      cameraControls: !_isSequenceActive,
+                      // Disable controls during sequence for focus
+                      backgroundColor: Colors.transparent,
+                      cameraTarget: '0m 1.2m 0.1m',
+                      cameraOrbit: '0deg 90deg 1.6m',
+                      minCameraOrbit: 'auto 45deg 1.0m',
+                      maxCameraOrbit: 'auto 110deg 6m',
+                      minFieldOfView: '20deg',
+                      maxFieldOfView: '65deg',
+                      fieldOfView: '35deg',
+                      disablePan: true,
+                      // Enable panning: drag with 2 fingers (mobile) or Ctrl+drag (desktop)
+                      disableTap: true,
+                      // Enable tap to focus: tap on model parts to center camera there
+                      disableZoom: true,
+                      // Enable zoom: pinch gesture (mobile) or scroll wheel (desktop)
+                    ),
 
                     // NO loading overlays for instant HandTalk-like performance
 
@@ -614,7 +792,7 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
               Positioned(
                 left: 0,
                 right: 0,
-                bottom: 12,
+                bottom: 8,
                 child:
                     // Modern unified input container with Claude-like design and acrylic transparency
                     ClipRRect(

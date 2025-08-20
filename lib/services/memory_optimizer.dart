@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 
 /// Advanced memory management and optimization service
 class MemoryOptimizer {
@@ -18,8 +17,15 @@ class MemoryOptimizer {
   static const int MEMORY_WARNING_THRESHOLD_MB = 300; // Increased threshold
   static const int MEMORY_CRITICAL_THRESHOLD_MB = 400; // Increased threshold
 
-  /// Initialize memory monitoring - disabled aggressive monitoring
+  /// Initialize memory monitoring - debug mode safe
   Future<void> initialize() async {
+    // In debug mode, use minimal monitoring to prevent conflicts
+    if (kDebugMode) {
+      print('🧠 MemoryOptimizer initialized in debug mode (minimal monitoring)');
+      return;
+    }
+
+    // Full monitoring only in release mode
     // Disable memory monitoring during image capture to prevent app restarts
     // _memoryMonitorTimer =
     //     Timer.periodic(MEMORY_CHECK_INTERVAL, (_) => _checkMemoryUsage());

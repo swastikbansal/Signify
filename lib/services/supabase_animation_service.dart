@@ -27,10 +27,12 @@ class SupabaseAnimationService {
   static final _client = Supabase.instance.client;
   static const String BUCKET_NAME = 'animations';
 
-  // Enhanced caching system
+  // Enhanced caching system for ultra-fast performance
   static final Map<String, String> _urlCache = {};
   static final Map<String, AnimationMetadata> _metadataCache = {};
   static final Set<String> _preloadedWords = {};
+  static final Map<String, AnimationData> _fullAnimationCache =
+      {}; // New: Full animation data cache
 
   // Single fallback duration - no hardcoded words
   static const int DEFAULT_DURATION = 3500;
@@ -138,12 +140,19 @@ class SupabaseAnimationService {
 
     // First pass: collect cached animations for instant response
     for (final word in words) {
-      if (_urlCache.containsKey(word) && _metadataCache.containsKey(word)) {
-        print('✅ [BATCH CACHE HIT] Found cached: "$word"');
-        results.add(AnimationData(
+      if (_fullAnimationCache.containsKey(word)) {
+        results.add(_fullAnimationCache[word]!);
+        print('⚡ [ULTRA-CACHE HIT] Found ultra-cached: "$word"');
+      } else if (_urlCache.containsKey(word) &&
+          _metadataCache.containsKey(word)) {
+        final cachedAnimation = AnimationData(
           url: _urlCache[word]!,
           metadata: _metadataCache[word]!,
-        ));
+        );
+        _fullAnimationCache[word] =
+            cachedAnimation; // Cache for ultra-fast next access
+        results.add(cachedAnimation);
+        print('✅ [BATCH CACHE HIT] Found cached: "$word"');
       } else {
         print('🔍 [BATCH CACHE MISS] Need to fetch: "$word"');
         // Placeholder for uncached words
@@ -406,6 +415,58 @@ class SupabaseAnimationService {
     _urlCache.clear();
     _metadataCache.clear();
     _preloadedWords.clear();
+    _fullAnimationCache.clear(); // Clear full animation cache too
     print('🧹 Cache cleared');
+  }
+
+  /// Ultra-fast batch preloading for seamless animation sequences
+  static Future<void> ultraPreloadAnimations(List<String> words) async {
+    try {
+      print(
+          '⚡ Ultra-preloading ${words.length} animations for seamless playback');
+
+      final uncachedWords = words
+          .where((word) => !_fullAnimationCache.containsKey(word))
+          .toList();
+
+      if (uncachedWords.isNotEmpty) {
+        // Batch fetch uncached animations
+        final response = await _client
+            .from('animations')
+            .select('word, file_path, duration_ms, category')
+            .inFilter(
+                'word', uncachedWords.map((w) => w.toLowerCase()).toList());
+
+        for (final row in response) {
+          final word = row['word'];
+          if (row['file_path'] != null) {
+            String filePath = row['file_path'];
+            if (filePath.startsWith('animations/')) {
+              filePath = filePath.substring('animations/'.length);
+            }
+
+            final url =
+                _client.storage.from(BUCKET_NAME).getPublicUrl(filePath);
+            final metadata = AnimationMetadata(
+              word: row['word'],
+              duration: row['duration_ms'] ?? DEFAULT_DURATION,
+              category: row['category'] ?? 'general',
+            );
+
+            // Cache everything for ultra-fast access
+            _urlCache[word] = url;
+            _metadataCache[word] = metadata;
+            _fullAnimationCache[word] =
+                AnimationData(url: url, metadata: metadata);
+
+            print('⚡ CACHED: $word (${metadata.duration}ms)');
+          }
+        }
+      }
+
+      print('⚡ Ultra-preloading complete - ${words.length} animations ready');
+    } catch (e) {
+      print('⚠️ Error in ultra-preloading: $e');
+    }
   }
 }

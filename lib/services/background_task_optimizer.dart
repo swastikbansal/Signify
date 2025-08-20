@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:isolate';
+import 'package:flutter/foundation.dart';
 import '../config/app_config.dart';
 import '../services/app_state_manager.dart';
 
@@ -95,7 +96,12 @@ class BackgroundTaskOptimizer {
 
   /// Start task processing
   void _startProcessing() {
-    _processingTimer = Timer.periodic(const Duration(milliseconds: 100), (_) {
+    // Use less frequent processing in debug mode to reduce conflicts
+    const processingInterval = kDebugMode 
+        ? Duration(milliseconds: 500) 
+        : Duration(milliseconds: 100);
+        
+    _processingTimer = Timer.periodic(processingInterval, (_) {
       if (!_isProcessing && _activeWorkers < _maxWorkers) {
         _processPendingTasks();
       }
