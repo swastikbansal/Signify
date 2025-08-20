@@ -89,6 +89,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   List<String> get sentenceWords => List.from(_currentSentence);
 
   // API related state
+  // String _apiUrl = 'https://192.168.29.42:5000/process_frame';
   String _apiUrl = 'https://swastikbansal-signify.hf.space/process_frame';
   bool _isApiEnabled = true;
   int _lastApiCallTime = 0;
