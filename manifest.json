@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Signify-ISL Animation Viewer",
+  "name": "Signify-ISL YouTube Extension",
   "version": "1.0.0",
   "description": "View Indian Sign Language animations on any webpage",
   "permissions": [
@@ -9,7 +9,7 @@
   ],
   "action": {
     "default_popup": "popup.html",
-    "default_title": "ISL Animation Viewer"
+    "default_title": "Signify"
   },
   "content_scripts": [
     {
