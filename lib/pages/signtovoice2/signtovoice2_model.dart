@@ -57,7 +57,6 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
 
   String get errorMessage => _errorMessage;
 
-  // Camera information getters for skeleton overlay
   bool get isFrontCamera {
     return _cameraController?.description.lensDirection ==
         CameraLensDirection.front;
@@ -72,14 +71,11 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
       PerformanceCacheManager.instance;
 
   // Store coordinate data
-  String _lastUpdateTime = ''; // Removed landmark & pose data
+  String _lastUpdateTime = '';
 
-  // Prediction history for debug
   final List<String> _predictionHistory = [];
 
-  // Sentence building state
   final List<String> _currentSentence = [];
-  // Removed duplicate suppression state for simplified always-append behavior
 
   List<String> get predictionHistory => _predictionHistory;
 
@@ -91,45 +87,37 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   List<String> get sentenceWords => List.from(_currentSentence);
 
   // API related state
-  String _apiUrl = 'http://192.168.29.168:5000/process_frame';
+  String _apiUrl = 'https://swastikbansal-signify.hf.space/process_frame';
   bool _isApiEnabled = true;
   int _lastApiCallTime = 0;
-  static const int _apiCallInterval = 200; // Faster polling (~5-6 FPS target if server keeps up)
+  static const int _apiCallInterval = 200; //ms
 
-  // Simplified fixed encoding parameters
-  // Encoding parameters (match prior working setup)
+  static const int _jpegQuality = 80;
 
-  static const int _jpegQuality = 80; // Better quality for sign language
-
-  bool _apiInFlight = false; // Ensure only one request at a time
-  // Removed frame_index usage to match previous API expectations
+  bool _apiInFlight = false; 
   
   // Enhanced HTTP client with connection pooling
   late final http.Client _httpClient;
 
   void _initializeHttpClient() {
     _httpClient = http.Client();
-    // Note: Dart's http.Client automatically handles connection pooling
-    // and keep-alive connections when using the same client instance
   }
 
-  // Skeleton overlay state
-  // Removed skeleton overlay & coordinate transformation flags
 
   // Text-to-Speech state
   FlutterTts? _flutterTts;
   bool _isTtsInitialized = false;
   bool _isSpeaking = false;
-  String _selectedLanguage = 'en-US'; // Default language
+  String _selectedLanguage = 'en-US';
   double _speechRate = 0.5;
   double _speechVolume = 0.8;
   double _speechPitch = 1.0;
-  bool _autoSpeakEnabled = false; // Auto-speak new words when added
-  bool _ttsToggleState = false; // Track if TTS is manually toggled ON/OFF
+  bool _autoSpeakEnabled = false;
+  bool _ttsToggleState = false;
 
   // Translation state
   final GoogleTranslator _translator = GoogleTranslator();
-  bool _translationEnabled = true; // Enable translation by default
+  bool _translationEnabled = true;
   bool _isTranslating = false;
 
   // Available languages for TTS
@@ -802,8 +790,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   // Method to toggle API calls
   void setApiEnabled(bool enabled) {
     _isApiEnabled = enabled;
-    print(
-        'API prediction ${enabled ? 'enabled' : 'disabled'} - using ${enabled ? 'remote' : 'local'} prediction');
+    print('API prediction ${enabled ? 'enabled' : 'disabled'} - using ${enabled ? 'remote' : 'local'} prediction');
   }
 
   // Method to toggle between API-based and local prediction
@@ -822,6 +809,8 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
 
   // Method to get current API URL
   String get apiUrl => _apiUrl;
+  
+
 
   // Method to reset API call timer (useful for immediate API calls)
   void resetApiTimer() {
