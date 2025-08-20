@@ -98,8 +98,8 @@ class BackgroundTaskOptimizer {
   void _startProcessing() {
     // Use less frequent processing in debug mode to reduce conflicts
     const processingInterval = kDebugMode 
-        ? const Duration(milliseconds: 500) 
-        : const Duration(milliseconds: 100);
+        ? Duration(milliseconds: 500) 
+        : Duration(milliseconds: 100);
         
     _processingTimer = Timer.periodic(processingInterval, (_) {
       if (!_isProcessing && _activeWorkers < _maxWorkers) {

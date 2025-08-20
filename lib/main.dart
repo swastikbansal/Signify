@@ -93,7 +93,7 @@ Stack trace: ${filteredStackTrace.join("\n")}''';
   };
 
   /// Optimized debounce cleanup - reduced frequency in debug mode to prevent conflicts
-  const cleanupDuration = kDebugMode ? const Duration(seconds: 10) : const Duration(seconds: 5);
+  const cleanupDuration = kDebugMode ? Duration(seconds: 10) : Duration(seconds: 5);
   Timer.periodic(cleanupDuration, (timer) {
     EasyDebounce.cancel('508f3c74205c87928b71f49040062e732f9c20b0');
   });

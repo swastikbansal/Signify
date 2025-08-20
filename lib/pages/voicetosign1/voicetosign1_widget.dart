@@ -321,7 +321,7 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
       // Show user-friendly error in debug mode
       if (kDebugMode && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text('Camera temporarily unavailable in debug mode'),
             backgroundColor: Colors.orange,
             duration: Duration(seconds: 2),
@@ -405,7 +405,7 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
       // Show user-friendly error in debug mode
       if (kDebugMode && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content:
                 Text('Image processing temporarily unavailable in debug mode'),
             backgroundColor: Colors.orange,
@@ -792,7 +792,7 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
               Positioned(
                 left: 0,
                 right: 0,
-                bottom: 12,
+                bottom: 8,
                 child:
                     // Modern unified input container with Claude-like design and acrylic transparency
                     ClipRRect(

@@ -120,13 +120,13 @@ class _Account4WidgetState extends State<Account4Widget>
                 size: 80,
                 color: FlutterFlowTheme.of(context).secondaryText,
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Text(
                 'Debug Mode: Please sign in',
                 style: FlutterFlowTheme.of(context).titleMedium,
                 textAlign: TextAlign.center,
               ),
-              SizedBox(height: 24),
+              const SizedBox(height: 24),
               FFButtonWidget(
                 onPressed: () async {
                   context.pushNamed('authPage');
