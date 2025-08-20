@@ -1,32 +1,30 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
+import 'dart:async';
 
+import 'package:easy_debounce/easy_debounce.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'auth/firebase_auth/firebase_user_provider.dart';
-import 'auth/firebase_auth/auth_util.dart';
 
-import 'backend/firebase/firebase_config.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
+import 'auth/firebase_auth/auth_util.dart';
+import 'auth/firebase_auth/firebase_user_provider.dart';
+import 'backend/firebase/firebase_config.dart';
+// Security and state management
+import 'config/app_config.dart';
 import 'flutter_flow/flutter_flow_util.dart';
 import 'flutter_flow/internationalization.dart';
 import 'index.dart';
-
-// Performance optimization services
-import 'services/performance_cache_manager.dart';
+import 'services/app_state_manager.dart';
+import 'services/background_task_optimizer.dart';
+import 'services/database_optimizer.dart';
+import 'services/error_recovery_service.dart';
 import 'services/memory_optimizer.dart';
 import 'services/network_optimizer.dart';
-import 'services/database_optimizer.dart';
-import 'services/background_task_optimizer.dart';
-
-// Security and state management
-import 'config/app_config.dart';
-import 'services/app_state_manager.dart';
-import 'services/error_recovery_service.dart';
-
-import 'dart:async';
-import 'package:easy_debounce/easy_debounce.dart';
+// Performance optimization services
+import 'services/performance_cache_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -54,7 +52,7 @@ void main() async {
       print('🐛 Debug Error: ${details.exceptionAsString()}');
       return originalErrorWidgetBuilder(details);
     }
-    
+
     // Only use custom error handling in release mode
     try {
       final match = RegExp(
@@ -93,7 +91,8 @@ Stack trace: ${filteredStackTrace.join("\n")}''';
   };
 
   /// Optimized debounce cleanup - reduced frequency in debug mode to prevent conflicts
-  const cleanupDuration = kDebugMode ? Duration(seconds: 10) : Duration(seconds: 5);
+  const cleanupDuration =
+      kDebugMode ? Duration(seconds: 10) : Duration(seconds: 5);
   Timer.periodic(cleanupDuration, (timer) {
     EasyDebounce.cancel('508f3c74205c87928b71f49040062e732f9c20b0');
   });
@@ -233,7 +232,7 @@ class _MyAppState extends State<MyApp> {
       NetworkOptimizer.instance.dispose();
       PerformanceCacheManager.instance.dispose();
     }
-    
+
     // Always dispose memory optimizer (minimal in debug mode)
     MemoryOptimizer.instance.dispose();
 
@@ -366,76 +365,164 @@ class _NavBarPageState extends State<NavBarPage> {
     };
     final currentIndex = tabs.keys.toList().indexOf(_currentPageName);
 
-    return Scaffold(
-      body: _currentPage ?? tabs[_currentPageName],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: currentIndex,
-        onTap: (i) => safeSetState(() {
-          _currentPage = null;
-          _currentPageName = tabs.keys.toList()[i];
-        }),
-        backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
-        selectedItemColor: FlutterFlowTheme.of(context).primary,
-        unselectedItemColor: FlutterFlowTheme.of(context).secondaryText,
-        showSelectedLabels: true,
-        showUnselectedLabels: true,
-        type: BottomNavigationBarType.fixed,
-        items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: const Icon(
-              Icons.sign_language_outlined,
-              size: 30.0,
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        systemNavigationBarColor:
+            FlutterFlowTheme.of(context).secondaryBackground,
+        systemNavigationBarIconBrightness:
+            Theme.of(context).brightness == Brightness.light
+                ? Brightness.dark
+                : Brightness.light,
+      ),
+      child: Scaffold(
+        body: _currentPage ?? tabs[_currentPageName],
+        bottomNavigationBar: NavigationBar(
+          selectedIndex: currentIndex,
+          onDestinationSelected: (i) => safeSetState(() {
+            _currentPage = null;
+            _currentPageName = tabs.keys.toList()[i];
+          }),
+          backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
+          indicatorColor:
+              FlutterFlowTheme.of(context).primary.withOpacity(0.16),
+          surfaceTintColor: FlutterFlowTheme.of(context).secondaryBackground,
+          elevation: 10.0,
+          height: 66.0, // Reduced from 80.0 to 66.0
+          animationDuration: const Duration(milliseconds: 300),
+          labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+          // Custom label text styling for selected/unselected states
+          labelTextStyle: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
+              return TextStyle(
+                color: FlutterFlowTheme.of(context).primary,
+                fontSize: 12.0,
+                fontWeight: FontWeight.w500,
+              );
+            }
+            return TextStyle(
+              color: FlutterFlowTheme.of(context).secondaryText,
+              fontSize: 12.0,
+              fontWeight: FontWeight.w400,
+            );
+          }),
+          // Reduce padding between icon and label
+          labelPadding:
+              const EdgeInsets.only(top: 2.0), // Reduced from default 4.0
+          destinations: [
+            Tooltip(
+              message: 'Convert speech to sign language',
+              preferBelow: false, // Position tooltip above
+              decoration: BoxDecoration(
+                color: FlutterFlowTheme.of(context).alternate,
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              textStyle: TextStyle(
+                color: FlutterFlowTheme.of(context).primaryText,
+                fontSize: 14.0,
+              ),
+              child: NavigationDestination(
+                icon: Icon(
+                  Icons.record_voice_over_outlined,
+                  size: 24.0,
+                  color: FlutterFlowTheme.of(context).secondaryText,
+                ),
+                selectedIcon: Icon(
+                  Icons.record_voice_over,
+                  size: 24.0,
+                  color: FlutterFlowTheme.of(context).primary,
+                ),
+                label: FFLocalizations.of(context).getText(
+                  'ktfggi18' /* Speak */,
+                ),
+                tooltip: '', // Disable default tooltip
+              ),
             ),
-            activeIcon: const Icon(
-              Icons.sign_language,
-              size: 30.0,
+            Tooltip(
+              message: 'Convert sign language to speech',
+              preferBelow: false, // Position tooltip above
+              decoration: BoxDecoration(
+                color: FlutterFlowTheme.of(context).alternate,
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              textStyle: TextStyle(
+                color: FlutterFlowTheme.of(context).primaryText,
+                fontSize: 14.0,
+              ),
+              child: NavigationDestination(
+                icon: Icon(
+                  Icons.sign_language_outlined,
+                  size: 24.0,
+                  color: FlutterFlowTheme.of(context).secondaryText,
+                ),
+                selectedIcon: Icon(
+                  Icons.sign_language,
+                  size: 24.0,
+                  color: FlutterFlowTheme.of(context).primary,
+                ),
+                label: FFLocalizations.of(context).getText(
+                  'helpdw8b' /* Sign */,
+                ),
+                tooltip: '', // Disable default tooltip
+              ),
             ),
-            label: FFLocalizations.of(context).getText(
-              'ktfggi18' /* Voice to sign */,
+            Tooltip(
+              message: 'Sign language dictionary',
+              preferBelow: false, // Position tooltip above
+              decoration: BoxDecoration(
+                color: FlutterFlowTheme.of(context).alternate,
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              textStyle: TextStyle(
+                color: FlutterFlowTheme.of(context).primaryText,
+                fontSize: 14.0,
+              ),
+              child: NavigationDestination(
+                icon: Icon(
+                  Icons.book_outlined,
+                  size: 24.0,
+                  color: FlutterFlowTheme.of(context).secondaryText,
+                ),
+                selectedIcon: Icon(
+                  Icons.book,
+                  size: 24.0,
+                  color: FlutterFlowTheme.of(context).primary,
+                ),
+                label: FFLocalizations.of(context).getText(
+                  '5fzg2vtn' /* Dictionary */,
+                ),
+                tooltip: '', // Disable default tooltip
+              ),
             ),
-            tooltip: '',
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(
-              Icons.spatial_audio_off_outlined,
-              size: 30.0,
+            Tooltip(
+              message: 'User account and settings',
+              preferBelow: false, // Position tooltip above
+              decoration: BoxDecoration(
+                color: FlutterFlowTheme.of(context).alternate,
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              textStyle: TextStyle(
+                color: FlutterFlowTheme.of(context).primaryText,
+                fontSize: 14.0,
+              ),
+              child: NavigationDestination(
+                icon: Icon(
+                  Icons.person_outline,
+                  size: 24.0,
+                  color: FlutterFlowTheme.of(context).secondaryText,
+                ),
+                selectedIcon: Icon(
+                  Icons.person,
+                  size: 24.0,
+                  color: FlutterFlowTheme.of(context).primary,
+                ),
+                label: FFLocalizations.of(context).getText(
+                  'k68wh7xs' /* Account */,
+                ),
+                tooltip: '', // Disable default tooltip
+              ),
             ),
-            activeIcon: const Icon(
-              Icons.spatial_audio_off_rounded,
-              size: 30.0,
-            ),
-            label: FFLocalizations.of(context).getText(
-              'vgleqcd8' /* Sign to Voice */,
-            ),
-            tooltip: '',
-          ),
-          const BottomNavigationBarItem(
-            icon: Icon(
-              Icons.book_outlined,
-              size: 30.0,
-            ),
-            activeIcon: Icon(
-              Icons.book,
-              size: 30.0,
-            ),
-            label: 'Dictionary',
-            tooltip: '',
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(
-              Icons.account_circle_outlined,
-              size: 30.0,
-            ),
-            activeIcon: const Icon(
-              Icons.account_circle_rounded,
-              size: 30.0,
-            ),
-            label: FFLocalizations.of(context).getText(
-              'k68wh7xs' /* Account */,
-            ),
-            tooltip: '',
-          )
-        ],
+          ],
+        ),
       ),
     );
   }
