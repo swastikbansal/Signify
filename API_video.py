@@ -20,8 +20,6 @@ REST_SPEED_THRESHOLD :float = 90.0   # pixels/second; lower => more sensitive to
 MIN_POINTS_FOR_REST :int = 2       
 REQUIRED_CONSECUTIVE_FRAMES :int = 3  
 
-
-
 app = Flask(__name__)
 
 # Queue for video frames to be displayed
