@@ -4,9 +4,21 @@ import time
 class Utils:
     def __init__(self, axes, restSpeed, minPoints, requiredFrames):
         self.axes = axes
-        self.REST_SPEED_THRESHOLD = restSpeed  # pixels/second; lower => more sensitive to rest
+        self.REST_SPEED_THRESHOLD = restSpeed  # pixels/second
         self.MIN_POINTS_FOR_REST = minPoints
         self.REQUIRED_CONSECUTIVE_FRAMES = requiredFrames
+
+        # persistent state used across consecutive calls to is_resting
+        self.prev_positions = {
+            "positions": {},        # dict e.g. {"left_wrist": np.array([...]), ...}
+            "timestamp": None,
+            "counters": {           # consecutive low-speed frame counters per key
+                "left_wrist": 0,
+                "right_wrist": 0,
+                "left_shoulder": 0,
+                "right_shoulder": 0
+            }
+        }
 
     def _landmark_to_pixel(self, landmark, img_shape):
         """Convert normalized landmark to pixel (x,y)."""
@@ -18,26 +30,9 @@ class Utils:
         Compute average speed (pixels/sec) for selected landmarks across frames.
         Returns True if movement is below REST_SPEED_THRESHOLD.
         """
-        
-        # Global previous positions and timing for rest detection
-        prev_positions = {
-            "left_wrist": None,
-            "right_wrist": None,
-            "left_shoulder": None,
-            "right_shoulder": None,
-            "timestamp": None,
-            # per-landmark counters for consecutive low-speed frames
-            "counters": {
-                "left_wrist": 0,
-                "right_wrist": 0,
-                "left_shoulder": 0,
-                "right_shoulder": 0
-            }
-        }
-
         current_time = time.time()
         points = {}
-        
+
         # Hands: get wrist landmark (index 0) if available
         if getattr(res_hands, "multi_hand_landmarks", None) and getattr(res_hands, "multi_handedness", None):
             for hand_landmarks, handedness in zip(res_hands.multi_hand_landmarks, res_hands.multi_handedness):
@@ -52,53 +47,63 @@ class Utils:
                 elif label == 'Right':
                     points['right_wrist'] = wrist
 
-        # Initialize previous timestamp if missing
-        if prev_positions['timestamp'] is None:
-            prev_positions['timestamp'] = current_time
-            prev_positions.update({k: v for k, v in points.items()})
+        # convenience ref
+        prev = self.prev_positions
+
+        # If first frame (no timestamp), store and return not-resting
+        if prev['timestamp'] is None:
+            prev['timestamp'] = current_time
+            prev['positions'] = points.copy()
+            # reset counters for any missing keys
+            for k in prev['counters']:
+                if k not in prev['positions']:
+                    prev['counters'][k] = 0
             return False
         
         # Update prev and return False if there is lack of lm's (not resting)
         if len(points) < 1:
-            prev_positions['timestamp'] = current_time
-            prev_positions.update({k: v for k, v in points.items()})
-            
-            # reset counters if no data for those keys
-            for k in prev_positions['counters']:
+            prev['timestamp'] = current_time
+            prev['positions'] = points.copy()
+            # reset counters for keys that are missing
+            for k in prev['counters']:
                 if k not in points:
-                    prev_positions['counters'][k] = 0
+                    prev['counters'][k] = 0
             return False
-        
-        dt = current_time - prev_positions['timestamp']
+
+        dt = current_time - prev['timestamp']
+        # avoid division by zero or negative dt
         if dt <= 0:
-            prev_positions['timestamp'] = current_time
-            prev_positions.update({k: v for k, v in points.items()})
+            prev['timestamp'] = current_time
+            prev['positions'] = points.copy()
             return False
 
         speeds = []
         speed_map = {}
+
+        # compute speeds only where previous positions exist
         for key, cur_pos in points.items():
-            prev_pos = prev_positions.get(key)
+            prev_pos = prev['positions'].get(key)
             if prev_pos is not None:
                 dist = np.linalg.norm(cur_pos - prev_pos)
                 speed = dist / dt
                 speeds.append(speed)
                 speed_map[key] = speed
 
-        # updating prev pos & time
-        prev_positions['timestamp'] = current_time
-        prev_positions.update({k: v for k, v in points.items()})
+        # update timestamp and previous positions for next call
+        prev['timestamp'] = current_time
+        prev['positions'] = points.copy()
 
-        # Restting counters for disappered landmarks
-        for k in list(prev_positions['counters'].keys()):
+        # reset counters for disappeared landmarks
+        for k in list(prev['counters'].keys()):
             if k not in speed_map:
-                prev_positions['counters'][k] = 0
+                prev['counters'][k] = 0
 
         # Using avg speed to detect on enough lm's
         if len(speeds) >= self.MIN_POINTS_FOR_REST:
             avg_speed = float(np.mean(speeds))
-            for k in prev_positions['counters']:
-                prev_positions['counters'][k] = 0 # reset counters on insufficient data
+            # Reset per-key counters because we're using an average decision
+            for k in prev['counters']:
+                prev['counters'][k] = 0
             return avg_speed < self.REST_SPEED_THRESHOLD
 
         # Case for a single hand 
@@ -106,14 +111,14 @@ class Utils:
             key = next(iter(speed_map))
             speed = speed_map[key]
             if speed < self.REST_SPEED_THRESHOLD:
-                prev_positions['counters'][key] = prev_positions['counters'].get(key, 0) + 1
-                if prev_positions['counters'][key] >= self.REQUIRED_CONSECUTIVE_FRAMES:
+                prev['counters'][key] = prev['counters'].get(key, 0) + 1
+                if prev['counters'][key] >= self.REQUIRED_CONSECUTIVE_FRAMES:
+                    # do NOT reset counters here so subsequent frames continue to be treated as resting
                     return True
-                else:
-                    return False
-            else:
-                prev_positions['counters'][key] = 0
                 return False
+            # movement above threshold -> reset that counter
+            prev['counters'][key] = 0
+            return False
 
         return False
 

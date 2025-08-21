@@ -16,9 +16,10 @@ warnings.filterwarnings("ignore")
 
 
 # Rest detection parameters (tweak these for your camera/subject)
-REST_SPEED_THRESHOLD :float = 90.0   # pixels/second; lower => more sensitive to rest
+REST_SPEED_THRESHOLD :float = 30.0   # pixels/second; lower => more sensitive to rest
 MIN_POINTS_FOR_REST :int = 2       
 REQUIRED_CONSECUTIVE_FRAMES :int = 3  
+REST_DELAY = 2  # Frames before considering rest
 
 app = Flask(__name__)
 
@@ -130,7 +131,7 @@ def process_image(img):
         print(resting)
         if not resting:
             try:
-                # Process hand landmarks (for both left and right hands)
+                # Process landmarks
                 if res_hands.multi_hand_landmarks:
                     for hand_landmarks, handedness in zip(res_hands.multi_hand_landmarks, res_hands.multi_handedness):
                         label = handedness.classification[0].label
@@ -148,7 +149,6 @@ def process_image(img):
                             img, hand_landmarks, mp_hands.HAND_CONNECTIONS
                         )
 
-                # Process pose landmarks
                 if res_pose.pose_landmarks:
                     pose_landmarks = res_pose.pose_landmarks
                     pose_features = utils.extract_pose_features(pose_landmarks.landmark)  # Pass landmark attribute
@@ -191,7 +191,7 @@ def process_image(img):
             # Determine the number of available sources (hand(s)/pose)
             num_sources = sum(prob is not None for prob in [left_probs, right_probs, pose_probs])
             if num_sources == 0:
-                return {"message": "No valid data", "frame_count": frame_count}
+                return {"message": "No valid data", "frame_count": frame_count}, img
                 
             avg = (left_probs_aligned + right_probs_aligned + pose_probs_aligned) / (100 * num_sources)
 
@@ -210,11 +210,13 @@ def process_image(img):
                 accumulated_probs = None
                 frame_count = 0
 
-            return {"prediction": pred} if pred else {"message": "Collecting frames", "frame_count": frame_count}, img
+            return ({"prediction": pred} if pred else {"message": "Collecting frames", "frame_count": frame_count}), img
+        
         else:
-            return {"prediction": "rest"}
+            return {"prediction": "rest"}, img
     except Exception as e:
-        return {"message": "Error occurred", "error": str(e)}
+        print(f"Error processing image: {e}")
+        return {"message": "Error occurred", "error": str(e)}, img
 
 @app.route('/')
 def home():
