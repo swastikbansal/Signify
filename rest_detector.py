@@ -5,8 +5,8 @@ import cv2
 
 # Rest detection parameters (tweak these for your camera/subject)
 REST_SPEED_THRESHOLD = 90.0   # pixels/second; lower => more sensitive to rest
-MIN_POINTS_FOR_REST = 2       # min no. of tracked points required to decide rest
-REQUIRED_CONSECUTIVE_FRAMES = 3  # consecutive low-speed frames required for single-point rest
+MIN_POINTS_FOR_REST = 2       
+REQUIRED_CONSECUTIVE_FRAMES = 3  
 
 # Global previous positions and timing for rest detection
 prev_positions = {

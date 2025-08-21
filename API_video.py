@@ -14,6 +14,14 @@ import warnings
 
 warnings.filterwarnings("ignore")
 
+
+# Rest detection parameters (tweak these for your camera/subject)
+REST_SPEED_THRESHOLD :float = 90.0   # pixels/second; lower => more sensitive to rest
+MIN_POINTS_FOR_REST :int = 2       
+REQUIRED_CONSECUTIVE_FRAMES :int = 3  
+
+
+
 app = Flask(__name__)
 
 # Queue for video frames to be displayed
@@ -83,7 +91,7 @@ axes: dict = {
         "-z": np.array([0, 0, -1]),
     }  
     
-utils = Utils(axes)
+utils = Utils(axes, REST_SPEED_THRESHOLD, MIN_POINTS_FOR_REST, REQUIRED_CONSECUTIVE_FRAMES)
 
 def display_frames():
     """
@@ -116,89 +124,99 @@ def process_image(img):
     res_pose = pose.process(img_rgb)
     res_hands = hands.process(img_rgb)
     img.flags.writeable = True
+    annotated = img.copy()
     
+    # Trying to detect rest using the function
     try:
-        # Process hand landmarks (for both left and right hands)
-        if res_hands.multi_hand_landmarks:
-            for hand_landmarks, handedness in zip(res_hands.multi_hand_landmarks, res_hands.multi_handedness):
-                label = handedness.classification[0].label
-                features = utils.extract_features(hand_landmarks.landmark, res_pose.pose_landmarks.landmark if res_pose.pose_landmarks else [])
+        resting = utils.is_resting(res_hands, annotated.shape)
+        print(resting)
+        if not resting:
+            try:
+                # Process hand landmarks (for both left and right hands)
+                if res_hands.multi_hand_landmarks:
+                    for hand_landmarks, handedness in zip(res_hands.multi_hand_landmarks, res_hands.multi_handedness):
+                        label = handedness.classification[0].label
+                        features = utils.extract_features(hand_landmarks.landmark, res_pose.pose_landmarks.landmark if res_pose.pose_landmarks else [])
 
-                if label == 'Left':
-                    left_prediction = left_model.predict([features])[0]
-                    left_probs = left_model.predict_proba([features])[0]
-                elif label == 'Right':
-                    right_prediction = right_model.predict([features])[0]
-                    right_probs = right_model.predict_proba([features])[0]
+                        if label == 'Left':
+                            left_prediction = left_model.predict([features])[0]
+                            left_probs = left_model.predict_proba([features])[0]
+                        elif label == 'Right':
+                            right_prediction = right_model.predict([features])[0]
+                            right_probs = right_model.predict_proba([features])[0]
 
-                # Draw hand landmarks on the frame
-                mp.solutions.drawing_utils.draw_landmarks(
-                    img, hand_landmarks, mp_hands.HAND_CONNECTIONS
-                )
+                        # Draw hand landmarks on the frame
+                        mp.solutions.drawing_utils.draw_landmarks(
+                            img, hand_landmarks, mp_hands.HAND_CONNECTIONS
+                        )
 
-        # Process pose landmarks
-        if res_pose.pose_landmarks:
-            pose_landmarks = res_pose.pose_landmarks
-            pose_features = utils.extract_pose_features(pose_landmarks.landmark)  # Pass landmark attribute
-            pose_prediction = pose_model.predict([pose_features])[0]
-            pose_probs = pose_model.predict_proba([pose_features])[0]
+                # Process pose landmarks
+                if res_pose.pose_landmarks:
+                    pose_landmarks = res_pose.pose_landmarks
+                    pose_features = utils.extract_pose_features(pose_landmarks.landmark)  # Pass landmark attribute
+                    pose_prediction = pose_model.predict([pose_features])[0]
+                    pose_probs = pose_model.predict_proba([pose_features])[0]
+                    
+                    # Draw pose landmarks on the frame
+                    mp.solutions.drawing_utils.draw_landmarks(
+                        img, pose_landmarks, mp_pose.POSE_CONNECTIONS
+                    )
             
-            # Draw pose landmarks on the frame
-            mp.solutions.drawing_utils.draw_landmarks(
-                img, pose_landmarks, mp_pose.POSE_CONNECTIONS
+            except Exception as e:
+                print(f"Feature extraction error: {e}")
+                return {"message": "Feature extraction failed", "frame_count": frame_count}, img
+
+            # Gathering all class labels used by the three models
+            all_classes = sorted(
+                set(left_model.classes_).union(
+                set(right_model.classes_)).union(
+                set(pose_model.classes_))
             )
-    
-    except Exception as e:
-        print(f"Feature extraction error: {e}")
-        return {"message": "Feature extraction failed", "frame_count": frame_count}, img
+            
+            # Aligning probabilities with the master list of classes
+            left_probs_aligned = np.zeros(len(all_classes))
+            right_probs_aligned = np.zeros(len(all_classes))
+            pose_probs_aligned = np.zeros(len(all_classes))
+            
+            if left_probs is not None:
+                left_dict = dict(zip(left_model.classes_, left_probs))
+                left_probs_aligned = np.array([left_dict.get(cls, 0) for cls in all_classes]) * 100
 
-    # Gathering all class labels used by the three models
-    all_classes = sorted(
-        set(left_model.classes_).union(
-        set(right_model.classes_)).union(
-        set(pose_model.classes_))
-    )
-    
-    # Aligning probabilities with the master list of classes
-    left_probs_aligned = np.zeros(len(all_classes))
-    right_probs_aligned = np.zeros(len(all_classes))
-    pose_probs_aligned = np.zeros(len(all_classes))
-    
-    if left_probs is not None:
-        left_dict = dict(zip(left_model.classes_, left_probs))
-        left_probs_aligned = np.array([left_dict.get(cls, 0) for cls in all_classes]) * 100
+            if right_probs is not None:
+                right_dict = dict(zip(right_model.classes_, right_probs))
+                right_probs_aligned = np.array([right_dict.get(cls, 0) for cls in all_classes]) * 100
 
-    if right_probs is not None:
-        right_dict = dict(zip(right_model.classes_, right_probs))
-        right_probs_aligned = np.array([right_dict.get(cls, 0) for cls in all_classes]) * 100
-
-    if pose_probs is not None:
-        pose_dict = dict(zip(pose_model.classes_, pose_probs))
-        pose_probs_aligned = np.array([pose_dict.get(cls, 0) for cls in all_classes]) * 100
-  
-    # Determine the number of available sources (hand(s)/pose)
-    num_sources = sum(prob is not None for prob in [left_probs, right_probs, pose_probs])
-    if num_sources == 0:
-        return {"message": "No valid data", "frame_count": frame_count}
+            if pose_probs is not None:
+                pose_dict = dict(zip(pose_model.classes_, pose_probs))
+                pose_probs_aligned = np.array([pose_dict.get(cls, 0) for cls in all_classes]) * 100
         
-    avg = (left_probs_aligned + right_probs_aligned + pose_probs_aligned) / (100 * num_sources)
+            # Determine the number of available sources (hand(s)/pose)
+            num_sources = sum(prob is not None for prob in [left_probs, right_probs, pose_probs])
+            if num_sources == 0:
+                return {"message": "No valid data", "frame_count": frame_count}
+                
+            avg = (left_probs_aligned + right_probs_aligned + pose_probs_aligned) / (100 * num_sources)
 
-    # Convert these averages into final percentages based on custom thresholds
-    avg_probs = calulating_percentage(avg, all_classes)
+            # Convert these averages into final percentages based on custom thresholds
+            avg_probs = calulating_percentage(avg, all_classes)
 
-    if accumulated_probs is None:
-        accumulated_probs = np.zeros_like(avg_probs)
-    accumulated_probs += avg_probs
-    frame_count += 1
-    
-    # Updating the final prediction text after a fixed no. of frames
-    if frame_count == 5:
-        max_idx = np.argmax(accumulated_probs)
-        pred = all_classes[max_idx]
-        accumulated_probs = None
-        frame_count = 0
+            if accumulated_probs is None:
+                accumulated_probs = np.zeros_like(avg_probs)
+            accumulated_probs += avg_probs
+            frame_count += 1
+            
+            # Updating the final prediction text after a fixed no. of frames
+            if frame_count == 5:
+                max_idx = np.argmax(accumulated_probs)
+                pred = all_classes[max_idx]
+                accumulated_probs = None
+                frame_count = 0
 
-    return {"prediction": pred} if pred else {"message": "Collecting frames", "frame_count": frame_count}, img
+            return {"prediction": pred} if pred else {"message": "Collecting frames", "frame_count": frame_count}, img
+        else:
+            return {"prediction": "rest"}
+    except Exception as e:
+        return {"message": "Error occurred", "error": str(e)}
 
 @app.route('/')
 def home():

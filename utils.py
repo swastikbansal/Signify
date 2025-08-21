@@ -1,12 +1,123 @@
-import cv2
-import mediapipe as mp
-import pickle
 import numpy as np
+import time
 
 class Utils:
-    def __init__(self, axes):
+    def __init__(self, axes, restSpeed, minPoints, requiredFrames):
         self.axes = axes
+        self.REST_SPEED_THRESHOLD = restSpeed  # pixels/second; lower => more sensitive to rest
+        self.MIN_POINTS_FOR_REST = minPoints
+        self.REQUIRED_CONSECUTIVE_FRAMES = requiredFrames
+
+    def _landmark_to_pixel(self, landmark, img_shape):
+        """Convert normalized landmark to pixel (x,y)."""
+        h, w = img_shape[0], img_shape[1]
+        return np.array([landmark.x * w, landmark.y * h], dtype=float)
+
+    def is_resting(self, res_hands, img_shape):
+        """
+        Compute average speed (pixels/sec) for selected landmarks across frames.
+        Returns True if movement is below REST_SPEED_THRESHOLD.
+        """
         
+        # Global previous positions and timing for rest detection
+        prev_positions = {
+            "left_wrist": None,
+            "right_wrist": None,
+            "left_shoulder": None,
+            "right_shoulder": None,
+            "timestamp": None,
+            # per-landmark counters for consecutive low-speed frames
+            "counters": {
+                "left_wrist": 0,
+                "right_wrist": 0,
+                "left_shoulder": 0,
+                "right_shoulder": 0
+            }
+        }
+
+        current_time = time.time()
+        points = {}
+        
+        # Hands: get wrist landmark (index 0) if available
+        if getattr(res_hands, "multi_hand_landmarks", None) and getattr(res_hands, "multi_handedness", None):
+            for hand_landmarks, handedness in zip(res_hands.multi_hand_landmarks, res_hands.multi_handedness):
+                label = handedness.classification[0].label
+                try:
+                    wrist = self._landmark_to_pixel(hand_landmarks.landmark[0], img_shape)
+                except Exception:
+                    continue
+
+                if label == 'Left':
+                    points['left_wrist'] = wrist
+                elif label == 'Right':
+                    points['right_wrist'] = wrist
+
+        # Initialize previous timestamp if missing
+        if prev_positions['timestamp'] is None:
+            prev_positions['timestamp'] = current_time
+            prev_positions.update({k: v for k, v in points.items()})
+            return False
+        
+        # Update prev and return False if there is lack of lm's (not resting)
+        if len(points) < 1:
+            prev_positions['timestamp'] = current_time
+            prev_positions.update({k: v for k, v in points.items()})
+            
+            # reset counters if no data for those keys
+            for k in prev_positions['counters']:
+                if k not in points:
+                    prev_positions['counters'][k] = 0
+            return False
+        
+        dt = current_time - prev_positions['timestamp']
+        if dt <= 0:
+            prev_positions['timestamp'] = current_time
+            prev_positions.update({k: v for k, v in points.items()})
+            return False
+
+        speeds = []
+        speed_map = {}
+        for key, cur_pos in points.items():
+            prev_pos = prev_positions.get(key)
+            if prev_pos is not None:
+                dist = np.linalg.norm(cur_pos - prev_pos)
+                speed = dist / dt
+                speeds.append(speed)
+                speed_map[key] = speed
+
+        # updating prev pos & time
+        prev_positions['timestamp'] = current_time
+        prev_positions.update({k: v for k, v in points.items()})
+
+        # Restting counters for disappered landmarks
+        for k in list(prev_positions['counters'].keys()):
+            if k not in speed_map:
+                prev_positions['counters'][k] = 0
+
+        # Using avg speed to detect on enough lm's
+        if len(speeds) >= self.MIN_POINTS_FOR_REST:
+            avg_speed = float(np.mean(speeds))
+            for k in prev_positions['counters']:
+                prev_positions['counters'][k] = 0 # reset counters on insufficient data
+            return avg_speed < self.REST_SPEED_THRESHOLD
+
+        # Case for a single hand 
+        if len(speeds) == 1:
+            key = next(iter(speed_map))
+            speed = speed_map[key]
+            if speed < self.REST_SPEED_THRESHOLD:
+                prev_positions['counters'][key] = prev_positions['counters'].get(key, 0) + 1
+                if prev_positions['counters'][key] >= self.REQUIRED_CONSECUTIVE_FRAMES:
+                    return True
+                else:
+                    return False
+            else:
+                prev_positions['counters'][key] = 0
+                return False
+
+        return False
+
+    
     def calculate_angle1(self, vec1, vec2):
         dot_product = np.dot(vec1, vec2)
         norm_vec1 = np.linalg.norm(vec1)
