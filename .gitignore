@@ -1,10 +1,12 @@
 # Dataset related
-Dataset
-MP_data
-Avg_MP_data
+Dataset/
 test.py
-Downloads
-.venv
-.vscode
-__pycache__
+.venv/
+.vscode/
 debug_data
+Test Recordings
+
+# common python ignores
+*.pyc
+__pycache__/
+.pytest_cache/
