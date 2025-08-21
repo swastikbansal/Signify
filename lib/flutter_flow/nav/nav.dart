@@ -48,7 +48,7 @@ const debugRouteLinkMap = {
   '/tutorialPage':
       'https://app.flutterflow.io/project/signify-hq88od?tab=uiBuilder&page=tutorialPage',
   '/customSigns':
-      'https://app.flutterflow.io/project/signify-hq88od?tab=uiBuilder&page=customSigns'
+      'https://app.flutterflow.io/project/signify-hq88od?tab=uiBuilder&page=customSigns',
 };
 
 class AppStateNotifier extends ChangeNotifier {
@@ -59,7 +59,6 @@ class AppStateNotifier extends ChangeNotifier {
 
   BaseAuthUser? initialUser;
   BaseAuthUser? user;
-  bool showSplashImage = true;
   String? _redirectLocation;
 
   /// Determines whether the app will refresh and build again when a sign
@@ -69,7 +68,7 @@ class AppStateNotifier extends ChangeNotifier {
   /// Otherwise, this will trigger a refresh and interrupt the action(s).
   bool notifyOnAuthChange = true;
 
-  bool get loading => user == null || showSplashImage;
+  bool get loading => user == null;
   bool get loggedIn => user?.loggedIn ?? false;
   bool get initiallyLoggedIn => initialUser?.loggedIn ?? false;
   bool get shouldRedirect => loggedIn && _redirectLocation != null;
@@ -99,139 +98,136 @@ class AppStateNotifier extends ChangeNotifier {
   }
 
   void stopShowingSplashImage() {
-    showSplashImage = false;
+    // Native splash screen handling - no longer needed
     notifyListeners();
   }
 }
 
 GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
-      initialLocation: '/',
-      debugLogDiagnostics: true,
-      refreshListenable: appStateNotifier,
-      errorBuilder: (context, state) =>
-          appStateNotifier.loggedIn ? const NavBarPage() : const SelectlanguageWidget(),
-      routes: [
-        FFRoute(
-          name: '_initialize',
-          path: '/',
-          builder: (context, _) =>
-              appStateNotifier.loggedIn ? const NavBarPage() : const SelectlanguageWidget(),
-        ),
-        FFRoute(
-          name: 'voicetosign1',
-          path: '/voicetosign1',
-          builder: (context, params) => params.isEmpty
-              ? const NavBarPage(initialPage: 'voicetosign1')
-              : const NavBarPage(
-                  initialPage: 'voicetosign1',
-                  page: Voicetosign1Widget(),
-                ),
-        ),
-        FFRoute(
-          name: 'signtovoice2',
-          path: '/signtovoice2',
-          builder: (context, params) => params.isEmpty
-              ? const NavBarPage(initialPage: 'signtovoice2')
-              : const NavBarPage(
-                  initialPage: 'signtovoice2',
-                  page: Signtovoice2Widget(),
-                ),
-        ),
-        FFRoute(
-          name: 'education3',
-          path: '/education3',
-          builder: (context, params) => params.isEmpty
-              ? const NavBarPage(initialPage: 'education3')
-              : const NavBarPage(
-                  initialPage: 'education3',
-                  page: Education3Widget(),
-                ),
-        ),
-        FFRoute(
-          name: 'onboardingPage',
-          path: '/onboardingPage',
-          builder: (context, params) => const OnboardingPageWidget(),
-        ),
-        FFRoute(
-          name: 'forgotPassword',
-          path: '/forgotPassword',
-          builder: (context, params) => const ForgotPasswordWidget(),
-        ),
-        FFRoute(
-          name: 'appSettings',
-          path: '/appSettings',
-          builder: (context, params) => const AppSettingsWidget(),
-        ),
-        FFRoute(
-          name: 'editProfile',
-          path: '/editProfile',
-          builder: (context, params) => const EditProfileWidget(),
-        ),
-        FFRoute(
-          name: 'account4',
-          path: '/account4',
-          builder: (context, params) => params.isEmpty
-              ? const NavBarPage(initialPage: 'account4')
-              : const NavBarPage(
-                  initialPage: 'account4',
-                  page: Account4Widget(),
-                ),
-        ),
-        FFRoute(
-          name: 'supportPage',
-          path: '/supportPage',
-          builder: (context, params) => const SupportPageWidget(),
-        ),
-        FFRoute(
-          name: 'selectlanguage',
-          path: '/selectLanguage',
-          builder: (context, params) => const SelectlanguageWidget(),
-        ),
-        FFRoute(
-          name: 'reportBug',
-          path: '/reportBug',
-          builder: (context, params) => const ReportBugWidget(),
-        ),
-        FFRoute(
-          name: 'requestFeature',
-          path: '/requestFeature',
-          builder: (context, params) => const RequestFeatureWidget(),
-        ),
-        FFRoute(
-          name: 'islDict',
-          path: '/islDict',
-          builder: (context, params) => const IslDictWidget(),
-        ),
-        FFRoute(
-          name: 'islCommunity',
-          path: '/islCommunity',
-          builder: (context, params) => const IslCommunityWidget(),
-        ),
-        FFRoute(
-          name: 'authPage',
-          path: '/authPage',
-          builder: (context, params) => const AuthPageWidget(),
-        ),
-        FFRoute(
-          name: 'tutorialPage',
-          path: '/tutorialPage',
-          builder: (context, params) => const TutorialPageWidget(),
-        ),
-        FFRoute(
-          name: 'customSigns',
-          path: '/customSigns',
-          builder: (context, params) => const CustomSignsPage(),
-        )
-      ].map((r) => r.toRoute(appStateNotifier)).toList(),
-      observers: [routeObserver],
-    );
+  initialLocation: '/',
+  debugLogDiagnostics: true,
+  refreshListenable: appStateNotifier,
+  errorBuilder: (context, state) => appStateNotifier.loggedIn
+      ? const NavBarPage()
+      : const SelectlanguageWidget(),
+  routes: [
+    FFRoute(
+      name: '_initialize',
+      path: '/',
+      builder: (context, _) => appStateNotifier.loggedIn
+          ? const NavBarPage()
+          : const SelectlanguageWidget(),
+    ),
+    FFRoute(
+      name: 'voicetosign1',
+      path: '/voicetosign1',
+      builder: (context, params) => params.isEmpty
+          ? const NavBarPage(initialPage: 'voicetosign1')
+          : const NavBarPage(
+              initialPage: 'voicetosign1',
+              page: Voicetosign1Widget(),
+            ),
+    ),
+    FFRoute(
+      name: 'signtovoice2',
+      path: '/signtovoice2',
+      builder: (context, params) => params.isEmpty
+          ? const NavBarPage(initialPage: 'signtovoice2')
+          : const NavBarPage(
+              initialPage: 'signtovoice2',
+              page: Signtovoice2Widget(),
+            ),
+    ),
+    FFRoute(
+      name: 'education3',
+      path: '/education3',
+      builder: (context, params) => params.isEmpty
+          ? const NavBarPage(initialPage: 'education3')
+          : const NavBarPage(
+              initialPage: 'education3',
+              page: Education3Widget(),
+            ),
+    ),
+    FFRoute(
+      name: 'onboardingPage',
+      path: '/onboardingPage',
+      builder: (context, params) => const OnboardingPageWidget(),
+    ),
+    FFRoute(
+      name: 'forgotPassword',
+      path: '/forgotPassword',
+      builder: (context, params) => const ForgotPasswordWidget(),
+    ),
+    FFRoute(
+      name: 'appSettings',
+      path: '/appSettings',
+      builder: (context, params) => const AppSettingsWidget(),
+    ),
+    FFRoute(
+      name: 'editProfile',
+      path: '/editProfile',
+      builder: (context, params) => const EditProfileWidget(),
+    ),
+    FFRoute(
+      name: 'account4',
+      path: '/account4',
+      builder: (context, params) => params.isEmpty
+          ? const NavBarPage(initialPage: 'account4')
+          : const NavBarPage(initialPage: 'account4', page: Account4Widget()),
+    ),
+    FFRoute(
+      name: 'supportPage',
+      path: '/supportPage',
+      builder: (context, params) => const SupportPageWidget(),
+    ),
+    FFRoute(
+      name: 'selectlanguage',
+      path: '/selectLanguage',
+      builder: (context, params) => const SelectlanguageWidget(),
+    ),
+    FFRoute(
+      name: 'reportBug',
+      path: '/reportBug',
+      builder: (context, params) => const ReportBugWidget(),
+    ),
+    FFRoute(
+      name: 'requestFeature',
+      path: '/requestFeature',
+      builder: (context, params) => const RequestFeatureWidget(),
+    ),
+    FFRoute(
+      name: 'islDict',
+      path: '/islDict',
+      builder: (context, params) => const IslDictWidget(),
+    ),
+    FFRoute(
+      name: 'islCommunity',
+      path: '/islCommunity',
+      builder: (context, params) => const IslCommunityWidget(),
+    ),
+    FFRoute(
+      name: 'authPage',
+      path: '/authPage',
+      builder: (context, params) => const AuthPageWidget(),
+    ),
+    FFRoute(
+      name: 'tutorialPage',
+      path: '/tutorialPage',
+      builder: (context, params) => const TutorialPageWidget(),
+    ),
+    FFRoute(
+      name: 'customSigns',
+      path: '/customSigns',
+      builder: (context, params) => const CustomSignsPage(),
+    ),
+  ].map((r) => r.toRoute(appStateNotifier)).toList(),
+  observers: [routeObserver],
+);
 
 extension NavParamExtensions on Map<String, String?> {
   Map<String, String> get withoutNulls => Map.fromEntries(
-        entries
-            .where((e) => e.value != null)
-            .map((e) => MapEntry(e.key, e.value!)),
-      );
+    entries.where((e) => e.value != null).map((e) => MapEntry(e.key, e.value!)),
+  );
 }
 
 extension NavigationExtensions on BuildContext {
@@ -242,15 +238,14 @@ extension NavigationExtensions on BuildContext {
     Map<String, String> queryParameters = const <String, String>{},
     Object? extra,
     bool ignoreRedirect = false,
-  }) =>
-      !mounted || GoRouter.of(this).shouldRedirect(ignoreRedirect)
-          ? null
-          : goNamed(
-              name,
-              pathParameters: pathParameters,
-              queryParameters: queryParameters,
-              extra: extra,
-            );
+  }) => !mounted || GoRouter.of(this).shouldRedirect(ignoreRedirect)
+      ? null
+      : goNamed(
+          name,
+          pathParameters: pathParameters,
+          queryParameters: queryParameters,
+          extra: extra,
+        );
 
   void pushNamedAuth(
     String name,
@@ -259,15 +254,14 @@ extension NavigationExtensions on BuildContext {
     Map<String, String> queryParameters = const <String, String>{},
     Object? extra,
     bool ignoreRedirect = false,
-  }) =>
-      !mounted || GoRouter.of(this).shouldRedirect(ignoreRedirect)
-          ? null
-          : pushNamed(
-              name,
-              pathParameters: pathParameters,
-              queryParameters: queryParameters,
-              extra: extra,
-            );
+  }) => !mounted || GoRouter.of(this).shouldRedirect(ignoreRedirect)
+      ? null
+      : pushNamed(
+          name,
+          pathParameters: pathParameters,
+          queryParameters: queryParameters,
+          extra: extra,
+        );
 
   void safePop() {
     // If there is only one route on the stack, navigate to the initial
@@ -284,8 +278,8 @@ extension GoRouterExtensions on GoRouter {
   AppStateNotifier get appState => AppStateNotifier.instance;
   void prepareAuthEvent([bool ignoreRedirect = false]) =>
       appState.hasRedirect() && !ignoreRedirect
-          ? null
-          : appState.updateNotifyOnAuthChange(false);
+      ? null
+      : appState.updateNotifyOnAuthChange(false);
   bool shouldRedirect(bool ignoreRedirect) =>
       !ignoreRedirect && appState.hasRedirect();
   void clearRedirectLocation() => appState.clearRedirectLocation();
@@ -323,18 +317,17 @@ class FFParameters {
       asyncParams.containsKey(param.key) && param.value is String;
   bool get hasFutures => state.allParams.entries.any(isAsyncParam);
   Future<bool> completeFutures() => Future.wait(
-        state.allParams.entries.where(isAsyncParam).map(
-          (param) async {
-            final doc = await asyncParams[param.key]!(param.value)
-                .onError((_, __) => null);
-            if (doc != null) {
-              futureParamValues[param.key] = doc;
-              return true;
-            }
-            return false;
-          },
-        ),
-      ).onError((_, __) => [false]).then((v) => v.every((e) => e));
+    state.allParams.entries.where(isAsyncParam).map((param) async {
+      final doc = await asyncParams[param.key]!(
+        param.value,
+      ).onError((_, __) => null);
+      if (doc != null) {
+        futureParamValues[param.key] = doc;
+        return true;
+      }
+      return false;
+    }),
+  ).onError((_, __) => [false]).then((v) => v.every((e) => e));
 
   dynamic getParam<T>(
     String paramName,
@@ -381,65 +374,57 @@ class FFRoute {
   final List<GoRoute> routes;
 
   GoRoute toRoute(AppStateNotifier appStateNotifier) => GoRoute(
-        name: name,
-        path: path,
-        redirect: (context, state) {
-          if (appStateNotifier.shouldRedirect) {
-            final redirectLocation = appStateNotifier.getRedirectLocation();
-            appStateNotifier.clearRedirectLocation();
-            return redirectLocation;
-          }
+    name: name,
+    path: path,
+    redirect: (context, state) {
+      if (appStateNotifier.shouldRedirect) {
+        final redirectLocation = appStateNotifier.getRedirectLocation();
+        appStateNotifier.clearRedirectLocation();
+        return redirectLocation;
+      }
 
-          if (requireAuth && !appStateNotifier.loggedIn) {
-            appStateNotifier.setRedirectLocationIfUnset(state.uri.toString());
-            return '/selectLanguage';
-          }
-          return null;
-        },
-        pageBuilder: (context, state) {
-          fixStatusBarOniOS16AndBelow(context);
-          final ffParams = FFParameters(state, asyncParams);
-          final page = ffParams.hasFutures
-              ? FutureBuilder(
-                  future: ffParams.completeFutures(),
-                  builder: (context, _) => builder(context, ffParams),
-                )
-              : builder(context, ffParams);
-          final child = appStateNotifier.loading
-              ? Container(
-                  color: const Color(0xFFFAB713),
-                  child: Image.asset(
-                    'assets/images/color_png_(2).png',
-                    fit: BoxFit.contain,
-                  ),
-                )
-              : page;
+      if (requireAuth && !appStateNotifier.loggedIn) {
+        appStateNotifier.setRedirectLocationIfUnset(state.uri.toString());
+        return '/selectLanguage';
+      }
+      return null;
+    },
+    pageBuilder: (context, state) {
+      fixStatusBarOniOS16AndBelow(context);
+      final ffParams = FFParameters(state, asyncParams);
+      final page = ffParams.hasFutures
+          ? FutureBuilder(
+              future: ffParams.completeFutures(),
+              builder: (context, _) => builder(context, ffParams),
+            )
+          : builder(context, ffParams);
+      final child = page;
 
-          final transitionInfo = state.transitionInfo;
-          return transitionInfo.hasTransition
-              ? CustomTransitionPage(
-                  key: state.pageKey,
-                  child: child,
-                  transitionDuration: transitionInfo.duration,
-                  transitionsBuilder:
-                      (context, animation, secondaryAnimation, child) =>
-                          PageTransition(
-                    type: transitionInfo.transitionType,
-                    duration: transitionInfo.duration,
-                    reverseDuration: transitionInfo.duration,
-                    alignment: transitionInfo.alignment,
-                    child: child,
-                  ).buildTransitions(
-                    context,
-                    animation,
-                    secondaryAnimation,
-                    child,
-                  ),
-                )
-              : MaterialPage(key: state.pageKey, child: child);
-        },
-        routes: routes,
-      );
+      final transitionInfo = state.transitionInfo;
+      return transitionInfo.hasTransition
+          ? CustomTransitionPage(
+              key: state.pageKey,
+              child: child,
+              transitionDuration: transitionInfo.duration,
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) =>
+                      PageTransition(
+                        type: transitionInfo.transitionType,
+                        duration: transitionInfo.duration,
+                        reverseDuration: transitionInfo.duration,
+                        alignment: transitionInfo.alignment,
+                        child: child,
+                      ).buildTransitions(
+                        context,
+                        animation,
+                        secondaryAnimation,
+                        child,
+                      ),
+            )
+          : MaterialPage(key: state.pageKey, child: child);
+    },
+    routes: routes,
+  );
 }
 
 class TransitionInfo {
@@ -455,7 +440,8 @@ class TransitionInfo {
   final Duration duration;
   final Alignment? alignment;
 
-  static TransitionInfo appDefault() => const TransitionInfo(hasTransition: false);
+  static TransitionInfo appDefault() =>
+      const TransitionInfo(hasTransition: false);
 }
 
 class RootPageContext {
@@ -472,10 +458,8 @@ class RootPageContext {
         location != rootPageContext?.errorRoute;
   }
 
-  static Widget wrap(Widget child, {String? errorRoute}) => Provider.value(
-        value: RootPageContext(true, errorRoute),
-        child: child,
-      );
+  static Widget wrap(Widget child, {String? errorRoute}) =>
+      Provider.value(value: RootPageContext(true, errorRoute), child: child);
 }
 
 extension GoRouterLocationExtension on GoRouter {

@@ -56,8 +56,8 @@ void main() async {
     // Only use custom error handling in release mode
     try {
       final match = RegExp(
-              r'The relevant error-causing widget was:\s+([a-zA-Z0-9]+)(.|\n)*When the exception was thrown, this was the stack:((.|\n)*)')
-          .firstMatch(details.toString());
+        r'The relevant error-causing widget was:\s+([a-zA-Z0-9]+)(.|\n)*When the exception was thrown, this was the stack:((.|\n)*)',
+      ).firstMatch(details.toString());
       if (match == null) {
         return originalErrorWidgetBuilder(details);
       }
@@ -78,7 +78,8 @@ void main() async {
         filteredStackTrace.add(line);
       }
 
-      final result = '''${details.exceptionAsString()}
+      final result =
+          '''${details.exceptionAsString()}
       
 The relevant error-causing widget was: $widgetName
 
@@ -91,8 +92,9 @@ Stack trace: ${filteredStackTrace.join("\n")}''';
   };
 
   /// Optimized debounce cleanup - reduced frequency in debug mode to prevent conflicts
-  const cleanupDuration =
-      kDebugMode ? Duration(seconds: 10) : Duration(seconds: 5);
+  const cleanupDuration = kDebugMode
+      ? Duration(seconds: 10)
+      : Duration(seconds: 5);
   Timer.periodic(cleanupDuration, (timer) {
     EasyDebounce.cancel('508f3c74205c87928b71f49040062e732f9c20b0');
   });
@@ -182,10 +184,12 @@ class _MyAppState extends State<MyApp> {
     return matchList.uri.toString();
   }
 
-  List<String> getRouteStack() =>
-      _router.routerDelegate.currentConfiguration.matches
-          .map((e) => getRoute(e))
-          .toList();
+  List<String> getRouteStack() => _router
+      .routerDelegate
+      .currentConfiguration
+      .matches
+      .map((e) => getRoute(e))
+      .toList();
 
   late Stream<BaseAuthUser> userStream;
 
@@ -203,10 +207,8 @@ class _MyAppState extends State<MyApp> {
         debugLogAuthenticatedUser();
       });
     jwtTokenStream.listen((_) {});
-    Future.delayed(
-      const Duration(milliseconds: 1000),
-      () => _appStateNotifier.stopShowingSplashImage(),
-    );
+    // Remove custom splash screen delay - native splash is sufficient
+    _appStateNotifier.stopShowingSplashImage();
 
     _router.routerDelegate.addListener(() {
       if (mounted) {
@@ -248,9 +250,9 @@ class _MyAppState extends State<MyApp> {
   }
 
   void setThemeMode(ThemeMode mode) => safeSetState(() {
-        _themeMode = mode;
-        FlutterFlowTheme.saveThemeMode(mode);
-      });
+    _themeMode = mode;
+    FlutterFlowTheme.saveThemeMode(mode);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -367,161 +369,178 @@ class _NavBarPageState extends State<NavBarPage> {
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
-        systemNavigationBarColor:
-            FlutterFlowTheme.of(context).secondaryBackground,
+        systemNavigationBarColor: FlutterFlowTheme.of(
+          context,
+        ).secondaryBackground,
         systemNavigationBarIconBrightness:
             Theme.of(context).brightness == Brightness.light
-                ? Brightness.dark
-                : Brightness.light,
+            ? Brightness.dark
+            : Brightness.light,
       ),
       child: Scaffold(
         body: _currentPage ?? tabs[_currentPageName],
-        bottomNavigationBar: NavigationBar(
-          selectedIndex: currentIndex,
-          onDestinationSelected: (i) => safeSetState(() {
-            _currentPage = null;
-            _currentPageName = tabs.keys.toList()[i];
-          }),
-          backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
-          indicatorColor:
-              FlutterFlowTheme.of(context).primary.withOpacity(0.16),
-          surfaceTintColor: FlutterFlowTheme.of(context).secondaryBackground,
-          elevation: 10.0,
-          height: 66.0, // Reduced from 80.0 to 66.0
-          animationDuration: const Duration(milliseconds: 300),
-          labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-          // Custom label text styling for selected/unselected states
-          labelTextStyle: WidgetStateProperty.resolveWith((states) {
-            if (states.contains(WidgetState.selected)) {
+        bottomNavigationBar: Container(
+          decoration: BoxDecoration(
+            border: Border(
+              top: BorderSide(
+                color: FlutterFlowTheme.of(context).alternate,
+                width: 0.0, // Adds border to the top of the NavBar
+              ),
+            ),
+          ),
+          child: NavigationBar(
+            selectedIndex: currentIndex,
+            onDestinationSelected: (i) => safeSetState(() {
+              _currentPage = null;
+              _currentPageName = tabs.keys.toList()[i];
+            }),
+            backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
+            indicatorColor: FlutterFlowTheme.of(
+              context,
+            ).primary.withOpacity(0.16),
+            surfaceTintColor: FlutterFlowTheme.of(context).secondaryBackground,
+            elevation: 10.0,
+            height: 65.0,
+            // Reduced from 80.0 to 65.0
+            animationDuration: const Duration(milliseconds: 300),
+            labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+            // Custom label text styling for selected/unselected states
+            labelTextStyle: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.selected)) {
+                return TextStyle(
+                  color: FlutterFlowTheme.of(context).primary,
+                  fontSize: 12.0,
+                  fontWeight: FontWeight.w500,
+                );
+              }
               return TextStyle(
-                color: FlutterFlowTheme.of(context).primary,
+                color: FlutterFlowTheme.of(context).secondaryText,
                 fontSize: 12.0,
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.w400,
               );
-            }
-            return TextStyle(
-              color: FlutterFlowTheme.of(context).secondaryText,
-              fontSize: 12.0,
-              fontWeight: FontWeight.w400,
-            );
-          }),
-          // Reduce padding between icon and label
-          labelPadding:
-              const EdgeInsets.only(top: 2.0), // Reduced from default 4.0
-          destinations: [
-            Tooltip(
-              message: 'Convert speech to sign language',
-              preferBelow: false, // Position tooltip above
-              decoration: BoxDecoration(
-                color: FlutterFlowTheme.of(context).alternate,
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-              textStyle: TextStyle(
-                color: FlutterFlowTheme.of(context).primaryText,
-                fontSize: 14.0,
-              ),
-              child: NavigationDestination(
-                icon: Icon(
-                  Icons.record_voice_over_outlined,
-                  size: 24.0,
-                  color: FlutterFlowTheme.of(context).secondaryText,
+            }),
+
+            // Reduce padding between icon and label
+            // labelPadding: const EdgeInsets.only(top: 4.0), // Padding between icon and label default 4.0
+            destinations: [
+              Tooltip(
+                message: 'Convert speech to sign language',
+                preferBelow: false,
+                // Position tooltip above
+                decoration: BoxDecoration(
+                  color: FlutterFlowTheme.of(context).alternate,
+                  borderRadius: BorderRadius.circular(8.0),
                 ),
-                selectedIcon: Icon(
-                  Icons.record_voice_over,
-                  size: 24.0,
-                  color: FlutterFlowTheme.of(context).primary,
+                textStyle: TextStyle(
+                  color: FlutterFlowTheme.of(context).primaryText,
+                  fontSize: 14.0,
                 ),
-                label: FFLocalizations.of(context).getText(
-                  'ktfggi18' /* Speak */,
+                child: NavigationDestination(
+                  icon: Icon(
+                    Icons.record_voice_over_outlined,
+                    size: 24.0,
+                    color: FlutterFlowTheme.of(context).secondaryText,
+                  ),
+                  selectedIcon: Icon(
+                    Icons.record_voice_over,
+                    size: 24.0,
+                    color: FlutterFlowTheme.of(context).primary,
+                  ),
+                  label: FFLocalizations.of(
+                    context,
+                  ).getText('ktfggi18' /* Speak */),
+                  tooltip: '', // Disable default tooltip
                 ),
-                tooltip: '', // Disable default tooltip
               ),
-            ),
-            Tooltip(
-              message: 'Convert sign language to speech',
-              preferBelow: false, // Position tooltip above
-              decoration: BoxDecoration(
-                color: FlutterFlowTheme.of(context).alternate,
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-              textStyle: TextStyle(
-                color: FlutterFlowTheme.of(context).primaryText,
-                fontSize: 14.0,
-              ),
-              child: NavigationDestination(
-                icon: Icon(
-                  Icons.sign_language_outlined,
-                  size: 24.0,
-                  color: FlutterFlowTheme.of(context).secondaryText,
+              Tooltip(
+                message: 'Convert sign language to speech',
+                preferBelow: false,
+                // Position tooltip above
+                decoration: BoxDecoration(
+                  color: FlutterFlowTheme.of(context).alternate,
+                  borderRadius: BorderRadius.circular(8.0),
                 ),
-                selectedIcon: Icon(
-                  Icons.sign_language,
-                  size: 24.0,
-                  color: FlutterFlowTheme.of(context).primary,
+                textStyle: TextStyle(
+                  color: FlutterFlowTheme.of(context).primaryText,
+                  fontSize: 14.0,
                 ),
-                label: FFLocalizations.of(context).getText(
-                  'helpdw8b' /* Sign */,
+                child: NavigationDestination(
+                  icon: Icon(
+                    Icons.sign_language_outlined,
+                    size: 24.0,
+                    color: FlutterFlowTheme.of(context).secondaryText,
+                  ),
+                  selectedIcon: Icon(
+                    Icons.sign_language,
+                    size: 24.0,
+                    color: FlutterFlowTheme.of(context).primary,
+                  ),
+                  label: FFLocalizations.of(
+                    context,
+                  ).getText('helpdw8b' /* Sign */),
+                  tooltip: '', // Disable default tooltip
                 ),
-                tooltip: '', // Disable default tooltip
               ),
-            ),
-            Tooltip(
-              message: 'Sign language dictionary',
-              preferBelow: false, // Position tooltip above
-              decoration: BoxDecoration(
-                color: FlutterFlowTheme.of(context).alternate,
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-              textStyle: TextStyle(
-                color: FlutterFlowTheme.of(context).primaryText,
-                fontSize: 14.0,
-              ),
-              child: NavigationDestination(
-                icon: Icon(
-                  Icons.book_outlined,
-                  size: 24.0,
-                  color: FlutterFlowTheme.of(context).secondaryText,
+              Tooltip(
+                message: 'Sign language dictionary',
+                preferBelow: false,
+                // Position tooltip above
+                decoration: BoxDecoration(
+                  color: FlutterFlowTheme.of(context).alternate,
+                  borderRadius: BorderRadius.circular(8.0),
                 ),
-                selectedIcon: Icon(
-                  Icons.book,
-                  size: 24.0,
-                  color: FlutterFlowTheme.of(context).primary,
+                textStyle: TextStyle(
+                  color: FlutterFlowTheme.of(context).primaryText,
+                  fontSize: 14.0,
                 ),
-                label: FFLocalizations.of(context).getText(
-                  '5fzg2vtn' /* Dictionary */,
+                child: NavigationDestination(
+                  icon: Icon(
+                    Icons.book_outlined,
+                    size: 24.0,
+                    color: FlutterFlowTheme.of(context).secondaryText,
+                  ),
+                  selectedIcon: Icon(
+                    Icons.book,
+                    size: 24.0,
+                    color: FlutterFlowTheme.of(context).primary,
+                  ),
+                  label: FFLocalizations.of(
+                    context,
+                  ).getText('5fzg2vtn' /* Dictionary */),
+                  tooltip: '', // Disable default tooltip
                 ),
-                tooltip: '', // Disable default tooltip
               ),
-            ),
-            Tooltip(
-              message: 'User account and settings',
-              preferBelow: false, // Position tooltip above
-              decoration: BoxDecoration(
-                color: FlutterFlowTheme.of(context).alternate,
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-              textStyle: TextStyle(
-                color: FlutterFlowTheme.of(context).primaryText,
-                fontSize: 14.0,
-              ),
-              child: NavigationDestination(
-                icon: Icon(
-                  Icons.person_outline,
-                  size: 24.0,
-                  color: FlutterFlowTheme.of(context).secondaryText,
+              Tooltip(
+                message: 'User account and settings',
+                preferBelow: false,
+                // Position tooltip above
+                decoration: BoxDecoration(
+                  color: FlutterFlowTheme.of(context).alternate,
+                  borderRadius: BorderRadius.circular(8.0),
                 ),
-                selectedIcon: Icon(
-                  Icons.person,
-                  size: 24.0,
-                  color: FlutterFlowTheme.of(context).primary,
+                textStyle: TextStyle(
+                  color: FlutterFlowTheme.of(context).primaryText,
+                  fontSize: 14.0,
                 ),
-                label: FFLocalizations.of(context).getText(
-                  'k68wh7xs' /* Account */,
+                child: NavigationDestination(
+                  icon: Icon(
+                    Icons.person_outline,
+                    size: 24.0,
+                    color: FlutterFlowTheme.of(context).secondaryText,
+                  ),
+                  selectedIcon: Icon(
+                    Icons.person,
+                    size: 24.0,
+                    color: FlutterFlowTheme.of(context).primary,
+                  ),
+                  label: FFLocalizations.of(
+                    context,
+                  ).getText('k68wh7xs' /* Account */),
+                  tooltip: '', // Disable default tooltip
                 ),
-                tooltip: '', // Disable default tooltip
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

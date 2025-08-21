@@ -651,7 +651,7 @@ class _RequestFeatureWidgetState extends State<RequestFeatureWidget>
                               ),
                               SliderTheme(
                                 data: const SliderThemeData(
-                                  showValueIndicator: ShowValueIndicator.always,
+                                  showValueIndicator: ShowValueIndicator.onDrag,
                                 ),
                                 child: SizedBox(
                                   width: 300.0,
@@ -901,7 +901,7 @@ class _RequestFeatureWidgetState extends State<RequestFeatureWidget>
                                       safeSetState(
                                           () => _model.switchValue = newValue);
                                     },
-                                    activeColor:
+                                    activeThumbColor:
                                         FlutterFlowTheme.of(context).primary,
                                     activeTrackColor:
                                         FlutterFlowTheme.of(context)

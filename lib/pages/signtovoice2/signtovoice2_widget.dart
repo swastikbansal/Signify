@@ -1,11 +1,14 @@
+import 'dart:ui' as ui;
+
+import 'package:camera/camera.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import 'signtovoice2_model.dart';
+
 export 'signtovoice2_model.dart';
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:camera/camera.dart';
-import 'dart:ui' as ui;
 
 class Signtovoice2Widget extends StatefulWidget {
   const Signtovoice2Widget({super.key});
@@ -56,13 +59,12 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
       vsync: this,
     );
 
-    _movingLineAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _movingLineController,
-      curve: Curves.easeInOutQuart,
-    ));
+    _movingLineAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _movingLineController,
+        curve: Curves.easeInOutQuart,
+      ),
+    );
 
     // Initialize scroll controller for auto-scroll functionality
     _textFieldScrollController = ScrollController();
@@ -204,9 +206,9 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
 
   @override
   Widget build(BuildContext context) {
-    DebugFlutterFlowModelContext.maybeOf(context)
-        ?.parentModelCallback
-        ?.call(_model);
+    DebugFlutterFlowModelContext.maybeOf(
+      context,
+    )?.parentModelCallback?.call(_model);
 
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
@@ -235,17 +237,21 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                           Text(
                             'Press camera button to start detection',
                             textAlign: TextAlign.center,
-                            style: FlutterFlowTheme.of(context)
-                                .bodyMedium
+                            style: FlutterFlowTheme.of(context).bodyMedium
                                 .override(
-                                  fontFamily: FlutterFlowTheme.of(context)
-                                      .bodyMediumFamily,
-                                  color: FlutterFlowTheme.of(context)
-                                      .secondaryText,
+                                  fontFamily: FlutterFlowTheme.of(
+                                    context,
+                                  ).bodyMediumFamily,
+                                  color: FlutterFlowTheme.of(
+                                    context,
+                                  ).secondaryText,
                                   letterSpacing: 0.0,
                                   useGoogleFonts: GoogleFonts.asMap()
-                                      .containsKey(FlutterFlowTheme.of(context)
-                                          .bodyMediumFamily),
+                                      .containsKey(
+                                        FlutterFlowTheme.of(
+                                          context,
+                                        ).bodyMediumFamily,
+                                      ),
                                 ),
                           ),
                         ],
@@ -262,19 +268,19 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(16.0),
                 child: BackdropFilter(
-                  filter: ui.ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
+                  filter: ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
                   child: Container(
                     decoration: BoxDecoration(
                       // Acrylic glass effect with transparency like Windows/Grok AI
-                      color: FlutterFlowTheme.of(context)
-                          .secondaryBackground
-                          .withOpacity(0.90),
+                      color: FlutterFlowTheme.of(
+                        context,
+                      ).secondaryBackground.withOpacity(0.90),
                       borderRadius: BorderRadius.circular(16.0),
                       border: Border.all(
                         // Subtle glass-like border with opacity
-                        color: FlutterFlowTheme.of(context)
-                            .alternate
-                            .withOpacity(0.6),
+                        color: FlutterFlowTheme.of(
+                          context,
+                        ).alternate.withOpacity(0.6),
                         width: 1.0,
                       ),
                       gradient: LinearGradient(
@@ -282,12 +288,12 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                         end: Alignment.bottomRight,
                         colors: [
                           // Modern glassmorphism gradient
-                          FlutterFlowTheme.of(context)
-                              .secondaryBackground
-                              .withOpacity(0.9),
-                          FlutterFlowTheme.of(context)
-                              .secondaryBackground
-                              .withOpacity(0.7),
+                          FlutterFlowTheme.of(
+                            context,
+                          ).secondaryBackground.withOpacity(0.9),
+                          FlutterFlowTheme.of(
+                            context,
+                          ).secondaryBackground.withOpacity(0.7),
                         ],
                       ),
                       boxShadow: [
@@ -324,7 +330,8 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                                     painter: MovingLinePainter(
                                       progress: _movingLineAnimation.value,
                                       color: const Color(
-                                          0xFFFAB317), // App yellow color
+                                        0xFFFAB317,
+                                      ), // App yellow color
                                       strokeWidth: 3.0,
                                     ),
                                   ),
@@ -365,19 +372,22 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                                     hintStyle: FlutterFlowTheme.of(context)
                                         .bodyMedium
                                         .override(
-                                          fontFamily:
-                                              FlutterFlowTheme.of(context)
-                                                  .bodyMediumFamily,
+                                          fontFamily: FlutterFlowTheme.of(
+                                            context,
+                                          ).bodyMediumFamily,
                                           color: _model.isTranslating
                                               ? const Color(0xFFFAB317)
-                                              : FlutterFlowTheme.of(context)
-                                                  .secondaryText,
+                                              : FlutterFlowTheme.of(
+                                                  context,
+                                                ).secondaryText,
                                           fontSize: 16.0,
                                           letterSpacing: 0.0,
                                           useGoogleFonts: GoogleFonts.asMap()
                                               .containsKey(
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyMediumFamily),
+                                                FlutterFlowTheme.of(
+                                                  context,
+                                                ).bodyMediumFamily,
+                                              ),
                                         ),
                                     enabledBorder: InputBorder.none,
                                     focusedBorder: InputBorder.none,
@@ -386,17 +396,19 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                                     isDense: true,
                                     contentPadding: EdgeInsets.zero,
                                   ),
-                                  style: FlutterFlowTheme.of(context)
-                                      .bodyMedium
+                                  style: FlutterFlowTheme.of(context).bodyMedium
                                       .override(
-                                        fontFamily: FlutterFlowTheme.of(context)
-                                            .bodyMediumFamily,
+                                        fontFamily: FlutterFlowTheme.of(
+                                          context,
+                                        ).bodyMediumFamily,
                                         fontSize: 16.0,
                                         letterSpacing: 0.0,
                                         useGoogleFonts: GoogleFonts.asMap()
                                             .containsKey(
-                                                FlutterFlowTheme.of(context)
-                                                    .bodyMediumFamily),
+                                              FlutterFlowTheme.of(
+                                                context,
+                                              ).bodyMediumFamily,
+                                            ),
                                         lineHeight: 1.4,
                                       ),
                                   textAlign: TextAlign.start,
@@ -404,8 +416,9 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                                   // Allow expansion up to 6 lines
                                   minLines: 1,
                                   keyboardType: TextInputType.multiline,
-                                  cursorColor:
-                                      FlutterFlowTheme.of(context).primary,
+                                  cursorColor: FlutterFlowTheme.of(
+                                    context,
+                                  ).primary,
                                 ),
                               ),
                             ),
@@ -426,53 +439,63 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                                       message:
                                           'Select language for text-to-speech output',
                                       decoration: BoxDecoration(
-                                        color: FlutterFlowTheme.of(context)
-                                            .alternate,
-                                        borderRadius:
-                                            BorderRadius.circular(8.0),
+                                        color: FlutterFlowTheme.of(
+                                          context,
+                                        ).alternate,
+                                        borderRadius: BorderRadius.circular(
+                                          8.0,
+                                        ),
                                         boxShadow: [
                                           BoxShadow(
-                                            color:
-                                                Colors.black.withOpacity(0.1),
+                                            color: Colors.black.withOpacity(
+                                              0.1,
+                                            ),
                                             blurRadius: 4.0,
                                             offset: const Offset(0, 2),
                                           ),
                                         ],
                                       ),
                                       textStyle: TextStyle(
-                                        color: FlutterFlowTheme.of(context)
-                                            .primaryText,
+                                        color: FlutterFlowTheme.of(
+                                          context,
+                                        ).primaryText,
                                         fontSize: 12.0,
                                         fontWeight: FontWeight.w500,
                                       ),
                                       preferBelow: false,
                                       showDuration: const Duration(seconds: 2),
                                       child: ModernDropDown(
-                                        value: _model.availableLanguages[
-                                                _model.selectedLanguage] ??
+                                        value:
+                                            _model.availableLanguages[_model
+                                                .selectedLanguage] ??
                                             'English (US)',
                                         options: _model
-                                            .availableLanguages.values
+                                            .availableLanguages
+                                            .values
                                             .toList(),
                                         onChanged: (val) async {
                                           // Find the language code for the selected language name
                                           String? selectedCode;
-                                          _model.availableLanguages
-                                              .forEach((code, name) {
+                                          _model.availableLanguages.forEach((
+                                            code,
+                                            name,
+                                          ) {
                                             if (name == val) {
                                               selectedCode = code;
                                             }
                                           });
 
                                           if (selectedCode != null) {
-                                            await _model
-                                                .setTtsLanguage(selectedCode!);
+                                            await _model.setTtsLanguage(
+                                              selectedCode!,
+                                            );
                                             safeSetState(() {});
                                             print(
-                                                'TTS Language changed to: $selectedCode ($val)');
+                                              'TTS Language changed to: $selectedCode ($val)',
+                                            );
                                           }
                                         },
-                                        width: 110.0,
+                                        width: 120.0,
                                         height: 36.0,
                                       ),
                                     ), // Removed walkthrough functionality
@@ -490,22 +513,26 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                                           ? 'Turn off text-to-speech'
                                           : 'Turn on text-to-speech',
                                       decoration: BoxDecoration(
-                                        color: FlutterFlowTheme.of(context)
-                                            .alternate,
-                                        borderRadius:
-                                            BorderRadius.circular(8.0),
+                                        color: FlutterFlowTheme.of(
+                                          context,
+                                        ).alternate,
+                                        borderRadius: BorderRadius.circular(
+                                          8.0,
+                                        ),
                                         boxShadow: [
                                           BoxShadow(
-                                            color:
-                                                Colors.black.withOpacity(0.1),
+                                            color: Colors.black.withOpacity(
+                                              0.1,
+                                            ),
                                             blurRadius: 4.0,
                                             offset: const Offset(0, 2),
                                           ),
                                         ],
                                       ),
                                       textStyle: TextStyle(
-                                        color: FlutterFlowTheme.of(context)
-                                            .primaryText,
+                                        color: FlutterFlowTheme.of(
+                                          context,
+                                        ).primaryText,
                                         fontSize: 12.0,
                                         fontWeight: FontWeight.w500,
                                       ),
@@ -514,8 +541,9 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                                       child: Material(
                                         color: Colors.transparent,
                                         child: InkWell(
-                                          borderRadius:
-                                              BorderRadius.circular(8.0),
+                                          borderRadius: BorderRadius.circular(
+                                            8.0,
+                                          ),
                                           onTap: () async {
                                             await _model.toggleTts();
                                             safeSetState(() {});
@@ -529,8 +557,9 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                                                   : Icons.volume_off_rounded,
                                               color: _model.ttsToggleState
                                                   ? const Color(0xFFFAB317)
-                                                  : FlutterFlowTheme.of(context)
-                                                      .secondaryText,
+                                                  : FlutterFlowTheme.of(
+                                                      context,
+                                                    ).secondaryText,
                                               size: 24.0,
                                             ),
                                           ),
@@ -543,28 +572,32 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
 
                                   // Camera toggle button (no border)
                                   Container(
-                                    margin: const EdgeInsets.only(right: 8.0),
+                                    // margin: const EdgeInsets.only(right: 4.0),
                                     child: Tooltip(
                                       message: _model.isDetecting
                                           ? 'Stop sign detection'
                                           : 'Start sign detection',
                                       decoration: BoxDecoration(
-                                        color: FlutterFlowTheme.of(context)
-                                            .alternate,
-                                        borderRadius:
-                                            BorderRadius.circular(8.0),
+                                        color: FlutterFlowTheme.of(
+                                          context,
+                                        ).alternate,
+                                        borderRadius: BorderRadius.circular(
+                                          8.0,
+                                        ),
                                         boxShadow: [
                                           BoxShadow(
-                                            color:
-                                                Colors.black.withOpacity(0.1),
+                                            color: Colors.black.withOpacity(
+                                              0.1,
+                                            ),
                                             blurRadius: 4.0,
                                             offset: const Offset(0, 2),
                                           ),
                                         ],
                                       ),
                                       textStyle: TextStyle(
-                                        color: FlutterFlowTheme.of(context)
-                                            .primaryText,
+                                        color: FlutterFlowTheme.of(
+                                          context,
+                                        ).primaryText,
                                         fontSize: 12.0,
                                         fontWeight: FontWeight.w500,
                                       ),
@@ -573,8 +606,9 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                                       child: Material(
                                         color: Colors.transparent,
                                         child: InkWell(
-                                          borderRadius:
-                                              BorderRadius.circular(8.0),
+                                          borderRadius: BorderRadius.circular(
+                                            8.0,
+                                          ),
                                           onTap: () async {
                                             await _model.toggleDetection();
                                             safeSetState(() {});
@@ -588,8 +622,9 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                                                   : Icons.camera_alt_rounded,
                                               color: _model.isDetecting
                                                   ? const Color(0xFFFAB317)
-                                                  : FlutterFlowTheme.of(context)
-                                                      .secondaryText,
+                                                  : FlutterFlowTheme.of(
+                                                      context,
+                                                    ).secondaryText,
                                               size: 24.0,
                                             ),
                                           ),
@@ -635,7 +670,8 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                           alignment: Alignment.center,
                           transform: _model.isFrontCamera
                               ? Matrix4.rotationY(
-                                  3.14159) // Mirror horizontally for front camera
+                                  3.14159,
+                                ) // Mirror horizontally for front camera
                               : Matrix4.identity(),
                           child: CameraPreview(_model.cameraController!),
                         ),
@@ -720,7 +756,8 @@ class MovingLinePainter extends CustomPainter {
         // Moving phase: single solid line travels around the perimeter
         final lineLength =
             length * 0.2; // Line covers 20% of perimeter for better visibility
-        final startDistance = (progress / 0.85) *
+        final startDistance =
+            (progress / 0.85) *
             length; // Travel full perimeter in first 85% of animation
 
         final extractedPath = pathMetric.extractPath(
@@ -828,158 +865,163 @@ class _ModernDropDownState extends State<ModernDropDown>
 
     // Calculate dropdown height to position it above
     const double maxDropdownHeight = 200.0;
-    final double dropdownHeight =
-        (widget.options.length * 40.0).clamp(0.0, maxDropdownHeight);
+    final double dropdownHeight = (widget.options.length * 40.0).clamp(
+      0.0,
+      maxDropdownHeight,
+    );
 
     _overlayEntry = OverlayEntry(
-        builder: (context) => Positioned(
-            left: offset.dx,
-            top: offset.dy - dropdownHeight - 4, // Position above with 4px gap
-            width: size.width,
-            child: ClipRRect(
+      builder: (context) => Positioned(
+        left: offset.dx,
+        top: offset.dy - dropdownHeight - 4,
+        // Position above with 4px gap
+        width: size.width,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: BackdropFilter(
+            filter: ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+            child: Material(
+              elevation: 0,
+              // Remove elevation since we have acrylic effect
               borderRadius: BorderRadius.circular(12),
-              child: BackdropFilter(
-                filter: ui.ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
-                child: Material(
-                  elevation: 0, // Remove elevation since we have acrylic effect
+              color: Colors.transparent,
+              child: Container(
+                constraints: const BoxConstraints(
+                  maxHeight: 200, // Scrollable if more than 5 items (40 each)
+                ),
+                decoration: BoxDecoration(
+                  // Acrylic glass effect matching the main container
+                  color: FlutterFlowTheme.of(
+                    context,
+                  ).secondaryBackground.withOpacity(0.88),
                   borderRadius: BorderRadius.circular(12),
-                  color: Colors.transparent,
-                  child: Container(
-                    constraints: const BoxConstraints(
-                      maxHeight:
-                          200, // Scrollable if more than 5 items (40 each)
+                  border: Border.all(
+                    color: FlutterFlowTheme.of(
+                      context,
+                    ).alternate.withOpacity(0.4),
+                    width: 1,
+                  ),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      // Glassmorphism gradient for dropdown
+                      FlutterFlowTheme.of(
+                        context,
+                      ).secondaryBackground.withOpacity(0.90),
+                      FlutterFlowTheme.of(
+                        context,
+                      ).secondaryBackground.withOpacity(0.80),
+                    ],
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.12),
+                      blurRadius: 20,
+                      offset: const Offset(0, 6),
+                      spreadRadius: -2,
                     ),
-                    decoration: BoxDecoration(
-                      // Acrylic glass effect matching the main container
-                      color: FlutterFlowTheme.of(context)
-                          .secondaryBackground
-                          .withOpacity(0.88),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: FlutterFlowTheme.of(context)
-                            .alternate
-                            .withOpacity(0.4),
-                        width: 1,
-                      ),
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          // Glassmorphism gradient for dropdown
-                          FlutterFlowTheme.of(context)
-                              .secondaryBackground
-                              .withOpacity(0.92),
-                          FlutterFlowTheme.of(context)
-                              .secondaryBackground
-                              .withOpacity(0.82),
-                        ],
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.12),
-                          blurRadius: 20,
-                          offset: const Offset(0, 6),
-                          spreadRadius: -2,
-                        ),
-                        BoxShadow(
-                          color: Colors.white.withOpacity(0.05),
-                          blurRadius: 6,
-                          offset: const Offset(0, -1),
-                        ),
-                      ],
+                    BoxShadow(
+                      color: Colors.white.withOpacity(0.05),
+                      blurRadius: 6,
+                      offset: const Offset(0, -1),
                     ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Scrollbar(
-                        thumbVisibility: widget.options.length > 5,
-                        child: ListView.separated(
-                          padding: EdgeInsets.zero,
-                          shrinkWrap: true,
-                          itemCount: widget.options.length,
-                          separatorBuilder: (context, index) => Divider(
-                            height: 1,
-                            color: FlutterFlowTheme.of(context).alternate,
-                          ),
-                          itemBuilder: (context, index) {
-                            final option = widget.options[index];
-                            final isSelected = option == widget.value;
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Scrollbar(
+                    thumbVisibility: widget.options.length > 5,
+                    child: ListView.separated(
+                      padding: EdgeInsets.zero,
+                      shrinkWrap: true,
+                      itemCount: widget.options.length,
+                      separatorBuilder: (context, index) => Divider(
+                        height: 1,
+                        color: FlutterFlowTheme.of(context).alternate,
+                      ),
+                      itemBuilder: (context, index) {
+                        final option = widget.options[index];
+                        final isSelected = option == widget.value;
 
-                            return InkWell(
-                              onTap: () {
-                                widget.onChanged(option);
-                                _collapseDropdown();
-                              },
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 150),
-                                height: 40,
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 12),
-                                decoration: BoxDecoration(
-                                  // Subtle acrylic highlight for selected item
-                                  color: isSelected
-                                      ? FlutterFlowTheme.of(context)
-                                          .primary
-                                          .withOpacity(0.08)
-                                      : Colors.transparent,
-                                  borderRadius: BorderRadius.circular(6),
-                                  border: isSelected
-                                      ? Border.all(
-                                          color: FlutterFlowTheme.of(context)
-                                              .primary
-                                              .withOpacity(0.2),
-                                          width: 1,
-                                        )
-                                      : null,
-                                ),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        option,
-                                        style: FlutterFlowTheme.of(context)
-                                            .bodySmall
-                                            .override(
-                                              fontFamily:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodySmallFamily,
-                                              color: isSelected
-                                                  ? FlutterFlowTheme.of(context)
-                                                      .primary
-                                                  : FlutterFlowTheme.of(context)
-                                                      .primaryText,
-                                              fontSize: 12.0,
-                                              letterSpacing: 0.0,
-                                              fontWeight: isSelected
-                                                  ? FontWeight.w600
-                                                  : FontWeight.w500,
-                                              useGoogleFonts:
-                                                  GoogleFonts.asMap()
-                                                      .containsKey(
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .bodySmallFamily),
-                                            ),
-                                      ),
-                                    ),
-                                    if (isSelected)
-                                      Icon(
-                                        Icons.check_rounded,
-                                        size: 16,
-                                        color: FlutterFlowTheme.of(context)
-                                            .primary,
-                                      ),
-                                  ],
-                                ),
-                              ),
-                            );
+                        return InkWell(
+                          onTap: () {
+                            widget.onChanged(option);
+                            _collapseDropdown();
                           },
-                        ),
-                      ),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 150),
+                            height: 40,
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            decoration: BoxDecoration(
+                              // Subtle acrylic highlight for selected item
+                              color: isSelected
+                                  ? FlutterFlowTheme.of(
+                                      context,
+                                    ).primary.withOpacity(0.08)
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(6),
+                              border: isSelected
+                                  ? Border.all(
+                                      color: FlutterFlowTheme.of(
+                                        context,
+                                      ).primary.withOpacity(0.2),
+                                      width: 1,
+                                    )
+                                  : null,
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    option,
+                                    style: FlutterFlowTheme.of(context)
+                                        .bodySmall
+                                        .override(
+                                          fontFamily: FlutterFlowTheme.of(
+                                            context,
+                                          ).bodySmallFamily,
+                                          color: isSelected
+                                              ? FlutterFlowTheme.of(
+                                                  context,
+                                                ).primary
+                                              : FlutterFlowTheme.of(
+                                                  context,
+                                                ).primaryText,
+                                          fontSize: 12.0,
+                                          letterSpacing: 0.0,
+                                          fontWeight: isSelected
+                                              ? FontWeight.w600
+                                              : FontWeight.w500,
+                                          useGoogleFonts: GoogleFonts.asMap()
+                                              .containsKey(
+                                                FlutterFlowTheme.of(
+                                                  context,
+                                                ).bodySmallFamily,
+                                              ),
+                                        ),
+                                  ),
+                                ),
+                                if (isSelected)
+                                  Icon(
+                                    Icons.check_rounded,
+                                    size: 16,
+                                    color: FlutterFlowTheme.of(context).primary,
+                                  ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ),
               ),
-            )));
+            ),
+          ),
+        ),
+      ),
+    );
 
     Overlay.of(context).insert(_overlayEntry!);
     _animationController.forward();
@@ -999,7 +1041,7 @@ class _ModernDropDownState extends State<ModernDropDown>
     return ClipRRect(
       borderRadius: BorderRadius.circular(10.0),
       child: BackdropFilter(
-        filter: ui.ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
+        filter: ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
         child: GestureDetector(
           onTap: _toggleDropdown,
           child: AnimatedContainer(
@@ -1009,10 +1051,9 @@ class _ModernDropDownState extends State<ModernDropDown>
             padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
             decoration: BoxDecoration(
               // Acrylic glass effect matching the main container
-              color:
-                  FlutterFlowTheme.of(context).secondaryBackground.withOpacity(
-                        _isExpanded ? 0.85 : 0.75,
-                      ),
+              color: FlutterFlowTheme.of(
+                context,
+              ).secondaryBackground.withOpacity(_isExpanded ? 0.85 : 0.75),
               borderRadius: BorderRadius.circular(10.0),
               border: Border.all(
                 color: _isExpanded
@@ -1025,12 +1066,12 @@ class _ModernDropDownState extends State<ModernDropDown>
                 end: Alignment.bottomRight,
                 colors: [
                   // Glassmorphism gradient matching main container
-                  FlutterFlowTheme.of(context)
-                      .secondaryBackground
-                      .withOpacity(_isExpanded ? 0.9 : 0.8),
-                  FlutterFlowTheme.of(context)
-                      .secondaryBackground
-                      .withOpacity(_isExpanded ? 0.7 : 0.6),
+                  FlutterFlowTheme.of(
+                    context,
+                  ).secondaryBackground.withOpacity(_isExpanded ? 0.9 : 0.8),
+                  FlutterFlowTheme.of(
+                    context,
+                  ).secondaryBackground.withOpacity(_isExpanded ? 0.7 : 0.6),
                 ],
               ),
               boxShadow: [
@@ -1053,15 +1094,15 @@ class _ModernDropDownState extends State<ModernDropDown>
                   child: Text(
                     widget.value,
                     style: FlutterFlowTheme.of(context).bodySmall.override(
-                          fontFamily:
-                              FlutterFlowTheme.of(context).bodySmallFamily,
-                          color: FlutterFlowTheme.of(context).primaryText,
-                          fontSize: 12.0,
-                          letterSpacing: 0.0,
-                          fontWeight: FontWeight.w500,
-                          useGoogleFonts: GoogleFonts.asMap().containsKey(
-                              FlutterFlowTheme.of(context).bodySmallFamily),
-                        ),
+                      fontFamily: FlutterFlowTheme.of(context).bodySmallFamily,
+                      color: FlutterFlowTheme.of(context).primaryText,
+                      fontSize: 12.0,
+                      letterSpacing: 0.0,
+                      fontWeight: FontWeight.w500,
+                      useGoogleFonts: GoogleFonts.asMap().containsKey(
+                        FlutterFlowTheme.of(context).bodySmallFamily,
+                      ),
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),

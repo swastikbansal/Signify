@@ -207,7 +207,7 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                                         HapticFeedback.mediumImpact();
                                       }
                                     },
-                                    activeColor:
+                                    activeThumbColor:
                                         FlutterFlowTheme.of(context).primary,
                                     activeTrackColor:
                                         FlutterFlowTheme.of(context)
@@ -287,7 +287,7 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                                         HapticFeedback.heavyImpact();
                                       }
                                     },
-                                    activeColor:
+                                    activeThumbColor:
                                         FlutterFlowTheme.of(context).primary,
                                     activeTrackColor:
                                         FlutterFlowTheme.of(context)
@@ -366,7 +366,7 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                                         HapticFeedback.heavyImpact();
                                       }
                                     },
-                                    activeColor:
+                                    activeThumbColor:
                                         FlutterFlowTheme.of(context).primary,
                                     activeTrackColor:
                                         FlutterFlowTheme.of(context)
