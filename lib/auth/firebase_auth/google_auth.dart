@@ -19,12 +19,7 @@ Future<UserCredential?> googleSignInFunc() async {
     await googleSignIn.initialize();
 
     // Authenticate the user
-    final GoogleSignInAccount? googleUser = await googleSignIn.authenticate();
-
-    // If user cancels the sign-in
-    if (googleUser == null) {
-      return null;
-    }
+    final GoogleSignInAccount googleUser = await googleSignIn.authenticate();
 
     // For Firebase Auth, we need access and ID tokens
     // Check if user has required scopes

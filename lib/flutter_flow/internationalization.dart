@@ -4617,6 +4617,16 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'pa': 'ਐਪ ਤਰਜੀਹਾਂ',
       'te': 'యాప్ ప్రాధాన్యతలు',
     },
+    'ushyb1bc': {
+      'en': 'Add Custom Signs',
+      'bn': 'কাস্টম সাইন যোগ করুন',
+      'gu': 'કસ્ટમ ચિહ્નો ઉમેરો',
+      'hi': 'कस्टम साइन जोड़ें',
+      'kn': 'ಕಸ್ಟಮ್ ಚಿಹ್ನೆಗಳು ಸೇರಿಸಿ',
+      'mr': 'कस्टम चिन्ह जोडा',
+      'pa': 'ਕਸਟਮ ਸਾਈਨ ਸ਼ਾਮਲ ਕਰੋ',
+      'te': 'కస్టమ్ చిహ్నాలు జోడించండి',
+    },
     'h3mkejsw': {
       'en':
           'Tailor the app to your needs by choosing your preferred language, adjusting font sizes, and switching themes and many more.',

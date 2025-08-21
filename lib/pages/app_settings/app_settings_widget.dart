@@ -70,9 +70,9 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
 
   @override
   Widget build(BuildContext context) {
-    DebugFlutterFlowModelContext.maybeOf(context)
-        ?.parentModelCallback
-        ?.call(_model);
+    DebugFlutterFlowModelContext.maybeOf(
+      context,
+    )?.parentModelCallback?.call(_model);
 
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
@@ -101,16 +101,17 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                 },
               ),
               Text(
-                FFLocalizations.of(context).getText(
-                  'vyjrewaq' /* App Settings */,
-                ),
+                FFLocalizations.of(
+                  context,
+                ).getText('vyjrewaq' /* App Settings */),
                 textAlign: TextAlign.start,
                 style: FlutterFlowTheme.of(context).headlineSmall.override(
-                      fontFamily: 'Space Grotesk',
-                      letterSpacing: 0.0,
-                      useGoogleFonts:
-                          GoogleFonts.asMap().containsKey('Space Grotesk'),
-                    ),
+                  fontFamily: 'Space Grotesk',
+                  letterSpacing: 0.0,
+                  useGoogleFonts: GoogleFonts.asMap().containsKey(
+                    'Space Grotesk',
+                  ),
+                ),
               ),
             ],
           ),
@@ -162,16 +163,17 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                                         style: FlutterFlowTheme.of(context)
                                             .bodyLarge
                                             .override(
-                                              fontFamily:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyLargeFamily,
+                                              fontFamily: FlutterFlowTheme.of(
+                                                context,
+                                              ).bodyLargeFamily,
                                               letterSpacing: 0.0,
                                               useGoogleFonts:
                                                   GoogleFonts.asMap()
                                                       .containsKey(
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .bodyLargeFamily),
+                                                        FlutterFlowTheme.of(
+                                                          context,
+                                                        ).bodyLargeFamily,
+                                                      ),
                                             ),
                                       ),
                                       Text(
@@ -181,19 +183,20 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                                         style: FlutterFlowTheme.of(context)
                                             .bodySmall
                                             .override(
-                                              fontFamily:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodySmallFamily,
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .primaryText,
+                                              fontFamily: FlutterFlowTheme.of(
+                                                context,
+                                              ).bodySmallFamily,
+                                              color: FlutterFlowTheme.of(
+                                                context,
+                                              ).primaryText,
                                               letterSpacing: 0.0,
                                               useGoogleFonts:
                                                   GoogleFonts.asMap()
                                                       .containsKey(
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .bodySmallFamily),
+                                                        FlutterFlowTheme.of(
+                                                          context,
+                                                        ).bodySmallFamily,
+                                                      ),
                                             ),
                                       ),
                                     ],
@@ -202,21 +205,111 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                                     value: _model.switchValue1!,
                                     onChanged: (newValue) async {
                                       safeSetState(
-                                          () => _model.switchValue1 = newValue);
+                                        () => _model.switchValue1 = newValue,
+                                      );
                                       if (newValue) {
                                         HapticFeedback.mediumImpact();
                                       }
                                     },
-                                    activeThumbColor:
-                                        FlutterFlowTheme.of(context).primary,
-                                    activeTrackColor:
-                                        FlutterFlowTheme.of(context)
-                                            .primaryText,
-                                    inactiveTrackColor:
-                                        FlutterFlowTheme.of(context)
-                                            .primaryBackground,
-                                    inactiveThumbColor:
-                                        FlutterFlowTheme.of(context).alternate,
+                                    activeThumbColor: FlutterFlowTheme.of(
+                                      context,
+                                    ).primary,
+                                    activeTrackColor: FlutterFlowTheme.of(
+                                      context,
+                                    ).primaryText,
+                                    inactiveTrackColor: FlutterFlowTheme.of(
+                                      context,
+                                    ).primaryBackground,
+                                    inactiveThumbColor: FlutterFlowTheme.of(
+                                      context,
+                                    ).alternate,
+                                  ),
+                                ],
+                              ),
+                              Divider(
+                                thickness: 1.0,
+                                color: FlutterFlowTheme.of(context).alternate,
+                              ),
+                              Row(
+                                mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Dark Mode',
+                                        style: FlutterFlowTheme.of(context)
+                                            .bodyLarge
+                                            .override(
+                                              fontFamily: FlutterFlowTheme.of(
+                                                context,
+                                              ).bodyLargeFamily,
+                                              letterSpacing: 0.0,
+                                              useGoogleFonts:
+                                                  GoogleFonts.asMap()
+                                                      .containsKey(
+                                                        FlutterFlowTheme.of(
+                                                          context,
+                                                        ).bodyLargeFamily,
+                                                      ),
+                                            ),
+                                      ),
+                                      Text(
+                                        'Switch between light and dark themes',
+                                        style: FlutterFlowTheme.of(context)
+                                            .bodySmall
+                                            .override(
+                                              fontFamily: FlutterFlowTheme.of(
+                                                context,
+                                              ).bodySmallFamily,
+                                              color: FlutterFlowTheme.of(
+                                                context,
+                                              ).secondaryText,
+                                              letterSpacing: 0.0,
+                                              useGoogleFonts:
+                                                  GoogleFonts.asMap()
+                                                      .containsKey(
+                                                        FlutterFlowTheme.of(
+                                                          context,
+                                                        ).bodySmallFamily,
+                                                      ),
+                                            ),
+                                      ),
+                                    ],
+                                  ),
+                                  Switch(
+                                    value:
+                                        Theme.of(context).brightness ==
+                                        Brightness.dark,
+                                    onChanged: (newValue) async {
+                                      if (newValue) {
+                                        setDarkModeSetting(
+                                          context,
+                                          ThemeMode.dark,
+                                        );
+                                      } else {
+                                        setDarkModeSetting(
+                                          context,
+                                          ThemeMode.light,
+                                        );
+                                      }
+                                    },
+                                    activeThumbColor: FlutterFlowTheme.of(
+                                      context,
+                                    ).primary,
+                                    activeTrackColor: FlutterFlowTheme.of(
+                                      context,
+                                    ).primaryText,
+                                    inactiveTrackColor: FlutterFlowTheme.of(
+                                      context,
+                                    ).primaryBackground,
+                                    inactiveThumbColor: FlutterFlowTheme.of(
+                                      context,
+                                    ).alternate,
                                   ),
                                 ],
                               ),
@@ -236,22 +329,23 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        FFLocalizations.of(context).getText(
-                                          'o2z8pr5p' /* Auto-Update */,
-                                        ),
+                                        FFLocalizations.of(
+                                          context,
+                                        ).getText('o2z8pr5p' /* Auto-Update */),
                                         style: FlutterFlowTheme.of(context)
                                             .bodyLarge
                                             .override(
-                                              fontFamily:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyLargeFamily,
+                                              fontFamily: FlutterFlowTheme.of(
+                                                context,
+                                              ).bodyLargeFamily,
                                               letterSpacing: 0.0,
                                               useGoogleFonts:
                                                   GoogleFonts.asMap()
                                                       .containsKey(
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .bodyLargeFamily),
+                                                        FlutterFlowTheme.of(
+                                                          context,
+                                                        ).bodyLargeFamily,
+                                                      ),
                                             ),
                                       ),
                                       Text(
@@ -261,19 +355,20 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                                         style: FlutterFlowTheme.of(context)
                                             .bodySmall
                                             .override(
-                                              fontFamily:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodySmallFamily,
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .secondaryText,
+                                              fontFamily: FlutterFlowTheme.of(
+                                                context,
+                                              ).bodySmallFamily,
+                                              color: FlutterFlowTheme.of(
+                                                context,
+                                              ).secondaryText,
                                               letterSpacing: 0.0,
                                               useGoogleFonts:
                                                   GoogleFonts.asMap()
                                                       .containsKey(
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .bodySmallFamily),
+                                                        FlutterFlowTheme.of(
+                                                          context,
+                                                        ).bodySmallFamily,
+                                                      ),
                                             ),
                                       ),
                                     ],
@@ -282,21 +377,24 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                                     value: _model.switchValue2!,
                                     onChanged: (newValue) async {
                                       safeSetState(
-                                          () => _model.switchValue2 = newValue);
+                                        () => _model.switchValue2 = newValue,
+                                      );
                                       if (newValue) {
                                         HapticFeedback.heavyImpact();
                                       }
                                     },
-                                    activeThumbColor:
-                                        FlutterFlowTheme.of(context).primary,
-                                    activeTrackColor:
-                                        FlutterFlowTheme.of(context)
-                                            .primaryText,
-                                    inactiveTrackColor:
-                                        FlutterFlowTheme.of(context)
-                                            .primaryBackground,
-                                    inactiveThumbColor:
-                                        FlutterFlowTheme.of(context).alternate,
+                                    activeThumbColor: FlutterFlowTheme.of(
+                                      context,
+                                    ).primary,
+                                    activeTrackColor: FlutterFlowTheme.of(
+                                      context,
+                                    ).primaryText,
+                                    inactiveTrackColor: FlutterFlowTheme.of(
+                                      context,
+                                    ).primaryBackground,
+                                    inactiveThumbColor: FlutterFlowTheme.of(
+                                      context,
+                                    ).alternate,
                                   ),
                                 ],
                               ),
@@ -315,22 +413,23 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        FFLocalizations.of(context).getText(
-                                          '3nod5i83' /* Usage Data */,
-                                        ),
+                                        FFLocalizations.of(
+                                          context,
+                                        ).getText('3nod5i83' /* Usage Data */),
                                         style: FlutterFlowTheme.of(context)
                                             .bodyLarge
                                             .override(
-                                              fontFamily:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyLargeFamily,
+                                              fontFamily: FlutterFlowTheme.of(
+                                                context,
+                                              ).bodyLargeFamily,
                                               letterSpacing: 0.0,
                                               useGoogleFonts:
                                                   GoogleFonts.asMap()
                                                       .containsKey(
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .bodyLargeFamily),
+                                                        FlutterFlowTheme.of(
+                                                          context,
+                                                        ).bodyLargeFamily,
+                                                      ),
                                             ),
                                       ),
                                       Text(
@@ -340,19 +439,20 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                                         style: FlutterFlowTheme.of(context)
                                             .bodySmall
                                             .override(
-                                              fontFamily:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodySmallFamily,
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .secondaryText,
+                                              fontFamily: FlutterFlowTheme.of(
+                                                context,
+                                              ).bodySmallFamily,
+                                              color: FlutterFlowTheme.of(
+                                                context,
+                                              ).secondaryText,
                                               letterSpacing: 0.0,
                                               useGoogleFonts:
                                                   GoogleFonts.asMap()
                                                       .containsKey(
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .bodySmallFamily),
+                                                        FlutterFlowTheme.of(
+                                                          context,
+                                                        ).bodySmallFamily,
+                                                      ),
                                             ),
                                       ),
                                     ],
@@ -361,21 +461,24 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                                     value: _model.switchValue3!,
                                     onChanged: (newValue) async {
                                       safeSetState(
-                                          () => _model.switchValue3 = newValue);
+                                        () => _model.switchValue3 = newValue,
+                                      );
                                       if (newValue) {
                                         HapticFeedback.heavyImpact();
                                       }
                                     },
-                                    activeThumbColor:
-                                        FlutterFlowTheme.of(context).primary,
-                                    activeTrackColor:
-                                        FlutterFlowTheme.of(context)
-                                            .primaryText,
-                                    inactiveTrackColor:
-                                        FlutterFlowTheme.of(context)
-                                            .primaryBackground,
-                                    inactiveThumbColor:
-                                        FlutterFlowTheme.of(context).alternate,
+                                    activeThumbColor: FlutterFlowTheme.of(
+                                      context,
+                                    ).primary,
+                                    activeTrackColor: FlutterFlowTheme.of(
+                                      context,
+                                    ).primaryText,
+                                    inactiveTrackColor: FlutterFlowTheme.of(
+                                      context,
+                                    ).primaryBackground,
+                                    inactiveThumbColor: FlutterFlowTheme.of(
+                                      context,
+                                    ).alternate,
                                   ),
                                 ],
                               ),
@@ -403,20 +506,23 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                                       style: FlutterFlowTheme.of(context)
                                           .bodyLarge
                                           .override(
-                                            fontFamily:
-                                                FlutterFlowTheme.of(context)
-                                                    .bodyLargeFamily,
+                                            fontFamily: FlutterFlowTheme.of(
+                                              context,
+                                            ).bodyLargeFamily,
                                             letterSpacing: 0.0,
                                             useGoogleFonts: GoogleFonts.asMap()
                                                 .containsKey(
-                                                    FlutterFlowTheme.of(context)
-                                                        .bodyLargeFamily),
+                                                  FlutterFlowTheme.of(
+                                                    context,
+                                                  ).bodyLargeFamily,
+                                                ),
                                           ),
                                     ),
                                     Icon(
                                       Icons.chevron_right,
-                                      color: FlutterFlowTheme.of(context)
-                                          .secondaryText,
+                                      color: FlutterFlowTheme.of(
+                                        context,
+                                      ).secondaryText,
                                       size: 24.0,
                                     ),
                                   ],
@@ -432,26 +538,29 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    FFLocalizations.of(context).getText(
-                                      'u5chverd' /* Clear Cache */,
-                                    ),
+                                    FFLocalizations.of(
+                                      context,
+                                    ).getText('u5chverd' /* Clear Cache */),
                                     style: FlutterFlowTheme.of(context)
                                         .bodyLarge
                                         .override(
-                                          fontFamily:
-                                              FlutterFlowTheme.of(context)
-                                                  .bodyLargeFamily,
+                                          fontFamily: FlutterFlowTheme.of(
+                                            context,
+                                          ).bodyLargeFamily,
                                           letterSpacing: 0.0,
                                           useGoogleFonts: GoogleFonts.asMap()
                                               .containsKey(
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyLargeFamily),
+                                                FlutterFlowTheme.of(
+                                                  context,
+                                                ).bodyLargeFamily,
+                                              ),
                                         ),
                                   ),
                                   Icon(
                                     Icons.chevron_right,
-                                    color: FlutterFlowTheme.of(context)
-                                        .secondaryText,
+                                    color: FlutterFlowTheme.of(
+                                      context,
+                                    ).secondaryText,
                                     size: 24.0,
                                   ),
                                 ],
@@ -466,26 +575,29 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    FFLocalizations.of(context).getText(
-                                      '780qecpi' /* Privacy Policy */,
-                                    ),
+                                    FFLocalizations.of(
+                                      context,
+                                    ).getText('780qecpi' /* Privacy Policy */),
                                     style: FlutterFlowTheme.of(context)
                                         .bodyLarge
                                         .override(
-                                          fontFamily:
-                                              FlutterFlowTheme.of(context)
-                                                  .bodyLargeFamily,
+                                          fontFamily: FlutterFlowTheme.of(
+                                            context,
+                                          ).bodyLargeFamily,
                                           letterSpacing: 0.0,
                                           useGoogleFonts: GoogleFonts.asMap()
                                               .containsKey(
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyLargeFamily),
+                                                FlutterFlowTheme.of(
+                                                  context,
+                                                ).bodyLargeFamily,
+                                              ),
                                         ),
                                   ),
                                   Icon(
                                     Icons.chevron_right,
-                                    color: FlutterFlowTheme.of(context)
-                                        .secondaryText,
+                                    color: FlutterFlowTheme.of(
+                                      context,
+                                    ).secondaryText,
                                     size: 24.0,
                                   ),
                                 ],
@@ -506,20 +618,23 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                                     style: FlutterFlowTheme.of(context)
                                         .bodyLarge
                                         .override(
-                                          fontFamily:
-                                              FlutterFlowTheme.of(context)
-                                                  .bodyLargeFamily,
+                                          fontFamily: FlutterFlowTheme.of(
+                                            context,
+                                          ).bodyLargeFamily,
                                           letterSpacing: 0.0,
                                           useGoogleFonts: GoogleFonts.asMap()
                                               .containsKey(
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyLargeFamily),
+                                                FlutterFlowTheme.of(
+                                                  context,
+                                                ).bodyLargeFamily,
+                                              ),
                                         ),
                                   ),
                                   Icon(
                                     Icons.chevron_right,
-                                    color: FlutterFlowTheme.of(context)
-                                        .secondaryText,
+                                    color: FlutterFlowTheme.of(
+                                      context,
+                                    ).secondaryText,
                                     size: 24.0,
                                   ),
                                 ],
@@ -549,37 +664,42 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                FFLocalizations.of(context).getText(
-                                  'vjtkg90o' /* Version */,
-                                ),
-                                style: FlutterFlowTheme.of(context)
-                                    .bodyLarge
+                                FFLocalizations.of(
+                                  context,
+                                ).getText('vjtkg90o' /* Version */),
+                                style: FlutterFlowTheme.of(context).bodyLarge
                                     .override(
-                                      fontFamily: FlutterFlowTheme.of(context)
-                                          .bodyLargeFamily,
+                                      fontFamily: FlutterFlowTheme.of(
+                                        context,
+                                      ).bodyLargeFamily,
                                       letterSpacing: 0.0,
                                       useGoogleFonts: GoogleFonts.asMap()
                                           .containsKey(
-                                              FlutterFlowTheme.of(context)
-                                                  .bodyLargeFamily),
+                                            FlutterFlowTheme.of(
+                                              context,
+                                            ).bodyLargeFamily,
+                                          ),
                                     ),
                               ),
                               Text(
-                                FFLocalizations.of(context).getText(
-                                  'efa2h2pl' /* 2.1.0 */,
-                                ),
-                                style: FlutterFlowTheme.of(context)
-                                    .bodyMedium
+                                FFLocalizations.of(
+                                  context,
+                                ).getText('efa2h2pl' /* 2.1.0 */),
+                                style: FlutterFlowTheme.of(context).bodyMedium
                                     .override(
-                                      fontFamily: FlutterFlowTheme.of(context)
-                                          .bodyMediumFamily,
-                                      color: FlutterFlowTheme.of(context)
-                                          .primaryText,
+                                      fontFamily: FlutterFlowTheme.of(
+                                        context,
+                                      ).bodyMediumFamily,
+                                      color: FlutterFlowTheme.of(
+                                        context,
+                                      ).primaryText,
                                       letterSpacing: 0.0,
                                       useGoogleFonts: GoogleFonts.asMap()
                                           .containsKey(
-                                              FlutterFlowTheme.of(context)
-                                                  .bodyMediumFamily),
+                                            FlutterFlowTheme.of(
+                                              context,
+                                            ).bodyMediumFamily,
+                                          ),
                                     ),
                               ),
                             ],
@@ -609,7 +729,11 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                               ),
                               Padding(
                                 padding: const EdgeInsetsDirectional.fromSTEB(
-                                    30.0, 0.0, 0.0, 0.0),
+                                  30.0,
+                                  0.0,
+                                  0.0,
+                                  0.0,
+                                ),
                                 child: Column(
                                   mainAxisSize: MainAxisSize.max,
                                   mainAxisAlignment: MainAxisAlignment.start,
@@ -618,25 +742,30 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                                     Padding(
                                       padding:
                                           const EdgeInsetsDirectional.fromSTEB(
-                                              0.0, 0.0, 0.0, 2.0),
+                                            0.0,
+                                            0.0,
+                                            0.0,
+                                            2.0,
+                                          ),
                                       child: Text(
-                                        FFLocalizations.of(context).getText(
-                                          'b5rf4hn9' /* Developer */,
-                                        ),
+                                        FFLocalizations.of(
+                                          context,
+                                        ).getText('b5rf4hn9' /* Developer */),
                                         style: FlutterFlowTheme.of(context)
                                             .bodyLarge
                                             .override(
-                                              fontFamily:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyLargeFamily,
+                                              fontFamily: FlutterFlowTheme.of(
+                                                context,
+                                              ).bodyLargeFamily,
                                               letterSpacing: 0.0,
                                               fontWeight: FontWeight.w800,
                                               useGoogleFonts:
                                                   GoogleFonts.asMap()
                                                       .containsKey(
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .bodyLargeFamily),
+                                                        FlutterFlowTheme.of(
+                                                          context,
+                                                        ).bodyLargeFamily,
+                                                      ),
                                             ),
                                       ),
                                     ),
@@ -647,14 +776,16 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium
                                           .override(
-                                            fontFamily:
-                                                FlutterFlowTheme.of(context)
-                                                    .bodyMediumFamily,
+                                            fontFamily: FlutterFlowTheme.of(
+                                              context,
+                                            ).bodyMediumFamily,
                                             letterSpacing: 0.0,
                                             useGoogleFonts: GoogleFonts.asMap()
                                                 .containsKey(
-                                                    FlutterFlowTheme.of(context)
-                                                        .bodyMediumFamily),
+                                                  FlutterFlowTheme.of(
+                                                    context,
+                                                  ).bodyMediumFamily,
+                                                ),
                                           ),
                                     ),
                                     InkWell(
@@ -664,7 +795,8 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                                       highlightColor: Colors.transparent,
                                       onTap: () async {
                                         await launchURL(
-                                            'mailto:prabhjotassi16@gmail.com?subject=Signify App User:&body=Share App Feedback:');
+                                          'mailto:prabhjotassi16@gmail.com?subject=Signify App User:&body=Share App Feedback:',
+                                        );
                                       },
                                       child: Text(
                                         FFLocalizations.of(context).getText(
@@ -673,19 +805,20 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                                         style: FlutterFlowTheme.of(context)
                                             .bodySmall
                                             .override(
-                                              fontFamily:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodySmallFamily,
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .primary,
+                                              fontFamily: FlutterFlowTheme.of(
+                                                context,
+                                              ).bodySmallFamily,
+                                              color: FlutterFlowTheme.of(
+                                                context,
+                                              ).primary,
                                               letterSpacing: 0.0,
                                               useGoogleFonts:
                                                   GoogleFonts.asMap()
                                                       .containsKey(
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .bodySmallFamily),
+                                                        FlutterFlowTheme.of(
+                                                          context,
+                                                        ).bodySmallFamily,
+                                                      ),
                                             ),
                                       ),
                                     ),
@@ -714,11 +847,10 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Text(
-                            FFLocalizations.of(context).getText(
-                              'tmmii36i' /* Follow us on */,
-                            ),
-                            style: FlutterFlowTheme.of(context)
-                                .titleLarge
+                            FFLocalizations.of(
+                              context,
+                            ).getText('tmmii36i' /* Follow us on */),
+                            style: FlutterFlowTheme.of(context).titleLarge
                                 .override(
                                   fontFamily: 'Space Grotesk',
                                   letterSpacing: 0.0,
@@ -744,104 +876,128 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                               Align(
                                 alignment: const AlignmentDirectional(0.0, 0.0),
                                 child: FlutterFlowIconButton(
-                                  borderColor:
-                                      FlutterFlowTheme.of(context).alternate,
+                                  borderColor: FlutterFlowTheme.of(
+                                    context,
+                                  ).alternate,
                                   borderRadius: 12.0,
                                   borderWidth: 2.0,
                                   buttonSize: 48.0,
-                                  fillColor: FlutterFlowTheme.of(context)
-                                      .secondaryBackground,
-                                  hoverColor:
-                                      FlutterFlowTheme.of(context).alternate,
-                                  hoverIconColor:
-                                      FlutterFlowTheme.of(context).secondary,
+                                  fillColor: FlutterFlowTheme.of(
+                                    context,
+                                  ).secondaryBackground,
+                                  hoverColor: FlutterFlowTheme.of(
+                                    context,
+                                  ).alternate,
+                                  hoverIconColor: FlutterFlowTheme.of(
+                                    context,
+                                  ).secondary,
                                   icon: FaIcon(
                                     FontAwesomeIcons.youtube,
-                                    color: FlutterFlowTheme.of(context)
-                                        .primaryText,
+                                    color: FlutterFlowTheme.of(
+                                      context,
+                                    ).primaryText,
                                     size: 30.0,
                                   ),
                                   onPressed: () async {
                                     await launchURL(
-                                        'https://youtube.com/@ujjwalseth2412?si=anotS_YFAGKqZzVa');
+                                      'https://youtube.com/@ujjwalseth2412?si=anotS_YFAGKqZzVa',
+                                    );
                                   },
                                 ),
                               ),
                               Align(
                                 alignment: const AlignmentDirectional(0.0, 0.0),
                                 child: FlutterFlowIconButton(
-                                  borderColor:
-                                      FlutterFlowTheme.of(context).alternate,
+                                  borderColor: FlutterFlowTheme.of(
+                                    context,
+                                  ).alternate,
                                   borderRadius: 12.0,
                                   borderWidth: 2.0,
                                   buttonSize: 48.0,
-                                  fillColor: FlutterFlowTheme.of(context)
-                                      .secondaryBackground,
-                                  hoverColor:
-                                      FlutterFlowTheme.of(context).alternate,
-                                  hoverIconColor:
-                                      FlutterFlowTheme.of(context).secondary,
+                                  fillColor: FlutterFlowTheme.of(
+                                    context,
+                                  ).secondaryBackground,
+                                  hoverColor: FlutterFlowTheme.of(
+                                    context,
+                                  ).alternate,
+                                  hoverIconColor: FlutterFlowTheme.of(
+                                    context,
+                                  ).secondary,
                                   icon: FaIcon(
                                     FontAwesomeIcons.instagram,
-                                    color: FlutterFlowTheme.of(context)
-                                        .primaryText,
+                                    color: FlutterFlowTheme.of(
+                                      context,
+                                    ).primaryText,
                                     size: 30.0,
                                   ),
                                   onPressed: () async {
                                     await launchURL(
-                                        'https://www.instagram.com/ujjwalseth2412/');
+                                      'https://www.instagram.com/ujjwalseth2412/',
+                                    );
                                   },
                                 ),
                               ),
                               Align(
                                 alignment: const AlignmentDirectional(0.0, 0.0),
                                 child: FlutterFlowIconButton(
-                                  borderColor:
-                                      FlutterFlowTheme.of(context).alternate,
+                                  borderColor: FlutterFlowTheme.of(
+                                    context,
+                                  ).alternate,
                                   borderRadius: 12.0,
                                   borderWidth: 2.0,
                                   buttonSize: 48.0,
-                                  fillColor: FlutterFlowTheme.of(context)
-                                      .secondaryBackground,
-                                  hoverColor:
-                                      FlutterFlowTheme.of(context).alternate,
-                                  hoverIconColor:
-                                      FlutterFlowTheme.of(context).secondary,
+                                  fillColor: FlutterFlowTheme.of(
+                                    context,
+                                  ).secondaryBackground,
+                                  hoverColor: FlutterFlowTheme.of(
+                                    context,
+                                  ).alternate,
+                                  hoverIconColor: FlutterFlowTheme.of(
+                                    context,
+                                  ).secondary,
                                   icon: FaIcon(
                                     FontAwesomeIcons.github,
-                                    color: FlutterFlowTheme.of(context)
-                                        .primaryText,
+                                    color: FlutterFlowTheme.of(
+                                      context,
+                                    ).primaryText,
                                     size: 30.0,
                                   ),
                                   onPressed: () async {
                                     await launchURL(
-                                        'https://github.com/prabhjot0109');
+                                      'https://github.com/prabhjot0109',
+                                    );
                                   },
                                 ),
                               ),
                               Align(
                                 alignment: const AlignmentDirectional(0.0, 0.0),
                                 child: FlutterFlowIconButton(
-                                  borderColor:
-                                      FlutterFlowTheme.of(context).alternate,
+                                  borderColor: FlutterFlowTheme.of(
+                                    context,
+                                  ).alternate,
                                   borderRadius: 12.0,
                                   borderWidth: 2.0,
                                   buttonSize: 48.0,
-                                  fillColor: FlutterFlowTheme.of(context)
-                                      .secondaryBackground,
-                                  hoverColor:
-                                      FlutterFlowTheme.of(context).alternate,
-                                  hoverIconColor:
-                                      FlutterFlowTheme.of(context).secondary,
+                                  fillColor: FlutterFlowTheme.of(
+                                    context,
+                                  ).secondaryBackground,
+                                  hoverColor: FlutterFlowTheme.of(
+                                    context,
+                                  ).alternate,
+                                  hoverIconColor: FlutterFlowTheme.of(
+                                    context,
+                                  ).secondary,
                                   icon: FaIcon(
                                     FontAwesomeIcons.linkedinIn,
-                                    color: FlutterFlowTheme.of(context)
-                                        .primaryText,
+                                    color: FlutterFlowTheme.of(
+                                      context,
+                                    ).primaryText,
                                     size: 30.0,
                                   ),
                                   onPressed: () async {
                                     await launchURL(
-                                        'https://www.linkedin.com/in/prabhjotsinghassi/');
+                                      'https://www.linkedin.com/in/prabhjotsinghassi/',
+                                    );
                                   },
                                 ),
                               ),
@@ -851,9 +1007,7 @@ class _AppSettingsWidgetState extends State<AppSettingsWidget> with RouteAware {
                       ),
                     ),
                   ),
-                ]
-                    .divide(const SizedBox(height: 16.0))
-                    .around(const SizedBox(height: 16.0)),
+                ].divide(const SizedBox(height: 16.0)).around(const SizedBox(height: 16.0)),
               ),
             ),
           ),
