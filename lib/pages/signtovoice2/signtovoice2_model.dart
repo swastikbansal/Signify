@@ -89,23 +89,23 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   List<String> get sentenceWords => List.from(_currentSentence);
 
   // API related state
-  // String _apiUrl = 'https://192.168.29.42:5000/process_frame';
-  String _apiUrl = 'https://swastikbansal-signify.hf.space/process_frame';
+  String _apiUrl = 'http://192.168.29.42:5000/process_frame';
+
+  // String _apiUrl = 'https://swastikbansal-signify.hf.space/process_frame';
   bool _isApiEnabled = true;
   int _lastApiCallTime = 0;
-  static const int _apiCallInterval = 200; //ms
+  static const int _apiCallInterval = 100; //ms
 
   static const int _jpegQuality = 80;
 
-  bool _apiInFlight = false; 
-  
+  bool _apiInFlight = false;
+
   // Enhanced HTTP client with connection pooling
   late final http.Client _httpClient;
 
   void _initializeHttpClient() {
     _httpClient = http.Client();
   }
-
 
   // Text-to-Speech state
   FlutterTts? _flutterTts;
@@ -730,7 +730,9 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
           if (status == 'success') {
             // Extract prediction from successful response
             final prediction = responseData['prediction'] as String?;
-            if (prediction != null && prediction.isNotEmpty) {
+            if (prediction != null &&
+                prediction.isNotEmpty &&
+                prediction != 'rest') {
               print('Received prediction from frame API: $prediction');
 
               // Update prediction history
@@ -797,7 +799,8 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   // Method to toggle API calls
   void setApiEnabled(bool enabled) {
     _isApiEnabled = enabled;
-    print('API prediction ${enabled ? 'enabled' : 'disabled'} - using ${enabled ? 'remote' : 'local'} prediction');
+    print(
+        'API prediction ${enabled ? 'enabled' : 'disabled'} - using ${enabled ? 'remote' : 'local'} prediction');
   }
 
   // Method to toggle between API-based and local prediction
@@ -816,8 +819,6 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
 
   // Method to get current API URL
   String get apiUrl => _apiUrl;
-  
-
 
   // Method to reset API call timer (useful for immediate API calls)
   void resetApiTimer() {
