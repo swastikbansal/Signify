@@ -13,12 +13,12 @@ class SignifyFirebaseUser extends BaseAuthUser {
 
   @override
   AuthUserInfo get authUserInfo => AuthUserInfo(
-        uid: user?.uid,
-        email: user?.email,
-        displayName: user?.displayName,
-        photoUrl: user?.photoURL,
-        phoneNumber: user?.phoneNumber,
-      );
+    uid: user?.uid,
+    email: user?.email,
+    displayName: user?.displayName,
+    photoUrl: user?.photoURL,
+    phoneNumber: user?.phoneNumber,
+  );
 
   @override
   Future? delete() => user?.delete();
@@ -26,9 +26,12 @@ class SignifyFirebaseUser extends BaseAuthUser {
   @override
   Future? updateEmail(String email) async {
     try {
-      await user?.updateEmail(email);
-    } catch (_) {
+      // In newer versions of Firebase Auth, updateEmail may not be available
+      // Instead, use verifyBeforeUpdateEmail for secure email updates
       await user?.verifyBeforeUpdateEmail(email);
+    } catch (e) {
+      print('Error updating email: $e');
+      rethrow;
     }
   }
 
@@ -52,9 +55,9 @@ class SignifyFirebaseUser extends BaseAuthUser {
 
   @override
   Future refreshUser() async {
-    await FirebaseAuth.instance.currentUser
-        ?.reload()
-        .then((_) => user = FirebaseAuth.instance.currentUser);
+    await FirebaseAuth.instance.currentUser?.reload().then(
+      (_) => user = FirebaseAuth.instance.currentUser,
+    );
   }
 
   static BaseAuthUser fromUserCredential(UserCredential userCredential) =>
@@ -63,13 +66,13 @@ class SignifyFirebaseUser extends BaseAuthUser {
 }
 
 Stream<BaseAuthUser> signifyFirebaseUserStream() => FirebaseAuth.instance
-        .authStateChanges()
-        .debounce((user) => user == null && !loggedIn
-            ? TimerStream(true, const Duration(seconds: 1))
-            : Stream.value(user))
-        .map<BaseAuthUser>(
-      (user) {
-        currentUser = SignifyFirebaseUser(user);
-        return currentUser!;
-      },
-    );
+    .authStateChanges()
+    .debounce(
+      (user) => user == null && !loggedIn
+          ? TimerStream(true, const Duration(seconds: 1))
+          : Stream.value(user),
+    )
+    .map<BaseAuthUser>((user) {
+      currentUser = SignifyFirebaseUser(user);
+      return currentUser!;
+    });
