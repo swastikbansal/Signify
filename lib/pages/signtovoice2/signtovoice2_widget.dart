@@ -498,11 +498,7 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                                         width: 120.0,
                                         height: 36.0,
                                       ),
-                                    ), // Removed walkthrough functionality
-                                    // .addWalkthrough(
-                                    //   dropDownB9wm9jo8,
-                                    //   _model.signifyScreen2Controller,
-                                    // ),
+                                    ),
                                   ),
 
                                   // Speaker toggle button with TTS state

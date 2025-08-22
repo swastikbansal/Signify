@@ -94,9 +94,9 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
 
   bool _isApiEnabled = true;
   int _lastApiCallTime = 0;
-  static const int _apiCallInterval = 100; //ms
+  static const int _apiCallInterval = 200; // API call interval in milliseconds
 
-  static const int _jpegQuality = 80;
+  static const int _jpegQuality = 70; // Quality for JPEG encoding
 
   bool _apiInFlight = false;
 
