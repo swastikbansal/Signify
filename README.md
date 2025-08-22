@@ -8,6 +8,11 @@ ISL Translator for hard of hearing individuals.
 
 Signify is an Indian Sign Language (ISL) translator designed to assist hard-of-hearing individuals by recognizing and translating 30 ISL signs using machine learning models.
 
+## 📋 Release Information
+
+**Current Version**: v1.0.0  
+📄 **[Full Release Notes](RELEASE_NOTES.md)** - Comprehensive documentation of features, installation, and technical details  
+📄 **[Release Summary](RELEASE_SUMMARY.md)** - Quick overview of key features and highlights
 
 ## dataset
 self made dataset 
