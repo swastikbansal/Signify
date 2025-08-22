@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:ui' as ui;
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
@@ -9,9 +8,10 @@ import 'package:model_viewer_plus/model_viewer_plus.dart';
 
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import '/services/safe_image_processor.dart';
 import '/services/supabase_animation_service.dart';
 import 'voicetosign1_model.dart';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'dart:io';
 
 export 'voicetosign1_model.dart';
 
@@ -106,8 +106,9 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
   bool isProcessingImage = false;
   bool isMovingLineActive = false; // For the moving line animation
 
-  // OCR variables - using SafeImageProcessor instead of direct TextRecognizer
+  // OCR variables - using direct Google ML Kit TextRecognizer
   final ImagePicker _imagePicker = ImagePicker();
+  late TextRecognizer _textRecognizer;
 
   @override
   void initState() {
@@ -124,6 +125,9 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
     // Animation initialization
     currentAnimation = defaultAnimation;
     isPlayingSequence = false;
+
+    // Initialize OCR TextRecognizer
+    _textRecognizer = TextRecognizer();
 
     // Preload core vocabulary in background for instant access
     SupabaseAnimationService.preloadCoreVocabulary();
@@ -149,7 +153,7 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
     _model.dispose();
     _movingLineController.dispose();
     _animationTimer?.cancel(); // Cancel animation timer
-    SafeImageProcessor.instance.dispose();
+    _textRecognizer.close(); // Dispose text recognizer
     super.dispose();
   }
 
@@ -254,81 +258,86 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
   // Image handling methods
   Future<void> _pickImage() async {
     try {
-      // Intentionally minimal logging
+      setState(() {
+        isProcessingImage = true;
+      });
 
       final XFile? pickedFile = await _imagePicker.pickImage(
         source: ImageSource.gallery,
         maxWidth: 1200,
         maxHeight: 1200,
-        imageQuality: 70,
+        imageQuality: 80,
       );
 
       if (pickedFile == null) {
+        setState(() {
+          isProcessingImage = false;
+        });
         return;
       }
 
       await _processImageSafely(pickedFile, isFromCamera: false);
     } catch (e) {
+      debugPrint('Gallery image picker error: $e');
       setState(() {
         isProcessingImage = false;
       });
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to pick image: Please try again'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
   Future<void> _takePhoto() async {
+    setState(() {
+      isProcessingImage = true;
+    });
+
     try {
-      // Debug mode: Additional protection against camera conflicts
-      if (kDebugMode) {
-        print('📸 Debug mode: Starting camera capture with extra protection');
-        // Longer delay in debug mode to prevent conflicts
-        await Future.delayed(const Duration(milliseconds: 500));
-      }
-
-      // Minimal logging for camera capture
-
-      // Add pre-camera delay to ensure proper initialization
-      await Future.delayed(const Duration(milliseconds: 300));
-
       final XFile? pickedFile = await _imagePicker.pickImage(
         source: ImageSource.camera,
-        maxWidth: 1080, // Reduced from 1200 for better stability
-        maxHeight: 1080, // Reduced from 1200 for better stability
-        imageQuality: 60, // Reduced from 70 for smaller file size
+        maxWidth: 1200, // Increased back for better OCR quality
+        maxHeight: 1200, // Increased back for better OCR quality
+        imageQuality: 80, // Increased for better OCR accuracy
+        preferredCameraDevice:
+            CameraDevice.rear, // Specify rear camera for better quality
       );
 
       if (pickedFile == null) {
-        if (kDebugMode) {
-          print('📸 Debug mode: Camera capture cancelled by user');
-        }
+        setState(() {
+          isProcessingImage = false;
+        });
         return;
       }
 
-      // Debug mode: Additional post-camera stabilization
-      if (kDebugMode) {
-        print('📸 Debug mode: Camera capture completed, stabilizing...');
-        await Future.delayed(const Duration(milliseconds: 500));
-      }
-
-      // Add post-camera delay to ensure proper file handling
-      await Future.delayed(const Duration(milliseconds: 300));
-      // Silent after capture
-
       await _processImageSafely(pickedFile, isFromCamera: true);
     } catch (e) {
-      if (kDebugMode) {
-        print('❌ Debug mode: Camera error caught safely: $e');
-      }
+      debugPrint('Camera capture error: $e');
       setState(() {
         isProcessingImage = false;
       });
 
-      // Show user-friendly error in debug mode
-      if (kDebugMode && mounted) {
+      // Show user-friendly error based on the error type
+      String errorMessage = 'Camera error: Please try again';
+      if (e.toString().contains('permission')) {
+        errorMessage =
+            'Camera permission required. Please grant permission in settings.';
+      } else if (e.toString().contains('not available')) {
+        errorMessage = 'Camera not available on this device.';
+      }
+
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Camera temporarily unavailable in debug mode'),
-            backgroundColor: Colors.orange,
-            duration: Duration(seconds: 2),
+          SnackBar(
+            content: Text(errorMessage),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 3),
           ),
         );
       }
@@ -339,86 +348,63 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
     XFile pickedFile, {
     bool isFromCamera = false,
   }) async {
-    setState(() {
-      isProcessingImage = true;
-    });
-
-    // Debug mode: Extra logging and protection
-    if (kDebugMode) {
-      print(
-        '🖼️ Debug mode: Processing ${isFromCamera ? 'camera' : 'gallery'} image safely',
-      );
-    }
-
     try {
-      // Use safe image processor with camera flag
-      final result = await SafeImageProcessor.instance.processImageSafely(
-        imageFile: pickedFile,
-        maxWidth: 1200,
-        maxHeight: 1200,
-        imageQuality: 70,
-        isFromCamera: isFromCamera, // Pass camera flag for special handling
+      // Ensure file exists and is readable before processing
+      final file = File(pickedFile.path);
+      if (!await file.exists()) {
+        throw Exception('Image file not found');
+      }
+
+      // Add a small delay for camera captures to ensure file is fully written
+      if (isFromCamera) {
+        await Future.delayed(const Duration(milliseconds: 100));
+      }
+
+      // Process image for OCR
+      String extractedText = '';
+      try {
+        final inputImage = InputImage.fromFile(file);
+        final recognizedText = await _textRecognizer.processImage(inputImage);
+        extractedText = recognizedText.text.trim();
+      } catch (ocrError) {
+        debugPrint('OCR processing failed: $ocrError');
+        // Continue without OCR - don't let OCR failure break the app
+      }
+
+      setState(() {
+        // Add extracted text to the text field if any
+        if (extractedText.isNotEmpty) {
+          if (_model.textController!.text.isNotEmpty) {
+            _model.textController!.text += ' $extractedText';
+          } else {
+            _model.textController!.text = extractedText;
+          }
+          inputSentence = _model.textController!.text;
+          // Use enhanced voice-to-sign integration for OCR text
+          _model.updateInputSentence(inputSentence);
+        }
+
+        // Add image path for preview (safer than File objects)
+        uploadedImagePaths.add(pickedFile.path);
+        isProcessingImage = false;
+      });
+
+      debugPrint(
+        'Image processed successfully. OCR text length: ${extractedText.length}',
       );
-
-      if (result['success'] == true) {
-        final String extractedText = result['text'] ?? '';
-        final String imagePath = result['imagePath'];
-
-        setState(() {
-          // Add extracted text to the text field if any
-          if (extractedText.isNotEmpty) {
-            if (_model.textController!.text.isNotEmpty) {
-              _model.textController!.text += ' $extractedText';
-            } else {
-              _model.textController!.text = extractedText;
-            }
-            inputSentence = _model.textController!.text;
-            // Use enhanced voice-to-sign integration for OCR text
-            _model.updateInputSentence(inputSentence);
-          }
-
-          // Add image path for preview (safer than File objects)
-          uploadedImagePaths.add(imagePath);
-
-          isProcessingImage = false;
-        });
-
-        // Debug mode: Success logging
-        if (kDebugMode) {
-          print('✅ Debug mode: Image processed successfully');
-          if (extractedText.isNotEmpty) {
-            print(
-              '📝 Debug mode: Extracted text: "${extractedText.substring(0, extractedText.length.clamp(0, 50))}..."',
-            );
-          }
-        }
-      } else {
-        setState(() {
-          isProcessingImage = false;
-        });
-
-        if (kDebugMode) {
-          print('⚠️ Debug mode: Image processing returned failure');
-        }
-      }
     } catch (e) {
-      if (kDebugMode) {
-        print('❌ Debug mode: Image processing error caught: $e');
-      }
+      debugPrint('Image processing error: $e');
 
       setState(() {
         isProcessingImage = false;
       });
 
-      // Show user-friendly error in debug mode
-      if (kDebugMode && mounted) {
+      // Show user-friendly error
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Image processing temporarily unavailable in debug mode',
-            ),
-            backgroundColor: Colors.orange,
-            duration: Duration(seconds: 2),
+          SnackBar(
+            content: Text('Failed to process image: ${e.toString()}'),
+            backgroundColor: Colors.red,
           ),
         );
       }
@@ -962,12 +948,59 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
                                                             BorderRadius.circular(
                                                               8.0,
                                                             ),
-                                                        child: SafeImagePreview(
-                                                          imagePath:
-                                                              uploadedImagePaths[index],
+                                                        child: Container(
                                                           width: 60.0,
                                                           height: 60.0,
-                                                          onRemove: () {
+                                                          decoration: BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius.circular(
+                                                                  8,
+                                                                ),
+                                                            border: Border.all(
+                                                              color: Colors
+                                                                  .grey[300]!,
+                                                            ),
+                                                          ),
+                                                          child: ClipRRect(
+                                                            borderRadius:
+                                                                BorderRadius.circular(
+                                                                  8,
+                                                                ),
+                                                            child: Image.file(
+                                                              File(
+                                                                uploadedImagePaths[index],
+                                                              ),
+                                                              width: 60.0,
+                                                              height: 60.0,
+                                                              fit: BoxFit.cover,
+                                                              errorBuilder:
+                                                                  (
+                                                                    context,
+                                                                    error,
+                                                                    stackTrace,
+                                                                  ) {
+                                                                    return Container(
+                                                                      width:
+                                                                          60.0,
+                                                                      height:
+                                                                          60.0,
+                                                                      color: Colors
+                                                                          .grey[300],
+                                                                      child: const Icon(
+                                                                        Icons
+                                                                            .error,
+                                                                      ),
+                                                                    );
+                                                                  },
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Positioned(
+                                                        top: -4,
+                                                        right: -4,
+                                                        child: GestureDetector(
+                                                          onTap: () {
                                                             setState(() {
                                                               uploadedImagePaths
                                                                   .removeAt(
@@ -975,6 +1008,23 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
                                                                   );
                                                             });
                                                           },
+                                                          child: Container(
+                                                            width: 20,
+                                                            height: 20,
+                                                            decoration:
+                                                                const BoxDecoration(
+                                                                  color: Colors
+                                                                      .red,
+                                                                  shape: BoxShape
+                                                                      .circle,
+                                                                ),
+                                                            child: const Icon(
+                                                              Icons.close,
+                                                              size: 12,
+                                                              color:
+                                                                  Colors.white,
+                                                            ),
+                                                          ),
                                                         ),
                                                       ),
                                                     ],

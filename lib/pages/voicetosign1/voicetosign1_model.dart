@@ -3,7 +3,6 @@ import 'voicetosign1_widget.dart' show Voicetosign1Widget;
 import 'package:flutter/material.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import '/services/supabase_animation_service.dart';
-import '/services/voice_to_sign_animator.dart';
 
 class Voicetosign1Model extends FlutterFlowModel<Voicetosign1Widget> {
   ///  Local state fields for this page.
@@ -79,8 +78,12 @@ class Voicetosign1Model extends FlutterFlowModel<Voicetosign1Widget> {
     }
     // Clear speech variables
     clearSpeechText();
-    // Dispose voice-to-sign animator
-    VoiceToSignAnimator.instance.dispose();
+    // Clear animation state
+    clearAnimations();
+
+    // Clear any large objects to help with memory management
+    _animationQueue.clear();
+    _wordQueue.clear();
   }
 
   // Enhanced voice-to-sign integration methods
@@ -88,51 +91,78 @@ class Voicetosign1Model extends FlutterFlowModel<Voicetosign1Widget> {
     inputSentence = newValue;
     debugLogWidgetClass(this);
 
-    // Use enhanced voice-to-sign integration for real-time processing
-    VoiceToSignAnimator.instance.processSpeechForAnimation(
-      speechText: newValue,
-      onAnimationsReady: (animations, words) {
-        _animationQueue = animations;
-        _wordQueue = words;
-        debugLogWidgetClass(this);
-      },
-      onNoAnimations: () {
+    // Process speech directly using SupabaseAnimationService
+    _processTextForAnimation(newValue);
+  }
+
+  // Process text for animation using direct SupabaseAnimationService
+  Future<void> _processTextForAnimation(String text) async {
+    if (text.trim().isEmpty) {
+      _animationQueue.clear();
+      _wordQueue.clear();
+      debugLogWidgetClass(this);
+      return;
+    }
+
+    try {
+      // Parse words efficiently
+      final words = text
+          .toLowerCase()
+          .trim()
+          .split(RegExp(r'\s+'))
+          .map((word) => word.replaceAll(RegExp(r'[^\w]'), ''))
+          .where((word) => word.isNotEmpty)
+          .toList();
+
+      if (words.isEmpty) {
         _animationQueue.clear();
         _wordQueue.clear();
         debugLogWidgetClass(this);
-      },
-    );
+        return;
+      }
+
+      // Fetch animations efficiently using SupabaseAnimationService
+      final animationsData =
+          await SupabaseAnimationService.getBatchAnimationsWithMetadata(words);
+
+      final animationQueue = <AnimationData>[];
+      final wordQueue = <String>[];
+
+      for (int i = 0; i < words.length; i++) {
+        if (i < animationsData.length && animationsData[i].url != null) {
+          animationQueue.add(animationsData[i]);
+          wordQueue.add(words[i]);
+        }
+      }
+
+      _animationQueue = animationQueue;
+      _wordQueue = wordQueue;
+      debugLogWidgetClass(this);
+    } catch (e) {
+      debugPrint('❌ Error processing text for animation: $e');
+      _animationQueue.clear();
+      _wordQueue.clear();
+      debugLogWidgetClass(this);
+    }
   }
 
   // Process final speech text for animation
   Future<void> processFinalSpeechForAnimation(String finalText) async {
-    await VoiceToSignAnimator.instance.processFinalSpeech(
-      finalText: finalText,
-      onAnimationsReady: (animations, words) {
-        _animationQueue = animations;
-        _wordQueue = words;
-        debugLogWidgetClass(this);
-      },
-      onNoAnimations: () {
-        _animationQueue.clear();
-        _wordQueue.clear();
-        debugLogWidgetClass(this);
-      },
-    );
+    await _processTextForAnimation(finalText);
   }
 
   // Clear animation state
   void clearAnimations() {
     _animationQueue.clear();
     _wordQueue.clear();
-    VoiceToSignAnimator.instance.reset();
     debugLogWidgetClass(this);
   }
 
   // Initialize speech recognition
   Future<bool> initSpeech() async {
     try {
-      bool available = await speechToText?.initialize(
+      bool available =
+          await speechToText?.initialize(
             onError: (error) {
               debugPrint("Speech initialization error: $error");
             },
@@ -264,61 +294,58 @@ class Voicetosign1Model extends FlutterFlowModel<Voicetosign1Widget> {
 
   @override
   WidgetClassDebugData toWidgetClassDebugData() => WidgetClassDebugData(
-        localStates: {
-          'imgpath': debugSerializeParam(
-            imgpath,
-            ParamType.String,
-            link:
-                'https://app.flutterflow.io/project/signify-hq88od?tab=uiBuilder&page=voicetosign1',
-            searchReference:
-                'reference=QiEKEAoHaW1ncGF0aBIFcGs1NDQqBxIFZmFsc2VyBAgEIAFQAVoHaW1ncGF0aGIMdm9pY2V0b3NpZ24x',
-            name: 'String',
-            nullable: false,
-          ),
-          'title': debugSerializeParam(
-            title,
-            ParamType.String,
-            link:
-                'https://app.flutterflow.io/project/signify-hq88od?tab=uiBuilder&page=voicetosign1',
-            searchReference:
-                'reference=QhoKDgoFdGl0bGUSBWJoM2Z0KgISAHIECAMgAVABWgV0aXRsZWIMdm9pY2V0b3NpZ24x',
-            name: 'String',
-            nullable: false,
-          ),
-          'description': debugSerializeParam(
-            description,
-            ParamType.String,
-            link:
-                'https://app.flutterflow.io/project/signify-hq88od?tab=uiBuilder&page=voicetosign1',
-            searchReference:
-                'reference=QiAKFAoLZGVzY3JpcHRpb24SBXdnbmJmKgISAHIECAMgAVABWgtkZXNjcmlwdGlvbmIMdm9pY2V0b3NpZ24x',
-            name: 'String',
-            nullable: false,
-          )
-        },
-        widgetStates: {
-          'textFieldText': debugSerializeParam(
-            textController?.text,
-            ParamType.String,
-            link:
-                'https://app.flutterflow.io/project/signify-hq88od?tab=uiBuilder&page=voicetosign1',
-            name: 'String',
-            nullable: true,
-          )
-        },
-        generatorVariables: debugGeneratorVariables,
-        backendQueries: debugBackendQueries,
-        componentStates: {
-          ...widgetBuilderComponents.map(
-            (key, value) => MapEntry(
-              key,
-              value.toWidgetClassDebugData(),
-            ),
-          ),
-        }.withoutNulls,
+    localStates: {
+      'imgpath': debugSerializeParam(
+        imgpath,
+        ParamType.String,
         link:
-            'https://app.flutterflow.io/project/signify-hq88od/tab=uiBuilder&page=voicetosign1',
-        searchReference: 'reference=Ogx2b2ljZXRvc2lnbjFQAVoMdm9pY2V0b3NpZ24x',
-        widgetClassName: 'voicetosign1',
-      );
+            'https://app.flutterflow.io/project/signify-hq88od?tab=uiBuilder&page=voicetosign1',
+        searchReference:
+            'reference=QiEKEAoHaW1ncGF0aBIFcGs1NDQqBxIFZmFsc2VyBAgEIAFQAVoHaW1ncGF0aGIMdm9pY2V0b3NpZ24x',
+        name: 'String',
+        nullable: false,
+      ),
+      'title': debugSerializeParam(
+        title,
+        ParamType.String,
+        link:
+            'https://app.flutterflow.io/project/signify-hq88od?tab=uiBuilder&page=voicetosign1',
+        searchReference:
+            'reference=QhoKDgoFdGl0bGUSBWJoM2Z0KgISAHIECAMgAVABWgV0aXRsZWIMdm9pY2V0b3NpZ24x',
+        name: 'String',
+        nullable: false,
+      ),
+      'description': debugSerializeParam(
+        description,
+        ParamType.String,
+        link:
+            'https://app.flutterflow.io/project/signify-hq88od?tab=uiBuilder&page=voicetosign1',
+        searchReference:
+            'reference=QiAKFAoLZGVzY3JpcHRpb24SBXdnbmJmKgISAHIECAMgAVABWgtkZXNjcmlwdGlvbmIMdm9pY2V0b3NpZ24x',
+        name: 'String',
+        nullable: false,
+      ),
+    },
+    widgetStates: {
+      'textFieldText': debugSerializeParam(
+        textController?.text,
+        ParamType.String,
+        link:
+            'https://app.flutterflow.io/project/signify-hq88od?tab=uiBuilder&page=voicetosign1',
+        name: 'String',
+        nullable: true,
+      ),
+    },
+    generatorVariables: debugGeneratorVariables,
+    backendQueries: debugBackendQueries,
+    componentStates: {
+      ...widgetBuilderComponents.map(
+        (key, value) => MapEntry(key, value.toWidgetClassDebugData()),
+      ),
+    }.withoutNulls,
+    link:
+        'https://app.flutterflow.io/project/signify-hq88od/tab=uiBuilder&page=voicetosign1',
+    searchReference: 'reference=Ogx2b2ljZXRvc2lnbjFQAVoMdm9pY2V0b3NpZ24x',
+    widgetClassName: 'voicetosign1',
+  );
 }

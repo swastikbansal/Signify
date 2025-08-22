@@ -12,20 +12,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'account4_model.dart';
 export 'account4_model.dart';
 
-// Performance optimization imports
-import '/services/memory_optimizer.dart';
-
-/// Disposable wrapper for account widget
-class _AccountDisposable implements Disposable {
-  final _Account4WidgetState state;
-  _AccountDisposable(this.state);
-
-  @override
-  void dispose() {
-    // Additional cleanup if needed
-  }
-}
-
 class Account4Widget extends StatefulWidget {
   const Account4Widget({super.key});
 
@@ -33,8 +19,7 @@ class Account4Widget extends StatefulWidget {
   State<Account4Widget> createState() => _Account4WidgetState();
 }
 
-class _Account4WidgetState extends State<Account4Widget>
-    with RouteAware, MemoryOptimizedWidget {
+class _Account4WidgetState extends State<Account4Widget> with RouteAware {
   late Account4Model _model;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
@@ -43,17 +28,11 @@ class _Account4WidgetState extends State<Account4Widget>
   void initState() {
     super.initState();
     _model = createModel(context, () => Account4Model());
-
-    // Tutorial walkthrough removed for performance optimization
-    // Performance optimization: register for memory cleanup
-    MemoryOptimizer.instance.registerDisposable(_AccountDisposable(this));
   }
 
   @override
   void dispose() {
     _model.dispose();
-    // Clean up memory-tracked resources
-    disposeMemoryResources();
     super.dispose();
   }
 

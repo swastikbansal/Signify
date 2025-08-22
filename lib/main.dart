@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -17,142 +16,48 @@ import 'config/app_config.dart';
 import 'flutter_flow/flutter_flow_util.dart';
 import 'flutter_flow/internationalization.dart';
 import 'index.dart';
-import 'services/app_state_manager.dart';
-import 'services/background_task_optimizer.dart';
-import 'services/database_optimizer.dart';
-import 'services/error_recovery_service.dart';
-import 'services/memory_optimizer.dart';
-import 'services/network_optimizer.dart';
-// Performance optimization services
-import 'services/performance_cache_manager.dart';
+import 'services/error_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   GoRouter.optionURLReflectsImperativeAPIs = true;
   usePathUrlStrategy();
 
-  // Initialize performance services only in release mode to avoid debug conflicts
-  if (kReleaseMode) {
-    await _initializePerformanceServices();
-  } else {
-    print('🔧 Debug mode: Skipping aggressive performance optimizations');
-  }
+  // Initialize modern error handling service
+  ErrorService.instance.initialize();
 
   await initFirebase();
-
   await FlutterFlowTheme.initialize();
-
   await FFLocalizations.initialize();
 
-  // Simplified error handling for debug mode to prevent blank pages
-  final originalErrorWidgetBuilder = ErrorWidget.builder;
+  // Industry-standard error handling
   ErrorWidget.builder = (FlutterErrorDetails details) {
-    // In debug mode, use default error handling to see actual errors
     if (kDebugMode) {
-      print('🐛 Debug Error: ${details.exceptionAsString()}');
-      return originalErrorWidgetBuilder(details);
+      return ErrorWidget(details.exception);
     }
-
-    // Only use custom error handling in release mode
-    try {
-      final match = RegExp(
-        r'The relevant error-causing widget was:\s+([a-zA-Z0-9]+)(.|\n)*When the exception was thrown, this was the stack:((.|\n)*)',
-      ).firstMatch(details.toString());
-      if (match == null) {
-        return originalErrorWidgetBuilder(details);
-      }
-      final widgetName = match.group(1);
-      final stackTrace = match.group(3)!;
-
-      final filteredStackTrace = <String>[];
-      var foundProjectTraces = false;
-      for (final line in stackTrace.split('\n')) {
-        if (line.startsWith('packages/signify/')) {
-          foundProjectTraces = true;
-        } else {
-          if (foundProjectTraces) {
-            filteredStackTrace.add('...');
-            break;
-          }
-        }
-        filteredStackTrace.add(line);
-      }
-
-      final result =
-          '''${details.exceptionAsString()}
-      
-The relevant error-causing widget was: $widgetName
-
-Stack trace: ${filteredStackTrace.join("\n")}''';
-
-      return ErrorWidget.withDetails(message: result);
-    } catch (_) {
-      return originalErrorWidgetBuilder(details);
-    }
+    return ErrorService.buildErrorWidget(
+      'Something went wrong. Please restart the app.',
+    );
   };
 
-  /// Optimized debounce cleanup - reduced frequency in debug mode to prevent conflicts
-  const cleanupDuration = kDebugMode
-      ? Duration(seconds: 10)
-      : Duration(seconds: 5);
-  Timer.periodic(cleanupDuration, (timer) {
-    EasyDebounce.cancel('508f3c74205c87928b71f49040062e732f9c20b0');
-  });
-
-  // Initialize Supabase for loading 3D ISL Animations with error recovery
-  await _initializeSupabaseWithRetry();
+  // Initialize Supabase with simplified error handling
+  await _initializeSupabase();
 
   runApp(const MyApp());
 }
 
-/// Initialize performance optimization services - disabled in debug mode
-Future<void> _initializePerformanceServices() async {
+/// Initialize Supabase with proper error handling
+Future<void> _initializeSupabase() async {
   try {
-    // In debug mode, use minimal performance services to avoid conflicts
-    if (kDebugMode) {
-      print('🔧 Debug mode: Using minimal performance optimization');
-      // Only initialize basic memory optimizer without aggressive monitoring
-      await MemoryOptimizer.instance.initialize();
-      return;
-    }
-
-    // Full performance optimization for release mode
-    // Initialize memory optimizer
-    await MemoryOptimizer.instance.initialize();
-
-    // Initialize cache manager
-    PerformanceCacheManager.instance.initialize();
-
-    // Initialize remaining optimizers (instant performance achieved with new system)
-    NetworkOptimizer.instance.initialize();
-    DatabaseOptimizer.instance.initialize();
-    BackgroundTaskOptimizer.instance.initialize();
-
-    print('🚀 Full performance services initialized for release mode');
+    await Supabase.initialize(
+      url: AppConfig.supabaseUrl,
+      anonKey: AppConfig.supabaseAnonKey,
+    );
+    print('✅ Supabase initialized successfully');
   } catch (e) {
-    print('⚠️ Error initializing performance services: $e');
+    print('❌ Failed to initialize Supabase: $e');
+    // Continue app initialization even if Supabase fails
   }
-}
-
-/// Initialize Supabase with error recovery
-Future<void> _initializeSupabaseWithRetry() async {
-  return ErrorRecoveryService.instance.handleWithRetry(
-    operationKey: 'supabase_init',
-    operation: () async {
-      await Supabase.initialize(
-        url: AppConfig.supabaseUrl,
-        anonKey: AppConfig.supabaseAnonKey,
-      );
-      print('✅ Supabase initialized successfully');
-    },
-    onError: (error) {
-      print('❌ Failed to initialize Supabase: $error');
-      AppStateManager.instance.setError('Failed to initialize services');
-    },
-    onMaxRetriesReached: () {
-      print('🚨 Critical: Supabase initialization failed after all retries');
-    },
-  );
 }
 
 class MyApp extends StatefulWidget {
@@ -225,22 +130,6 @@ class _MyAppState extends State<MyApp> {
   @override
   void dispose() {
     authUserSub.cancel();
-
-    // Only dispose performance services if they were initialized (release mode)
-    if (kReleaseMode) {
-      // Dispose all performance services in correct order
-      BackgroundTaskOptimizer.instance.dispose();
-      DatabaseOptimizer.instance.dispose();
-      NetworkOptimizer.instance.dispose();
-      PerformanceCacheManager.instance.dispose();
-    }
-
-    // Always dispose memory optimizer (minimal in debug mode)
-    MemoryOptimizer.instance.dispose();
-
-    // Dispose error recovery service
-    ErrorRecoveryService.instance.dispose();
-
     super.dispose();
   }
 

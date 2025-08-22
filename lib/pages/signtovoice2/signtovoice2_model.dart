@@ -11,7 +11,6 @@ import 'package:translator/translator.dart';
 
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/form_field_controller.dart';
-import '/services/performance_cache_manager.dart';
 import 'signtovoice2_widget.dart' show Signtovoice2Widget;
 
 class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
@@ -67,10 +66,6 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   double? get cameraAspectRatio {
     return _cameraController?.value.aspectRatio;
   }
-
-  // Cache manager for improved performance
-  final PerformanceCacheManager _cacheManager =
-      PerformanceCacheManager.instance;
 
   // Store coordinate data
   String _lastUpdateTime = '';
@@ -1058,9 +1053,6 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
       _predictionHistory.clear();
       _currentSentence.clear();
       // Landmark data already removed
-
-      // Dispose cache manager - use the performance cache manager
-      _cacheManager.clearAll();
 
       // Dispose camera
       _disposeActiveCamera();
