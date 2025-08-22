@@ -11,19 +11,29 @@ class ISLExtensionViewer {
         this.container = null;
         this.canvas = null;
         this.isInitialized = false;
+    this.defaultModelPath = null; // cached resolved default.glb path (remote preferred)
+    // When false, don't show looping default avatar in idle state; only show during actual word animations
+    this.enableIdleDefault = false;
+    // Caching & preloading
+    this.modelCache = new Map(); // key: resolved fullPath -> gltf
+    this.preloadPromises = new Map(); // key: resolved fullPath -> promise
+    this.lastPreloadTranscriptIndex = -1;
+    this.playbackSpeed = 1.25; // speed multiplier for animation to better sync with displayed words
 
-        // Available models - these paths will be resolved relative to the extension
-        this.availableModels = [
-            { name: 'default.glb', path: 'animation/default.glb' },
-            { name: 'baby.glb', path: 'animation/baby.glb' },
-            { name: 'book.glb', path: 'animation/book.glb' },
-            { name: 'boy.glb', path: 'animation/boy.glb' },
-            { name: 'cold.glb', path: 'animation/cold.glb' },
-            { name: 'drink.glb', path: 'animation/drink.glb' },
-            { name: 'happy.glb', path: 'animation/happy.glb' },
-            { name: 'teacher.glb', path: 'animation/teacher.glb' },
-            { name: 'work.glb', path: 'animation/work.glb' }
+        // Known models; actual URLs will be resolved from Supabase when configured,
+        // otherwise they fall back to local extension assets under animation/
+        this.knownModelNames = [
+            'default.glb',
+            // 'baby.glb',
+            // 'book.glb',
+            // 'boy.glb',
+            // 'cold.glb',
+            // 'drink.glb',
+            // 'happy.glb',
+            // 'teacher.glb',
+            // 'work.glb'
         ];
+        this.availableModels = [];
     }
 
     async createViewer() {
@@ -72,7 +82,10 @@ class ISLExtensionViewer {
         // Load Three.js if not already loaded
         await this.loadThreeJS();
         
-        // Initialize Three.js scene
+    // Resolve models from Supabase (if configured) before initializing the scene
+    await this.resolveAvailableModels();
+
+    // Initialize Three.js scene
         await this.initThreeJS();
         
         this.isInitialized = true;
@@ -143,14 +156,16 @@ class ISLExtensionViewer {
         
         console.log('Three.js scene initialized, loading initial model...');
         
-        try {
-            await this.loadInitialModel();
-            console.log('Initial model loaded successfully');
-        } catch (error) {
-            console.error('Failed to load initial model:', error);
-            const statusElem = document.getElementById('isl-viewer-status');
-            if (statusElem) {
-                statusElem.textContent = 'Ready (default model failed to load)';
+        if (this.enableIdleDefault) {
+            try {
+                await this.loadInitialModel();
+                console.log('Initial model loaded successfully');
+            } catch (error) {
+                console.error('Failed to load initial model:', error);
+                const statusElem = document.getElementById('isl-viewer-status');
+                if (statusElem) {
+                    statusElem.textContent = 'Ready (default model failed to load)';
+                }
             }
         }
         
@@ -173,10 +188,67 @@ class ISLExtensionViewer {
     }
 
     async loadInitialModel() {
-        const defaultModel = this.availableModels.find(m => m.name === 'default.glb');
-        if (defaultModel) {
-            await this.loadAndPlayAnimation(defaultModel.path, { loop: true });
+        // Ensure models are resolved at least once
+        if (!this.availableModels || this.availableModels.length === 0) {
+            await this.resolveAvailableModels();
         }
+        let defaultUrl = this.availableModels.find(m => m.name.toLowerCase() === 'default.glb')?.path;
+        if (!defaultUrl && window.SupabaseStorage && window.SupabaseStorage.isConfigured && window.SupabaseStorage.isConfigured()) {
+            try {
+                defaultUrl = await window.SupabaseStorage.getObjectURL('default.glb');
+                if (defaultUrl) {
+                    this.availableModels.push({ name: 'default.glb', path: defaultUrl });
+                }
+            } catch (_) {}
+        }
+        if (defaultUrl) {
+            this.defaultModelPath = defaultUrl;
+            await this.loadAndPlayAnimation(defaultUrl, { loop: true });
+        } else {
+            // Per request: allow local default.glb as a fallback for initial/idle state only
+            const localDefault = 'animation/default.glb';
+            console.log('Supabase default not available, falling back to local:', localDefault);
+            this.defaultModelPath = localDefault;
+            await this.loadAndPlayAnimation(localDefault, { loop: true });
+        }
+    }
+
+    async resolveAvailableModels() {
+        try {
+            if (window.SupabaseStorage) {
+                await window.SupabaseStorage.init();
+                if (window.SupabaseStorage.isConfigured()) {
+                    const remote = await window.SupabaseStorage.fetchAvailableModels();
+                    this.availableModels = Array.isArray(remote) ? remote : [];
+                    console.log('Available models resolved from Supabase:', this.availableModels);
+                    return;
+                }
+            }
+        } catch (e) {
+            console.warn('Supabase model resolution failed, no local fallback per configuration:', e);
+        }
+        // Supabase-only mode: do not populate local fallbacks
+        this.availableModels = [];
+    }
+
+    async getDefaultModelPath() {
+        if (this.defaultModelPath) return this.defaultModelPath;
+        // try to resolve again (in case initial resolution happened before Supabase init)
+        try {
+            if (window.SupabaseStorage && window.SupabaseStorage.isConfigured && window.SupabaseStorage.isConfigured()) {
+                const url = await window.SupabaseStorage.getObjectURL('default.glb');
+                if (url) {
+                    this.defaultModelPath = url;
+                    if (!this.availableModels.find(m => m.name.toLowerCase() === 'default.glb')) {
+                        this.availableModels.push({ name: 'default.glb', path: url });
+                    }
+                    return url;
+                }
+            }
+        } catch (_) {}
+        // local fallback
+        this.defaultModelPath = 'animation/default.glb';
+        return this.defaultModelPath;
     }
 
     async processSentence(sentence) {
@@ -189,12 +261,9 @@ class ISLExtensionViewer {
             const skippedWords = [];
 
             for (const word of words) {
-                const model = this.availableModels.find(m => m.name.toLowerCase() === `${word}.glb`);
-                if (model) {
-                    animationsToPlay.push({ word, path: model.path });
-                } else {
-                    skippedWords.push(word);
-                }
+                const res = await this.resolveWordModel(word);
+                if (res.fallback) skippedWords.push(word);
+                animationsToPlay.push({ word, path: res.path, fallback: res.fallback });
             }
 
             const statusElem = document.getElementById('isl-viewer-status');
@@ -205,17 +274,45 @@ class ISLExtensionViewer {
             }
 
             const skippedInfo = skippedWords.length > 0 ? `| Skipped: ${skippedWords.join(', ')}` : '';
+
+            // Preload all animations first to eliminate mid-sequence delays
+            const uniquePaths = [...new Set(animationsToPlay.map(a => a.path))];
+            let loadedCount = 0;
+            statusElem.textContent = `Preloading animations (0/${uniquePaths.length})...`;
+            await Promise.all(uniquePaths.map(async p => {
+                try {
+                    await this.preloadModel(p);
+                    loadedCount++;
+                    statusElem.textContent = `Preloading animations (${loadedCount}/${uniquePaths.length})...`;
+                } catch (e) {
+                    console.warn('[ISL][PRELOAD][FAIL]', p, e.message);
+                }
+            }));
+            statusElem.textContent = 'Starting sequence...';
             
             for (const [index, anim] of animationsToPlay.entries()) {
-                statusElem.textContent = `Playing: ${anim.word} (${index + 1}/${animationsToPlay.length}) ${skippedInfo}`;
-                await this.loadAndPlayAnimation(anim.path);
+                statusElem.textContent = `Playing: ${anim.word}${anim.fallback ? ' (default)' : ''} (${index + 1}/${animationsToPlay.length}) ${skippedInfo}`;
+                await this.loadAndPlayAnimation(anim.path, { crossFade: 0.25, useCache: true });
                 if (index < animationsToPlay.length - 1) {
                     await new Promise(r => setTimeout(r, 250));
+                    // Opportunistic preload of next+1 (already preloaded globally, but could have failed earlier)
+                    const nextAnim = animationsToPlay[index + 1];
+                    if (nextAnim) this.preloadModel(nextAnim.path).catch(()=>{});
                 }
             }
             
-            statusElem.textContent = 'Sequence complete. Ready for next input.';
-            await this.loadInitialModel();
+            statusElem.textContent = 'Sequence complete.';
+            if (this.enableIdleDefault) {
+                await this.loadInitialModel();
+            } else {
+                // Clear model after short pause to remove resting avatar
+                setTimeout(() => {
+                    if (this.currentModel && this.scene) {
+                        try { this.scene.remove(this.currentModel); } catch(_){}
+                        this.currentModel = null;
+                    }
+                }, 1200);
+            }
 
             // Notify popup of completion
             chrome.runtime.sendMessage({
@@ -278,31 +375,41 @@ class ISLExtensionViewer {
                     loadingElement.style.display = 'block';
                 }
 
-                // Clean up previous model
+                // Instead of removing immediately, fade out previous animation if desired (simple clear for now)
                 if (this.currentModel) {
-                    this.scene.remove(this.currentModel);
+                    try { this.scene.remove(this.currentModel); } catch(_){}
                     this.currentModel = null;
                 }
                 if (this.mixer) {
-                    this.mixer.stopAllAction();
+                    try { this.mixer.stopAllAction(); } catch(_){}
                     this.mixer = null;
                 }
 
-                // Convert relative path to extension URL
-                const fullPath = chrome.runtime.getURL(modelPath);
-                console.log('Loading model from:', fullPath);
+                // Use remote URLs directly; convert relative paths to extension URLs
+                let fullPath = modelPath;
+                let source = 'remote';
+                if (!/^https?:\/\//i.test(modelPath)) {
+                    fullPath = chrome.runtime.getURL(modelPath);
+                    source = 'local';
+                }
+                const fetchStart = (performance && performance.now) ? performance.now() : Date.now();
+                console.log(`[ISL][FETCH][START] src="${fullPath}" origin=${source}`);
 
-                const loader = new THREE.GLTFLoader();
-                
-                // Add timeout to the loader
-                const loadPromise = loader.loadAsync(fullPath);
-                const timeoutPromise = new Promise((_, reject) => {
-                    setTimeout(() => reject(new Error('Model loading timeout')), 15000);
-                });
-                
-                const gltf = await Promise.race([loadPromise, timeoutPromise]);
+                // Use cache / preload when available
+                let gltf = null;
+                if (options.useCache && this.modelCache.has(fullPath)) {
+                    gltf = this.modelCache.get(fullPath);
+                } else {
+                    gltf = await this.preloadModel(fullPath, { directPath: true });
+                }
                 this.currentModel = gltf.scene;
-                this.scene.add(this.currentModel);
+                if (this.scene && this.currentModel) {
+                    this.scene.add(this.currentModel);
+                } else {
+                    throw new Error('Scene not initialized for model add');
+                }
+                const fetchEnd = (performance && performance.now) ? performance.now() : Date.now();
+                console.log(`[ISL][FETCH][SUCCESS] src="${fullPath}" origin=${source} timeMs=${(fetchEnd - fetchStart).toFixed(1)} animations=${gltf.animations ? gltf.animations.length : 0}`);
 
                 this.currentModel.traverse(child => {
                     if (child.isMesh) {
@@ -318,32 +425,46 @@ class ISLExtensionViewer {
                 }
 
                 if (gltf.animations && gltf.animations.length > 0) {
+                    const prevMixer = this.mixer;
+                    const prevAction = this.previousAction;
                     this.mixer = new THREE.AnimationMixer(this.currentModel);
                     const clip = gltf.animations[0];
+                    console.log('Playing clip:', clip.name || '(unnamed)', 'duration(s)=', clip.duration);
                     const action = this.mixer.clipAction(clip);
-                    
+                    action.timeScale = this.playbackSpeed; // apply speed multiplier
                     if (options.loop) {
                         action.setLoop(THREE.LoopRepeat);
-                        action.play();
-                        console.log('Looping animation started for:', modelPath);
-                        resolve();
                     } else {
                         action.setLoop(THREE.LoopOnce);
                         action.clampWhenFinished = true;
-                        
-                        // Set up finished listener
-                        const onFinished = () => {
-                            this.mixer.removeEventListener('finished', onFinished);
-                            console.log('Animation finished for:', modelPath);
-                            resolve();
-                        };
+                    }
+                    // Cross-fade only if same mixer/root
+                    if (prevAction && prevMixer === this.mixer && options.crossFade) {
+                        prevAction.crossFadeTo(action, options.crossFade, false);
+                    } else {
+                        action.reset();
+                        action.enabled = true;
+                        action.weight = 1.0;
+                    }
+                    action.play();
+                    this.previousAction = action;
+                    if (prevMixer && prevMixer !== this.mixer) {
+                        try { prevMixer.stopAllAction(); } catch (_) {}
+                    }
+                    if (options.loop) {
+                        console.log('Looping animation started for:', modelPath);
+                        resolve();
+                    } else {
+                        const duration = (clip.duration / this.playbackSpeed) * 1000; // adjust wait based on speed
+                        let finished = false;
+                        const safeResolve = () => { if (!finished) { finished = true; resolve(); } };
+                        const onFinished = () => { finished = true; this.mixer.removeEventListener('finished', onFinished); console.log('Animation finished for:', modelPath); safeResolve(); };
                         this.mixer.addEventListener('finished', onFinished);
-                        
-                        action.play();
-                        console.log('Single animation started for:', modelPath);
+                        setTimeout(safeResolve, duration + 250);
+                        console.log('Single animation started for:', modelPath, 'duration(ms)=', duration);
                     }
                 } else {
-                    console.log('No animations found in model:', modelPath);
+                    console.log(`[ISL][FETCH][NO_ANIMATION] src="${fullPath}"`);
                     const statusElem = document.getElementById('isl-viewer-status');
                     if (statusElem) {
                         statusElem.textContent = 'Model loaded but no animations found.';
@@ -351,50 +472,124 @@ class ISLExtensionViewer {
                     setTimeout(resolve, 1000);
                 }
             } catch (error) {
-                console.error(`Failed to load model: ${modelPath}`, error);
+                console.error(`[ISL][FETCH][FAIL] src="${modelPath}" error=${error.message}`);
                 const loadingElement = document.getElementById('isl-viewer-loading');
                 if (loadingElement) {
                     loadingElement.style.display = 'none';
                 }
-                
+
                 const statusElem = document.getElementById('isl-viewer-status');
                 if (statusElem) {
                     statusElem.textContent = `Failed to load animation: ${error.message}`;
                 }
-                
                 reject(error);
             }
         });
     }
 
     centerModel() {
-        if (!this.currentModel) return;
-        
-        // Get the bounding box of the model
-        const box = new THREE.Box3().setFromObject(this.currentModel);
-        const center = box.getCenter(new THREE.Vector3());
-        const size = box.getSize(new THREE.Vector3());
-        
-        // Center the model horizontally
-        this.currentModel.position.x = -center.x;
-        this.currentModel.position.z = -center.z;
-        
-        // Position the model so knees are at the bottom of the frame
-        // Assume knees are at about 30% of the avatar height from the bottom
-        const kneeHeight = size.y * 0.3;
-        this.currentModel.position.y = -box.min.y - kneeHeight;
-        
-        // Scale the model to show from knee to head properly
-        // We want the knee-to-head portion (70% of avatar) to fill the frame
-        const visibleHeight = size.y * 0.7; // From knee to head
-        if (visibleHeight > 2.0) {
-            const scale = 2.0 / visibleHeight;
-            this.currentModel.scale.setScalar(scale);
+    if (!this.currentModel || !this.camera || !this.controls) return;
+
+    const box = new THREE.Box3().setFromObject(this.currentModel);
+    const size = box.getSize(new THREE.Vector3());
+    const center = box.getCenter(new THREE.Vector3());
+
+    // Re-center model at origin horizontally
+    this.currentModel.position.x = this.currentModel.position.x - center.x;
+    this.currentModel.position.z = this.currentModel.position.z - center.z;
+
+    // Desired framing parameters
+    const HEAD_ROOM = 0.03; // minimal headroom
+    const LOWER_CROP = 0.18; // include a bit more lower torso
+    const TARGET_SCREEN_HEIGHT = 3.1; // larger scale for near-fill
+
+    // Raw height
+    const fullHeight = size.y || 1;
+    const scale = TARGET_SCREEN_HEIGHT / (fullHeight * (1 - LOWER_CROP - HEAD_ROOM));
+    this.currentModel.scale.setScalar(scale);
+
+    // Recompute box after scale for precise positioning
+    const scaledBox = new THREE.Box3().setFromObject(this.currentModel);
+    const scaledSize = scaledBox.getSize(new THREE.Vector3());
+    const scaledMin = scaledBox.min;
+    const scaledMax = scaledBox.max;
+
+    // Position so that the LOWER_CROP point (e.g., upper thighs) sits near y=0
+    const targetLowerY = scaledMin.y + scaledSize.y * LOWER_CROP;
+    this.currentModel.position.y -= targetLowerY; // shift so that lower crop aligns with ground plane
+
+    // Compute camera distance from bounding sphere to fit height comfortably
+    const sphere = new THREE.Sphere();
+    scaledBox.getBoundingSphere(sphere);
+    const fov = this.camera.fov * (Math.PI / 180);
+    // distance = radius / sin(fov/2); but we want vertical fit: use height/ (2*tan(fov/2))
+    const desiredHalfHeight = (scaledSize.y * (1 - LOWER_CROP + HEAD_ROOM)) / 2;
+    const distance = desiredHalfHeight / Math.tan(fov / 2) * 1.05; // small padding
+    this.camera.position.set(0.15, scaledSize.y * 0.62, distance * 0.82); // slight horizontal offset + closer
+    this.camera.near = Math.max(0.01, distance * 0.1);
+    this.camera.far = distance * 10;
+    this.camera.updateProjectionMatrix();
+
+    // Aim controls target at chest/hands zone (~40% of height above lower crop)
+    this.controls.target.set(0.05, scaledSize.y * (LOWER_CROP + 0.47), 0);
+    this.controls.update();
+    }
+
+    async resolveWordModel(word) {
+        const fnameLower = `${word}.glb`;
+        const fnameTitle = `${word.charAt(0).toUpperCase()}${word.slice(1)}.glb`;
+        let model = this.availableModels.find(m => m.name.toLowerCase() === fnameLower.toLowerCase());
+        if (!model && window.SupabaseStorage && window.SupabaseStorage.isConfigured && window.SupabaseStorage.isConfigured()) {
+            try {
+                let url = await window.SupabaseStorage.getObjectURL(fnameLower);
+                if (!url) url = await window.SupabaseStorage.getObjectURL(fnameTitle);
+                if (url) {
+                    const pickedName = url.includes(fnameTitle) ? fnameTitle : fnameLower;
+                    model = { name: pickedName, path: url };
+                    this.availableModels.push(model);
+                    console.log(`[ISL][RESOLVE] word="${word}" status=FOUND url=${url}`);
+                }
+            } catch (e) {
+                console.warn('[ISL][RESOLVE][ERR]', word, e.message);
+            }
         }
-        
-        // Focus camera on upper torso/chest level for sign language gestures
-        this.controls.target.set(0, size.y * 0.4, 0);
-        this.controls.update();
+        if (model) return { path: model.path, fallback: false };
+        const fallbackPath = await this.getDefaultModelPath();
+        console.log(`[ISL][RESOLVE] word="${word}" status=MISS usingDefault path=${fallbackPath}`);
+        return { path: fallbackPath, fallback: true };
+    }
+
+    async preloadModel(path, { directPath = false } = {}) {
+        // Accept already-resolved full paths or relative model paths
+        let fullPath = path;
+        if (!directPath && !/^https?:\/\//i.test(path)) {
+            fullPath = chrome.runtime.getURL(path);
+        }
+        if (this.modelCache.has(fullPath)) return this.modelCache.get(fullPath);
+        if (this.preloadPromises.has(fullPath)) return this.preloadPromises.get(fullPath);
+        const promise = (async () => {
+            // Ensure THREE ready
+            for (let i=0;i<100;i++) {
+                if (window.THREE && window.THREE.GLTFLoader) break;
+                await new Promise(r=>setTimeout(r,50));
+            }
+            console.log(`[ISL][PRELOAD][START] ${fullPath}`);
+            const loader = new THREE.GLTFLoader();
+            if (typeof loader.setCrossOrigin === 'function') loader.setCrossOrigin('anonymous');
+            try {
+                const gltf = await loader.loadAsync(fullPath);
+                this.modelCache.set(fullPath, gltf);
+                console.log(`[ISL][PRELOAD][SUCCESS] ${fullPath}`);
+                return gltf;
+            } catch (e) {
+                console.warn(`[ISL][PRELOAD][FAIL] ${fullPath} ${e.message}`);
+                throw e;
+            } finally {
+                this.preloadPromises.delete(fullPath);
+            }
+        })();
+        this.preloadPromises.set(fullPath, promise);
+        return promise;
     }
 
     animate() {
@@ -540,14 +735,36 @@ function syncWithVideo(video) {
             updateCurrentWord(word.originalText);
             // Play ISL animation for the word
             if (islViewer && word.word) {
-                const model = islViewer.availableModels.find(m => 
-                    m.name.toLowerCase() === `${word.word}.glb`
-                );
-                if (model) {
-                    islViewer.loadAndPlayAnimation(model.path).catch(err => {
-                        console.log('Animation not found for word:', word.word);
-                    });
-                }
+                const fnameLower = `${word.word}.glb`;
+                const fnameTitle = `${word.word.charAt(0).toUpperCase()}${word.word.slice(1)}.glb`;
+                let model = islViewer.availableModels.find(m => m.name.toLowerCase() === fnameLower.toLowerCase());
+                const tryPlay = async () => {
+                    if (model) {
+                        await islViewer.loadAndPlayAnimation(model.path);
+                        return true;
+                    }
+                    // Resolve from Supabase on demand
+                    if (window.SupabaseStorage && window.SupabaseStorage.isConfigured && window.SupabaseStorage.isConfigured()) {
+                        try {
+                            console.log('[Supabase][YouTube] Resolving model for', word.word, 'trying', fnameLower, 'then', fnameTitle);
+                            let url = await window.SupabaseStorage.getObjectURL(fnameLower);
+                            if (!url) url = await window.SupabaseStorage.getObjectURL(fnameTitle);
+                            if (url) {
+                                const pickedName = url.includes(fnameTitle) ? fnameTitle : fnameLower;
+                                model = { name: pickedName, path: url };
+                                islViewer.availableModels.push(model);
+                                await islViewer.loadAndPlayAnimation(url);
+                                return true;
+                            }
+                        } catch (_) {}
+                    }
+                    return false;
+                };
+                tryPlay().catch(async () => {
+                    console.log('[ISL][YouTube] Animation not found, using default for word:', word.word);
+                    const fallback = await islViewer.getDefaultModelPath();
+                    await islViewer.loadAndPlayAnimation(fallback, { crossFade: 0.25 });
+                });
             }
         }
     }, 100);
