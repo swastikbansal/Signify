@@ -89,9 +89,9 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   List<String> get sentenceWords => List.from(_currentSentence);
 
   // API related state
-  String _apiUrl = 'http://192.168.29.42:5000/process_frame';
+  // String _apiUrl = 'http://192.168.29.42:5000/process_frame';
+  String _apiUrl = 'https://philosia-codecult-signify.hf.space/process_frame';
 
-  // String _apiUrl = 'https://swastikbansal-signify.hf.space/process_frame';
   bool _isApiEnabled = true;
   int _lastApiCallTime = 0;
   static const int _apiCallInterval = 100; //ms
@@ -211,7 +211,8 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
         // Don't change the toggle state - keep TTS enabled if it was enabled
         _notifyStateChange();
         print(
-            "TTS: Speech completed - TTS remains ${_ttsToggleState ? 'ON' : 'OFF'}");
+          "TTS: Speech completed - TTS remains ${_ttsToggleState ? 'ON' : 'OFF'}",
+        );
       });
 
       _flutterTts!.setErrorHandler((msg) {
@@ -406,14 +407,18 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
       String translateLangCode =
           _languageCodeMapping[targetLanguage] ?? targetLanguage;
       if (translateLangCode.contains('-')) {
-        translateLangCode =
-            translateLangCode.split('-')[0]; // Extract base language code
+        translateLangCode = translateLangCode.split(
+          '-',
+        )[0]; // Extract base language code
       }
 
       print("Translating '$text' to language: $translateLangCode");
 
-      var translation =
-          await _translator.translate(text, from: 'en', to: translateLangCode);
+      var translation = await _translator.translate(
+        text,
+        from: 'en',
+        to: translateLangCode,
+      );
 
       String translatedText = translation.text;
       print("Translation result: '$translatedText'");
@@ -445,8 +450,10 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
 
     try {
       String currentText = _currentSentence.join(' ');
-      String translatedText =
-          await translateText(currentText, _selectedLanguage);
+      String translatedText = await translateText(
+        currentText,
+        _selectedLanguage,
+      );
 
       if (translatedText != currentText && textController != null) {
         textController!.text = translatedText;
@@ -473,8 +480,10 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
         _selectedLanguage != 'en-US' &&
         _selectedLanguage != 'en-GB') {
       try {
-        translatedText =
-            await translateText(currentSentenceText, _selectedLanguage);
+        translatedText = await translateText(
+          currentSentenceText,
+          _selectedLanguage,
+        );
       } catch (e) {
         print('Translation error: $e');
         translatedText = currentSentenceText; // Fall back to original text
@@ -531,8 +540,10 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
           _selectedLanguage != 'en-GB' &&
           currentSentenceText.isNotEmpty) {
         try {
-          translatedText =
-              await translateText(currentSentenceText, _selectedLanguage);
+          translatedText = await translateText(
+            currentSentenceText,
+            _selectedLanguage,
+          );
         } catch (e) {
           print('Translation error: $e');
           translatedText = currentSentenceText; // Fall back to original text
@@ -606,7 +617,8 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
       // Encode to JPEG with consistent quality
       final jpegBytes = img.encodeJpg(convertedImage, quality: _jpegQuality);
       print(
-          'JPEG encoded: ${jpegBytes.length} bytes (${convertedImage.width}x${convertedImage.height}) q=$_jpegQuality');
+        'JPEG encoded: ${jpegBytes.length} bytes (${convertedImage.width}x${convertedImage.height}) q=$_jpegQuality',
+      );
       return Uint8List.fromList(jpegBytes);
     } catch (e) {
       print('Error converting camera image to JPEG: $e');
@@ -703,8 +715,9 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
       http.StreamedResponse response;
       final sendStart = DateTime.now();
       try {
-        response =
-            await _httpClient.send(request).timeout(const Duration(seconds: 2));
+        response = await _httpClient
+            .send(request)
+            .timeout(const Duration(seconds: 2));
       } on TimeoutException catch (_) {
         print('Frame API call timed out after 2s');
         _errorMessage = 'API timeout';
@@ -715,7 +728,8 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
       final elapsed = DateTime.now().difference(sendStart).inMilliseconds;
       final responseString = await response.stream.bytesToString();
       print(
-          'API responded in ${elapsed}ms status=${response.statusCode} len=${responseString.length}');
+        'API responded in ${elapsed}ms status=${response.statusCode} len=${responseString.length}',
+      );
 
       if (response.statusCode == 200) {
         print('Frame API call successful: $responseString');
@@ -800,14 +814,16 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   void setApiEnabled(bool enabled) {
     _isApiEnabled = enabled;
     print(
-        'API prediction ${enabled ? 'enabled' : 'disabled'} - using ${enabled ? 'remote' : 'local'} prediction');
+      'API prediction ${enabled ? 'enabled' : 'disabled'} - using ${enabled ? 'remote' : 'local'} prediction',
+    );
   }
 
   // Method to toggle between API-based and local prediction
   void togglePredictionMode() {
     _isApiEnabled = !_isApiEnabled;
     print(
-        'Switched to ${_isApiEnabled ? 'API-based' : 'local'} prediction mode');
+      'Switched to ${_isApiEnabled ? 'API-based' : 'local'} prediction mode',
+    );
     _notifyStateChange();
   }
 
@@ -892,11 +908,13 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
         _isCameraInitialized = true;
         _notifyStateChange();
         print(
-            'Medium-quality camera initialized successfully: ${_cameraController!.description.name}');
+          'Medium-quality camera initialized successfully: ${_cameraController!.description.name}',
+        );
         print('Camera is front: $isFrontCamera');
         print('Camera resolution: ${_cameraController!.value.previewSize}');
         print(
-            'Camera aspect ratio: ${cameraAspectRatio?.toStringAsFixed(3) ?? "Unknown"}');
+          'Camera aspect ratio: ${cameraAspectRatio?.toStringAsFixed(3) ?? "Unknown"}',
+        );
         print('Image format: ${ImageFormatGroup.bgra8888}');
         print('Resolution preset: Medium');
       }
@@ -928,7 +946,8 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
         // Debug logging (only occasionally to avoid spam)
         if (DateTime.now().millisecondsSinceEpoch % 1000 < 100) {
           print(
-              'Processing camera image: ${image.width}x${image.height}, format: ${image.format.group.name}, planes: ${image.planes.length}');
+            'Processing camera image: ${image.width}x${image.height}, format: ${image.format.group.name}, planes: ${image.planes.length}',
+          );
         }
 
         // Send frame to API for prediction instead of local processing
@@ -948,7 +967,8 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
       // Debug why processing is not happening
       if (DateTime.now().millisecondsSinceEpoch % 2000 < 100) {
         print(
-            'Not processing image - isDetecting: $_isDetecting, isInitialized: $_isInitialized, isProcessing: $_isProcessingFrame');
+          'Not processing image - isDetecting: $_isDetecting, isInitialized: $_isInitialized, isProcessing: $_isProcessingFrame',
+        );
       }
     }
   }
@@ -1000,7 +1020,8 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
           _isInitialized = true; // Add this line to set initialized to true
           print('Detection started - API-based processing');
           print(
-              'Detection initialized: $_isInitialized, detecting: $_isDetecting');
+            'Detection initialized: $_isInitialized, detecting: $_isDetecting',
+          );
         } catch (e) {
           _errorMessage = 'Start detection error: $e';
           _isDetecting = false;
@@ -1058,37 +1079,34 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
 
   @override
   WidgetClassDebugData toWidgetClassDebugData() => WidgetClassDebugData(
-        widgetStates: {
-          'dropDownValue': debugSerializeParam(
-            dropDownValue,
-            ParamType.String,
-            link:
-                'https://app.flutterflow.io/project/signify-hq88od?tab=uiBuilder&page=signtovoice2',
-            name: 'String',
-            nullable: true,
-          ),
-          'textFieldText': debugSerializeParam(
-            textController?.text,
-            ParamType.String,
-            link:
-                'https://app.flutterflow.io/project/signify-hq88od?tab=uiBuilder&page=signtovoice2',
-            name: 'String',
-            nullable: true,
-          )
-        },
-        generatorVariables: debugGeneratorVariables,
-        backendQueries: debugBackendQueries,
-        componentStates: {
-          ...widgetBuilderComponents.map(
-            (key, value) => MapEntry(
-              key,
-              value.toWidgetClassDebugData(),
-            ),
-          ),
-        }.withoutNulls,
+    widgetStates: {
+      'dropDownValue': debugSerializeParam(
+        dropDownValue,
+        ParamType.String,
         link:
-            'https://app.flutterflow.io/project/signify-hq88od/tab=uiBuilder&page=signtovoice2',
-        searchReference: 'reference=OgxzaWdudG92b2ljZTJQAVoMc2lnbnRvdm9pY2Uy',
-        widgetClassName: 'signtovoice2',
-      );
+            'https://app.flutterflow.io/project/signify-hq88od?tab=uiBuilder&page=signtovoice2',
+        name: 'String',
+        nullable: true,
+      ),
+      'textFieldText': debugSerializeParam(
+        textController?.text,
+        ParamType.String,
+        link:
+            'https://app.flutterflow.io/project/signify-hq88od?tab=uiBuilder&page=signtovoice2',
+        name: 'String',
+        nullable: true,
+      ),
+    },
+    generatorVariables: debugGeneratorVariables,
+    backendQueries: debugBackendQueries,
+    componentStates: {
+      ...widgetBuilderComponents.map(
+        (key, value) => MapEntry(key, value.toWidgetClassDebugData()),
+      ),
+    }.withoutNulls,
+    link:
+        'https://app.flutterflow.io/project/signify-hq88od/tab=uiBuilder&page=signtovoice2',
+    searchReference: 'reference=OgxzaWdudG92b2ljZTJQAVoMc2lnbnRvdm9pY2Uy',
+    widgetClassName: 'signtovoice2',
+  );
 }
