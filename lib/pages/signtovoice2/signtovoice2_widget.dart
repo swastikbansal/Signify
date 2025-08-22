@@ -268,45 +268,67 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(16.0),
                 child: BackdropFilter(
-                  filter: ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                  filter: ui.ImageFilter.blur(
+                    sigmaX: 15.0,
+                    sigmaY: 15.0,
+                  ), // Enhanced blur for better GROK-like effect
                   child: Container(
                     decoration: BoxDecoration(
-                      // Acrylic glass effect with transparency like Windows/Grok AI
-                      color: FlutterFlowTheme.of(
-                        context,
-                      ).secondaryBackground.withOpacity(0.90),
-                      borderRadius: BorderRadius.circular(16.0),
-                      border: Border.all(
-                        // Subtle glass-like border with opacity
-                        color: FlutterFlowTheme.of(
-                          context,
-                        ).alternate.withOpacity(0.6),
-                        width: 1.0,
-                      ),
+                      // GROK app-style glassmorphism with theme-adaptive colors for dark/light mode
                       gradient: LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
-                          // Modern glassmorphism gradient
+                          // Perfect transparency levels using theme colors for dark/light mode
+                          FlutterFlowTheme.of(context).secondaryBackground
+                              .withOpacity(0.85), // Top-left highlight
                           FlutterFlowTheme.of(
                             context,
-                          ).secondaryBackground.withOpacity(0.9),
-                          FlutterFlowTheme.of(
-                            context,
-                          ).secondaryBackground.withOpacity(0.7),
+                          ).secondaryBackground.withOpacity(0.75), // Center
+                          FlutterFlowTheme.of(context).secondaryBackground
+                              .withOpacity(0.65), // Bottom-right shadow
+                          FlutterFlowTheme.of(context).secondaryBackground
+                              .withOpacity(0.55), // Bottom edge fade
                         ],
+                        stops: const [0.0, 0.3, 0.7, 1.0],
+                      ),
+                      borderRadius: BorderRadius.circular(
+                        20.0,
+                      ), // More modern rounded corners
+                      border: Border.all(
+                        // Theme-adaptive border for dark/light mode compatibility
+                        color: FlutterFlowTheme.of(
+                          context,
+                        ).alternate.withOpacity(0.6),
+                        width: 1.5, // Slightly thicker for better definition
                       ),
                       boxShadow: [
+                        // Multi-layered shadows for realistic depth like GROK app
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 20,
-                          offset: const Offset(0, 8),
-                          spreadRadius: -2,
+                          color: Colors.black.withOpacity(0.12),
+                          blurRadius: 32,
+                          offset: const Offset(0, 10),
+                          spreadRadius: -4,
                         ),
                         BoxShadow(
-                          color: Colors.white.withOpacity(0.05),
-                          blurRadius: 6,
-                          offset: const Offset(0, -1),
+                          color: Colors.black.withOpacity(0.06),
+                          blurRadius: 16,
+                          offset: const Offset(0, 4),
+                          spreadRadius: -2,
+                        ),
+                        // Inner glow for glass edge effect
+                        BoxShadow(
+                          color: Colors.white.withOpacity(0.15),
+                          blurRadius: 8,
+                          offset: const Offset(0, -2),
+                          spreadRadius: -1,
+                        ),
+                        // Subtle ambient shadow
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.04),
+                          blurRadius: 64,
+                          offset: const Offset(0, 20),
+                          spreadRadius: -8,
                         ),
                       ],
                     ),
@@ -496,7 +518,7 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                                           }
                                         },
                                         width: 120.0,
-                                        height: 36.0,
+                                        height: 40.0,
                                       ),
                                     ),
                                   ),
@@ -534,29 +556,108 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                                       ),
                                       preferBelow: false,
                                       showDuration: const Duration(seconds: 2),
-                                      child: Material(
-                                        color: Colors.transparent,
-                                        child: InkWell(
-                                          borderRadius: BorderRadius.circular(
-                                            8.0,
-                                          ),
-                                          onTap: () async {
-                                            await _model.toggleTts();
-                                            safeSetState(() {});
-                                          },
-                                          child: SizedBox(
-                                            width: 42.0,
-                                            height: 42.0,
-                                            child: Icon(
-                                              _model.ttsToggleState
-                                                  ? Icons.volume_up_rounded
-                                                  : Icons.volume_off_rounded,
-                                              color: _model.ttsToggleState
-                                                  ? const Color(0xFFFAB317)
-                                                  : FlutterFlowTheme.of(
-                                                      context,
-                                                    ).secondaryText,
-                                              size: 24.0,
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(
+                                          20.0,
+                                        ), // Perfect circle
+                                        child: BackdropFilter(
+                                          filter: ui.ImageFilter.blur(
+                                            sigmaX: 15.0,
+                                            sigmaY: 15.0,
+                                          ), // Enhanced blur matching dropdown
+                                          child: GestureDetector(
+                                            onTap: () async {
+                                              await _model.toggleTts();
+                                              safeSetState(() {});
+                                            },
+                                            child: Container(
+                                              width: 40.0,
+                                              height: 40.0,
+                                              decoration: BoxDecoration(
+                                                // GROK app-style glassmorphism with theme-adaptive colors
+                                                gradient: LinearGradient(
+                                                  begin: Alignment.topLeft,
+                                                  end: Alignment.bottomRight,
+                                                  colors: [
+                                                    FlutterFlowTheme.of(context)
+                                                        .alternate
+                                                        .withOpacity(0.80),
+                                                    FlutterFlowTheme.of(context)
+                                                        .alternate
+                                                        .withOpacity(0.70),
+                                                    FlutterFlowTheme.of(context)
+                                                        .alternate
+                                                        .withOpacity(0.60),
+                                                    FlutterFlowTheme.of(context)
+                                                        .alternate
+                                                        .withOpacity(0.50),
+                                                  ],
+                                                  stops: const [
+                                                    0.0,
+                                                    0.3,
+                                                    0.7,
+                                                    1.0,
+                                                  ],
+                                                ),
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                      20.0,
+                                                    ), // Perfect circle
+                                                border: Border.all(
+                                                  color: FlutterFlowTheme.of(
+                                                    context,
+                                                  ).alternate.withOpacity(0.6),
+                                                  width: 1.2,
+                                                ),
+                                                boxShadow: [
+                                                  // Multi-layered shadows matching dropdown
+                                                  BoxShadow(
+                                                    color: Colors.black
+                                                        .withOpacity(0.12),
+                                                    blurRadius: 16,
+                                                    offset: const Offset(0, 4),
+                                                    spreadRadius: -3,
+                                                  ),
+                                                  BoxShadow(
+                                                    color: Colors.black
+                                                        .withOpacity(0.05),
+                                                    blurRadius: 8,
+                                                    offset: const Offset(0, 2),
+                                                    spreadRadius: -1,
+                                                  ),
+                                                  // Inner glow for glass edge effect
+                                                  BoxShadow(
+                                                    color: Colors.white
+                                                        .withOpacity(0.10),
+                                                    blurRadius: 6,
+                                                    offset: const Offset(0, -1),
+                                                    spreadRadius: -1,
+                                                  ),
+                                                  // Subtle ambient shadow
+                                                  BoxShadow(
+                                                    color: Colors.black
+                                                        .withOpacity(0.04),
+                                                    blurRadius: 24,
+                                                    offset: const Offset(0, 8),
+                                                    spreadRadius: -4,
+                                                  ),
+                                                ],
+                                              ),
+                                              child: Center(
+                                                child: Icon(
+                                                  _model.ttsToggleState
+                                                      ? Icons.volume_up_rounded
+                                                      : Icons
+                                                            .volume_off_rounded,
+                                                  color: _model.ttsToggleState
+                                                      ? const Color(0xFFFAB317)
+                                                      : FlutterFlowTheme.of(
+                                                          context,
+                                                        ).secondaryText,
+                                                  size:
+                                                      20.0, // Slightly smaller to fit better in circle
+                                                ),
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -566,7 +667,7 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
 
                                   const Spacer(),
 
-                                  // Camera toggle button (no border)
+                                  // Camera toggle button
                                   Container(
                                     // margin: const EdgeInsets.only(right: 4.0),
                                     child: Tooltip(
@@ -599,29 +700,108 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                                       ),
                                       preferBelow: false,
                                       showDuration: const Duration(seconds: 2),
-                                      child: Material(
-                                        color: Colors.transparent,
-                                        child: InkWell(
-                                          borderRadius: BorderRadius.circular(
-                                            8.0,
-                                          ),
-                                          onTap: () async {
-                                            await _model.toggleDetection();
-                                            safeSetState(() {});
-                                          },
-                                          child: SizedBox(
-                                            width: 42.0,
-                                            height: 42.0,
-                                            child: Icon(
-                                              _model.isDetecting
-                                                  ? Icons.stop_rounded
-                                                  : Icons.camera_alt_rounded,
-                                              color: _model.isDetecting
-                                                  ? const Color(0xFFFAB317)
-                                                  : FlutterFlowTheme.of(
-                                                      context,
-                                                    ).secondaryText,
-                                              size: 24.0,
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(
+                                          20.0,
+                                        ), // Perfect circle
+                                        child: BackdropFilter(
+                                          filter: ui.ImageFilter.blur(
+                                            sigmaX: 15.0,
+                                            sigmaY: 15.0,
+                                          ), // Enhanced blur matching dropdown
+                                          child: GestureDetector(
+                                            onTap: () async {
+                                              await _model.toggleDetection();
+                                              safeSetState(() {});
+                                            },
+                                            child: Container(
+                                              width: 40.0,
+                                              height: 40.0,
+                                              decoration: BoxDecoration(
+                                                // GROK app-style glassmorphism with theme-adaptive colors
+                                                gradient: LinearGradient(
+                                                  begin: Alignment.topLeft,
+                                                  end: Alignment.bottomRight,
+                                                  colors: [
+                                                    FlutterFlowTheme.of(context)
+                                                        .alternate
+                                                        .withOpacity(0.80),
+                                                    FlutterFlowTheme.of(context)
+                                                        .alternate
+                                                        .withOpacity(0.70),
+                                                    FlutterFlowTheme.of(context)
+                                                        .alternate
+                                                        .withOpacity(0.60),
+                                                    FlutterFlowTheme.of(context)
+                                                        .alternate
+                                                        .withOpacity(0.50),
+                                                  ],
+                                                  stops: const [
+                                                    0.0,
+                                                    0.3,
+                                                    0.7,
+                                                    1.0,
+                                                  ],
+                                                ),
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                      20.0,
+                                                    ), // Perfect circle
+                                                border: Border.all(
+                                                  color: FlutterFlowTheme.of(
+                                                    context,
+                                                  ).alternate.withOpacity(0.6),
+                                                  width: 1.2,
+                                                ),
+                                                boxShadow: [
+                                                  // Multi-layered shadows matching dropdown
+                                                  BoxShadow(
+                                                    color: Colors.black
+                                                        .withOpacity(0.12),
+                                                    blurRadius: 16,
+                                                    offset: const Offset(0, 4),
+                                                    spreadRadius: -3,
+                                                  ),
+                                                  BoxShadow(
+                                                    color: Colors.black
+                                                        .withOpacity(0.05),
+                                                    blurRadius: 8,
+                                                    offset: const Offset(0, 2),
+                                                    spreadRadius: -1,
+                                                  ),
+                                                  // Inner glow for glass edge effect
+                                                  BoxShadow(
+                                                    color: Colors.white
+                                                        .withOpacity(0.10),
+                                                    blurRadius: 6,
+                                                    offset: const Offset(0, -1),
+                                                    spreadRadius: -1,
+                                                  ),
+                                                  // Subtle ambient shadow
+                                                  BoxShadow(
+                                                    color: Colors.black
+                                                        .withOpacity(0.04),
+                                                    blurRadius: 24,
+                                                    offset: const Offset(0, 8),
+                                                    spreadRadius: -4,
+                                                  ),
+                                                ],
+                                              ),
+                                              child: Center(
+                                                child: Icon(
+                                                  _model.isDetecting
+                                                      ? Icons.stop_rounded
+                                                      : Icons
+                                                            .camera_alt_rounded,
+                                                  color: _model.isDetecting
+                                                      ? const Color(0xFFFAB317)
+                                                      : FlutterFlowTheme.of(
+                                                          context,
+                                                        ).secondaryText,
+                                                  size:
+                                                      20.0, // Slightly smaller to fit better in circle
+                                                ),
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -875,52 +1055,78 @@ class _ModernDropDownState extends State<ModernDropDown>
         child: ClipRRect(
           borderRadius: BorderRadius.circular(12),
           child: BackdropFilter(
-            filter: ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+            filter: ui.ImageFilter.blur(
+              sigmaX: 15.0,
+              sigmaY: 15.0,
+            ), // Enhanced blur matching main container
             child: Material(
               elevation: 0,
-              // Remove elevation since we have acrylic effect
-              borderRadius: BorderRadius.circular(12),
+              // Remove elevation since we have enhanced glassmorphism
+              borderRadius: BorderRadius.circular(
+                16,
+              ), // Consistent with main container
               color: Colors.transparent,
               child: Container(
                 constraints: const BoxConstraints(
                   maxHeight: 200, // Scrollable if more than 5 items (40 each)
                 ),
                 decoration: BoxDecoration(
-                  // Acrylic glass effect matching the main container
-                  color: FlutterFlowTheme.of(
-                    context,
-                  ).secondaryBackground.withOpacity(0.88),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: FlutterFlowTheme.of(
-                      context,
-                    ).alternate.withOpacity(0.4),
-                    width: 1,
-                  ),
+                  // GROK app-style glassmorphism with theme-adaptive colors for dark/light mode
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      // Glassmorphism gradient for dropdown
+                      // Perfect transparency levels using theme colors for dark/light mode
+                      FlutterFlowTheme.of(context).secondaryBackground
+                          .withOpacity(0.80), // Top-left highlight
                       FlutterFlowTheme.of(
                         context,
-                      ).secondaryBackground.withOpacity(0.90),
-                      FlutterFlowTheme.of(
-                        context,
-                      ).secondaryBackground.withOpacity(0.80),
+                      ).secondaryBackground.withOpacity(0.70), // Center
+                      FlutterFlowTheme.of(context).secondaryBackground
+                          .withOpacity(0.60), // Bottom-right shadow
+                      FlutterFlowTheme.of(context).secondaryBackground
+                          .withOpacity(0.50), // Bottom edge fade
                     ],
+                    stops: const [0.0, 0.3, 0.7, 1.0],
+                  ),
+                  borderRadius: BorderRadius.circular(
+                    16,
+                  ), // Consistent rounded corners
+                  border: Border.all(
+                    // Theme-adaptive border for dark/light mode compatibility
+                    color: FlutterFlowTheme.of(
+                      context,
+                    ).alternate.withOpacity(0.5),
+                    width:
+                        1.2, // Slightly thinner for dropdown but still defined
                   ),
                   boxShadow: [
+                    // Multi-layered shadows matching main container depth
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.12),
-                      blurRadius: 20,
-                      offset: const Offset(0, 6),
-                      spreadRadius: -2,
+                      color: Colors.black.withOpacity(0.15),
+                      blurRadius: 28,
+                      offset: const Offset(0, 8),
+                      spreadRadius: -3,
                     ),
                     BoxShadow(
-                      color: Colors.white.withOpacity(0.05),
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 14,
+                      offset: const Offset(0, 4),
+                      spreadRadius: -1,
+                    ),
+                    // Inner glow for glass edge effect
+                    BoxShadow(
+                      color: Colors.white.withOpacity(0.12),
                       blurRadius: 6,
                       offset: const Offset(0, -1),
+                      spreadRadius: -1,
+                    ),
+                    // Subtle ambient shadow
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 40,
+                      offset: const Offset(0, 12),
+                      spreadRadius: -6,
                     ),
                   ],
                 ),
@@ -934,7 +1140,9 @@ class _ModernDropDownState extends State<ModernDropDown>
                       itemCount: widget.options.length,
                       separatorBuilder: (context, index) => Divider(
                         height: 1,
-                        color: FlutterFlowTheme.of(context).alternate,
+                        color: FlutterFlowTheme.of(
+                          context,
+                        ).alternate.withOpacity(0.8), // Theme-adaptive divider
                       ),
                       itemBuilder: (context, index) {
                         final option = widget.options[index];
@@ -950,18 +1158,24 @@ class _ModernDropDownState extends State<ModernDropDown>
                             height: 40,
                             padding: const EdgeInsets.symmetric(horizontal: 12),
                             decoration: BoxDecoration(
-                              // Subtle acrylic highlight for selected item
+                              // Enhanced glassmorphic highlight for selected item with theme colors
                               color: isSelected
                                   ? FlutterFlowTheme.of(
                                       context,
-                                    ).primary.withOpacity(0.08)
+                                    ).alternate.withOpacity(
+                                      0.4,
+                                    ) // Theme-adaptive highlight
                                   : Colors.transparent,
-                              borderRadius: BorderRadius.circular(6),
+                              borderRadius: BorderRadius.circular(
+                                8,
+                              ), // Slightly more rounded
                               border: isSelected
                                   ? Border.all(
-                                      color: FlutterFlowTheme.of(
-                                        context,
-                                      ).primary.withOpacity(0.2),
+                                      color: FlutterFlowTheme.of(context)
+                                          .alternate
+                                          .withOpacity(
+                                            0.6,
+                                          ), // Theme-adaptive border
                                       width: 1,
                                     )
                                   : null,
@@ -1035,52 +1249,91 @@ class _ModernDropDownState extends State<ModernDropDown>
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(10.0),
+      borderRadius: BorderRadius.circular(
+        12.0,
+      ), // Consistent with updated design
       child: BackdropFilter(
-        filter: ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+        filter: ui.ImageFilter.blur(
+          sigmaX: 15.0,
+          sigmaY: 15.0,
+        ), // Enhanced blur matching containers
         child: GestureDetector(
           onTap: _toggleDropdown,
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 150),
             width: widget.width,
             height: widget.height,
-            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 10.0,
+              vertical: 8.0,
+            ),
             decoration: BoxDecoration(
-              // Acrylic glass effect matching the main container
-              color: FlutterFlowTheme.of(
-                context,
-              ).secondaryBackground.withOpacity(_isExpanded ? 0.85 : 0.75),
-              borderRadius: BorderRadius.circular(10.0),
-              border: Border.all(
-                color: _isExpanded
-                    ? FlutterFlowTheme.of(context).primary
-                    : FlutterFlowTheme.of(context).alternate.withOpacity(0.4),
-                width: _isExpanded ? 2.0 : 1.0,
-              ),
+              // GROK app-style glassmorphism with theme-adaptive colors for dark/light mode
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  // Glassmorphism gradient matching main container
+                  // Perfect transparency levels using theme colors for dark/light mode
+                  FlutterFlowTheme.of(context).secondaryBackground.withOpacity(
+                    _isExpanded ? 0.90 : 0.80,
+                  ), // Slightly more opaque when expanded
                   FlutterFlowTheme.of(
                     context,
-                  ).secondaryBackground.withOpacity(_isExpanded ? 0.9 : 0.8),
+                  ).secondaryBackground.withOpacity(_isExpanded ? 0.80 : 0.70),
                   FlutterFlowTheme.of(
                     context,
-                  ).secondaryBackground.withOpacity(_isExpanded ? 0.7 : 0.6),
+                  ).secondaryBackground.withOpacity(_isExpanded ? 0.70 : 0.60),
+                  FlutterFlowTheme.of(
+                    context,
+                  ).secondaryBackground.withOpacity(_isExpanded ? 0.60 : 0.50),
                 ],
+                stops: const [0.0, 0.3, 0.7, 1.0],
+              ),
+              borderRadius: BorderRadius.circular(
+                12.0,
+              ), // Consistent rounded corners
+              border: Border.all(
+                // Theme-adaptive border with enhanced visibility when expanded
+                color: _isExpanded
+                    ? FlutterFlowTheme.of(context).alternate.withOpacity(
+                        0.8,
+                      ) // Brighter when expanded
+                    : FlutterFlowTheme.of(context).alternate.withOpacity(0.6),
+                width: _isExpanded ? 1.8 : 1.2,
               ),
               boxShadow: [
+                // Enhanced shadows matching main container
                 BoxShadow(
-                  color: Colors.black.withOpacity(_isExpanded ? 0.15 : 0.08),
-                  blurRadius: _isExpanded ? 12 : 8,
-                  offset: const Offset(0, 2),
-                  spreadRadius: _isExpanded ? -1 : -2,
+                  color: Colors.black.withOpacity(_isExpanded ? 0.18 : 0.12),
+                  blurRadius: _isExpanded ? 20 : 16,
+                  offset: Offset(
+                    0,
+                    _isExpanded ? 6 : 4,
+                  ), // Remove const for dynamic values
+                  spreadRadius: _isExpanded ? -2 : -3,
                 ),
                 BoxShadow(
-                  color: Colors.white.withOpacity(_isExpanded ? 0.08 : 0.04),
-                  blurRadius: 4,
+                  color: Colors.black.withOpacity(_isExpanded ? 0.08 : 0.05),
+                  blurRadius: _isExpanded ? 12 : 8,
+                  offset: const Offset(0, 2),
+                  spreadRadius: -1,
+                ),
+                // Inner glow for glass edge effect
+                BoxShadow(
+                  color: Colors.white.withOpacity(_isExpanded ? 0.15 : 0.10),
+                  blurRadius: 6,
                   offset: const Offset(0, -1),
+                  spreadRadius: -1,
+                ),
+                // Subtle ambient shadow
+                BoxShadow(
+                  color: Colors.black.withOpacity(_isExpanded ? 0.06 : 0.04),
+                  blurRadius: _isExpanded ? 32 : 24,
+                  offset: Offset(
+                    0,
+                    _isExpanded ? 10 : 8,
+                  ), // Remove const for dynamic values
+                  spreadRadius: -4,
                 ),
               ],
             ),
@@ -1108,9 +1361,12 @@ class _ModernDropDownState extends State<ModernDropDown>
                   child: Icon(
                     Icons.keyboard_arrow_down_rounded,
                     color: _isExpanded
-                        ? FlutterFlowTheme.of(context).primary
-                        : FlutterFlowTheme.of(context).secondaryText,
-                    size: 16.0,
+                        ? FlutterFlowTheme.of(context)
+                              .primaryText // Theme-adaptive text color when expanded
+                        : FlutterFlowTheme.of(
+                            context,
+                          ).secondaryText, // Theme-adaptive secondary text when collapsed
+                    size: 18.0, // Slightly larger for better visibility
                   ),
                 ),
               ],
