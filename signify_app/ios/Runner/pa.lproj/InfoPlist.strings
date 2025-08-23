@@ -1,0 +1,5 @@
+NSCameraUsageDescription = "ਕੈਮਰੇ ਨੂੰ ISL ਚਿੰਨ੍ਹ ਕੈਪਚਰ ਕਰਨ ਦਿਓ।";
+NSPhotoLibraryUsageDescription = "ਡਾਟਾ ਅੱਪਲੋਡ ਕਰਨ ਲਈ, ਇਸ ਐਪ ਨੂੰ ਫੋਟੋ ਲਾਇਬ੍ਰੇਰੀ ਤੱਕ ਪਹੁੰਚ ਕਰਨ ਦੀ ਇਜਾਜ਼ਤ ਦੀ ਲੋੜ ਹੁੰਦੀ ਹੈ।";
+NSLocationWhenInUseUsageDescription = "ਵਧੀਆ ਅਨੁਵਾਦ ਅਤੇ ਖੇਤਰੀ ਡੇਟਾ ਪ੍ਰਾਪਤ ਕਰਨ ਲਈ, ਇਸ ਐਪ ਨੂੰ ਤੁਹਾਡੇ ਮੌਜੂਦਾ ਸਥਾਨ ਤੱਕ ਪਹੁੰਚ ਦੀ ਲੋੜ ਹੈ।";
+NSMicrophoneUsageDescription = "ਸਪੀਚ ਰਿਕੋਗਨੀਸ਼ਨ ਦੀ ਵਰਤੋਂ ਕਰਨ ਲਈ ਮਾਈਕ੍ਰੋਫ਼ੋਨ ਪਹੁੰਚ ਦੀ ਇਜਾਜ਼ਤ ਦਿਓ।";
+PermissionGroupNotification = "ਸੂਚਨਾਵਾਂ ਨੂੰ ਤਾਜ਼ਾ ਅੱਪਡੇਟਾਂ ਬਾਰੇ ਸੂਚਨਾ ਪ੍ਰਾਪਤ ਕਰਨ ਦੀ ਇਜਾਜ਼ਤ ਦਿਓ।";
