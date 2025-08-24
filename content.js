@@ -729,6 +729,33 @@ let translationActive = false;
 let lastSyncedWord = '';
 let syncInterval = null;
 let isYouTubePage = false;
+let currentVideoId = null; // track current YouTube video id for SPA navigation
+
+function getYouTubeVideoId() {
+    try {
+        const url = new URL(window.location.href);
+        return url.searchParams.get('v');
+    } catch(_) { return null; }
+}
+
+function closeSignifyUI() {
+    translationActive = false;
+    if (syncInterval) clearInterval(syncInterval);
+    syncInterval = null;
+    transcriptData = [];
+    lastSyncedWord = '';
+    if (islViewer) {
+        try { islViewer.destroy(); } catch(_) {}
+        islViewer = null;
+    }
+    const outer = document.getElementById('signify-avatar-container');
+    if (outer && outer.parentNode) outer.parentNode.removeChild(outer);
+    const inner = document.getElementById('isl-viewer-container');
+    if (inner && inner.parentNode && inner.parentNode.id !== 'avatarDisplay') {
+        // only remove stray inner containers not already removed with outer
+        try { inner.parentNode.removeChild(inner); } catch(_) {}
+    }
+}
 
 // YouTube Detection and Initialization
 function detectYouTubePage() {
@@ -1008,9 +1035,7 @@ function showAvatarInterface() {
     document.body.appendChild(container);
 
     document.getElementById('signify-close').addEventListener('click', () => {
-        container.remove();
-        translationActive = false;
-        if (syncInterval) clearInterval(syncInterval);
+    closeSignifyUI();
     });
 
     // Initialize the ISL viewer in the avatar display
@@ -1034,6 +1059,12 @@ function createImmediateAvatar() {
                 islContainer.style.position = 'relative';
                 islContainer.style.width = '100%';
                 islContainer.style.height = '100%';
+                // Hide inner header so only one close button remains
+                const innerHeader = islContainer.querySelector('#isl-viewer-header');
+                if (innerHeader) innerHeader.style.display = 'none';
+                // Rebind inner close (if shown) to unified cleanup
+                const innerClose = islContainer.querySelector('#isl-viewer-close');
+                if (innerClose) innerClose.onclick = () => closeSignifyUI();
                 avatarDisplay.appendChild(islContainer);
                 islViewer.showViewer();
             }
@@ -1048,6 +1079,9 @@ function extractTranscriptAndStart() {
         return;
     }
 
+    const vid = getYouTubeVideoId();
+    currentVideoId = vid;
+
     // Extract transcript and start sync
     handleVideoPlay();
     
@@ -1061,6 +1095,24 @@ function extractTranscriptAndStart() {
     video.addEventListener('pause', () => {
         if (syncInterval) clearInterval(syncInterval);
     });
+}
+
+function monitorVideoChange() {
+    let lastId = getYouTubeVideoId();
+    setInterval(() => {
+        const newId = getYouTubeVideoId();
+        if (newId && lastId && newId !== lastId) {
+            // Video changed (SPA navigation) -> reset state and re-initialize if UI open
+            lastId = newId;
+            currentVideoId = newId;
+            transcriptData = [];
+            lastSyncedWord = '';
+            if (translationActive) {
+                console.log('[Signify] Detected video change, re-extracting transcript');
+                handleVideoPlay();
+            }
+        }
+    }, 1500);
 }
 
 // Initialize YouTube integration when page loads
@@ -1086,6 +1138,7 @@ function initYouTubeIntegration() {
             childList: true,
             subtree: true
         });
+    monitorVideoChange();
     }
 }
 
@@ -1117,9 +1170,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         return true; // Keep message channel open for async response
     } 
     else if (request.action === 'hideViewer') {
-        if (islViewer) {
-            islViewer.hideViewer();
-        }
+    closeSignifyUI();
         sendResponse({success: true});
     }
     else if (request.action === 'toggleYouTubeTranslation') {
