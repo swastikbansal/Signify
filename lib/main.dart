@@ -6,6 +6,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 import '/flutter_flow/flutter_flow_theme.dart';
 import 'auth/firebase_auth/auth_util.dart';
@@ -23,10 +25,12 @@ void main() async {
   GoRouter.optionURLReflectsImperativeAPIs = true;
   usePathUrlStrategy();
 
-  // Initialize modern error handling service
+  // Initialize Firebase first before any service that depends on it
+  await initFirebase();
+
+  // Initialize error handling service after Firebase is ready
   ErrorService.instance.initialize();
 
-  await initFirebase();
   await FlutterFlowTheme.initialize();
   await FFLocalizations.initialize();
 
@@ -53,9 +57,22 @@ Future<void> _initializeSupabase() async {
       url: AppConfig.supabaseUrl,
       anonKey: AppConfig.supabaseAnonKey,
     );
-    print('✅ Supabase initialized successfully');
+    AppConfig.secureLog('✅ Supabase initialized successfully');
   } catch (e) {
-    print('❌ Failed to initialize Supabase: $e');
+    AppConfig.secureLog('❌ Failed to initialize Supabase: $e');
+    // Only record to Crashlytics if Firebase is available
+    try {
+      if (Firebase.apps.isNotEmpty) {
+        await FirebaseCrashlytics.instance.recordError(
+          e,
+          StackTrace.current,
+          fatal: false,
+          reason: 'Supabase init failed',
+        );
+      }
+    } catch (_) {
+      // Silently ignore if Crashlytics is not available
+    }
     // Continue app initialization even if Supabase fails
   }
 }

@@ -1,8 +1,11 @@
+import 'dart:isolate';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:signify/config/app_config.dart';
 
-/// Modern error handling service using Flutter's built-in error reporting
-/// Replaces custom error boundary with industry-standard practices
+/// Production-grade error handling service with Firebase Crashlytics integration
+/// Provides comprehensive error reporting, user feedback, and debugging capabilities
 class ErrorService {
   static ErrorService? _instance;
   static ErrorService get instance => _instance ??= ErrorService._();
@@ -11,30 +14,143 @@ class ErrorService {
 
   /// Initialize error handling for the app
   void initialize() {
-    // Set up Flutter's error handling
+    try {
+      // Only configure Crashlytics if Firebase is available
+      _configureCrashlytics();
+    } catch (e) {
+      if (kDebugMode) {
+        print('Warning: Could not initialize Crashlytics: $e');
+      }
+    }
+
+    // Set up Flutter's error handling (both debug and release)
     FlutterError.onError = (FlutterErrorDetails details) {
-      // Log the error in debug mode
+      // In debug mode, show detailed error
       if (kDebugMode) {
         FlutterError.presentError(details);
-      } else {
-        // In release mode, report to crash analytics service
-        _reportError(details.exception, details.stack);
       }
+      // Report to Crashlytics if available
+      _reportFlutterError(details);
     };
 
-    // Handle errors not caught by Flutter
+    // Handle errors not caught by Flutter framework
     PlatformDispatcher.instance.onError = (error, stack) {
-      _reportError(error, stack);
+      _reportPlatformError(error, stack);
       return true;
     };
+
+    // Set up isolate error handling for comprehensive coverage
+    Isolate.current.addErrorListener(
+      RawReceivePort((pair) async {
+        final List<dynamic> errorAndStacktrace = pair;
+        await _reportIsolateError(
+          errorAndStacktrace.first,
+          errorAndStacktrace.last,
+        );
+      }).sendPort,
+    );
+  }
+
+  /// Configure Crashlytics safely
+  void _configureCrashlytics() {
+    FirebaseCrashlytics.instance
+        .setCrashlyticsCollectionEnabled(AppConfig.enableCrashReporting)
+        .catchError((_) {});
+  }
+
+  /// Report Flutter errors safely
+  void _reportFlutterError(FlutterErrorDetails details) {
+    try {
+      FirebaseCrashlytics.instance.recordFlutterFatalError(details);
+    } catch (_) {
+      // Silently ignore if Crashlytics is not available
+    }
+  }
+
+  /// Report platform errors safely
+  void _reportPlatformError(Object error, StackTrace stack) {
+    try {
+      FirebaseCrashlytics.instance
+          .recordError(error, stack, fatal: true)
+          .catchError((_) {});
+    } catch (_) {
+      // Silently ignore if Crashlytics is not available
+    }
+  }
+
+  /// Report isolate errors safely
+  Future<void> _reportIsolateError(Object error, StackTrace stack) async {
+    try {
+      await FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    } catch (_) {
+      // Silently ignore if Crashlytics is not available
+    }
   }
 
   /// Report errors to analytics service
   void _reportError(Object error, StackTrace? stack) {
-    // TODO: When Sentry/Crashlytics is added, report errors here
-    if (kDebugMode) {
-      debugPrint('Error: $error');
-      debugPrint('Stack: $stack');
+    // Report non-fatal errors to Crashlytics for production monitoring
+    FirebaseCrashlytics.instance
+        .recordError(error, stack, fatal: false)
+        .catchError((_) {});
+  }
+
+  /// Public method to report non-fatal errors
+  static void reportError(Object error, [StackTrace? stack]) {
+    instance._reportError(error, stack);
+  }
+
+  /// Handle caught exceptions with optional context
+  static Future<void> recordException(
+    Object exception,
+    StackTrace? stackTrace, {
+    String? reason,
+    Map<String, dynamic>? context,
+    bool fatal = false,
+  }) async {
+    try {
+      // Add context as custom keys if provided
+      if (context != null) {
+        for (final entry in context.entries) {
+          setCustomKey('context_${entry.key}', entry.value);
+        }
+      }
+
+      await FirebaseCrashlytics.instance.recordError(
+        exception,
+        stackTrace,
+        fatal: fatal,
+        reason: reason,
+      );
+    } catch (_) {
+      // Fail silently if Crashlytics is not available
+    }
+  }
+
+  /// Lightweight breadcrumb logging to Crashlytics
+  static Future<void> log(String message) async {
+    try {
+      await FirebaseCrashlytics.instance.log(message);
+    } catch (_) {
+      // Fail silently if Crashlytics is not available
+    }
+  }
+
+  /// Set custom key-value pairs for enhanced crash reports
+  static void setCustomKey(String key, Object value) {
+    try {
+      FirebaseCrashlytics.instance.setCustomKey(key, value);
+    } catch (_) {
+      // Fail silently if Crashlytics is not available
+    }
+  }
+
+  /// Set user identifier for crash reports (use anonymized ID)
+  static void setUserIdentifier(String identifier) {
+    try {
+      FirebaseCrashlytics.instance.setUserIdentifier(identifier);
+    } catch (_) {
+      // Fail silently if Crashlytics is not available
     }
   }
 
