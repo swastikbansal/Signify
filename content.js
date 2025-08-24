@@ -19,6 +19,19 @@ class ISLExtensionViewer {
     this.preloadPromises = new Map(); // key: resolved fullPath -> promise
     this.lastPreloadTranscriptIndex = -1;
     this.playbackSpeed = 1.25; // speed multiplier for animation to better sync with displayed words
+        // Continuous playback clip pipeline
+        this.baseAvatar = null;          // THREE.Scene of default avatar
+        this.clipCache = new Map();      // word|__default__ -> AnimationClip
+        this.clipPromises = new Map();   // in-flight clip loads
+        this.currentAction = null;
+        this.sequenceAbortToken = 0;     // for cancelling overlapping sequences
+        this.smoothConfig = {
+            overlapSeconds: 0.18,
+            fadePortion: 0.18,
+            minFade: 0.08,
+            maxFade: 0.35,
+            preloadAhead: 4
+        };
 
         // Known models; actual URLs will be resolved from Supabase when configured,
         // otherwise they fall back to local extension assets under animation/
@@ -203,13 +216,20 @@ class ISLExtensionViewer {
         }
         if (defaultUrl) {
             this.defaultModelPath = defaultUrl;
-            await this.loadAndPlayAnimation(defaultUrl, { loop: true });
+            // For continuous pipeline: load base avatar if not loaded
+            await this.ensureBaseAvatar(defaultUrl, { loop: this.enableIdleDefault });
+            if (this.enableIdleDefault) {
+                await this.playIdleLoop();
+            }
         } else {
             // Per request: allow local default.glb as a fallback for initial/idle state only
             const localDefault = 'animation/default.glb';
             console.log('Supabase default not available, falling back to local:', localDefault);
             this.defaultModelPath = localDefault;
-            await this.loadAndPlayAnimation(localDefault, { loop: true });
+            await this.ensureBaseAvatar(localDefault, { loop: this.enableIdleDefault });
+            if (this.enableIdleDefault) {
+                await this.playIdleLoop();
+            }
         }
     }
 
@@ -252,80 +272,9 @@ class ISLExtensionViewer {
     }
 
     async processSentence(sentence) {
-        if (this.isPlayingSequence) return;
-        this.isPlayingSequence = true;
-
-        try {
-            const words = sentence.toLowerCase().split(/\s+/).filter(Boolean);
-            const animationsToPlay = [];
-            const skippedWords = [];
-
-            for (const word of words) {
-                const res = await this.resolveWordModel(word);
-                if (res.fallback) skippedWords.push(word);
-                animationsToPlay.push({ word, path: res.path, fallback: res.fallback });
-            }
-
-            const statusElem = document.getElementById('isl-viewer-status');
-            if (animationsToPlay.length === 0) {
-                statusElem.textContent = `No animations found for "${sentence}".`;
-                setTimeout(() => this.loadInitialModel(), 2000);
-                return;
-            }
-
-            const skippedInfo = skippedWords.length > 0 ? `| Skipped: ${skippedWords.join(', ')}` : '';
-
-            // Preload all animations first to eliminate mid-sequence delays
-            const uniquePaths = [...new Set(animationsToPlay.map(a => a.path))];
-            let loadedCount = 0;
-            statusElem.textContent = `Preloading animations (0/${uniquePaths.length})...`;
-            await Promise.all(uniquePaths.map(async p => {
-                try {
-                    await this.preloadModel(p);
-                    loadedCount++;
-                    statusElem.textContent = `Preloading animations (${loadedCount}/${uniquePaths.length})...`;
-                } catch (e) {
-                    console.warn('[ISL][PRELOAD][FAIL]', p, e.message);
-                }
-            }));
-            statusElem.textContent = 'Starting sequence...';
-            
-            for (const [index, anim] of animationsToPlay.entries()) {
-                statusElem.textContent = `Playing: ${anim.word}${anim.fallback ? ' (default)' : ''} (${index + 1}/${animationsToPlay.length}) ${skippedInfo}`;
-                await this.loadAndPlayAnimation(anim.path, { crossFade: 0.25, useCache: true });
-                if (index < animationsToPlay.length - 1) {
-                    await new Promise(r => setTimeout(r, 250));
-                    // Opportunistic preload of next+1 (already preloaded globally, but could have failed earlier)
-                    const nextAnim = animationsToPlay[index + 1];
-                    if (nextAnim) this.preloadModel(nextAnim.path).catch(()=>{});
-                }
-            }
-            
-            statusElem.textContent = 'Sequence complete.';
-            if (this.enableIdleDefault) {
-                await this.loadInitialModel();
-            } else {
-                // Clear model after short pause to remove resting avatar
-                setTimeout(() => {
-                    if (this.currentModel && this.scene) {
-                        try { this.scene.remove(this.currentModel); } catch(_){}
-                        this.currentModel = null;
-                    }
-                }, 1200);
-            }
-
-            // Notify popup of completion
-            chrome.runtime.sendMessage({
-                action: 'updateStatus',
-                status: 'Animation sequence completed!'
-            });
-
-        } catch (error) {
-            console.error('Error processing sentence:', error);
-            document.getElementById('isl-viewer-status').textContent = 'An error occurred during playback.';
-        } finally {
-            this.isPlayingSequence = false;
-        }
+    if (!sentence || !sentence.trim()) return;
+    const words = sentence.toLowerCase().split(/\s+/).filter(Boolean);
+    this.playSentenceClips(words);
     }
 
     async loadAndPlayAnimation(modelPath, options = {}) {
@@ -590,6 +539,146 @@ class ISLExtensionViewer {
         })();
         this.preloadPromises.set(fullPath, promise);
         return promise;
+    }
+
+    /* ================= Continuous Playback Helpers ================= */
+    async ensureBaseAvatar(defaultUrlOverride = null, { loop = false } = {}) {
+        if (this.baseAvatar) return;
+        const url = defaultUrlOverride || (await this.getDefaultModelPath());
+        const gltf = await this.preloadModel(url, { directPath: true });
+        this.baseAvatar = gltf.scene.clone();
+        this.currentModel = this.baseAvatar;
+        this.scene.add(this.baseAvatar);
+        this.centerModel();
+        this.mixer = new THREE.AnimationMixer(this.baseAvatar);
+        // Cache default clip if present
+        if (gltf.animations && gltf.animations.length) {
+            this.clipCache.set('__default__', gltf.animations[0]);
+        }
+        if (loop && this.clipCache.has('__default__')) {
+            const a = this.mixer.clipAction(this.clipCache.get('__default__'));
+            a.timeScale = this.playbackSpeed;
+            a.play();
+            this.currentAction = a;
+        }
+    }
+
+    async playIdleLoop() {
+        await this.ensureBaseAvatar();
+        if (this.clipCache.has('__default__')) {
+            const clip = this.clipCache.get('__default__');
+            const action = this.mixer.clipAction(clip);
+            action.setLoop(THREE.LoopRepeat);
+            action.timeScale = this.playbackSpeed * 0.6; // slightly slower idle
+            action.play();
+            this.currentAction = action;
+        }
+    }
+
+    async fetchClipForWord(word) {
+        const key = word.toLowerCase();
+        if (this.clipCache.has(key)) return this.clipCache.get(key);
+        if (this.clipPromises.has(key)) return this.clipPromises.get(key);
+        const p = (async () => {
+            const { path, fallback } = await this.resolveWordModel(word);
+            const gltf = await this.preloadModel(path, { directPath: true });
+            let clip = null;
+            if (gltf.animations && gltf.animations.length) {
+                clip = gltf.animations[0].clone();
+            } else if (this.clipCache.has('__default__')) {
+                clip = this.clipCache.get('__default__');
+            } else {
+                throw new Error('No animation clip available');
+            }
+            // Retarget track root if needed
+            clip = this.retargetClipRoot(clip, gltf.scene, this.baseAvatar || gltf.scene);
+            const storeKey = fallback ? `__fallback_${key}` : key;
+            this.clipCache.set(storeKey, clip);
+            return clip;
+        })();
+        this.clipPromises.set(key, p);
+        try { return await p; } finally { this.clipPromises.delete(key); }
+    }
+
+    retargetClipRoot(clip, sourceScene, targetScene) {
+        if (!clip) return clip;
+        const srcRoot = sourceScene.children[0]?.name || sourceScene.name;
+        const dstRoot = targetScene.children[0]?.name || targetScene.name;
+        if (!srcRoot || !dstRoot || srcRoot === dstRoot) return clip;
+        const newTracks = clip.tracks.map(t => {
+            if (t.name.startsWith(srcRoot + '.')) {
+                const nt = t.clone();
+                nt.name = dstRoot + t.name.substring(srcRoot.length);
+                return nt;
+            }
+            return t;
+        });
+        return new THREE.AnimationClip(clip.name, clip.duration, newTracks);
+    }
+
+    adaptiveFade(clip) {
+        const raw = clip.duration * this.smoothConfig.fadePortion;
+        return Math.min(this.smoothConfig.maxFade, Math.max(this.smoothConfig.minFade, raw));
+    }
+
+    async playClipSequential(clip, isLast) {
+        if (!this.mixer || !clip) return;
+        const fade = this.adaptiveFade(clip);
+        const action = this.mixer.clipAction(clip);
+        action.reset();
+        action.setLoop(THREE.LoopOnce, 1);
+        action.clampWhenFinished = true;
+        action.timeScale = this.playbackSpeed;
+        if (this.currentAction && this.currentAction !== action) {
+            this.currentAction.crossFadeTo(action, fade, false);
+        } else if (!this.currentAction) {
+            action.fadeIn(fade);
+        }
+        this.currentAction = action;
+        action.play();
+        const effectiveDuration = clip.duration / this.playbackSpeed;
+        const wait = isLast ? effectiveDuration : Math.max(0.05, effectiveDuration - this.smoothConfig.overlapSeconds);
+        return new Promise(resolve => setTimeout(resolve, wait * 1000));
+    }
+
+    async playSentenceClips(words) {
+        this.sequenceAbortToken++;
+        const token = this.sequenceAbortToken;
+        this.isPlayingSequence = true;
+        const statusElem = document.getElementById('isl-viewer-status');
+        try {
+            await this.ensureBaseAvatar();
+            // Preload initial batch
+            const uniq = [];
+            for (const w of words) { const kw = w.toLowerCase(); if (!uniq.includes(kw)) uniq.push(kw); }
+            await Promise.all(uniq.slice(0, this.smoothConfig.preloadAhead).map(w => this.fetchClipForWord(w).catch(()=>{})));
+            for (let i=0;i<words.length;i++) {
+                if (token !== this.sequenceAbortToken) return; // aborted
+                const w = words[i];
+                if (statusElem) statusElem.textContent = `Playing: ${w} (${i+1}/${words.length})`;
+                const clip = await this.fetchClipForWord(w).catch(()=> this.clipCache.get('__default__'));
+                await this.playClipSequential(clip, i === words.length - 1);
+                const preloadIndex = i + this.smoothConfig.preloadAhead;
+                if (preloadIndex < words.length) this.fetchClipForWord(words[preloadIndex]).catch(()=>{});
+            }
+            if (statusElem) statusElem.textContent = 'Sequence complete.';
+        } catch (e) {
+            console.error('[ISL][SEQUENCE][ERROR]', e);
+            if (statusElem) statusElem.textContent = 'Playback error.';
+        } finally {
+            if (!this.enableIdleDefault) {
+                // leave last pose; optional fade-out could be added
+            }
+            this.isPlayingSequence = false;
+            chrome.runtime.sendMessage({ action: 'updateStatus', status: 'Animation sequence completed!' });
+        }
+    }
+
+    async playWord(word) {
+        if (!word) return;
+        await this.ensureBaseAvatar();
+        const clip = await this.fetchClipForWord(word).catch(()=> this.clipCache.get('__default__'));
+        await this.playClipSequential(clip, true);
     }
 
     animate() {
