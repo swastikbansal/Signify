@@ -287,7 +287,7 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                                     child: Icon(
                                       Icons.search_rounded,
                                       color:
-                                          FlutterFlowTheme.of(context).primary,
+                                          FlutterFlowTheme.of(context).secondaryText,
                                       size: 24.0,
                                     ),
                                   ),

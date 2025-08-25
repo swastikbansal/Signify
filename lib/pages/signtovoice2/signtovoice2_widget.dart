@@ -261,8 +261,8 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
 
             // Floating control panel positioned above bottom nav - Claude AI style with acrylic transparency
             Positioned(
-              bottom:
-                  12.0, // Position just above bottom nav bar (optimal spacing)
+              bottom: 12.0,
+              // Position just above bottom nav bar (optimal spacing)
               left: 8.0,
               right: 8.0,
               child: ClipRRect(
@@ -280,15 +280,22 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                         end: Alignment.bottomRight,
                         colors: [
                           // Perfect transparency levels using theme colors for dark/light mode
-                          FlutterFlowTheme.of(context).secondaryBackground
-                              .withOpacity(0.85), // Top-left highlight
                           FlutterFlowTheme.of(
                             context,
-                          ).secondaryBackground.withOpacity(0.75), // Center
-                          FlutterFlowTheme.of(context).secondaryBackground
-                              .withOpacity(0.65), // Bottom-right shadow
-                          FlutterFlowTheme.of(context).secondaryBackground
-                              .withOpacity(0.55), // Bottom edge fade
+                          ).secondaryBackground.withOpacity(0.85),
+                          // Top-left highlight
+                          FlutterFlowTheme.of(
+                            context,
+                          ).secondaryBackground.withOpacity(0.75),
+                          // Center
+                          FlutterFlowTheme.of(
+                            context,
+                          ).secondaryBackground.withOpacity(0.65),
+                          // Bottom-right shadow
+                          FlutterFlowTheme.of(
+                            context,
+                          ).secondaryBackground.withOpacity(0.55),
+                          // Bottom edge fade
                         ],
                         stops: const [0.0, 0.3, 0.7, 1.0],
                       ),
@@ -580,16 +587,16 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                                                   end: Alignment.bottomRight,
                                                   colors: [
                                                     FlutterFlowTheme.of(context)
-                                                        .alternate
+                                                        .secondaryBackground
                                                         .withOpacity(0.80),
                                                     FlutterFlowTheme.of(context)
-                                                        .alternate
+                                                        .secondaryBackground
                                                         .withOpacity(0.70),
                                                     FlutterFlowTheme.of(context)
-                                                        .alternate
+                                                        .secondaryBackground
                                                         .withOpacity(0.60),
                                                     FlutterFlowTheme.of(context)
-                                                        .alternate
+                                                        .secondaryBackground
                                                         .withOpacity(0.50),
                                                   ],
                                                   stops: const [
@@ -606,7 +613,7 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                                                 border: Border.all(
                                                   color: FlutterFlowTheme.of(
                                                     context,
-                                                  ).alternate.withOpacity(0.6),
+                                                  ).alternate.withOpacity(1.0),
                                                   width: 1.2,
                                                 ),
                                                 boxShadow: [
@@ -724,16 +731,16 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                                                   end: Alignment.bottomRight,
                                                   colors: [
                                                     FlutterFlowTheme.of(context)
-                                                        .alternate
+                                                        .secondaryBackground
                                                         .withOpacity(0.80),
                                                     FlutterFlowTheme.of(context)
-                                                        .alternate
+                                                        .secondaryBackground
                                                         .withOpacity(0.70),
                                                     FlutterFlowTheme.of(context)
-                                                        .alternate
+                                                        .secondaryBackground
                                                         .withOpacity(0.60),
                                                     FlutterFlowTheme.of(context)
-                                                        .alternate
+                                                        .secondaryBackground
                                                         .withOpacity(0.50),
                                                   ],
                                                   stops: const [
@@ -750,7 +757,7 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                                                 border: Border.all(
                                                   color: FlutterFlowTheme.of(
                                                     context,
-                                                  ).alternate.withOpacity(0.6),
+                                                  ).alternate.withOpacity(1.0),
                                                   width: 1.2,
                                                 ),
                                                 boxShadow: [
@@ -1077,15 +1084,22 @@ class _ModernDropDownState extends State<ModernDropDown>
                     end: Alignment.bottomRight,
                     colors: [
                       // Perfect transparency levels using theme colors for dark/light mode
-                      FlutterFlowTheme.of(context).secondaryBackground
-                          .withOpacity(0.80), // Top-left highlight
                       FlutterFlowTheme.of(
                         context,
-                      ).secondaryBackground.withOpacity(0.70), // Center
-                      FlutterFlowTheme.of(context).secondaryBackground
-                          .withOpacity(0.60), // Bottom-right shadow
-                      FlutterFlowTheme.of(context).secondaryBackground
-                          .withOpacity(0.50), // Bottom edge fade
+                      ).secondaryBackground.withOpacity(0.80),
+                      // Top-left highlight
+                      FlutterFlowTheme.of(
+                        context,
+                      ).secondaryBackground.withOpacity(0.70),
+                      // Center
+                      FlutterFlowTheme.of(
+                        context,
+                      ).secondaryBackground.withOpacity(0.60),
+                      // Bottom-right shadow
+                      FlutterFlowTheme.of(
+                        context,
+                      ).secondaryBackground.withOpacity(0.50),
+                      // Bottom edge fade
                     ],
                     stops: const [0.0, 0.3, 0.7, 1.0],
                   ),
@@ -1250,8 +1264,8 @@ class _ModernDropDownState extends State<ModernDropDown>
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(
-        12.0,
-      ), // Consistent with updated design
+        48.0,
+      ), // Changed from 12.0 to 48.0 for more rounded appearance
       child: BackdropFilter(
         filter: ui.ImageFilter.blur(
           sigmaX: 15.0,
@@ -1274,9 +1288,10 @@ class _ModernDropDownState extends State<ModernDropDown>
                 end: Alignment.bottomRight,
                 colors: [
                   // Perfect transparency levels using theme colors for dark/light mode
-                  FlutterFlowTheme.of(context).secondaryBackground.withOpacity(
-                    _isExpanded ? 0.90 : 0.80,
-                  ), // Slightly more opaque when expanded
+                  FlutterFlowTheme.of(
+                    context,
+                  ).secondaryBackground.withOpacity(_isExpanded ? 0.90 : 0.80),
+                  // Slightly more opaque when expanded
                   FlutterFlowTheme.of(
                     context,
                   ).secondaryBackground.withOpacity(_isExpanded ? 0.80 : 0.70),
@@ -1290,12 +1305,12 @@ class _ModernDropDownState extends State<ModernDropDown>
                 stops: const [0.0, 0.3, 0.7, 1.0],
               ),
               borderRadius: BorderRadius.circular(
-                12.0,
-              ), // Consistent rounded corners
+                48.0,
+              ), // Changed from 12.0 to 48.0 for more rounded corners
               border: Border.all(
                 // Theme-adaptive border with enhanced visibility when expanded
                 color: _isExpanded
-                    ? FlutterFlowTheme.of(context).alternate.withOpacity(
+                    ? FlutterFlowTheme.of(context).primary.withOpacity(
                         0.8,
                       ) // Brighter when expanded
                     : FlutterFlowTheme.of(context).alternate.withOpacity(0.6),
@@ -1363,10 +1378,9 @@ class _ModernDropDownState extends State<ModernDropDown>
                     color: _isExpanded
                         ? FlutterFlowTheme.of(context)
                               .primaryText // Theme-adaptive text color when expanded
-                        : FlutterFlowTheme.of(
-                            context,
-                          ).secondaryText, // Theme-adaptive secondary text when collapsed
-                    size: 18.0, // Slightly larger for better visibility
+                        : FlutterFlowTheme.of(context).secondaryText,
+                    // Theme-adaptive secondary text when collapsed
+                    size: 18.0, // Slightly larger to fit better in circle
                   ),
                 ),
               ],

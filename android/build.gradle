@@ -12,6 +12,10 @@ subprojects {
                 project.plugins.hasPlugin("com.android.library")) {
             project.android {
                 compileSdkVersion 36
+                // Enable BuildConfig for all Android modules
+                buildFeatures {
+                    buildConfig = true
+                }
             }
         }
     }

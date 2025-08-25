@@ -178,7 +178,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
         key: scaffoldKey,
-        backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
+        backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
         body: SafeArea(
           top: true,
           child: Row(
@@ -188,8 +188,8 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                 flex: 8,
                 child: Padding(
                   padding: const EdgeInsetsDirectional.fromSTEB(
-                    0.0,
                     16.0,
+                    0.0,
                     0.0,
                     0.0,
                   ),
@@ -197,7 +197,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                     width: double.infinity,
                     height: double.infinity,
                     decoration: BoxDecoration(
-                      color: FlutterFlowTheme.of(context).secondaryBackground,
+                      color: FlutterFlowTheme.of(context).primaryBackground,
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.max,
@@ -220,7 +220,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                           decoration: BoxDecoration(
                                             color: FlutterFlowTheme.of(
                                               context,
-                                            ).secondaryBackground,
+                                            ).primaryBackground,
                                             shape: BoxShape.rectangle,
                                           ),
                                           child: ClipRRect(
@@ -269,11 +269,11 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                           decoration: BoxDecoration(
                             color: FlutterFlowTheme.of(
                               context,
-                            ).secondaryBackground,
+                            ).primaryBackground,
                           ),
                           child: Padding(
                             padding: const EdgeInsetsDirectional.fromSTEB(
-                              16.0,
+                              0.0,
                               0.0,
                               16.0,
                               0.0,
@@ -294,7 +294,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                     labelPadding:
                                         const EdgeInsetsDirectional.fromSTEB(
                                           32.0,
-                                          20.0,
+                                          8.0,
                                           32.0,
                                           12.0,
                                         ),
@@ -337,7 +337,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                           0.0,
                                           0.0,
                                           0.0,
-                                          20.0,
+                                          16.0,
                                         ),
                                     tabs: [
                                       Tab(
@@ -820,7 +820,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                         color:
                                                             FlutterFlowTheme.of(
                                                               context,
-                                                            ).secondaryBackground,
+                                                            ).primaryBackground,
                                                         textStyle:
                                                             FlutterFlowTheme.of(
                                                               context,
@@ -970,7 +970,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                 ).customColor5,
                                                                 letterSpacing:
                                                                     0.0,
-                                                                fontSize: 14.0,
+                                                                fontSize: 16.0,
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .w600,
@@ -2160,7 +2160,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                   ).customColor5,
                                                               letterSpacing:
                                                                   0.0,
-                                                              fontSize: 14.0,
+                                                              fontSize: 16.0,
                                                               fontWeight:
                                                                   FontWeight
                                                                       .w600,
@@ -2448,7 +2448,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                     width: 100.0,
                     height: double.infinity,
                     decoration: BoxDecoration(
-                      color: FlutterFlowTheme.of(context).secondaryBackground,
+                      color: FlutterFlowTheme.of(context).primaryBackground,
                       image: const DecorationImage(
                         fit: BoxFit.cover,
                         image: CachedNetworkImageProvider(

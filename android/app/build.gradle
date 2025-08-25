@@ -33,37 +33,63 @@ if (keystorePropertiesFile.exists()) {
 android {
     namespace "com.philosia.signify"
     compileSdkVersion 36
+    ndkVersion "28.2.13676358"  // Latest stable NDK r28
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_21
-        targetCompatibility JavaVersion.VERSION_21
+    // Using Java 21 as requested; keep desugaring enabled
+    sourceCompatibility JavaVersion.VERSION_21
+    targetCompatibility JavaVersion.VERSION_21
         coreLibraryDesugaringEnabled true
     }
 
     kotlinOptions {
-        jvmTarget = '21'
-        // Suppress unchecked cast warnings for stable build
-        freeCompilerArgs += ['-Xsuppress-version-warnings', '-Xlint:-unchecked']
+    // Match Kotlin JVM target to Java 21
+    jvmTarget = '21'
     }
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
 
-    lintOptions {
+    lint{
         disable 'InvalidPackage'
         checkReleaseBuilds false
         abortOnError false
     }
 
-    packagingOptions {
-        pickFirst '**/libc++_shared.so'
-        pickFirst '**/libjsc.so'
-        exclude 'META-INF/DEPENDENCIES'
-        exclude 'META-INF/LICENSE'
-        exclude 'META-INF/LICENSE.txt'
-        exclude 'META-INF/NOTICE'
-        exclude 'META-INF/NOTICE.txt'
+    // Migrate to modern packaging DSL for AGP 8+
+    packaging {
+        jniLibs {
+            // Some plugins bundle libc++_shared; pickFirst avoids duplicate conflicts
+            pickFirsts += ['**/libc++_shared.so']
+            // Exclude unused ABIs to reduce APK size
+            excludes += ['**/x86/**', '**/x86_64/**', '**/mips/**', '**/mips64/**']
+        }
+        resources {
+            excludes += [
+                'META-INF/DEPENDENCIES',
+                'META-INF/LICENSE',
+                'META-INF/LICENSE.txt',
+                'META-INF/NOTICE',
+                'META-INF/NOTICE.txt',
+                'META-INF/*.SF',
+                'META-INF/*.DSA',
+                'META-INF/*.RSA'
+            ]
+        }
+    }
+
+    // Bundle configuration for Play Store optimization
+    bundle {
+        language {
+            enableSplit = true
+        }
+        density {
+            enableSplit = true
+        }
+        abi {
+            enableSplit = true
+        }
     }
 
     defaultConfig {
@@ -72,11 +98,21 @@ android {
         targetSdkVersion 36
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
-        multiDexEnabled true
-
+        
+        // NDK Configuration for ML Kit and native dependencies
         ndk {
+            // Only include ABIs you actually need to reduce APK size
             abiFilters 'arm64-v8a', 'armeabi-v7a'
         }
+        
+        // Performance optimizations
+        renderscriptTargetApi 24
+        renderscriptSupportModeEnabled false
+        
+        // Locale configuration to reduce APK size
+        resConfigs "en", "hi" // English and Hindi only
+        
+        // multiDexEnabled true
     }
 
     buildFeatures {
@@ -94,22 +130,41 @@ android {
 
     buildTypes {
         release {
-            signingConfig signingConfigs.debug    // ✅ Temporarily use debug signing for release
-            minifyEnabled true                    // ✅ Enable code optimization
-            shrinkResources true                  // ✅ Reduce APK size
+            signingConfig signingConfigs.debug       // ⚠️ Use release signing for production
+            minifyEnabled true                      // ✅ Enable code optimization
+            shrinkResources true                    // ✅ Reduce APK size
+            zipAlignEnabled true                    // ✅ Optimize APK alignment
+            
+            // Advanced optimization settings
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            
+            // Performance optimizations
+            manifestPlaceholders = [enableCrashReporting: "true"]
+            buildConfigField "boolean", "ENABLE_LOGGING", "false"
+            
+            // APK splitting for different architectures (reduces size)
+            ndk {
+                abiFilters 'arm64-v8a', 'armeabi-v7a'
+            }
         }
 
         debug {
             minifyEnabled false
             debuggable true
+            applicationIdSuffix ".debug"
+            versionNameSuffix "-debug"
+            manifestPlaceholders = [enableCrashReporting: "false"]
+            buildConfigField "boolean", "ENABLE_LOGGING", "true"
         }
-    }
-
-    configurations.all {
-        resolutionStrategy {
-            force 'androidx.core:core-ktx:1.17.0'
-            force 'androidx.appcompat:appcompat:1.7.1'
+        
+        // Profile build type for performance testing
+        profile {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.debug
+            manifestPlaceholders = [enableCrashReporting: "true"]
+            buildConfigField "boolean", "ENABLE_LOGGING", "false"
         }
     }
 }
@@ -118,14 +173,10 @@ flutter {
     source '../..'
 }
 dependencies {
-    implementation 'androidx.multidex:multidex:2.0.1'
     // Core Android dependencies
     implementation "androidx.appcompat:appcompat:1.7.1"
     implementation "androidx.core:core-ktx:1.17.0"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.20"
     // Core library desugaring for Java 21 compatibility
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
-    // ML Kit Text Recognition Language Dependencies
-    implementation 'com.google.mlkit:text-recognition-devanagari:16.0.0'
-
 }

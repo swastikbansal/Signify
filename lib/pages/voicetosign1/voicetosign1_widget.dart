@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:model_viewer_plus/model_viewer_plus.dart';
 
@@ -10,8 +12,6 @@ import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/services/supabase_animation_service.dart';
 import 'voicetosign1_model.dart';
-import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
-import 'dart:io';
 
 export 'voicetosign1_model.dart';
 
@@ -302,9 +302,12 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
     try {
       final XFile? pickedFile = await _imagePicker.pickImage(
         source: ImageSource.camera,
-        maxWidth: 1200, // Increased back for better OCR quality
-        maxHeight: 1200, // Increased back for better OCR quality
-        imageQuality: 80, // Increased for better OCR accuracy
+        maxWidth: 1200,
+        // Increased back for better OCR quality
+        maxHeight: 1200,
+        // Increased back for better OCR quality
+        imageQuality: 80,
+        // Increased for better OCR accuracy
         preferredCameraDevice:
             CameraDevice.rear, // Specify rear camera for better quality
       );
@@ -798,22 +801,18 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
 
               // Floating input container positioned at bottom
               Positioned(
-                left: 0,
-                right: 0,
-                bottom: 8,
+                left: 8.0,
+                right: 8.0,
+                bottom: 12.0,
                 child:
                     // Modern unified input container with Claude-like design and acrylic transparency
                     ClipRRect(
                       borderRadius: BorderRadius.circular(
-                        20.0,
+                        16.0,
                       ), // Match container border radius
                       child: BackdropFilter(
                         filter: ui.ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
                         child: Container(
-                          margin: const EdgeInsets.symmetric(
-                            horizontal: 8.0,
-                            vertical: 4.0,
-                          ), // Reduced horizontal margin for more space
                           decoration: BoxDecoration(
                             // GROK app-style glassmorphism with theme-adaptive colors for dark/light mode
                             gradient: LinearGradient(
@@ -892,7 +891,7 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
                                       return Container(
                                         decoration: BoxDecoration(
                                           borderRadius: BorderRadius.circular(
-                                            20.0,
+                                            16.0,
                                           ), // Match container border radius
                                           border: Border.all(
                                             color: Colors.transparent,

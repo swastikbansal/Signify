@@ -240,7 +240,7 @@ class _Account4WidgetState extends State<Account4Widget> with RouteAware {
                                         border: Border.all(
                                           color: FlutterFlowTheme.of(
                                             context,
-                                          ).primary,
+                                          ).primaryBackground,
                                           width: 2.0,
                                         ),
                                       ),

@@ -75,7 +75,7 @@ class _SelectlanguageWidgetState extends State<SelectlanguageWidget>
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
         key: scaffoldKey,
-        backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
+        backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
         body: SafeArea(
           top: true,
           child: Padding(
@@ -89,7 +89,7 @@ class _SelectlanguageWidgetState extends State<SelectlanguageWidget>
                   width: 160.0,
                   height: 160.0,
                   decoration: BoxDecoration(
-                    color: FlutterFlowTheme.of(context).secondaryBackground,
+                    color: FlutterFlowTheme.of(context).primaryBackground,
                     shape: BoxShape.circle,
                   ),
                   child: Image.asset(
