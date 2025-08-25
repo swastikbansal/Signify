@@ -14,12 +14,13 @@ import warnings
 
 warnings.filterwarnings("ignore")
 
-
-# Rest detection parameters (tweak these for your camera/subject)
+# Rest detection parameters
 REST_SPEED_THRESHOLD :float = 30.0   # pixels/second; lower => more sensitive to rest
 MIN_POINTS_FOR_REST :int = 2       
 REQUIRED_CONSECUTIVE_FRAMES :int = 3  
-REST_DELAY = 2  # Frames before considering rest
+REST_DELAY = 2
+
+USE_REST: bool = False
 
 app = Flask(__name__)
 
@@ -118,7 +119,10 @@ def process_image(img):
     
 
     try:
-        resting = utils.is_resting(res_hands, annotated.shape, rest_delay_seconds=REST_DELAY, fps=None)
+        if USE_REST:
+            resting = utils.is_resting(res_hands, annotated.shape, rest_delay_seconds=REST_DELAY, fps=None)
+        else:
+            resting = False
     except Exception as e:
         print(f"Rest detection error: {e}")
         resting = False
@@ -211,6 +215,10 @@ def process_image(img):
 def home():
     return "<h1>Signify API</h1>"
 
+@app.route('/custom', methods= ['POST'])
+def custom_model():
+    
+
 @app.route('/process_frame', methods=['POST'])
 def process_video_frame():
     """Receive a video frame, display it, and return a prediction."""
@@ -269,7 +277,6 @@ def process_video_frame():
 
     except Exception as e:
         return jsonify({"status": "error", "message": f"Processing error: {str(e)}"}), 500
-
 
 @app.route('/reset', methods=['POST'])
 def reset_accumulation():
