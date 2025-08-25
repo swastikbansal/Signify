@@ -1,12 +1,17 @@
 # Dataset related
 Dataset/
 test.py
-.venv/
+.venv/ 
 .vscode/
-debug_data
+debug_data/
 Test Recordings
 
 # common python ignores
 *.pyc
 __pycache__/
 .pytest_cache/
+
+# Custom Dataset testing items
+Python_Live/Dataset
+Python_Live/Models
+Python_Live/MP_DATA

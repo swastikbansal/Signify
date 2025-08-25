@@ -2,7 +2,18 @@ import numpy as np
 import time
 
 class Utils:
-    def __init__(self, axes, restSpeed, minPoints, requiredFrames):
+    def __init__(self, 
+        axes: dict = {
+        "x": np.array([1, 0, 0]),
+        "-x": np.array([-1, 0, 0]),
+        "y": np.array([0, 1, 0]),
+        "-y": np.array([0, -1, 0]),
+        "z": np.array([0, 0, 1]),
+        "-z": np.array([0, 0, -1]),
+    }, restSpeed:float = 50.0, 
+    minPoints:int = 2, 
+    requiredFrames:int = 3):
+
         self.axes = axes
         self.REST_SPEED_THRESHOLD = restSpeed  # pixels/second
         self.MIN_POINTS_FOR_REST = minPoints
@@ -160,16 +171,15 @@ class Utils:
         self.theta = np.arccos(cos_theta)
         return np.degrees(self.theta)
 
-    # Function to classify palm orientation
     def get_palm_orientation(self, normal):
+        """Function to classify palm orientation"""
         angles = {axis: self.angle_between_vectors(normal, direction) for axis, direction in self.axes.items()}
         # Find the axis with the smallest angle
         self.best_match_axis = min(angles, key=angles.get)
         return self.best_match_axis
 
-
     # Function to extract hand features (angles between vectors and axes)
-    def extract_features(self, hand_landmarks, pose_landmarks=None):
+    def extract_hand_features(self, hand_landmarks, pose_landmarks=None):
         hand_pairs = [
             (1 , 3) ,  # Thumb
             (6 , 8 ),  # Index finger

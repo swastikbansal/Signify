@@ -58,9 +58,9 @@ def calulating_percentage(avg, all_classes):
 
 def load_models():
     """Load all models"""
-    left_model_filename = r'Models\left_model.p'
-    right_model_filename = r'Models\right_model.p'
-    pose_model_filename = r'Models\pose_model.p'
+    left_model_filename = r'./Models/left_model.p'
+    right_model_filename = r'./Models/right_model.p'
+    pose_model_filename = r'./Models/pose_model.p'
 
     def load_model(filename):
         with open(filename, 'rb') as f:
@@ -80,17 +80,8 @@ mp_pose = mp.solutions.pose
 hands = mp_hands.Hands(max_num_hands=2, min_detection_confidence=0.5, min_tracking_confidence=0.5)
 pose = mp_pose.Pose(min_detection_confidence=0.7, min_tracking_confidence=0.7)
 
-# Initialize Utils with axes for palm orientation
-axes: dict = {
-        "x": np.array([1, 0, 0]),
-        "-x": np.array([-1, 0, 0]),
-        "y": np.array([0, 1, 0]),
-        "-y": np.array([0, -1, 0]),
-        "z": np.array([0, 0, 1]),
-        "-z": np.array([0, 0, -1]),
-    }  
     
-utils = Utils(axes, REST_SPEED_THRESHOLD, MIN_POINTS_FOR_REST, REQUIRED_CONSECUTIVE_FRAMES)
+utils = Utils(REST_SPEED_THRESHOLD, MIN_POINTS_FOR_REST, REQUIRED_CONSECUTIVE_FRAMES)
 
 def display_frames():
     """
@@ -139,7 +130,7 @@ def process_image(img):
         if getattr(res_hands, "multi_hand_landmarks", None):
             for hand_landmarks, handedness in zip(res_hands.multi_hand_landmarks, res_hands.multi_handedness):
                 label = handedness.classification[0].label
-                features = utils.extract_features(
+                features = utils.extract_hand_features(
                     hand_landmarks.landmark,
                     res_pose.pose_landmarks.landmark if res_pose.pose_landmarks else []
                 )

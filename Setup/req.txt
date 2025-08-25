@@ -1,5 +1,9 @@
-pandas
-ipykernel
+flask
+numpy
+matplotlib
 mediapipe
 opencv-python
+asgiref>=3.6.0
 scikit-learn-intelex
+uvicorn
+seaborn
