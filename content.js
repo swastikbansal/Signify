@@ -13,7 +13,7 @@ class ISLExtensionViewer {
         this.isInitialized = false;
     this.defaultModelPath = null; // cached resolved default.glb path (remote preferred)
     // When false, don't show looping default avatar in idle state; only show during actual word animations
-    this.enableIdleDefault = false;
+    this.enableIdleDefault = true; // play default animation by default
     // Caching & preloading
     this.modelCache = new Map(); // key: resolved fullPath -> gltf
     this.preloadPromises = new Map(); // key: resolved fullPath -> promise
@@ -30,8 +30,23 @@ class ISLExtensionViewer {
             fadePortion: 0.18,
             minFade: 0.08,
             maxFade: 0.35,
-            preloadAhead: 4
+            preloadAhead: 4,
+            inertialSeconds: 0.22,      // ease-in time for new clip
+            trimStatic: true,           // trim leading/trailing static frames
+            motionEpsilon: 0.0006,      // root movement threshold for static detection
+            motionFadeWeight: 0.55,     // influence of motion magnitude on fade length
+            minCompletionPortion: 0.9,  // ensure at least 90% of a clip time is shown before next starts
+            trimLeading: true,          // only trim beginning static frames
+            trimTrailing: false         // keep trailing hold so sign meaning stays visible
         };
+    // Continuous streaming (YouTube) playback queue
+    this.wordQueue = [];
+    this.isProcessingQueue = false;
+    this.lastQueuedWord = null;
+        // Root continuity tracking
+        this.lastRootPos = { x:0, y:0, z:0 };
+        this.hasLastRoot = false;
+        this.lastClipMotion = 0; // accumulated distance of last clip root path
 
         // Known models; actual URLs will be resolved from Supabase when configured,
         // otherwise they fall back to local extension assets under animation/
@@ -511,8 +526,9 @@ class ISLExtensionViewer {
     async preloadModel(path, { directPath = false } = {}) {
         // Accept already-resolved full paths or relative model paths
         let fullPath = path;
-        if (!directPath && !/^https?:\/\//i.test(path)) {
-            fullPath = chrome.runtime.getURL(path);
+        // Even when directPath flag is passed, if it's a relative path (extension asset) convert it.
+        if (!/^https?:\/\//i.test(fullPath)) {
+            try { fullPath = chrome.runtime.getURL(fullPath); } catch(_){}
         }
         if (this.modelCache.has(fullPath)) return this.modelCache.get(fullPath);
         if (this.preloadPromises.has(fullPath)) return this.preloadPromises.get(fullPath);
@@ -545,7 +561,7 @@ class ISLExtensionViewer {
     async ensureBaseAvatar(defaultUrlOverride = null, { loop = false } = {}) {
         if (this.baseAvatar) return;
         const url = defaultUrlOverride || (await this.getDefaultModelPath());
-        const gltf = await this.preloadModel(url, { directPath: true });
+    const gltf = await this.preloadModel(url); // will auto map relative to extension URL
         this.baseAvatar = gltf.scene.clone();
         this.currentModel = this.baseAvatar;
         this.scene.add(this.baseAvatar);
@@ -581,7 +597,7 @@ class ISLExtensionViewer {
         if (this.clipPromises.has(key)) return this.clipPromises.get(key);
         const p = (async () => {
             const { path, fallback } = await this.resolveWordModel(word);
-            const gltf = await this.preloadModel(path, { directPath: true });
+            const gltf = await this.preloadModel(path); // relative paths resolved
             let clip = null;
             if (gltf.animations && gltf.animations.length) {
                 clip = gltf.animations[0].clone();
@@ -592,12 +608,121 @@ class ISLExtensionViewer {
             }
             // Retarget track root if needed
             clip = this.retargetClipRoot(clip, gltf.scene, this.baseAvatar || gltf.scene);
+            // Preprocess clip (trim static ends, compute motion metrics)
+            clip = this.preprocessClip(clip);
             const storeKey = fallback ? `__fallback_${key}` : key;
             this.clipCache.set(storeKey, clip);
             return clip;
         })();
         this.clipPromises.set(key, p);
         try { return await p; } finally { this.clipPromises.delete(key); }
+    }
+
+    preprocessClip(clip) {
+        if (!clip) return clip;
+        if (this.smoothConfig.trimStatic) clip = this.trimStaticExtents(clip);
+        const posTrack = clip.tracks.find(t => t.name.endsWith('.position'));
+        if (posTrack) {
+            let dist = 0;
+            for (let i=3;i<posTrack.values.length;i+=3) {
+                const dx = posTrack.values[i] - posTrack.values[i-3];
+                const dy = posTrack.values[i+1] - posTrack.values[i-2];
+                const dz = posTrack.values[i+2] - posTrack.values[i-1];
+                dist += Math.sqrt(dx*dx + dy*dy + dz*dz);
+            }
+            clip.userData = clip.userData || {};
+            clip.userData.rootMotion = dist;
+        }
+        return clip;
+    }
+
+    trimStaticExtents(clip) {
+        const posTrack = clip.tracks.find(t => t.name.endsWith('.position'));
+        if (!posTrack) return clip;
+        const { motionEpsilon } = this.smoothConfig;
+        const times = posTrack.times;
+        const values = posTrack.values;
+        const len = times.length;
+        if (len < 3) return clip;
+        const isStatic = (i) => {
+            const a = i*3, b = (i+1)*3;
+            const dx = values[b]-values[a];
+            const dy = values[b+1]-values[a+1];
+            const dz = values[b+2]-values[a+2];
+            return (dx*dx+dy*dy+dz*dz) < motionEpsilon;
+        };
+        let start=0,end=len-1;
+        if (this.smoothConfig.trimLeading) {
+            for (let i=0;i<len-2;i++){ if(!isStatic(i)){ start=Math.max(0,i-1); break; } }
+        }
+        if (this.smoothConfig.trimTrailing) {
+            for (let i=len-2;i>=1;i--){ if(!isStatic(i)){ end=Math.min(len-1,i+1); break; } }
+        }
+        if (start===0 && end===len-1) return clip; // nothing to trim
+        const newTimes = times.slice(start,end+1);
+        const newVals = values.slice(start*3,(end+1)*3);
+        const sliceOther = (track) => {
+            if (track===posTrack) return new THREE.VectorKeyframeTrack(posTrack.name, newTimes.map(t=>t-newTimes[0]), newVals);
+            if (!track.times || track.times.length<2) return track;
+            const t0=newTimes[0], t1=newTimes[newTimes.length-1];
+            const inT=track.times;
+            let s=0,e=inT.length-1; while(s<inT.length && inT[s]<t0) s++; while(e>0 && inT[e]>t1) e--; if(e-s<1) return track;
+            const comp=track.getValueSize();
+            const tSlice=Array.from(inT.slice(s,e+1), tm => tm - t0);
+            const vSlice=track.values.slice(s*comp,(e+1)*comp);
+            const ctor=track.constructor; return new ctor(track.name,tSlice,vSlice);
+        };
+        const newTracks = clip.tracks.map(tr => sliceOther(tr));
+        return new THREE.AnimationClip(clip.name, newTimes[newTimes.length-1]-newTimes[0], newTracks);
+    }
+
+    applyRootContinuity(clip) {
+        if (!this.hasLastRoot) return clip;
+        const posTrack = clip.tracks.find(t => t.name.endsWith('.position'));
+        if (!posTrack) return clip;
+        const baseX = posTrack.values[0];
+        const baseY = posTrack.values[1];
+        const baseZ = posTrack.values[2];
+        const dx = this.lastRootPos.x - baseX;
+        const dy = this.lastRootPos.y - baseY;
+        const dz = this.lastRootPos.z - baseZ;
+        if (Math.abs(dx)+Math.abs(dy)+Math.abs(dz) < 1e-6) return clip;
+        const shifted = posTrack.values.slice();
+        for (let i=0;i<shifted.length;i+=3){ shifted[i]+=dx; shifted[i+1]+=dy; shifted[i+2]+=dz; }
+        const newTrack = new THREE.VectorKeyframeTrack(posTrack.name, posTrack.times, shifted);
+        const newTracks = clip.tracks.map(tr => tr===posTrack ? newTrack : tr);
+        return new THREE.AnimationClip(clip.name, clip.duration, newTracks);
+    }
+
+    captureLastRootPose(clip) {
+        const posTrack = clip.tracks.find(t => t.name.endsWith('.position'));
+        if (!posTrack) return;
+        const n = posTrack.values.length;
+        this.lastRootPos.x = posTrack.values[n-3];
+        this.lastRootPos.y = posTrack.values[n-2];
+        this.lastRootPos.z = posTrack.values[n-1];
+        this.hasLastRoot = true;
+        this.lastClipMotion = clip.userData?.rootMotion || 0;
+    }
+
+    inertialize(action) {
+        if (!action) return;
+        const total = this.smoothConfig.inertialSeconds;
+        if (!total) return;
+        const baseScale = this.playbackSpeed;
+        const start = (performance && performance.now) ? performance.now() : Date.now();
+        const step = () => {
+            const now = (performance && performance.now) ? performance.now() : Date.now();
+            const dt = (now - start)/1000;
+            if (dt < total && action.enabled) {
+                const k = dt/total; // 0..1
+                action.timeScale = baseScale * (0.4 + 0.6*k*k); // ease-in quadratic
+                requestAnimationFrame(step);
+            } else {
+                action.timeScale = baseScale;
+            }
+        };
+        requestAnimationFrame(step);
     }
 
     retargetClipRoot(clip, sourceScene, targetScene) {
@@ -617,12 +742,18 @@ class ISLExtensionViewer {
     }
 
     adaptiveFade(clip) {
-        const raw = clip.duration * this.smoothConfig.fadePortion;
-        return Math.min(this.smoothConfig.maxFade, Math.max(this.smoothConfig.minFade, raw));
+    let base = clip.duration * this.smoothConfig.fadePortion;
+    const motion = clip.userData?.rootMotion || 0;
+    const norm = Math.min(1, motion / 0.35); // assume >0.35 significant
+    base *= (0.5 + norm * this.smoothConfig.motionFadeWeight); // scale by motion
+    // Never let fade exceed half of clip shown portion to avoid hiding sign core
+    const maxAllowed = Math.min(this.smoothConfig.maxFade, (clip.duration * 0.5));
+    return Math.min(maxAllowed, Math.max(this.smoothConfig.minFade, base));
     }
 
     async playClipSequential(clip, isLast) {
         if (!this.mixer || !clip) return;
+        clip = this.applyRootContinuity(clip);
         const fade = this.adaptiveFade(clip);
         const action = this.mixer.clipAction(clip);
         action.reset();
@@ -636,8 +767,13 @@ class ISLExtensionViewer {
         }
         this.currentAction = action;
         action.play();
-        const effectiveDuration = clip.duration / this.playbackSpeed;
-        const wait = isLast ? effectiveDuration : Math.max(0.05, effectiveDuration - this.smoothConfig.overlapSeconds);
+        this.inertialize(action);
+    const effectiveDuration = clip.duration / this.playbackSpeed;
+    setTimeout(() => { try { this.captureLastRootPose(clip); } catch(_){} }, Math.max(0,(effectiveDuration-0.03)*1000));
+    // Ensure minimum completion portion
+    const minPlay = effectiveDuration * this.smoothConfig.minCompletionPortion;
+    const candidate = effectiveDuration - this.smoothConfig.overlapSeconds;
+    const wait = isLast ? effectiveDuration : Math.max(minPlay, candidate, 0.05);
         return new Promise(resolve => setTimeout(resolve, wait * 1000));
     }
 
@@ -679,6 +815,52 @@ class ISLExtensionViewer {
         await this.ensureBaseAvatar();
         const clip = await this.fetchClipForWord(word).catch(()=> this.clipCache.get('__default__'));
         await this.playClipSequential(clip, true);
+    }
+
+    enqueueWord(word) {
+        if (!word) return;
+        const w = word.toLowerCase();
+        // Avoid enqueueing duplicates back-to-back
+        if (this.lastQueuedWord === w) return;
+        this.lastQueuedWord = w;
+        this.wordQueue.push(w);
+        if (!this.isProcessingQueue) this.processQueue();
+    }
+
+    async processQueue() {
+        if (this.isProcessingQueue) return;
+        this.isProcessingQueue = true;
+        while (this.wordQueue.length) {
+            const current = this.wordQueue.shift();
+            try {
+                await this.ensureBaseAvatar();
+                let clip = await this.fetchClipForWord(current).catch(()=> this.clipCache.get('__default__'));
+                if (!clip && this.clipCache.get('__default__')) clip = this.clipCache.get('__default__');
+                if (clip) {
+                    // If more words already queued, treat as not last to allow overlap timing logic
+                    const isLast = this.wordQueue.length === 0;
+                    await this.playClipSequential(clip, isLast);
+                }
+            } catch (e) {
+                console.warn('[ISL][QUEUE][ERR]', current, e.message);
+                // attempt idle fallback
+                try { await this.playIdleLoop(); } catch(_){ }
+            }
+        }
+        // When queue drains, keep idle loop (if enabled)
+        if (this.enableIdleDefault && this.clipCache.get('__default__')) {
+            // If currentAction finished or not default, softly transition back
+            if (this.currentAction && this.currentAction.getClip() !== this.clipCache.get('__default__')) {
+                const idle = this.mixer.clipAction(this.clipCache.get('__default__'));
+                idle.reset();
+                idle.setLoop(THREE.LoopRepeat);
+                idle.timeScale = this.playbackSpeed * 0.6;
+                if (this.currentAction) this.currentAction.crossFadeTo(idle, 0.25, false); else idle.fadeIn(0.25);
+                idle.play();
+                this.currentAction = idle;
+            }
+        }
+        this.isProcessingQueue = false;
     }
 
     animate() {
@@ -730,6 +912,7 @@ let lastSyncedWord = '';
 let syncInterval = null;
 let isYouTubePage = false;
 let currentVideoId = null; // track current YouTube video id for SPA navigation
+let transcriptVideoId = null; // video id the current transcript belongs to
 
 function getYouTubeVideoId() {
     try {
@@ -790,41 +973,49 @@ function waitForElement(selector, timeout = 10000) {
     });
 }
 
-async function extractTranscript() {
+async function extractTranscript({ force = false, retry = 0 } = {}) {
+    const vid = getYouTubeVideoId();
+    if (!vid) return;
+    if (!force && transcriptVideoId === vid && transcriptData.length) return; // already fresh
     transcriptData = [];
+    lastSyncedWord = '';
     try {
-        const transcriptButton = await waitForElement('button[aria-label="Show transcript"]');
-        transcriptButton.click();
-
-        await waitForElement('ytd-transcript-segment-renderer');
-        const segments = document.querySelectorAll('ytd-transcript-segment-renderer');
-
-        segments.forEach((segment, index) => {
+        transcriptVideoId = vid;
+        // Try to open transcript panel if not present
+        let segments = document.querySelectorAll('ytd-transcript-segment-renderer');
+        if (!segments.length) {
+            const btn = document.querySelector('button[aria-label="Show transcript"], button[aria-label="Transcript"], button[aria-label*="transcript"]');
+            if (btn) {
+                btn.click();
+                await waitForElement('ytd-transcript-segment-renderer');
+                segments = document.querySelectorAll('ytd-transcript-segment-renderer');
+            }
+        }
+        if (!segments.length && retry < 3) {
+            // DOM not ready yet for new video; retry with backoff
+            setTimeout(() => extractTranscript({ force: true, retry: retry + 1 }), 600 * (retry + 1));
+            return;
+        }
+        segments.forEach(segment => {
             const timeEl = segment.querySelector('.segment-timestamp');
             const textEl = segment.querySelector('.segment-text');
-            if (timeEl && textEl) {
-                const timeText = timeEl.textContent.trim();
-                const startTime = parseTimeToSeconds(timeText);
-                const segmentText = textEl.textContent.trim();
-                const words = segmentText.split(/\s+/).filter(Boolean);
-                const wordDuration = 5 / words.length;
-
-                words.forEach((word, wordIndex) => {
-                    const cleanedWord = word.toLowerCase().replace(/[^\w\s'-]/g, '');
-                    const wordStartTime = startTime + (wordIndex * wordDuration);
-                    const wordEndTime = startTime + ((wordIndex + 1) * wordDuration);
-                    transcriptData.push({
-                        word: cleanedWord,
-                        startTime: wordStartTime,
-                        endTime: wordEndTime,
-                        originalText: word
-                    });
-                });
-            }
+            if (!timeEl || !textEl) return;
+            const timeText = timeEl.textContent.trim();
+            const startTime = parseTimeToSeconds(timeText);
+            const segmentText = textEl.textContent.trim();
+            const words = segmentText.split(/\s+/).filter(Boolean);
+            const wordDuration = words.length ? (5 / words.length) : 0.5; // crude fallback
+            words.forEach((word, wi) => {
+                const cleanedWord = word.toLowerCase().replace(/[^\w\s'-]/g, '');
+                const wordStartTime = startTime + wi * wordDuration;
+                const wordEndTime = startTime + (wi + 1) * wordDuration;
+                transcriptData.push({ word: cleanedWord, startTime: wordStartTime, endTime: wordEndTime, originalText: word });
+            });
         });
-        console.log('Transcript extracted:', transcriptData.length, 'words');
+        console.log('[Signify] Transcript extracted for', vid, 'words=', transcriptData.length, 'retry=', retry);
     } catch (error) {
-        console.error('Transcript extraction failed:', error);
+        console.error('[Signify] Transcript extraction failed (retry', retry, '):', error);
+        if (retry < 3) setTimeout(() => extractTranscript({ force: true, retry: retry + 1 }), 800 * (retry + 1));
     }
 }
 
@@ -898,16 +1089,12 @@ function updateCurrentWord(word) {
 function handleVideoPlay() {
     const video = document.querySelector('video');
     if (!video) return;
-    
-    if (transcriptData.length === 0) {
-        extractTranscript().then(() => {
-            translationActive = true;
-            syncWithVideo(video);
-        });
-    } else {
+    const vid = getYouTubeVideoId();
+    const needForce = transcriptVideoId !== vid;
+    extractTranscript({ force: needForce }).then(() => {
         translationActive = true;
         syncWithVideo(video);
-    }
+    });
 }
 
 function createSignifyButton() {
@@ -1107,9 +1294,11 @@ function monitorVideoChange() {
             currentVideoId = newId;
             transcriptData = [];
             lastSyncedWord = '';
+            transcriptVideoId = null;
             if (translationActive) {
-                console.log('[Signify] Detected video change, re-extracting transcript');
-                handleVideoPlay();
+                console.log('[Signify] Detected video change, scheduling transcript refresh');
+                // Give YouTube DOM time to swap transcript elements
+                setTimeout(() => handleVideoPlay(), 1000);
             }
         }
     }, 1500);

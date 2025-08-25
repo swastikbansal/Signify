@@ -27,15 +27,22 @@
 		if (STATE.initialized) return true;
 		try {
 			const cfg = await loadSettings();
-			STATE.supabaseUrl = (cfg.supabaseUrl||'').replace(/\/$/,'');
-			STATE.supabaseAnonKey = cfg.supabaseAnonKey||null;
-			STATE.bucket = cfg.bucketName || DEFAULT_BUCKET;
+			// Only override hard-coded defaults if values exist in storage.
+			if (cfg.supabaseUrl) STATE.supabaseUrl = cfg.supabaseUrl.replace(/\/$/,'');
+			if (cfg.supabaseAnonKey) STATE.supabaseAnonKey = cfg.supabaseAnonKey;
+			if (cfg.bucketName) STATE.bucket = cfg.bucketName; else STATE.bucket = STATE.bucket || DEFAULT_BUCKET;
 			STATE.useSigned = cfg.useSigned === true; // default false
 			if (STATE.supabaseUrl && STATE.supabaseAnonKey){
 				STATE.initialized = true;
 				console.log('[SupabaseConfig] Initialized with bucket', STATE.bucket, 'signed=', STATE.useSigned);
 			} else {
-				console.warn('[SupabaseConfig] Missing supabaseUrl or anon key in storage');
+				// Keep defaults (hard-coded) available for local testing; still mark initialized if they exist.
+				if (STATE.supabaseUrl && STATE.supabaseAnonKey){
+					STATE.initialized = true;
+					console.log('[SupabaseConfig] Using bundled defaults (no stored credentials)');
+				} else {
+					console.warn('[SupabaseConfig] Missing supabaseUrl or anon key; remote models disabled');
+				}
 			}
 		} catch(e){
 			console.error('[SupabaseConfig] init error', e);
