@@ -7,3 +7,5 @@ asgiref>=3.6.0
 scikit-learn-intelex
 uvicorn
 seaborn
+supabase
+dotenv

@@ -2,29 +2,27 @@ import numpy as np
 import time
 
 class Utils:
-    def __init__(self, 
-        axes: dict = {
-        "x": np.array([1, 0, 0]),
-        "-x": np.array([-1, 0, 0]),
-        "y": np.array([0, 1, 0]),
-        "-y": np.array([0, -1, 0]),
-        "z": np.array([0, 0, 1]),
-        "-z": np.array([0, 0, -1]),
-    }, restSpeed:float = 50.0, 
-    minPoints:int = 2, 
-    requiredFrames:int = 3):
+    def __init__(self, restSpeed:float = 50.0, minPoints:int = 2, requiredFrames:int = 3):
 
-        self.axes = axes
-        self.REST_SPEED_THRESHOLD = restSpeed  # pixels/second
-        self.MIN_POINTS_FOR_REST = minPoints
-        self.REQUIRED_CONSECUTIVE_FRAMES = requiredFrames
+        self.axes:dict = {
+            "x": np.array([1, 0, 0]),
+            "-x": np.array([-1, 0, 0]),
+            "y": np.array([0, 1, 0]),
+            "-y": np.array([0, -1, 0]),
+            "z": np.array([0, 0, 1]),
+            "-z": np.array([0, 0, -1]),
+            }
+        
+        self.REST_SPEED_THRESHOLD: float = restSpeed  # pixels/second
+        self.MIN_POINTS_FOR_REST: int = minPoints
+        self.REQUIRED_CONSECUTIVE_FRAMES: int = requiredFrames
 
-        self.rest_buffer_frame = 0
-        # persistent state used across consecutive calls to is_resting
-        self.prev_positions = {
-            "positions": {},        # dict e.g. {"left_wrist": np.array([...]), ...}
+        self.rest_buffer_frame: int = 0
+
+        self.prev_positions: dict = {
+            "positions": {},
             "timestamp": None,
-            "counters": {           # consecutive low-speed frame counters per key
+            "counters": {           
                 "left_wrist": 0,
                 "right_wrist": 0,
                 "left_shoulder": 0,
@@ -33,6 +31,97 @@ class Utils:
             "rest_start_time": None
         }
 
+    # Function to extract hand features (angles between vectors and axes)
+    def extract_hand_features(self, hand_landmarks, pose_landmarks=None):
+        hand_pairs = [
+            (1 , 3) ,  # Thumb
+            (6 , 8 ),  # Index finger
+            (10, 12),  # Middle finger
+            (14, 16),  # Ring finger
+            (18, 20),  # Pinky finger
+            (0 , 9)  # Palm direction
+        ]
+        
+        self.features = []
+        for pair in hand_pairs:
+            landmark1 = hand_landmarks[pair[0]]
+            landmark2 = hand_landmarks[pair[1]]
+            
+            vector = np.array([landmark2.x - landmark1.x, landmark2.y - landmark1.y, landmark2.z - landmark1.z])
+            x_axis = np.array([1, 0, 0])
+            y_axis = np.array([0, 1, 0])
+            z_axis = np.array([0, 0, 1])
+            
+            angle_x = self.calculate_angle1(vector, x_axis)
+            angle_y = self.calculate_angle1(vector, y_axis)
+            angle_z = self.calculate_angle1(vector, z_axis)
+            
+            self.features.extend([angle_x, angle_y, angle_z])
+        
+        # Safe access to landmarks for 0, 5, and 17
+        vector_0_to_5 = self.get_coordinates_safe(hand_landmarks, 5) - self.get_coordinates_safe(hand_landmarks, 0)
+        vector_0_to_17 = self.get_coordinates_safe(hand_landmarks, 17) - self.get_coordinates_safe(hand_landmarks, 0)
+        
+        normal_vector = np.cross(vector_0_to_5, vector_0_to_17)
+        
+        normal_angle_x = self.calculate_angle1(normal_vector, x_axis)
+        normal_angle_y = self.calculate_angle1(normal_vector, y_axis)
+        normal_angle_z = self.calculate_angle1(normal_vector, z_axis)
+        
+        self.features.extend([normal_angle_x, normal_angle_y, normal_angle_z])
+        
+        # If pose landmarks are available, calculate the distance between nose and wrist
+        
+        nose_landmark = self.get_coordinates_safe(pose_landmarks, 0)  # Nose is at index 0 in pose landmarks
+        wrist_landmark = self.get_coordinates_safe(hand_landmarks, 0)  # Wrist is at index 0 in hand landmarks
+            
+        # Calculate the distance in the x and y axes
+        distance_x = abs(nose_landmark[0] - wrist_landmark[0])
+        distance_y = abs(nose_landmark[1] - wrist_landmark[1])
+            
+        # Append the x and y distances as new features
+        self.features.extend([distance_x, distance_y])
+        
+        return self.features
+    
+        # Function to extract the pose features
+    def extract_pose_features(self, landmarks):
+        # Define the landmark indices for the required sets of points (using Pose landmark indices)
+        points_sets = {
+            "angle_11_12_14": (self.get_coordinates_safe(landmarks, 11), self.get_coordinates_safe(landmarks, 12), self.get_coordinates_safe(landmarks, 14)),  # Left shoulder, right shoulder, right elbow
+            "angle_12_14_16": (self.get_coordinates_safe(landmarks, 12), self.get_coordinates_safe(landmarks, 11), self.get_coordinates_safe(landmarks, 13)),  # Right shoulder, right elbow, right wrist
+            "angle_11_13_15": (self.get_coordinates_safe(landmarks, 11), self.get_coordinates_safe(landmarks, 13), self.get_coordinates_safe(landmarks, 15)),  # Left shoulder, left elbow, left wrist
+            "angle_13_15_17": (self.get_coordinates_safe(landmarks, 12), self.get_coordinates_safe(landmarks, 14), self.get_coordinates_safe(landmarks, 16)),  # Left elbow, left wrist, left hand
+            "normal_1": (self.get_coordinates_safe(landmarks, 15), self.get_coordinates_safe(landmarks, 17), self.get_coordinates_safe(landmarks, 19)),  # Plane formed by left shoulder, left hip, left knee
+            "normal_2": (self.get_coordinates_safe(landmarks, 16), self.get_coordinates_safe(landmarks, 18), self.get_coordinates_safe(landmarks, 20))   # Plane formed by right shoulder, right hip, right knee
+        }
+
+        # Calculate the angles between the specific sets of points
+        self.angles = []
+        for key, (p1, p2, p3) in points_sets.items():
+            if key.startswith("angle"):
+                angle = self.calculate_angle2(p1, p2, p3)
+                self.angles.append(angle)
+        
+        # Calculate normals and angles with axes
+        for key, (p1, p2, p3) in points_sets.items():
+            if key.startswith("normal"):
+                normal = self.calculate_normal_safe(p1, p2, p3)  # Safe normal calculation
+                if np.array_equal(normal, [-1, -1, -1]):
+                    # If normal is [-1, -1, -1], it indicates missing points, so append [-1, -1, -1] for each axis angle
+                    self.angles.extend([-1, -1, -1])
+                else:
+                    normal_angles = self.calculate_normal_angles(normal)
+                    self.angles.extend(normal_angles)  # Append angles with x, y, z axes
+
+        # Add the distance between points 15 (left wrist) and 16 (right wrist)
+        p15 = self.get_coordinates_safe(landmarks, 15)  # Left wrist
+        p16 = self.get_coordinates_safe(landmarks, 16)  # Right wrist
+        x_distance, y_distance = self.calculate_xy_distance(p15, p16)
+        self.angles.extend([x_distance, y_distance])  # Append x and y distance to the feature list
+        
+        return self.angles
+    
     def _landmark_to_pixel(self, landmark, img_shape):
         """Convert normalized landmark to pixel (x,y)."""
         h, w = img_shape[0], img_shape[1]
@@ -146,7 +235,6 @@ class Utils:
         # default
         self.prev_positions['rest_start_time'] = None
         return False
-
     
     def calculate_angle1(self, vec1, vec2):
         dot_product = np.dot(vec1, vec2)
@@ -160,7 +248,6 @@ class Utils:
             return np.array([landmark[index].x, landmark[index].y, landmark[index].z])
         except IndexError:
             return np.array([-1, -1, -1])  
-
 
     def angle_between_vectors(self, v1, v2):
         dot_product = np.dot(v1, v2)
@@ -178,58 +265,7 @@ class Utils:
         self.best_match_axis = min(angles, key=angles.get)
         return self.best_match_axis
 
-    # Function to extract hand features (angles between vectors and axes)
-    def extract_hand_features(self, hand_landmarks, pose_landmarks=None):
-        hand_pairs = [
-            (1 , 3) ,  # Thumb
-            (6 , 8 ),  # Index finger
-            (10, 12),  # Middle finger
-            (14, 16),  # Ring finger
-            (18, 20),  # Pinky finger
-            (0 , 9)  # Palm direction
-        ]
-        
-        self.features = []
-        for pair in hand_pairs:
-            landmark1 = hand_landmarks[pair[0]]
-            landmark2 = hand_landmarks[pair[1]]
-            
-            vector = np.array([landmark2.x - landmark1.x, landmark2.y - landmark1.y, landmark2.z - landmark1.z])
-            x_axis = np.array([1, 0, 0])
-            y_axis = np.array([0, 1, 0])
-            z_axis = np.array([0, 0, 1])
-            
-            angle_x = self.calculate_angle1(vector, x_axis)
-            angle_y = self.calculate_angle1(vector, y_axis)
-            angle_z = self.calculate_angle1(vector, z_axis)
-            
-            self.features.extend([angle_x, angle_y, angle_z])
-        
-        # Safe access to landmarks for 0, 5, and 17
-        vector_0_to_5 = self.get_coordinates_safe(hand_landmarks, 5) - self.get_coordinates_safe(hand_landmarks, 0)
-        vector_0_to_17 = self.get_coordinates_safe(hand_landmarks, 17) - self.get_coordinates_safe(hand_landmarks, 0)
-        
-        normal_vector = np.cross(vector_0_to_5, vector_0_to_17)
-        
-        normal_angle_x = self.calculate_angle1(normal_vector, x_axis)
-        normal_angle_y = self.calculate_angle1(normal_vector, y_axis)
-        normal_angle_z = self.calculate_angle1(normal_vector, z_axis)
-        
-        self.features.extend([normal_angle_x, normal_angle_y, normal_angle_z])
-        
-        # If pose landmarks are available, calculate the distance between nose and wrist
-        
-        nose_landmark = self.get_coordinates_safe(pose_landmarks, 0)  # Nose is at index 0 in pose landmarks
-        wrist_landmark = self.get_coordinates_safe(hand_landmarks, 0)  # Wrist is at index 0 in hand landmarks
-            
-        # Calculate the distance in the x and y axes
-        distance_x = abs(nose_landmark[0] - wrist_landmark[0])
-        distance_y = abs(nose_landmark[1] - wrist_landmark[1])
-            
-        # Append the x and y distances as new features
-        self.features.extend([distance_x, distance_y])
-        
-        return self.features
+    
 
     #Initialize pose extraction functions
     def calculate_normal_safe(self,p1, p2, p3):
@@ -279,40 +315,3 @@ class Utils:
         self.y_distance = abs(p1[1] - p2[1])  
         return self.x_distance, self.y_distance
 
-    # Function to extract the pose features
-    def extract_pose_features(self, landmarks):
-        # Define the landmark indices for the required sets of points (using Pose landmark indices)
-        points_sets = {
-            "angle_11_12_14": (self.get_coordinates_safe(landmarks, 11), self.get_coordinates_safe(landmarks, 12), self.get_coordinates_safe(landmarks, 14)),  # Left shoulder, right shoulder, right elbow
-            "angle_12_14_16": (self.get_coordinates_safe(landmarks, 12), self.get_coordinates_safe(landmarks, 11), self.get_coordinates_safe(landmarks, 13)),  # Right shoulder, right elbow, right wrist
-            "angle_11_13_15": (self.get_coordinates_safe(landmarks, 11), self.get_coordinates_safe(landmarks, 13), self.get_coordinates_safe(landmarks, 15)),  # Left shoulder, left elbow, left wrist
-            "angle_13_15_17": (self.get_coordinates_safe(landmarks, 12), self.get_coordinates_safe(landmarks, 14), self.get_coordinates_safe(landmarks, 16)),  # Left elbow, left wrist, left hand
-            "normal_1": (self.get_coordinates_safe(landmarks, 15), self.get_coordinates_safe(landmarks, 17), self.get_coordinates_safe(landmarks, 19)),  # Plane formed by left shoulder, left hip, left knee
-            "normal_2": (self.get_coordinates_safe(landmarks, 16), self.get_coordinates_safe(landmarks, 18), self.get_coordinates_safe(landmarks, 20))   # Plane formed by right shoulder, right hip, right knee
-        }
-
-        # Calculate the angles between the specific sets of points
-        self.angles = []
-        for key, (p1, p2, p3) in points_sets.items():
-            if key.startswith("angle"):
-                angle = self.calculate_angle2(p1, p2, p3)
-                self.angles.append(angle)
-        
-        # Calculate normals and angles with axes
-        for key, (p1, p2, p3) in points_sets.items():
-            if key.startswith("normal"):
-                normal = self.calculate_normal_safe(p1, p2, p3)  # Safe normal calculation
-                if np.array_equal(normal, [-1, -1, -1]):
-                    # If normal is [-1, -1, -1], it indicates missing points, so append [-1, -1, -1] for each axis angle
-                    self.angles.extend([-1, -1, -1])
-                else:
-                    normal_angles = self.calculate_normal_angles(normal)
-                    self.angles.extend(normal_angles)  # Append angles with x, y, z axes
-
-        # Add the distance between points 15 (left wrist) and 16 (right wrist)
-        p15 = self.get_coordinates_safe(landmarks, 15)  # Left wrist
-        p16 = self.get_coordinates_safe(landmarks, 16)  # Right wrist
-        x_distance, y_distance = self.calculate_xy_distance(p15, p16)
-        self.angles.extend([x_distance, y_distance])  # Append x and y distance to the feature list
-        
-        return self.angles

@@ -1,10 +1,15 @@
-# Dataset related
-Dataset/
-test.py
+# Common folders
 .venv/ 
 .vscode/
+
+# Dataset related
+Dataset/
 debug_data/
-Test Recordings
+Test Recordings/
+Custom_Dataset/
+
+# Python files
+test.py
 
 # common python ignores
 *.pyc
@@ -15,3 +20,6 @@ __pycache__/
 Python_Live/Dataset
 Python_Live/Models
 Python_Live/MP_DATA
+
+# Env file
+.env

@@ -1,35 +1,27 @@
-import warnings
-warnings.filterwarnings("ignore")
-
+#API
 from flask import Flask, request, jsonify
+
+# ML
 import pickle
 import numpy as np
-from utils import Utils
 from matplotlib import pyplot as plt
 import mediapipe as mp
 import cv2
+
+# System modules
 import threading
 from queue import Queue, Empty
 import warnings
-
+import os
+import warnings
 warnings.filterwarnings("ignore")
 
-# Rest detection parameters
-REST_SPEED_THRESHOLD :float = 30.0   # pixels/second; lower => more sensitive to rest
-MIN_POINTS_FOR_REST :int = 2       
-REQUIRED_CONSECUTIVE_FRAMES :int = 3  
-REST_DELAY = 2
+#Custom modules
+from utils import Utils
+from CustomTrainer import Trainer
 
-USE_REST: bool = False
-
-app = Flask(__name__)
-
-# Queue for video frames to be displayed
-frame_queue = Queue(maxsize=10)
-
-# Global variables for frame accumulation
-accumulated_probs = None
-frame_count:int = 0
+# TO DO
+# Switching the model based on the response received from the model
 
 
 def calulating_percentage(avg, all_classes):
@@ -57,11 +49,17 @@ def calulating_percentage(avg, all_classes):
 
     return threshold_percentage
 
-def load_models():
-    """Load all models"""
-    left_model_filename = r'./Models/left_model.p'
-    right_model_filename = r'./Models/right_model.p'
-    pose_model_filename = r'./Models/pose_model.p'
+def load_models(model_type:str = "Default"):
+    if model_type == "Default":
+        """Load all models"""
+        left_model_filename = r'./Models/left_model.p'
+        right_model_filename = r'./Models/right_model.p'
+        pose_model_filename = r'./Models/pose_model.p'
+
+    elif model_type == "Custom":
+        left_model_filename = r'./Custom_Dataset/Models/left_model_new.p'
+        right_model_filename = r'./Custom_Dataset/Models/right_model_new.p'
+        pose_model_filename = r'./Custom_Dataset/Models/pose_model_new.p'
 
     def load_model(filename):
         with open(filename, 'rb') as f:
@@ -71,18 +69,6 @@ def load_models():
     return (load_model(left_model_filename), 
             load_model(right_model_filename), 
             load_model(pose_model_filename))
-
-# Load models once at startup
-left_model, right_model, pose_model = load_models()
-
-# Initialize MediaPipe solutions
-mp_hands = mp.solutions.hands
-mp_pose = mp.solutions.pose
-hands = mp_hands.Hands(max_num_hands=2, min_detection_confidence=0.5, min_tracking_confidence=0.5)
-pose = mp_pose.Pose(min_detection_confidence=0.7, min_tracking_confidence=0.7)
-
-    
-utils = Utils(REST_SPEED_THRESHOLD, MIN_POINTS_FOR_REST, REQUIRED_CONSECUTIVE_FRAMES)
 
 def display_frames():
     """
@@ -103,7 +89,7 @@ def display_frames():
             break
     cv2.destroyAllWindows()
 
-def process_image(img):
+def process_image(img, USE_REST:bool = False):
     """Process a single image (np.array) to get a prediction."""
     global accumulated_probs, frame_count
 
@@ -211,16 +197,70 @@ def process_image(img):
 
     return ({"prediction": pred} if pred else {"message": "Collecting frames", "frame_count": frame_count}), annotated
 
+# Rest detection parameters
+REST_SPEED_THRESHOLD :float = 30.0   # pixels/second; lower => more sensitive to rest
+MIN_POINTS_FOR_REST :int = 2       
+REQUIRED_CONSECUTIVE_FRAMES :int = 3  
+REST_DELAY = 2
+USE_REST: bool = False
+
+app = Flask(__name__)
+
+# Queue for video frames to be displayed
+frame_queue = Queue(maxsize=10)
+
+# Global variables for frame accumulation
+accumulated_probs = None
+frame_count:int = 0
+model_type = "Custom"   
+
+# Load models once at startup
+left_model, right_model, pose_model = load_models()
+
+# Initialize MediaPipe solutions
+mp_hands = mp.solutions.hands
+mp_pose = mp.solutions.pose
+hands = mp_hands.Hands(max_num_hands=2, min_detection_confidence=0.5, min_tracking_confidence=0.5)
+pose = mp_pose.Pose(min_detection_confidence=0.7, min_tracking_confidence=0.7)
+
+utils = Utils(REST_SPEED_THRESHOLD, MIN_POINTS_FOR_REST, REQUIRED_CONSECUTIVE_FRAMES)
+trainer = Trainer(hands,pose)
+
 @app.route('/')
 def home():
     return "<h1>Signify API</h1>"
 
-@app.route('/custom', methods= ['POST'])
+@app.route('/customTrain', methods= ['GET',"POST"])
 def custom_model():
-    
+    try:
+        status = trainer.run_training()
+        if status:
+            print("Model training completed")
+            switch_model_internal("Custom")
+            return jsonify({"status": "success", "message": "Custom model training completed and switched"}), 200
+    except Exception as e:
+        return jsonify({"status": "error", "message": f"Error training model: {str(e)}"}), 500
 
-@app.route('/process_frame', methods=['POST'])
-def process_video_frame():
+
+@app.route('/switchModel', methods=['POST', 'GET'])
+def switch_model():
+    """Switch the model based on the response received from the model."""
+    try:
+        data = request.json
+        model_type = data.get('model', 'Default')
+        switch_model_internal(model_type)
+        return jsonify({"status": "success", "message": f"Switched to model type {model_type}"}), 200
+    except Exception as e:
+        return jsonify({"status": "error", "message": f"Error switching model: {str(e)}"}), 500
+
+def switch_model_internal(model_type: str):
+    """Internal function to switch models"""
+    global left_model, right_model, pose_model
+    left_model, right_model, pose_model = load_models(model_type)
+    print(f"Models switched to: {model_type}")
+
+@app.route('/processFrame', methods=['POST'])
+def process_frame():
     """Receive a video frame, display it, and return a prediction."""
     try:
         if 'frame' not in request.files:
@@ -247,7 +287,10 @@ def process_video_frame():
             
         # Process the image to get a prediction
         result, annotated_img = process_image(img)
-        
+
+        if result.get("USE_REST"):
+            result, annotated_img = process_image(img, USE_REST=result["USE_REST"])
+
         if result.get("prediction"):
             # Clear the queue as we have a final prediction
             while not frame_queue.empty():
@@ -263,7 +306,7 @@ def process_video_frame():
             return jsonify({
                 "status": "success",
                 "prediction": result["prediction"]
-            }), 200
+            }, 200)
         else:
             text = f"{result.get('message', 'Processing')} ({result.get('frame_count', 0)}/5)"
             cv2.putText(annotated_img, text, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
@@ -273,7 +316,7 @@ def process_video_frame():
                 "status": "collecting",
                 "message": result.get("message", "Processing frames"),
                 "frame_count": result.get("frame_count", 0)
-            }), 200
+            }, 200)
 
     except Exception as e:
         return jsonify({"status": "error", "message": f"Processing error: {str(e)}"}), 500
@@ -303,11 +346,12 @@ if __name__ == '__main__':
 
     print("Starting prediction API server...")
     print("Endpoints available:")
-    print("- POST /process_frame - Process received frame and return predictions")
+    print("- POST /processFrame - Process received frame and return predictions")
+    print("- GET, POST /customTrain - Train a custom model")
+    print("- POST /switchModel - Switch between models")
     print("- POST /reset - Reset frame accumulation")
     print("- GET /health - Health check")
     print("Press 'q' in the 'Live Stream' window to quit.")
     
-    # use_reloader=False is important for threads
     app.run(host='0.0.0.0', port=5000, debug=True, threaded=True)
 
