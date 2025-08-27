@@ -2,11 +2,9 @@ import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import 'custom_signs_widget.dart' show CustomSignsPage;
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'package:file_picker/file_picker.dart';
 import '/services/supabase_storage_service.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 class CustomSignsModel extends FlutterFlowModel<CustomSignsPage> {
   FilePickerResult? selectedFiles;
@@ -22,7 +20,7 @@ class CustomSignsModel extends FlutterFlowModel<CustomSignsPage> {
   final Map<String, DebugDataField> debugGeneratorVariables = {};
   final Map<String, DebugDataField> debugBackendQueries = {};
   final Map<String, FlutterFlowModel> widgetBuilderComponents = {};
-  String _apiUrl = 'http://192.168.29.42:5000';
+  final String _apiUrl = 'http://192.168.29.42:5000';
   // String _apiUrl = 'https://philosia-codecult-signify.hf.space/process_frame';
 
   String get _customSignsEndpoint => '$_apiUrl/customTrain';

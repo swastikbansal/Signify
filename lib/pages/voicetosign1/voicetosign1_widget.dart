@@ -11,6 +11,7 @@ import 'package:model_viewer_plus/model_viewer_plus.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/services/supabase_animation_service.dart';
+import '/services/error_service.dart';
 import 'voicetosign1_model.dart';
 
 export 'voicetosign1_model.dart';
@@ -94,12 +95,19 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
   // Animation controllers for moving line animation (Claude AI style)
   late AnimationController _movingLineController;
   late Animation<double> _movingLineAnimation;
+  Timer? _prefetchDebounce; // debounce timer for on-type prefetch
 
   // Direct animation sequence state (moved from InstantAnimationPlayer)
   Timer? _animationTimer;
   int _currentAnimationIndex = 0;
   bool _isSequenceActive = false;
   String? _currentAnimationUrl;
+
+  // Double-buffered model viewers for seamless swaps
+  String? _viewerUrlA;
+  String? _viewerUrlB;
+  bool _useViewerA = true; // which viewer is currently visible
+  final Duration _crossfadeDuration = const Duration(milliseconds: 150);
 
   // Image handling variables - use paths instead of File objects for safety
   List<String> uploadedImagePaths = [];
@@ -125,6 +133,10 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
     // Animation initialization
     currentAnimation = defaultAnimation;
     isPlayingSequence = false;
+
+    // Initialize double buffer URLs
+    _viewerUrlA = defaultAnimation;
+    _viewerUrlB = defaultAnimation;
 
     // Initialize OCR TextRecognizer
     _textRecognizer = TextRecognizer();
@@ -154,6 +166,7 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
     _movingLineController.dispose();
     _animationTimer?.cancel(); // Cancel animation timer
     _textRecognizer.close(); // Dispose text recognizer
+    _prefetchDebounce?.cancel();
     super.dispose();
   }
 
@@ -190,6 +203,9 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
       _isSequenceActive = true;
     });
 
+    // Prime the double buffer with current and next URLs
+    _primeDoubleBuffer(_currentAnimationIndex);
+
     _playCurrentAnimationInstantly();
   }
 
@@ -207,6 +223,7 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
 
     setState(() {
       _currentAnimationUrl = currentAnimationData.url;
+
       currentAnimation = currentAnimationData.url;
       currentWord = currentWordData;
     });
@@ -220,25 +237,72 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
     final animationDuration = currentAnimationData.metadata.duration;
 
     // Debug info for performance monitoring
-    debugPrint(
-      '⚡ INSTANT: ${currentWordData ?? 'Unknown'} (${animationDuration}ms)',
+    // Lightweight breadcrumb for performance trace
+    ErrorService.log(
+      'instant_play ${currentWordData ?? 'unknown'} ${animationDuration}ms',
     );
 
-    // Pre-cache next animation for seamless transition (if exists)
-    if (_currentAnimationIndex + 1 < _animationQueue.length) {
-      final nextAnimation = _animationQueue[_currentAnimationIndex + 1];
-      InstantAnimationCache.ultraPreload([nextAnimation]);
-    }
+    // Preload next in the inactive viewer (if exists)
+    _preloadNextIntoInactiveViewer(_currentAnimationIndex + 1);
 
     _animationTimer?.cancel();
     _animationTimer = Timer(Duration(milliseconds: animationDuration), () {
+      // Swap viewers first to avoid any blank frame
+      setState(() {
+        _useViewerA = !_useViewerA;
+      });
+
       _currentAnimationIndex++;
+
+      // After swapping, update the now-inactive viewer with the upcoming URL
+      _preloadNextIntoInactiveViewer(_currentAnimationIndex + 1);
+
       _playCurrentAnimationInstantly();
     });
   }
 
+  // Set the active viewer to current, and the inactive to next (if any)
+  void _primeDoubleBuffer(int index) {
+    final String currentUrl = _animationQueue[index].url ?? defaultAnimation;
+    final String nextUrl = (index + 1 < _animationQueue.length)
+        ? (_animationQueue[index + 1].url ?? defaultAnimation)
+        : defaultAnimation;
+
+    setState(() {
+      if (_useViewerA) {
+        _viewerUrlA = currentUrl;
+        _viewerUrlB = nextUrl;
+      } else {
+        _viewerUrlB = currentUrl;
+        _viewerUrlA = nextUrl;
+      }
+    });
+  }
+
+  // Load the next URL into the viewer that is currently hidden
+  void _preloadNextIntoInactiveViewer(int nextIndex) {
+    final String nextUrl = (nextIndex < _animationQueue.length)
+        ? (_animationQueue[nextIndex].url ?? defaultAnimation)
+        : defaultAnimation;
+
+    setState(() {
+      if (_useViewerA) {
+        // A is visible, B is hidden -> preload B
+        _viewerUrlB = nextUrl;
+      } else {
+        // B is visible, A is hidden -> preload A
+        _viewerUrlA = nextUrl;
+      }
+    });
+
+    // Also hint our in-memory cache
+    if (nextIndex < _animationQueue.length) {
+      InstantAnimationCache.ultraPreload([_animationQueue[nextIndex]]);
+    }
+  }
+
   void _completeSequence() {
-    debugPrint('⚡ INSTANT sequence completed');
+    ErrorService.log('instant_sequence_complete');
 
     // Cancel any remaining timer
     _animationTimer?.cancel();
@@ -248,8 +312,12 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
       _isSequenceActive = false;
       _currentAnimationIndex = 0;
       _currentAnimationUrl = null;
+
       // Return to default animation smoothly
       currentAnimation = defaultAnimation;
+      _viewerUrlA = defaultAnimation;
+      _viewerUrlB = defaultAnimation;
+      _useViewerA = true;
     });
 
     _onAnimationSequenceComplete();
@@ -278,7 +346,7 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
 
       await _processImageSafely(pickedFile, isFromCamera: false);
     } catch (e) {
-      debugPrint('Gallery image picker error: $e');
+      ErrorService.reportError(e);
       setState(() {
         isProcessingImage = false;
       });
@@ -321,7 +389,7 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
 
       await _processImageSafely(pickedFile, isFromCamera: true);
     } catch (e) {
-      debugPrint('Camera capture error: $e');
+      ErrorService.reportError(e);
       setState(() {
         isProcessingImage = false;
       });
@@ -370,7 +438,7 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
         final recognizedText = await _textRecognizer.processImage(inputImage);
         extractedText = recognizedText.text.trim();
       } catch (ocrError) {
-        debugPrint('OCR processing failed: $ocrError');
+        ErrorService.reportError(ocrError);
         // Continue without OCR - don't let OCR failure break the app
       }
 
@@ -392,11 +460,9 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
         isProcessingImage = false;
       });
 
-      debugPrint(
-        'Image processed successfully. OCR text length: ${extractedText.length}',
-      );
+      ErrorService.log('ocr_len=${extractedText.length}');
     } catch (e) {
-      debugPrint('Image processing error: $e');
+      ErrorService.reportError(e);
 
       setState(() {
         isProcessingImage = false;
@@ -760,36 +826,61 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
                 ),
                 child: Stack(
                   children: [
-                    // Direct ModelViewer for ultra-seamless animations (HandTalk-style)
-                    ModelViewer(
-                      key: ValueKey(
-                        _currentAnimationUrl ??
-                            currentAnimation ??
-                            defaultAnimation,
+                    // Double-buffered ModelViewer stack with crossfade
+                    Positioned.fill(
+                      child: AnimatedOpacity(
+                        duration: _crossfadeDuration,
+                        opacity: _useViewerA ? 1.0 : 0.0,
+                        child: ModelViewer(
+                          key: ValueKey('viewerA_${_viewerUrlA ?? ''}'),
+                          src: _viewerUrlA ?? defaultAnimation,
+                          autoPlay: true,
+                          loading: Loading.eager,
+                          autoRotate: false,
+                          cameraControls: !_isSequenceActive,
+                          backgroundColor: Colors.transparent,
+                          cameraTarget: '0m 1.2m 0.1m',
+                          cameraOrbit: '0deg 90deg 1.6m',
+                          minCameraOrbit: 'auto 45deg 1.0m',
+                          maxCameraOrbit: 'auto 110deg 6m',
+                          minFieldOfView: '20deg',
+                          maxFieldOfView: '65deg',
+                          fieldOfView: '35deg',
+                          disablePan: true,
+                          disableTap: true,
+                          disableZoom: true,
+                          // Increase model-viewer cache to keep multiple GLBs hot
+                          relatedJs:
+                              'try{self.ModelViewerElement&&(self.ModelViewerElement.modelCacheSize=20)}catch(e){}',
+                        ),
                       ),
-                      src:
-                          _currentAnimationUrl ??
-                          currentAnimation ??
-                          defaultAnimation,
-                      autoPlay: true,
-                      // Auto-play default animation for its resting position
-                      autoRotate: false,
-                      cameraControls: !_isSequenceActive,
-                      // Disable controls during sequence for focus
-                      backgroundColor: Colors.transparent,
-                      cameraTarget: '0m 1.2m 0.1m',
-                      cameraOrbit: '0deg 90deg 1.6m',
-                      minCameraOrbit: 'auto 45deg 1.0m',
-                      maxCameraOrbit: 'auto 110deg 6m',
-                      minFieldOfView: '20deg',
-                      maxFieldOfView: '65deg',
-                      fieldOfView: '35deg',
-                      disablePan: true,
-                      // Enable panning: drag with 2 fingers (mobile) or Ctrl+drag (desktop)
-                      disableTap: true,
-                      // Enable tap to focus: tap on model parts to center camera there
-                      disableZoom: true,
-                      // Enable zoom: pinch gesture (mobile) or scroll wheel (desktop)
+                    ),
+                    Positioned.fill(
+                      child: AnimatedOpacity(
+                        duration: _crossfadeDuration,
+                        opacity: _useViewerA ? 0.0 : 1.0,
+                        child: ModelViewer(
+                          key: ValueKey('viewerB_${_viewerUrlB ?? ''}'),
+                          src: _viewerUrlB ?? defaultAnimation,
+                          autoPlay: true,
+                          loading: Loading.eager,
+                          autoRotate: false,
+                          cameraControls: !_isSequenceActive,
+                          backgroundColor: Colors.transparent,
+                          cameraTarget: '0m 1.2m 0.2m',
+                          cameraOrbit: '0deg 90deg 1.6m',
+                          minCameraOrbit: 'auto 45deg 1.0m',
+                          maxCameraOrbit: 'auto 110deg 6m',
+                          minFieldOfView: '20deg',
+                          maxFieldOfView: '65deg',
+                          fieldOfView: '35deg',
+                          disablePan: true,
+                          disableTap: true,
+                          disableZoom: true,
+                          relatedJs:
+                              'try{self.ModelViewerElement&&(self.ModelViewerElement.modelCacheSize=20)}catch(e){}',
+                        ),
+                      ),
                     ),
 
                     // NO loading overlays for instant HandTalk-like performance

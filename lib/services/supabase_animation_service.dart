@@ -1,4 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter/foundation.dart';
+import '/services/error_service.dart';
 
 // Data classes for animation handling
 class AnimationMetadata {
@@ -17,10 +19,7 @@ class AnimationData {
   final String? url;
   final AnimationMetadata metadata;
 
-  AnimationData({
-    required this.url,
-    required this.metadata,
-  });
+  AnimationData({required this.url, required this.metadata});
 }
 
 class SupabaseAnimationService {
@@ -42,20 +41,18 @@ class SupabaseAnimationService {
 
   // Get single animation with metadata for smooth playback
   static Future<AnimationData?> getAnimationWithMetadata(String word) async {
-    print('🔍 [DEBUG] Fetching animation for word: "$word"');
+    _dbg('fetch "$word"');
 
     try {
       // Check cache first for instant response
       if (_urlCache.containsKey(word) && _metadataCache.containsKey(word)) {
-        print(
-            '✅ [CACHE HIT] Found cached animation for "$word": ${_urlCache[word]}');
+        _dbg('cache_hit "$word"');
         return AnimationData(
           url: _urlCache[word]!,
           metadata: _metadataCache[word]!,
         );
       }
-
-      print('🌐 [API CALL] Cache miss for "$word", querying Supabase...');
+      _dbg('cache_miss "$word"');
 
       // Query database for file path and metadata
       final response = await _client
@@ -64,26 +61,16 @@ class SupabaseAnimationService {
           .eq('word', word.toLowerCase())
           .single();
 
-      print('📊 [SUPABASE RESPONSE] Raw data: $response');
-
       if (response['file_path'] != null) {
-        print('📁 [FILE PATH] Original path: "${response['file_path']}"');
-
         // Get public URL from storage - fix double path issue
         String filePath = response['file_path'];
 
         // Remove any duplicate bucket name from path
         if (filePath.startsWith('animations/')) {
           filePath = filePath.substring('animations/'.length);
-          print(
-              '🔧 [PATH FIX] Removed duplicate "animations/", new path: "$filePath"');
         }
 
         final url = _client.storage.from(BUCKET_NAME).getPublicUrl(filePath);
-
-        print('🔗 [FINAL URL] Generated URL for "${response['word']}": $url');
-        print('⏱️ [DURATION] Animation duration: ${response['duration_ms']}ms');
-        print('🏷️ [CATEGORY] Word category: ${response['category']}');
 
         final metadata = AnimationMetadata(
           word: response['word'],
@@ -95,20 +82,15 @@ class SupabaseAnimationService {
         _urlCache[word] = url;
         _metadataCache[word] = metadata;
 
-        print('💾 [CACHE STORE] Cached animation for "$word"');
-        print(
-            '📈 [CACHE SIZE] URL cache: ${_urlCache.length}, Metadata cache: ${_metadataCache.length}');
-
         // Update usage count (fire and forget)
         _updateUsageCount(word);
 
         return AnimationData(url: url, metadata: metadata);
       } else {
-        print('❌ [NO FILE] No file_path found in response for "$word"');
+        _dbg('no_file "$word"');
       }
-    } catch (e) {
-      print('💥 [ERROR] Failed to fetch animation for "$word": $e');
-      print('🔍 [ERROR TYPE] Error type: ${e.runtimeType}');
+    } catch (e, st) {
+      ErrorService.reportError(e, st);
       // Return fallback with default duration
       return AnimationData(
         url: null,
@@ -119,8 +101,7 @@ class SupabaseAnimationService {
         ),
       );
     }
-
-    print('❓ [NULL RESULT] No animation data found for "$word"');
+    _dbg('null_result "$word"');
     return null;
   }
 
@@ -131,9 +112,9 @@ class SupabaseAnimationService {
 
   // Enhanced batch processing for sentence-level optimization
   static Future<List<AnimationData>> getBatchAnimationsWithMetadata(
-      List<String> words) async {
-    print(
-        '🎯 [BATCH START] Processing ${words.length} words: ${words.join(", ")}');
+    List<String> words,
+  ) async {
+    _dbg('batch_start n=${words.length}');
 
     final results = <AnimationData>[];
     final uncachedWords = <String>[];
@@ -142,7 +123,7 @@ class SupabaseAnimationService {
     for (final word in words) {
       if (_fullAnimationCache.containsKey(word)) {
         results.add(_fullAnimationCache[word]!);
-        print('⚡ [ULTRA-CACHE HIT] Found ultra-cached: "$word"');
+        _dbg('ultra_cache_hit "$word"');
       } else if (_urlCache.containsKey(word) &&
           _metadataCache.containsKey(word)) {
         final cachedAnimation = AnimationData(
@@ -152,38 +133,41 @@ class SupabaseAnimationService {
         _fullAnimationCache[word] =
             cachedAnimation; // Cache for ultra-fast next access
         results.add(cachedAnimation);
-        print('✅ [BATCH CACHE HIT] Found cached: "$word"');
+        _dbg('batch_cache_hit "$word"');
       } else {
-        print('🔍 [BATCH CACHE MISS] Need to fetch: "$word"');
         // Placeholder for uncached words
-        results.add(AnimationData(
+        results.add(
+          AnimationData(
             url: null,
             metadata: AnimationMetadata(
               word: word,
               duration: DEFAULT_DURATION,
               category: 'pending',
-            )));
+            ),
+          ),
+        );
         uncachedWords.add(word);
       }
     }
 
-    print(
-        '📊 [BATCH SUMMARY] Cached: ${words.length - uncachedWords.length}, To fetch: ${uncachedWords.length}');
+    _dbg(
+      'batch_summary cached=${words.length - uncachedWords.length} fetch=${uncachedWords.length}',
+    );
 
     // Second pass: fetch uncached words in batch
     if (uncachedWords.isNotEmpty) {
       try {
-        print(
-            '🌐 [BATCH API] Fetching ${uncachedWords.length} words from Supabase...');
+        _dbg('batch_api_fetch n=${uncachedWords.length}');
 
         final response = await _client
             .from('animations')
             .select('word, file_path, duration_ms, category')
             .inFilter(
-                'word', uncachedWords.map((w) => w.toLowerCase()).toList());
+              'word',
+              uncachedWords.map((w) => w.toLowerCase()).toList(),
+            );
 
-        print(
-            '📊 [BATCH RESPONSE] Got ${response.length} results from database');
+        _dbg('batch_response n=${response.length}');
 
         final fetchedData = <String, AnimationData>{};
 
@@ -191,11 +175,7 @@ class SupabaseAnimationService {
           final word = row['word'];
           final filePath = row['file_path'];
 
-          print('🔧 [BATCH PROCESS] Processing "$word" with path "$filePath"');
-
           final url = _client.storage.from(BUCKET_NAME).getPublicUrl(filePath);
-
-          print('🔗 [BATCH URL] Generated URL for "$word": $url');
 
           final metadata = AnimationMetadata(
             word: word,
@@ -210,31 +190,30 @@ class SupabaseAnimationService {
           fetchedData[word] = AnimationData(url: url, metadata: metadata);
         }
 
-        print('💾 [BATCH CACHE] Cached ${fetchedData.length} new animations');
+        _dbg('batch_cached n=${fetchedData.length}');
 
         // Update results with fetched data
         for (int i = 0; i < words.length; i++) {
           final word = words[i].toLowerCase();
           if (fetchedData.containsKey(word)) {
             results[i] = fetchedData[word]!;
-            print('✅ [BATCH UPDATE] Updated result for "$word"');
+            _dbg('batch_update "$word"');
           } else {
-            print('❌ [BATCH MISSING] No data found for "$word"');
+            _dbg('batch_missing "$word"');
           }
         }
-      } catch (e) {
-        print('💥 [BATCH ERROR] Failed to fetch batch animations: $e');
-        print('🔍 [BATCH ERROR TYPE] Error type: ${e.runtimeType}');
+      } catch (e, st) {
+        ErrorService.reportError(e, st);
       }
     }
-
-    print('🎯 [BATCH COMPLETE] Returning ${results.length} animation results');
+    _dbg('batch_complete n=${results.length}');
     return results;
   }
 
   // Legacy method for backward compatibility
   static Future<Map<String, String>> getBatchAnimations(
-      List<String> words) async {
+    List<String> words,
+  ) async {
     final animationsData = await getBatchAnimationsWithMetadata(words);
     final Map<String, String> urls = {};
 
@@ -257,17 +236,20 @@ class SupabaseAnimationService {
           .order('usage_count', ascending: false)
           .limit(CORE_VOCABULARY_LIMIT);
 
-      final coreWords =
-          response.map<String>((row) => row['word'] as String).toList();
+      final coreWords = response
+          .map<String>((row) => row['word'] as String)
+          .toList();
 
       if (coreWords.isNotEmpty) {
         await getBatchAnimationsWithMetadata(coreWords);
         _preloadedWords.addAll(coreWords);
-        print('✅ Preloaded ${coreWords.length} core animations dynamically');
+        _dbg('preloaded_core n=${coreWords.length}');
       } else {
         // Fallback: if no usage data, get any available words
-        final fallbackResponse =
-            await _client.from('animations').select('word').limit(20);
+        final fallbackResponse = await _client
+            .from('animations')
+            .select('word')
+            .limit(20);
 
         final fallbackWords = fallbackResponse
             .map<String>((row) => row['word'] as String)
@@ -276,12 +258,11 @@ class SupabaseAnimationService {
         if (fallbackWords.isNotEmpty) {
           await getBatchAnimationsWithMetadata(fallbackWords);
           _preloadedWords.addAll(fallbackWords);
-          print(
-              '✅ Preloaded ${fallbackWords.length} available animations as fallback');
+          _dbg('preloaded_fallback n=${fallbackWords.length}');
         }
       }
-    } catch (e) {
-      print('⚠️ Failed to preload core vocabulary: $e');
+    } catch (e, st) {
+      ErrorService.reportError(e, st);
     }
   }
 
@@ -313,13 +294,11 @@ class SupabaseAnimationService {
         if (relatedWords.isNotEmpty) {
           // Preload in background without blocking current operation
           getBatchAnimationsWithMetadata(relatedWords);
-          print(
-              '🔮 Preloaded ${relatedWords.length} related words for category: $category');
+          _dbg('preloaded_related n=${relatedWords.length} cat=$category');
         }
       }
     } catch (e) {
       // Ignore preload errors - not critical
-      print('⚠️ Failed to preload related words for $currentWord: $e');
     }
   }
 
@@ -347,8 +326,10 @@ class SupabaseAnimationService {
   }
 
   // Get available words by category - for dynamic expansion
-  static Future<List<String>> getWordsByCategory(String category,
-      {int limit = 50}) async {
+  static Future<List<String>> getWordsByCategory(
+    String category, {
+    int limit = 50,
+  }) async {
     try {
       final response = await _client
           .from('animations')
@@ -383,8 +364,10 @@ class SupabaseAnimationService {
   }
 
   // Search words by partial match - for dynamic word discovery
-  static Future<List<String>> searchWords(String query,
-      {int limit = 10}) async {
+  static Future<List<String>> searchWords(
+    String query, {
+    int limit = 10,
+  }) async {
     try {
       final response = await _client
           .from('animations')
@@ -416,14 +399,13 @@ class SupabaseAnimationService {
     _metadataCache.clear();
     _preloadedWords.clear();
     _fullAnimationCache.clear(); // Clear full animation cache too
-    print('🧹 Cache cleared');
+    _dbg('cache_cleared');
   }
 
   /// Ultra-fast batch preloading for seamless animation sequences
   static Future<void> ultraPreloadAnimations(List<String> words) async {
     try {
-      print(
-          '⚡ Ultra-preloading ${words.length} animations for seamless playback');
+      _dbg('ultra_preload_start n=${words.length}');
 
       final uncachedWords = words
           .where((word) => !_fullAnimationCache.containsKey(word))
@@ -435,7 +417,9 @@ class SupabaseAnimationService {
             .from('animations')
             .select('word, file_path, duration_ms, category')
             .inFilter(
-                'word', uncachedWords.map((w) => w.toLowerCase()).toList());
+              'word',
+              uncachedWords.map((w) => w.toLowerCase()).toList(),
+            );
 
         for (final row in response) {
           final word = row['word'];
@@ -445,8 +429,9 @@ class SupabaseAnimationService {
               filePath = filePath.substring('animations/'.length);
             }
 
-            final url =
-                _client.storage.from(BUCKET_NAME).getPublicUrl(filePath);
+            final url = _client.storage
+                .from(BUCKET_NAME)
+                .getPublicUrl(filePath);
             final metadata = AnimationMetadata(
               word: row['word'],
               duration: row['duration_ms'] ?? DEFAULT_DURATION,
@@ -456,17 +441,26 @@ class SupabaseAnimationService {
             // Cache everything for ultra-fast access
             _urlCache[word] = url;
             _metadataCache[word] = metadata;
-            _fullAnimationCache[word] =
-                AnimationData(url: url, metadata: metadata);
+            _fullAnimationCache[word] = AnimationData(
+              url: url,
+              metadata: metadata,
+            );
 
-            print('⚡ CACHED: $word (${metadata.duration}ms)');
+            _dbg('cached "$word" dur=${metadata.duration}');
           }
         }
       }
 
-      print('⚡ Ultra-preloading complete - ${words.length} animations ready');
-    } catch (e) {
-      print('⚠️ Error in ultra-preloading: $e');
+      _dbg('ultra_preload_done n=${words.length}');
+    } catch (e, st) {
+      ErrorService.reportError(e, st);
     }
+  }
+}
+
+void _dbg(String msg) {
+  if (kDebugMode) {
+    // Use lightweight breadcrumb logging in debug only
+    ErrorService.log('[anim] $msg');
   }
 }
