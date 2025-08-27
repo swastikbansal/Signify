@@ -80,7 +80,8 @@ class _CustomSignsPageState extends State<CustomSignsPage> {
                 // Step 1: Select files from local storage
                 await _model.selectFiles();
 
-                if (_model.selectedFiles != null && _model.selectedFiles!.files.isNotEmpty) {
+                if (_model.selectedFiles != null &&
+                    _model.selectedFiles!.files.isNotEmpty) {
                   // Step 2: Show rename dialog for multiple files
                   final shouldProceed = await _showMultipleFilesRenameDialog();
 
@@ -97,18 +98,22 @@ class _CustomSignsPageState extends State<CustomSignsPage> {
                       final fileCount = _model.selectedFiles?.files.length ?? 0;
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text(success
-                              ? '$fileCount file${fileCount > 1 ? 's' : ''} uploaded successfully!'
-                              : 'File upload failed. Please try again.'),
+                          content: Text(
+                            success
+                                ? '$fileCount file${fileCount > 1 ? 's' : ''} uploaded successfully!'
+                                : 'File upload failed. Please try again.',
+                          ),
                           backgroundColor: success ? Colors.green : Colors.red,
                           duration: const Duration(seconds: 3),
-                          action: success ? SnackBarAction(
-                            label: 'View',
-                            textColor: Colors.white,
-                            onPressed: () {
-                              // Scroll to show the newly uploaded files
-                            },
-                          ) : null,
+                          action: success
+                              ? SnackBarAction(
+                                  label: 'View',
+                                  textColor: Colors.white,
+                                  onPressed: () {
+                                    // Scroll to show the newly uploaded files
+                                  },
+                                )
+                              : null,
                         ),
                       );
                     }
@@ -142,18 +147,18 @@ class _CustomSignsPageState extends State<CustomSignsPage> {
                     // Show loading animation or upload icon
                     _model.isUploading
                         ? SizedBox(
-                      width: 40,
-                      height: 40,
-                      child: CircularProgressIndicator(
-                        color: FlutterFlowTheme.of(context).primary,
-                        strokeWidth: 3.0,
-                      ),
-                    )
+                            width: 40,
+                            height: 40,
+                            child: CircularProgressIndicator(
+                              color: FlutterFlowTheme.of(context).primary,
+                              strokeWidth: 3.0,
+                            ),
+                          )
                         : Icon(
-                      Icons.upload_rounded,
-                      color: FlutterFlowTheme.of(context).primary,
-                      size: 40,
-                    ),
+                            Icons.upload_rounded,
+                            color: FlutterFlowTheme.of(context).primary,
+                            size: 40,
+                          ),
                     const SizedBox(height: 8),
                     Text(
                       _model.isUploading
@@ -193,7 +198,9 @@ class _CustomSignsPageState extends State<CustomSignsPage> {
                           width: 40,
                           height: 40,
                           decoration: BoxDecoration(
-                            color: _model.getStatusColor(file['status'], context).withOpacity(0.1),
+                            color: _model
+                                .getStatusColor(file['status'], context)
+                                .withOpacity(0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: file['isBatch'] == true
@@ -203,7 +210,10 @@ class _CustomSignsPageState extends State<CustomSignsPage> {
                                       file['status'] == 'processing'
                                           ? Icons.hourglass_empty
                                           : Icons.folder,
-                                      color: _model.getStatusColor(file['status'], context),
+                                      color: _model.getStatusColor(
+                                        file['status'],
+                                        context,
+                                      ),
                                       size: 18,
                                     ),
                                     Positioned(
@@ -212,8 +222,13 @@ class _CustomSignsPageState extends State<CustomSignsPage> {
                                       child: Container(
                                         padding: const EdgeInsets.all(2),
                                         decoration: BoxDecoration(
-                                          color: _model.getStatusColor(file['status'], context),
-                                          borderRadius: BorderRadius.circular(8),
+                                          color: _model.getStatusColor(
+                                            file['status'],
+                                            context,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
                                         ),
                                         child: Text(
                                           '${file['fileCount'] ?? 1}',
@@ -231,7 +246,10 @@ class _CustomSignsPageState extends State<CustomSignsPage> {
                                   file['status'] == 'processing'
                                       ? Icons.hourglass_empty
                                       : Icons.image,
-                                  color: _model.getStatusColor(file['status'], context),
+                                  color: _model.getStatusColor(
+                                    file['status'],
+                                    context,
+                                  ),
                                   size: 20,
                                 ),
                         ),
@@ -245,7 +263,8 @@ class _CustomSignsPageState extends State<CustomSignsPage> {
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
-                            if (file['isBatch'] == true && file['fileCount'] != null)
+                            if (file['isBatch'] == true &&
+                                file['fileCount'] != null)
                               Padding(
                                 padding: const EdgeInsets.only(top: 2.0),
                                 child: Text(
@@ -265,17 +284,22 @@ class _CustomSignsPageState extends State<CustomSignsPage> {
                             Text(
                               "Uploaded on ${file['uploadDate'] ?? 'Unknown date'}",
                               style: TextStyle(
-                                color: FlutterFlowTheme.of(context).secondaryText,
+                                color: FlutterFlowTheme.of(
+                                  context,
+                                ).secondaryText,
                                 fontSize: 12,
                               ),
                             ),
-                            if (file['isBatch'] == true && file['fileList'] != null)
+                            if (file['isBatch'] == true &&
+                                file['fileList'] != null)
                               Padding(
                                 padding: const EdgeInsets.only(top: 4.0),
                                 child: Text(
                                   "Files: ${(file['fileList'] as List<String>).join(', ')}",
                                   style: TextStyle(
-                                    color: FlutterFlowTheme.of(context).secondaryText,
+                                    color: FlutterFlowTheme.of(
+                                      context,
+                                    ).secondaryText,
                                     fontSize: 10,
                                     fontStyle: FontStyle.italic,
                                   ),
@@ -288,21 +312,32 @@ class _CustomSignsPageState extends State<CustomSignsPage> {
                                 Text(
                                   file['fileSize'] ?? 'Unknown size',
                                   style: TextStyle(
-                                    color: FlutterFlowTheme.of(context).secondaryText,
+                                    color: FlutterFlowTheme.of(
+                                      context,
+                                    ).secondaryText,
                                     fontSize: 11,
                                   ),
                                 ),
                                 const SizedBox(width: 8),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                    vertical: 2,
+                                  ),
                                   decoration: BoxDecoration(
-                                    color: _model.getStatusColor(file['status'], context).withOpacity(0.1),
+                                    color: _model
+                                        .getStatusColor(file['status'], context)
+                                        .withOpacity(0.1),
                                     borderRadius: BorderRadius.circular(4),
                                   ),
                                   child: Text(
-                                    file['status']?.toString().toUpperCase() ?? 'UNKNOWN',
+                                    file['status']?.toString().toUpperCase() ??
+                                        'UNKNOWN',
                                     style: TextStyle(
-                                      color: _model.getStatusColor(file['status'], context),
+                                      color: _model.getStatusColor(
+                                        file['status'],
+                                        context,
+                                      ),
                                       fontSize: 10,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -357,43 +392,372 @@ class _CustomSignsPageState extends State<CustomSignsPage> {
     if (files.isEmpty) return false;
 
     final Map<String, TextEditingController> controllers = {};
+    final Map<String, TextEditingController> labelControllers = {};
     final TextEditingController batchNameController = TextEditingController();
-    
+    final String defaultBatchName = 'Custom Signs Collection';
+
     // Initialize controllers for each file
     for (var file in files) {
       final nameWithoutExtension = file.name.split('.').first;
-      controllers[file.name] = TextEditingController(text: nameWithoutExtension);
+      controllers[file.name] = TextEditingController(
+        text: nameWithoutExtension,
+      );
+      // Start labels empty; will fallback to batch name if left blank
+      labelControllers[file.name] = TextEditingController(text: '');
     }
 
-    // Set default batch name suggestion
-    if (files.length > 1) {
-      batchNameController.text = 'Custom Signs Collection';
-    }
+    // Use defaultBatchName as hint; keep controller empty so it's shown in background
+    // (will be used as fallback if user leaves the field empty)
+    batchNameController.text = '';
 
     return await showDialog<bool>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
-          title: Text(
-            files.length > 1 
-                ? 'Name Your Collection (${files.length} files)'
-                : 'Rename File',
-            style: TextStyle(
-              color: FlutterFlowTheme.of(context).primaryText,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          content: SizedBox(
-            width: double.maxFinite,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (files.length > 1) ...[
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
+              title: Text(
+                files.length > 1
+                    ? 'Name Your Collection (${files.length} files)'
+                    : 'Rename File',
+                style: TextStyle(
+                  color: FlutterFlowTheme.of(context).primaryText,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              content: SizedBox(
+                width: double.maxFinite,
+                // Constrain height to avoid layout overflows in dialog
+                height: MediaQuery.of(context).size.height * 0.65,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (files.length > 1) ...[
+                      Text(
+                        'Give your collection of ${files.length} files a meaningful name',
+                        style: TextStyle(
+                          color: FlutterFlowTheme.of(context).secondaryText,
+                          fontSize: 12,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: batchNameController,
+                        style: TextStyle(
+                          color: FlutterFlowTheme.of(context).primaryText,
+                        ),
+                        decoration: InputDecoration(
+                          labelText: 'Collection Name *',
+                          labelStyle: TextStyle(
+                            color: FlutterFlowTheme.of(context).secondaryText,
+                          ),
+                          hintText: defaultBatchName,
+                          hintStyle: TextStyle(
+                            color: FlutterFlowTheme.of(context).secondaryText,
+                          ),
+                          border: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: FlutterFlowTheme.of(context).alternate,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: FlutterFlowTheme.of(context).primary,
+                            ),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 12,
+                          ),
+                        ),
+                        maxLength: 50,
+                        textInputAction: TextInputAction.next,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Individual File Names (optional):',
+                        style: TextStyle(
+                          color: FlutterFlowTheme.of(context).primaryText,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                    ] else ...[
+                      Text(
+                        'You can rename this file or keep the original name',
+                        style: TextStyle(
+                          color: FlutterFlowTheme.of(context).secondaryText,
+                          fontSize: 12,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                    // Bounded scroll area for file inputs
+                    Expanded(
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: files.length,
+                        itemBuilder: (context, index) {
+                          final file = files[index];
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 12.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  files.length > 1
+                                      ? 'File ${index + 1}: ${file.name}'
+                                      : 'Original: ${file.name}',
+                                  style: TextStyle(
+                                    color: FlutterFlowTheme.of(
+                                      context,
+                                    ).primaryText,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                TextField(
+                                  controller: controllers[file.name],
+                                  style: TextStyle(
+                                    color: FlutterFlowTheme.of(
+                                      context,
+                                    ).primaryText,
+                                  ),
+                                  decoration: InputDecoration(
+                                    labelText: files.length > 1
+                                        ? 'Custom name (optional)'
+                                        : 'New file name',
+                                    labelStyle: TextStyle(
+                                      color: FlutterFlowTheme.of(
+                                        context,
+                                      ).secondaryText,
+                                    ),
+                                    hintText: 'Enter custom name',
+                                    hintStyle: TextStyle(
+                                      color: FlutterFlowTheme.of(
+                                        context,
+                                      ).secondaryText,
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: FlutterFlowTheme.of(
+                                          context,
+                                        ).alternate,
+                                      ),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: FlutterFlowTheme.of(
+                                          context,
+                                        ).primary,
+                                      ),
+                                    ),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 8,
+                                    ),
+                                  ),
+                                  maxLength: 50,
+                                  textInputAction: index < files.length - 1
+                                      ? TextInputAction.next
+                                      : TextInputAction.done,
+                                ),
+                                const SizedBox(height: 8),
+                                TextField(
+                                  controller: labelControllers[file.name],
+                                  style: TextStyle(
+                                    color: FlutterFlowTheme.of(
+                                      context,
+                                    ).primaryText,
+                                  ),
+                                  decoration: InputDecoration(
+                                    labelText: 'Label (optional)',
+                                    labelStyle: TextStyle(
+                                      color: FlutterFlowTheme.of(
+                                        context,
+                                      ).secondaryText,
+                                    ),
+                                    hintText: 'e.g., Stop, Yield, No Entry',
+                                    hintStyle: TextStyle(
+                                      color: FlutterFlowTheme.of(
+                                        context,
+                                      ).secondaryText,
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: FlutterFlowTheme.of(
+                                          context,
+                                        ).alternate,
+                                      ),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: FlutterFlowTheme.of(
+                                          context,
+                                        ).primary,
+                                      ),
+                                    ),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 8,
+                                    ),
+                                  ),
+                                  maxLength: 50,
+                                  textInputAction: index < files.length - 1
+                                      ? TextInputAction.next
+                                      : TextInputAction.done,
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    Text(
+                      'Extensions will be added automatically. Leave individual names blank to keep originals.',
+                      style: TextStyle(
+                        color: FlutterFlowTheme.of(context).secondaryText,
+                        fontSize: 11,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    // Dispose controllers
+                    batchNameController.dispose();
+                    for (var controller in controllers.values) {
+                      controller.dispose();
+                    }
+                    for (var controller in labelControllers.values) {
+                      controller.dispose();
+                    }
+                    Navigator.of(context).pop(false);
+                  },
+                  child: Text(
+                    'Cancel',
+                    style: TextStyle(
+                      color: FlutterFlowTheme.of(context).secondaryText,
+                    ),
+                  ),
+                ),
+                if (files.length > 1)
+                  TextButton(
+                    onPressed: () {
+                      // Keep all original names with default batch name
+                      _model.customFileNames.clear();
+                      _model.safeSetCustomBatchName(defaultBatchName);
+                      // If labels were empty, default them to the batch name
+                      for (var file in files) {
+                        _model.safeSetFileLabel(file.name, defaultBatchName);
+                      }
+                      // Dispose controllers
+                      batchNameController.dispose();
+                      for (var controller in controllers.values) {
+                        controller.dispose();
+                      }
+                      for (var controller in labelControllers.values) {
+                        controller.dispose();
+                      }
+                      Navigator.of(context).pop(true);
+                    },
+                    child: Text(
+                      'Use Defaults',
+                      style: TextStyle(
+                        color: FlutterFlowTheme.of(context).primary,
+                      ),
+                    ),
+                  ),
+                ElevatedButton(
+                  onPressed: () {
+                    // Validate batch name for multiple files
+                    if (files.length > 1) {
+                      final batchName = batchNameController.text.trim();
+                      // Use defaultBatchName as fallback if the user left the field empty
+                      final useBatchName = batchName.isEmpty
+                          ? defaultBatchName
+                          : batchName;
+                      _model.safeSetCustomBatchName(useBatchName);
+                    }
+
+                    // Set custom names for files that have been renamed
+                    for (var file in files) {
+                      final newName = controllers[file.name]?.text.trim() ?? '';
+                      if (newName.isNotEmpty) {
+                        _model.safeSetCustomFileName(file.name, newName);
+                      }
+                      // Set/override label if provided, else fallback to batch name (if any)
+                      final lbl =
+                          labelControllers[file.name]?.text.trim() ?? '';
+                      if (lbl.isNotEmpty) {
+                        _model.safeSetFileLabel(file.name, lbl);
+                      } else if ((batchNameController.text.trim().isNotEmpty) ||
+                          (files.length > 1)) {
+                        final fallback = batchNameController.text.trim().isEmpty
+                            ? defaultBatchName
+                            : batchNameController.text.trim();
+                        _model.safeSetFileLabel(file.name, fallback);
+                      }
+                    }
+
+                    // Dispose controllers
+                    batchNameController.dispose();
+                    for (var controller in controllers.values) {
+                      controller.dispose();
+                    }
+                    for (var controller in labelControllers.values) {
+                      controller.dispose();
+                    }
+                    Navigator.of(context).pop(true);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: FlutterFlowTheme.of(context).primary,
+                    foregroundColor: Colors.white,
+                  ),
+                  child: Text(
+                    files.length > 1 ? 'Create Collection' : 'Rename & Upload',
+                  ),
+                ),
+              ],
+            );
+          },
+        ) ??
+        false;
+  }
+
+  Future<bool> _showRenameDialog() async {
+    final TextEditingController nameController = TextEditingController();
+    final originalName = _model.selectedFiles?.files.single.name ?? '';
+    final nameWithoutExtension = originalName.split('.').first;
+
+    nameController.text = nameWithoutExtension;
+
+    return await showDialog<bool>(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
+              title: Text(
+                'Rename File',
+                style: TextStyle(
+                  color: FlutterFlowTheme.of(context).primaryText,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                   Text(
-                    'Give your collection of ${files.length} files a meaningful name',
+                    'Original name: $originalName',
                     style: TextStyle(
                       color: FlutterFlowTheme.of(context).secondaryText,
                       fontSize: 12,
@@ -401,16 +765,16 @@ class _CustomSignsPageState extends State<CustomSignsPage> {
                   ),
                   const SizedBox(height: 16),
                   TextField(
-                    controller: batchNameController,
+                    controller: nameController,
                     style: TextStyle(
                       color: FlutterFlowTheme.of(context).primaryText,
                     ),
                     decoration: InputDecoration(
-                      labelText: 'Collection Name *',
+                      labelText: 'New file name',
                       labelStyle: TextStyle(
                         color: FlutterFlowTheme.of(context).secondaryText,
                       ),
-                      hintText: 'e.g., Traffic Signs, Warning Signs, etc.',
+                      hintText: 'Enter custom name (without extension)',
                       hintStyle: TextStyle(
                         color: FlutterFlowTheme.of(context).secondaryText,
                       ),
@@ -424,310 +788,72 @@ class _CustomSignsPageState extends State<CustomSignsPage> {
                           color: FlutterFlowTheme.of(context).primary,
                         ),
                       ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 12, 
-                        vertical: 12,
-                      ),
                     ),
                     maxLength: 50,
-                    textInputAction: TextInputAction.next,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Individual File Names (optional):',
-                    style: TextStyle(
-                      color: FlutterFlowTheme.of(context).primaryText,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    textInputAction: TextInputAction.done,
                   ),
                   const SizedBox(height: 8),
-                ] else ...[
                   Text(
-                    'You can rename this file or keep the original name',
+                    'Extension (.jpg or .jpeg) will be added automatically',
                     style: TextStyle(
                       color: FlutterFlowTheme.of(context).secondaryText,
-                      fontSize: 12,
+                      fontSize: 11,
+                      fontStyle: FontStyle.italic,
                     ),
                   ),
-                  const SizedBox(height: 16),
                 ],
-                Flexible(
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: files.length,
-                    itemBuilder: (context, index) {
-                      final file = files[index];
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 12.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              files.length > 1 
-                                  ? 'File ${index + 1}: ${file.name}'
-                                  : 'Original: ${file.name}',
-                              style: TextStyle(
-                                color: FlutterFlowTheme.of(context).primaryText,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 13,
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            TextField(
-                              controller: controllers[file.name],
-                              style: TextStyle(
-                                color: FlutterFlowTheme.of(context).primaryText,
-                              ),
-                              decoration: InputDecoration(
-                                labelText: files.length > 1 ? 'Custom name (optional)' : 'New file name',
-                                labelStyle: TextStyle(
-                                  color: FlutterFlowTheme.of(context).secondaryText,
-                                ),
-                                hintText: 'Enter custom name',
-                                hintStyle: TextStyle(
-                                  color: FlutterFlowTheme.of(context).secondaryText,
-                                ),
-                                border: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: FlutterFlowTheme.of(context).alternate,
-                                  ),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: FlutterFlowTheme.of(context).primary,
-                                  ),
-                                ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 12, 
-                                  vertical: 8,
-                                ),
-                              ),
-                              maxLength: 50,
-                              textInputAction: index < files.length - 1 
-                                  ? TextInputAction.next 
-                                  : TextInputAction.done,
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                Text(
-                  'Extensions will be added automatically. Leave individual names blank to keep originals.',
-                  style: TextStyle(
-                    color: FlutterFlowTheme.of(context).secondaryText,
-                    fontSize: 11,
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                // Dispose controllers
-                batchNameController.dispose();
-                for (var controller in controllers.values) {
-                  controller.dispose();
-                }
-                Navigator.of(context).pop(false);
-              },
-              child: Text(
-                'Cancel',
-                style: TextStyle(
-                  color: FlutterFlowTheme.of(context).secondaryText,
-                ),
               ),
-            ),
-            if (files.length > 1)
-              TextButton(
-                onPressed: () {
-                  // Keep all original names with default batch name
-                  _model.customFileNames.clear();
-                  _model.setCustomBatchName('');
-                  // Dispose controllers
-                  batchNameController.dispose();
-                  for (var controller in controllers.values) {
-                    controller.dispose();
-                  }
-                  Navigator.of(context).pop(true);
-                },
-                child: Text(
-                  'Use Defaults',
-                  style: TextStyle(
-                    color: FlutterFlowTheme.of(context).primary,
-                  ),
-                ),
-              ),
-            ElevatedButton(
-              onPressed: () {
-                // Validate batch name for multiple files
-                if (files.length > 1) {
-                  final batchName = batchNameController.text.trim();
-                  if (batchName.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Please enter a collection name'),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                    return;
-                  }
-                  _model.setCustomBatchName(batchName);
-                }
-
-                // Set custom names for files that have been renamed
-                for (var file in files) {
-                  final newName = controllers[file.name]?.text.trim() ?? '';
-                  if (newName.isNotEmpty) {
-                    _model.setCustomFileName(file.name, newName);
-                  }
-                }
-                
-                // Dispose controllers
-                batchNameController.dispose();
-                for (var controller in controllers.values) {
-                  controller.dispose();
-                }
-                Navigator.of(context).pop(true);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: FlutterFlowTheme.of(context).primary,
-                foregroundColor: Colors.white,
-              ),
-              child: Text(files.length > 1 ? 'Create Collection' : 'Rename & Upload'),
-            ),
-          ],
-        );
-      },
-    ) ?? false;
-  }
-
-  Future<bool> _showRenameDialog() async {
-    final TextEditingController nameController = TextEditingController();
-    final originalName = _model.selectedFiles?.files.single.name ?? '';
-    final nameWithoutExtension = originalName.split('.').first;
-
-    nameController.text = nameWithoutExtension;
-
-    return await showDialog<bool>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
-          title: Text(
-            'Rename File',
-            style: TextStyle(
-              color: FlutterFlowTheme.of(context).primaryText,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Original name: $originalName',
-                style: TextStyle(
-                  color: FlutterFlowTheme.of(context).secondaryText,
-                  fontSize: 12,
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: nameController,
-                style: TextStyle(
-                  color: FlutterFlowTheme.of(context).primaryText,
-                ),
-                decoration: InputDecoration(
-                  labelText: 'New file name',
-                  labelStyle: TextStyle(
-                    color: FlutterFlowTheme.of(context).secondaryText,
-                  ),
-                  hintText: 'Enter custom name (without extension)',
-                  hintStyle: TextStyle(
-                    color: FlutterFlowTheme.of(context).secondaryText,
-                  ),
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: FlutterFlowTheme.of(context).alternate,
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(false);
+                  },
+                  child: Text(
+                    'Cancel',
+                    style: TextStyle(
+                      color: FlutterFlowTheme.of(context).secondaryText,
                     ),
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
+                ),
+                TextButton(
+                  onPressed: () {
+                    // Use original name
+                    _model.setCustomFileName(originalName, '');
+                    Navigator.of(context).pop(true);
+                  },
+                  child: Text(
+                    'Keep Original',
+                    style: TextStyle(
                       color: FlutterFlowTheme.of(context).primary,
                     ),
                   ),
                 ),
-                maxLength: 50,
-                textInputAction: TextInputAction.done,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Extension (.jpg or .jpeg) will be added automatically',
-                style: TextStyle(
-                  color: FlutterFlowTheme.of(context).secondaryText,
-                  fontSize: 11,
-                  fontStyle: FontStyle.italic,
+                ElevatedButton(
+                  onPressed: () {
+                    final newName = nameController.text.trim();
+                    if (newName.isNotEmpty) {
+                      _model.setCustomFileName(originalName, newName);
+                      Navigator.of(context).pop(true);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Please enter a valid file name'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: FlutterFlowTheme.of(context).primary,
+                    foregroundColor: Colors.white,
+                  ),
+                  child: const Text('Rename & Upload'),
                 ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(false);
-              },
-              child: Text(
-                'Cancel',
-                style: TextStyle(
-                  color: FlutterFlowTheme.of(context).secondaryText,
-                ),
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                // Use original name
-                _model.setCustomFileName(originalName, '');
-                Navigator.of(context).pop(true);
-              },
-              child: Text(
-                'Keep Original',
-                style: TextStyle(
-                  color: FlutterFlowTheme.of(context).primary,
-                ),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                final newName = nameController.text.trim();
-                if (newName.isNotEmpty) {
-                  _model.setCustomFileName(originalName, newName);
-                  Navigator.of(context).pop(true);
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Please enter a valid file name'),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: FlutterFlowTheme.of(context).primary,
-                foregroundColor: Colors.white,
-              ),
-              child: const Text('Rename & Upload'),
-            ),
-          ],
-        );
-      },
-    ) ?? false;
+              ],
+            );
+          },
+        ) ??
+        false;
   }
 
   void _showBatchDetailsDialog(Map<String, dynamic> batchFile) {
@@ -776,15 +902,24 @@ class _CustomSignsPageState extends State<CustomSignsPage> {
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
-                        color: _model.getStatusColor(batchFile['status'], context).withOpacity(0.1),
+                        color: _model
+                            .getStatusColor(batchFile['status'], context)
+                            .withOpacity(0.1),
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
-                        batchFile['status']?.toString().toUpperCase() ?? 'UNKNOWN',
+                        batchFile['status']?.toString().toUpperCase() ??
+                            'UNKNOWN',
                         style: TextStyle(
-                          color: _model.getStatusColor(batchFile['status'], context),
+                          color: _model.getStatusColor(
+                            batchFile['status'],
+                            context,
+                          ),
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
                         ),
@@ -808,7 +943,8 @@ class _CustomSignsPageState extends State<CustomSignsPage> {
                       shrinkWrap: true,
                       itemCount: (batchFile['fileList'] as List<String>).length,
                       itemBuilder: (context, index) {
-                        final fileName = (batchFile['fileList'] as List<String>)[index];
+                        final fileName =
+                            (batchFile['fileList'] as List<String>)[index];
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 2.0),
                           child: Row(
@@ -816,14 +952,18 @@ class _CustomSignsPageState extends State<CustomSignsPage> {
                               Icon(
                                 Icons.image,
                                 size: 16,
-                                color: FlutterFlowTheme.of(context).secondaryText,
+                                color: FlutterFlowTheme.of(
+                                  context,
+                                ).secondaryText,
                               ),
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
                                   fileName,
                                   style: TextStyle(
-                                    color: FlutterFlowTheme.of(context).primaryText,
+                                    color: FlutterFlowTheme.of(
+                                      context,
+                                    ).primaryText,
                                     fontSize: 13,
                                   ),
                                 ),
@@ -844,9 +984,7 @@ class _CustomSignsPageState extends State<CustomSignsPage> {
               },
               child: Text(
                 'Close',
-                style: TextStyle(
-                  color: FlutterFlowTheme.of(context).primary,
-                ),
+                style: TextStyle(color: FlutterFlowTheme.of(context).primary),
               ),
             ),
           ],

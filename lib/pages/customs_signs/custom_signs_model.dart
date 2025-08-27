@@ -2,42 +2,31 @@ import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import 'custom_signs_widget.dart' show CustomSignsPage;
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:file_picker/file_picker.dart';
+import '/services/supabase_storage_service.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class CustomSignsModel extends FlutterFlowModel<CustomSignsPage> {
-  ///  State fields for stateful widgets in this page.
-
-  // File picker state
   FilePickerResult? selectedFiles;
   bool isUploading = false;
-  Map<String, String> customFileNames = {}; // Store custom file names by original file name
-  String? customBatchName; // Store custom batch name
+  bool isTraining = false;
+  String? trainingError;
+  Map<String, String> customFileNames = {};
+  String? customBatchName;
+  Map<String, String> perFileLabels = {};
 
-  // List of uploaded files (you can replace this with actual backend data)
-  List<Map<String, dynamic>> uploadedFiles = [
-    {
-      'fileName': 'custom_data_1.jpg',
-      'uploadDate': 'Apr 20, 2024',
-      'fileSize': '2.3 MB',
-      'status': 'processed',
-      'fileCount': 1,
-      'fileList': ['custom_data_1.jpg'],
-      'isBatch': false,
-    },
-    {
-      'fileName': 'Traffic Signs Collection',
-      'uploadDate': 'Apr 10, 2024',
-      'fileSize': '5.2 MB',
-      'status': 'processed',
-      'fileCount': 3,
-      'fileList': ['custom_signs_1.jpeg', 'custom_signs_2.jpeg', 'custom_signs_3.jpeg'],
-      'isBatch': true,
-    },
-  ];
+  List<Map<String, dynamic>> uploadedFiles = [];
 
   final Map<String, DebugDataField> debugGeneratorVariables = {};
   final Map<String, DebugDataField> debugBackendQueries = {};
   final Map<String, FlutterFlowModel> widgetBuilderComponents = {};
+  String _apiUrl = 'http://192.168.29.42:5000';
+  // String _apiUrl = 'https://philosia-codecult-signify.hf.space/process_frame';
+
+  String get _customSignsEndpoint => '$_apiUrl/customTrain';
+  String get _switchModelEndpoint => '$_apiUrl/switchModel';
 
   @override
   void initState(BuildContext context) {
@@ -45,28 +34,27 @@ class CustomSignsModel extends FlutterFlowModel<CustomSignsPage> {
   }
 
   @override
-  void dispose() {
-    // Clean up any resources if needed
-  }
+  void dispose() {}
 
-  /// Method to handle file selection
   Future<void> selectFiles() async {
     try {
       final result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
-        allowedExtensions: ['jpg', 'jpeg'],
-        allowMultiple: true, // Enable multiple file selection
+        allowedExtensions: ['jpg', 'jpeg', 'png', 'webp'],
+        allowMultiple: true,
         allowCompression: true,
+        // Always include bytes; upload service will prefer bytes when available.
+        withData: true,
       );
 
       if (result != null && result.files.isNotEmpty) {
         selectedFiles = result;
-        customFileNames.clear(); // Reset custom names
+        customFileNames.clear();
+        perFileLabels.clear();
         debugPrint('Files selected: ${result.files.length} files');
         for (var file in result.files) {
           debugPrint('File: ${file.name}');
         }
-        // Note: State updates will be handled in the widget using safeSetState()
       } else {
         debugPrint('No files selected or picker was cancelled');
       }
@@ -75,81 +63,281 @@ class CustomSignsModel extends FlutterFlowModel<CustomSignsPage> {
     }
   }
 
-  /// Method to set custom file name for a specific file
-  void setCustomFileName(String originalName, String newName) {
-    customFileNames[originalName] = newName;
+  String _safeString(String? s) => (s ?? '').trim();
+
+  // Add safer wrapper methods for UI callbacks
+  void safeSetCustomFileName(String? originalName, String? newName) {
+    try {
+      setCustomFileName(originalName, newName);
+    } catch (e) {
+      debugPrint('Error setting custom file name: $e');
+    }
   }
 
-  /// Method to set custom batch name
-  void setCustomBatchName(String batchName) {
-    customBatchName = batchName;
+  void safeSetCustomBatchName(String? batchName) {
+    try {
+      setCustomBatchName(batchName);
+    } catch (e) {
+      debugPrint('Error setting custom batch name: $e');
+    }
   }
 
-  /// Get the final file name for a specific file (custom or original)
+  void safeSetFileLabel(String? originalName, String? label) {
+    try {
+      setFileLabel(originalName, label);
+    } catch (e) {
+      debugPrint('Error setting file label: $e');
+    }
+  }
+
+  void setCustomFileName(String? originalName, String? newName) {
+    if (originalName == null || newName == null) return;
+
+    final key = _safeString(originalName);
+    final value = _safeString(newName);
+
+    if (key.isEmpty) return;
+
+    try {
+      if (value.isEmpty) {
+        customFileNames.remove(key);
+      } else {
+        customFileNames[key] = value;
+      }
+    } catch (e) {
+      debugPrint('Error in setCustomFileName: $e');
+    }
+  }
+
+  void setCustomBatchName(String? batchName) {
+    if (batchName == null) {
+      customBatchName = null;
+      return;
+    }
+
+    try {
+      final value = _safeString(batchName);
+      customBatchName = value.isEmpty ? null : value;
+    } catch (e) {
+      debugPrint('Error in setCustomBatchName: $e');
+      customBatchName = null;
+    }
+  }
+
+  void setFileLabel(String? originalName, String? label) {
+    if (originalName == null || label == null) return;
+
+    final key = _safeString(originalName);
+    final value = _safeString(label);
+
+    if (key.isEmpty) return;
+
+    try {
+      if (value.isEmpty) {
+        perFileLabels.remove(key);
+      } else {
+        perFileLabels[key] = value;
+      }
+    } catch (e) {
+      debugPrint('Error in setFileLabel: $e');
+    }
+  }
+
+  /// Get the final file name for a specific file (null-safe)
   String getFinalFileName(String originalName, String? extension) {
-    if (customFileNames.containsKey(originalName) && 
-        customFileNames[originalName]!.isNotEmpty) {
-      final customName = customFileNames[originalName]!;
-      final ext = extension ?? 'jpg';
-      
-      // Add extension if not present
-      if (!customName.toLowerCase().endsWith('.jpg') &&
-          !customName.toLowerCase().endsWith('.jpeg')) {
+    final orig = _safeString(originalName);
+    if (orig.isEmpty) {
+      // Fallback name to avoid passing nulls elsewhere
+      return 'unnamed${extension != null ? '.$extension' : '.jpg'}';
+    }
+
+    if (customFileNames.containsKey(orig) &&
+        _safeString(customFileNames[orig]).isNotEmpty) {
+      final customName = _safeString(customFileNames[orig]);
+      final ext = _safeString(extension).isEmpty
+          ? 'jpg'
+          : _safeString(extension);
+
+      // Add extension if not present (case-insensitive)
+      final lower = customName.toLowerCase();
+      if (!lower.endsWith('.jpg') &&
+          !lower.endsWith('.jpeg') &&
+          !lower.endsWith('.png') &&
+          !lower.endsWith('.webp')) {
         return '$customName.$ext';
       }
       return customName;
     }
 
-    return originalName;
+    return orig;
   }
 
-  /// Method to upload files (replace with actual backend implementation)
+  /// Call the custom training endpoint with uploaded file paths
+  Future<bool> trainCustomModel(
+    List<String> filePaths,
+    List<String> labels,
+  ) async {
+    try {
+      isTraining = true;
+      trainingError = null;
+
+      final response = await http.post(
+        Uri.parse(_customSignsEndpoint),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'file_paths': filePaths, 'labels': labels}),
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        debugPrint('Training response: $responseData');
+
+        // Check if training was successful
+        if (responseData['status'] == 'success' ||
+            responseData['success'] == true) {
+          return await switchToCustomModel();
+        } else {
+          trainingError = responseData['message'] ?? 'Training failed';
+          return false;
+        }
+      } else {
+        trainingError = 'Server error: ${response.statusCode}';
+        debugPrint('Training failed with status: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      trainingError = 'Network error: $e';
+      debugPrint('Error during training: $e');
+      return false;
+    } finally {
+      isTraining = false;
+    }
+  }
+
+  /// Switch to the newly trained custom model
+  Future<bool> switchToCustomModel() async {
+    try {
+      final response = await http.post(
+        Uri.parse(_switchModelEndpoint),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'model_type': 'custom'}),
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        debugPrint('Model switch response: $responseData');
+        return responseData['status'] == 'success' ||
+            responseData['success'] == true;
+      } else {
+        debugPrint('Model switch failed with status: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      debugPrint('Error switching model: $e');
+      return false;
+    }
+  }
+
+  /// Upload files to Supabase Storage organized by labels
   Future<bool> uploadFiles() async {
     if (selectedFiles == null || selectedFiles!.files.isEmpty) return false;
 
     try {
       isUploading = true;
-      // Note: UI state updates will be handled in the widget using safeSetState()
 
-      // Simulate upload delay
-      await Future.delayed(const Duration(seconds: 3));
+      // Perform upload to Supabase Storage
+      final results = await SupabaseStorageService.uploadUserCustomPhotos(
+        files: selectedFiles!.files,
+        customNames: customFileNames,
+        labels: perFileLabels,
+      );
 
-      // Calculate total size of all files
-      double totalSize = 0;
-      for (var file in selectedFiles!.files) {
-        totalSize += file.size / (1024 * 1024); // Convert to MB
-      }
+      // Summarize upload outcome
+      final successes = results.where((r) => r.success).toList();
+      final failures = results.where((r) => !r.success).toList();
 
-      // Create a single batch entry for all uploaded files
-      final fileCount = selectedFiles!.files.length;
-      final batchLabel = fileCount == 1 
-          ? getFinalFileName(selectedFiles!.files.first.name, selectedFiles!.files.first.extension)
-          : (customBatchName?.isNotEmpty == true ? customBatchName! : 'Custom Signs Upload - $fileCount files');
+      // Calculate total size of successful uploads
+      double totalSize = successes.fold(
+        0.0,
+        (sum, r) => sum + (r.sizeBytes ?? 0) / (1024 * 1024),
+      );
 
-      // Create file list for details
-      final fileList = selectedFiles!.files.map((file) => 
-          getFinalFileName(file.name, file.extension)).toList();
+      // Batch label shown in UI
+      final fileCount = results.length;
+      final batchLabel = fileCount == 1
+          ? (successes.isNotEmpty
+                ? _safeString(successes.first.finalName)
+                : getFinalFileName(
+                    selectedFiles!.files.first.name,
+                    selectedFiles!.files.first.extension,
+                  ))
+          : (customBatchName?.isNotEmpty == true
+                ? customBatchName!
+                : 'Custom Signs Upload - $fileCount files');
+
+      // Create file list for details (defensive access)
+      final fileList = results.map((r) {
+        try {
+          if (r.success == true) {
+            final label = _safeString(r.label);
+            final finalName = _safeString(r.finalName);
+            return label.isNotEmpty ? '$label/$finalName' : finalName;
+          } else {
+            return 'FAILED: ${_safeString(r.originalName)}';
+          }
+        } catch (_) {
+          return 'FAILED: unknown';
+        }
+      }).toList();
 
       uploadedFiles.insert(0, {
         'fileName': batchLabel,
         'uploadDate': dateTimeFormat("MMM d, y", getCurrentTimestamp),
         'fileSize': '${totalSize.toStringAsFixed(1)} MB',
-        'status': 'processing',
+        'status': failures.isEmpty
+            ? 'processing'
+            : (successes.isNotEmpty ? 'partial' : 'failed'),
         'fileCount': fileCount,
-        'fileList': fileList, // Store individual file names for details
-        'isBatch': fileCount > 1, // Flag to identify batch uploads
+        'fileList': fileList,
+        'isBatch': fileCount > 1,
+        'publicUrls': successes
+            .map((r) => _safeString(r.publicUrl))
+            .where((s) => s.isNotEmpty)
+            .toList(),
+        'paths': successes
+            .map((r) => _safeString(r.path))
+            .where((s) => s.isNotEmpty)
+            .toList(),
       });
 
-      selectedFiles = null;
-      customFileNames.clear(); // Reset custom names
-      customBatchName = null; // Reset custom batch name
       isUploading = false;
-      // Note: UI state updates will be handled in the widget using safeSetState()
+
+      // Start training if uploads were successful DO NOT TOUCH FOR NOW
+      // if (successes.isNotEmpty) {
+      //   final filePaths = successes
+      //       .map((r) => _safeString(r.path))
+      //       .where((s) => s.isNotEmpty)
+      //       .toList();
+      //   final labels = successes
+      //       .map((r) => _safeString(r.label))
+      //       .where((s) => s.isNotEmpty)
+      //       .toList();
+
+      //   final trainingSuccess = await trainCustomModel(filePaths, labels);
+
+      //   // Update the status based on training result
+      //   uploadedFiles[0]['status'] = trainingSuccess ? 'processed' : 'failed';
+      //   if (!trainingSuccess && trainingError != null) {
+      //     uploadedFiles[0]['error'] = trainingError;
+      //   }
+      // }
+
+      selectedFiles = null;
+      customFileNames.clear();
+      customBatchName = null;
 
       return true;
     } catch (e) {
       isUploading = false;
-      // Note: UI state updates will be handled in the widget using safeSetState()
       debugPrint('Error uploading files: $e');
       return false;
     }
@@ -183,14 +371,11 @@ class CustomSignsModel extends FlutterFlowModel<CustomSignsPage> {
     backendQueries: debugBackendQueries,
     componentStates: {
       ...widgetBuilderComponents.map(
-            (key, value) => MapEntry(
-          key,
-          value.toWidgetClassDebugData(),
-        ),
+        (key, value) => MapEntry(key, value.toWidgetClassDebugData()),
       ),
     }.withoutNulls,
     link:
-    'https://app.flutterflow.io/project/signify-hq88od/tab=uiBuilder&page=customSigns',
+        'https://app.flutterflow.io/project/signify-hq88od/tab=uiBuilder&page=customSigns',
     searchReference: 'reference=OghjdXN0b21TaWducw==',
     widgetClassName: 'customSigns',
   );
