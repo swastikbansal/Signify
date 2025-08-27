@@ -1,13 +1,13 @@
 import 'dart:async';
 
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 import '/flutter_flow/flutter_flow_theme.dart';
 import 'auth/firebase_auth/auth_util.dart';
@@ -335,7 +335,9 @@ class _NavBarPageState extends State<NavBarPage> {
                 // Position tooltip above
                 decoration: BoxDecoration(
                   color: FlutterFlowTheme.of(context).alternate,
-                  borderRadius: BorderRadius.circular(8.0),
+                  borderRadius: BorderRadius.circular(
+                    48.0,
+                  ), // Changed from 8.0 to 48.0
                 ),
                 textStyle: TextStyle(
                   color: FlutterFlowTheme.of(context).primaryText,
@@ -364,7 +366,9 @@ class _NavBarPageState extends State<NavBarPage> {
                 // Position tooltip above
                 decoration: BoxDecoration(
                   color: FlutterFlowTheme.of(context).alternate,
-                  borderRadius: BorderRadius.circular(8.0),
+                  borderRadius: BorderRadius.circular(
+                    48.0,
+                  ), // Changed from 8.0 to 48.0
                 ),
                 textStyle: TextStyle(
                   color: FlutterFlowTheme.of(context).primaryText,
@@ -393,7 +397,9 @@ class _NavBarPageState extends State<NavBarPage> {
                 // Position tooltip above
                 decoration: BoxDecoration(
                   color: FlutterFlowTheme.of(context).alternate,
-                  borderRadius: BorderRadius.circular(8.0),
+                  borderRadius: BorderRadius.circular(
+                    48.0,
+                  ), // Changed from 8.0 to 48.0
                 ),
                 textStyle: TextStyle(
                   color: FlutterFlowTheme.of(context).primaryText,
@@ -422,7 +428,9 @@ class _NavBarPageState extends State<NavBarPage> {
                 // Position tooltip above
                 decoration: BoxDecoration(
                   color: FlutterFlowTheme.of(context).alternate,
-                  borderRadius: BorderRadius.circular(8.0),
+                  borderRadius: BorderRadius.circular(
+                    48.0,
+                  ), // Changed from 8.0 to 48.0
                 ),
                 textStyle: TextStyle(
                   color: FlutterFlowTheme.of(context).primaryText,

@@ -465,11 +465,11 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                   FlutterFlowTheme.of(
                                                                     context,
                                                                   ).alternate,
-                                                              width: 1.5,
+                                                              width: 1.0,
                                                             ),
                                                             borderRadius:
                                                                 BorderRadius.circular(
-                                                                  16.0,
+                                                                  48.0,
                                                                 ),
                                                           ),
                                                           focusedBorder: OutlineInputBorder(
@@ -482,7 +482,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                             ),
                                                             borderRadius:
                                                                 BorderRadius.circular(
-                                                                  16.0,
+                                                                  48.0,
                                                                 ),
                                                           ),
                                                           errorBorder: OutlineInputBorder(
@@ -495,7 +495,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                             ),
                                                             borderRadius:
                                                                 BorderRadius.circular(
-                                                                  16.0,
+                                                                  48.0,
                                                                 ),
                                                           ),
                                                           focusedErrorBorder:
@@ -509,7 +509,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                 ),
                                                                 borderRadius:
                                                                     BorderRadius.circular(
-                                                                      16.0,
+                                                                      48.0,
                                                                     ),
                                                               ),
                                                           filled: true,
@@ -540,7 +540,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                     color: Color(
                                                                       0xFF757575,
                                                                     ),
-                                                                    size: 22.0,
+                                                                    size: 20.0,
                                                                   ),
                                                                 )
                                                               : null,
@@ -659,11 +659,11 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                   FlutterFlowTheme.of(
                                                                     context,
                                                                   ).alternate,
-                                                              width: 1.5,
+                                                              width: 1.0,
                                                             ),
                                                             borderRadius:
                                                                 BorderRadius.circular(
-                                                                  16.0,
+                                                                  48.0,
                                                                 ),
                                                           ),
                                                           focusedBorder: OutlineInputBorder(
@@ -676,7 +676,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                             ),
                                                             borderRadius:
                                                                 BorderRadius.circular(
-                                                                  16.0,
+                                                                  48.0,
                                                                 ),
                                                           ),
                                                           errorBorder: OutlineInputBorder(
@@ -685,11 +685,11 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                   FlutterFlowTheme.of(
                                                                     context,
                                                                   ).error,
-                                                              width: 1.5,
+                                                              width: 1.0,
                                                             ),
                                                             borderRadius:
                                                                 BorderRadius.circular(
-                                                                  16.0,
+                                                                  48.0,
                                                                 ),
                                                           ),
                                                           focusedErrorBorder:
@@ -703,7 +703,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                 ),
                                                                 borderRadius:
                                                                     BorderRadius.circular(
-                                                                      16.0,
+                                                                      48.0,
                                                                     ),
                                                               ),
                                                           filled: true,
@@ -736,7 +736,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                   FlutterFlowTheme.of(
                                                                     context,
                                                                   ).secondaryText,
-                                                              size: 24.0,
+                                                              size: 20.0,
                                                             ),
                                                           ),
                                                         ),
@@ -937,8 +937,8 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                               'ogz7zsvu' /* Sign In */,
                                                             ),
                                                         options: FFButtonOptions(
-                                                          width: 240.0,
-                                                          height: 48.0,
+                                                          width: 310.0,
+                                                          height: 50.0,
                                                           padding:
                                                               const EdgeInsetsDirectional.fromSTEB(
                                                                 0.0,
@@ -990,7 +990,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                               ),
                                                           borderRadius:
                                                               BorderRadius.circular(
-                                                                16.0,
+                                                                48.0,
                                                               ),
                                                           hoverColor:
                                                               FlutterFlowTheme.of(
@@ -1016,6 +1016,48 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                     mainAxisSize:
                                                         MainAxisSize.max,
                                                     children: [
+                                                      // Align(
+                                                      //   alignment:
+                                                      //       const AlignmentDirectional(
+                                                      //         0.0,
+                                                      //         0.0,
+                                                      //       ),
+                                                      //   child: Padding(
+                                                      //     padding:
+                                                      //         const EdgeInsetsDirectional.fromSTEB(
+                                                      //           16.0,
+                                                      //           0.0,
+                                                      //           16.0,
+                                                      //           16.0,
+                                                      //         ),
+                                                      //     child: Text(
+                                                      //       FFLocalizations.of(
+                                                      //         context,
+                                                      //       ).getText(
+                                                      //         '9tybw60x' /* Or sign up with */,
+                                                      //       ),
+                                                      //       textAlign: TextAlign
+                                                      //           .center,
+                                                      //       style:
+                                                      //           FlutterFlowTheme.of(
+                                                      //             context,
+                                                      //           ).labelMedium.override(
+                                                      //             fontFamily:
+                                                      //                 FlutterFlowTheme.of(
+                                                      //                   context,
+                                                      //                 ).labelMediumFamily,
+                                                      //             letterSpacing:
+                                                      //                 0.0,
+                                                      //             useGoogleFonts:
+                                                      //                 GoogleFonts.asMap().containsKey(
+                                                      //                   FlutterFlowTheme.of(
+                                                      //                     context,
+                                                      //                   ).labelMediumFamily,
+                                                      //                 ),
+                                                      //           ),
+                                                      //     ),
+                                                      //   ),
+                                                      // ),
                                                       Align(
                                                         alignment:
                                                             const AlignmentDirectional(
@@ -1025,52 +1067,10 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                         child: Padding(
                                                           padding:
                                                               const EdgeInsetsDirectional.fromSTEB(
+                                                                0.0,
+                                                                0.0,
+                                                                0.0,
                                                                 16.0,
-                                                                0.0,
-                                                                16.0,
-                                                                16.0,
-                                                              ),
-                                                          child: Text(
-                                                            FFLocalizations.of(
-                                                              context,
-                                                            ).getText(
-                                                              '9tybw60x' /* Or sign up with */,
-                                                            ),
-                                                            textAlign: TextAlign
-                                                                .center,
-                                                            style:
-                                                                FlutterFlowTheme.of(
-                                                                  context,
-                                                                ).labelMedium.override(
-                                                                  fontFamily:
-                                                                      FlutterFlowTheme.of(
-                                                                        context,
-                                                                      ).labelMediumFamily,
-                                                                  letterSpacing:
-                                                                      0.0,
-                                                                  useGoogleFonts:
-                                                                      GoogleFonts.asMap().containsKey(
-                                                                        FlutterFlowTheme.of(
-                                                                          context,
-                                                                        ).labelMediumFamily,
-                                                                      ),
-                                                                ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      Align(
-                                                        alignment:
-                                                            const AlignmentDirectional(
-                                                              0.0,
-                                                              0.0,
-                                                            ),
-                                                        child: Padding(
-                                                          padding:
-                                                              const EdgeInsetsDirectional.fromSTEB(
-                                                                0.0,
-                                                                0.0,
-                                                                0.0,
-                                                                8.0,
                                                               ),
                                                           child: Wrap(
                                                             spacing: 16.0,
@@ -1142,12 +1142,12 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                   color:
                                                                       FlutterFlowTheme.of(
                                                                         context,
-                                                                      ).primary,
+                                                                      ).primaryText,
                                                                   size: 18.0,
                                                                 ),
                                                                 options: FFButtonOptions(
-                                                                  width: 240.0,
-                                                                  height: 48.0,
+                                                                  width: 310.0,
+                                                                  height: 50.0,
                                                                   padding:
                                                                       const EdgeInsetsDirectional.fromSTEB(
                                                                         0.0,
@@ -1191,12 +1191,12 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                   borderSide: BorderSide(
                                                                     color: FlutterFlowTheme.of(
                                                                       context,
-                                                                    ).alternate,
-                                                                    width: 1.5,
+                                                                    ).secondaryBackground,
+                                                                    width: 1.0,
                                                                   ),
                                                                   borderRadius:
                                                                       BorderRadius.circular(
-                                                                        16.0,
+                                                                        48.0,
                                                                       ),
                                                                   hoverColor:
                                                                       FlutterFlowTheme.of(
@@ -1337,11 +1337,11 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                     FlutterFlowTheme.of(
                                                                       context,
                                                                     ).alternate,
-                                                                width: 1.5,
+                                                                width: 1.0,
                                                               ),
                                                               borderRadius:
                                                                   BorderRadius.circular(
-                                                                    16.0,
+                                                                    48.0,
                                                                   ),
                                                             ),
                                                             focusedBorder: OutlineInputBorder(
@@ -1354,7 +1354,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                               ),
                                                               borderRadius:
                                                                   BorderRadius.circular(
-                                                                    16.0,
+                                                                    48.0,
                                                                   ),
                                                             ),
                                                             errorBorder: OutlineInputBorder(
@@ -1367,7 +1367,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                               ),
                                                               borderRadius:
                                                                   BorderRadius.circular(
-                                                                    16.0,
+                                                                    48.0,
                                                                   ),
                                                             ),
                                                             focusedErrorBorder:
@@ -1382,7 +1382,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                       ),
                                                                   borderRadius:
                                                                       BorderRadius.circular(
-                                                                        16.0,
+                                                                        48.0,
                                                                       ),
                                                                 ),
                                                             filled: true,
@@ -1415,7 +1415,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                         0xFF757575,
                                                                       ),
                                                                       size:
-                                                                          22.0,
+                                                                          20.0,
                                                                     ),
                                                                   )
                                                                 : null,
@@ -1541,11 +1541,11 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                     FlutterFlowTheme.of(
                                                                       context,
                                                                     ).alternate,
-                                                                width: 1.5,
+                                                                width: 1.0,
                                                               ),
                                                               borderRadius:
                                                                   BorderRadius.circular(
-                                                                    16.0,
+                                                                    48.0,
                                                                   ),
                                                             ),
                                                             focusedBorder: OutlineInputBorder(
@@ -1558,7 +1558,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                               ),
                                                               borderRadius:
                                                                   BorderRadius.circular(
-                                                                    16.0,
+                                                                    48.0,
                                                                   ),
                                                             ),
                                                             errorBorder: OutlineInputBorder(
@@ -1567,11 +1567,11 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                     FlutterFlowTheme.of(
                                                                       context,
                                                                     ).error,
-                                                                width: 1.5,
+                                                                width: 1.0,
                                                               ),
                                                               borderRadius:
                                                                   BorderRadius.circular(
-                                                                    16.0,
+                                                                    48.0,
                                                                   ),
                                                             ),
                                                             focusedErrorBorder:
@@ -1586,7 +1586,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                       ),
                                                                   borderRadius:
                                                                       BorderRadius.circular(
-                                                                        16.0,
+                                                                        48.0,
                                                                       ),
                                                                 ),
                                                             filled: true,
@@ -1619,7 +1619,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                         0xFF757575,
                                                                       ),
                                                                       size:
-                                                                          24.0,
+                                                                          20.0,
                                                                     ),
                                                                   )
                                                                 : null,
@@ -1735,11 +1735,11 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                     FlutterFlowTheme.of(
                                                                       context,
                                                                     ).alternate,
-                                                                width: 1.5,
+                                                                width: 1.0,
                                                               ),
                                                               borderRadius:
                                                                   BorderRadius.circular(
-                                                                    16.0,
+                                                                    48.0,
                                                                   ),
                                                             ),
                                                             focusedBorder: OutlineInputBorder(
@@ -1752,7 +1752,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                               ),
                                                               borderRadius:
                                                                   BorderRadius.circular(
-                                                                    16.0,
+                                                                    48.0,
                                                                   ),
                                                             ),
                                                             errorBorder: OutlineInputBorder(
@@ -1765,7 +1765,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                               ),
                                                               borderRadius:
                                                                   BorderRadius.circular(
-                                                                    16.0,
+                                                                    48.0,
                                                                   ),
                                                             ),
                                                             focusedErrorBorder:
@@ -1780,7 +1780,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                       ),
                                                                   borderRadius:
                                                                       BorderRadius.circular(
-                                                                        16.0,
+                                                                        48.0,
                                                                       ),
                                                                 ),
                                                             filled: true,
@@ -1812,7 +1812,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                 color: FlutterFlowTheme.of(
                                                                   context,
                                                                 ).secondaryText,
-                                                                size: 24.0,
+                                                                size: 20.0,
                                                               ),
                                                             ),
                                                           ),
@@ -1927,11 +1927,11 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                     FlutterFlowTheme.of(
                                                                       context,
                                                                     ).alternate,
-                                                                width: 1.5,
+                                                                width: 1.0,
                                                               ),
                                                               borderRadius:
                                                                   BorderRadius.circular(
-                                                                    16.0,
+                                                                    48.0,
                                                                   ),
                                                             ),
                                                             focusedBorder: OutlineInputBorder(
@@ -1944,7 +1944,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                               ),
                                                               borderRadius:
                                                                   BorderRadius.circular(
-                                                                    16.0,
+                                                                    48.0,
                                                                   ),
                                                             ),
                                                             errorBorder: OutlineInputBorder(
@@ -1957,7 +1957,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                               ),
                                                               borderRadius:
                                                                   BorderRadius.circular(
-                                                                    16.0,
+                                                                    48.0,
                                                                   ),
                                                             ),
                                                             focusedErrorBorder:
@@ -1972,7 +1972,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                       ),
                                                                   borderRadius:
                                                                       BorderRadius.circular(
-                                                                        16.0,
+                                                                        48.0,
                                                                       ),
                                                                 ),
                                                             filled: true,
@@ -2004,7 +2004,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                 color: FlutterFlowTheme.of(
                                                                   context,
                                                                 ).secondaryText,
-                                                                size: 24.0,
+                                                                size: 20.0,
                                                               ),
                                                             ),
                                                           ),
@@ -2129,8 +2129,8 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                 'za9j80x6' /* Create Account */,
                                                               ),
                                                           options: FFButtonOptions(
-                                                            width: 240.0,
-                                                            height: 48.0,
+                                                            width: 310.0,
+                                                            height: 50.0,
                                                             padding:
                                                                 const EdgeInsetsDirectional.fromSTEB(
                                                                   0.0,
@@ -2180,7 +2180,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                 ),
                                                             borderRadius:
                                                                 BorderRadius.circular(
-                                                                  16.0,
+                                                                  48.0,
                                                                 ),
                                                             hoverColor:
                                                                 FlutterFlowTheme.of(
@@ -2207,6 +2207,46 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                       mainAxisSize:
                                                           MainAxisSize.max,
                                                       children: [
+                                                        // Align(
+                                                        //   alignment:
+                                                        //       const AlignmentDirectional(
+                                                        //         0.0,
+                                                        //         0.0,
+                                                        //       ),
+                                                        //   child: Padding(
+                                                        //     padding:
+                                                        //         const EdgeInsetsDirectional.fromSTEB(
+                                                        //           16.0,
+                                                        //           0.0,
+                                                        //           16.0,
+                                                        //           12.0,
+                                                        //         ),
+                                                        //     child: Text(
+                                                        //       FFLocalizations.of(
+                                                        //         context,
+                                                        //       ).getText(
+                                                        //         '0v5qxzmj' /* Or sign up with */,
+                                                        //       ),
+                                                        //       textAlign:
+                                                        //           TextAlign
+                                                        //               .center,
+                                                        //       style: FlutterFlowTheme.of(context).labelMedium.override(
+                                                        //         fontFamily:
+                                                        //             FlutterFlowTheme.of(
+                                                        //               context,
+                                                        //             ).labelMediumFamily,
+                                                        //         letterSpacing:
+                                                        //             0.0,
+                                                        //         useGoogleFonts: GoogleFonts.asMap()
+                                                        //             .containsKey(
+                                                        //               FlutterFlowTheme.of(
+                                                        //                 context,
+                                                        //               ).labelMediumFamily,
+                                                        //             ),
+                                                        //       ),
+                                                        //     ),
+                                                        //   ),
+                                                        // ),
                                                         Align(
                                                           alignment:
                                                               const AlignmentDirectional(
@@ -2216,50 +2256,10 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                           child: Padding(
                                                             padding:
                                                                 const EdgeInsetsDirectional.fromSTEB(
-                                                                  16.0,
-                                                                  0.0,
-                                                                  16.0,
-                                                                  12.0,
-                                                                ),
-                                                            child: Text(
-                                                              FFLocalizations.of(
-                                                                context,
-                                                              ).getText(
-                                                                '0v5qxzmj' /* Or sign up with */,
-                                                              ),
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .center,
-                                                              style: FlutterFlowTheme.of(context).labelMedium.override(
-                                                                fontFamily:
-                                                                    FlutterFlowTheme.of(
-                                                                      context,
-                                                                    ).labelMediumFamily,
-                                                                letterSpacing:
-                                                                    0.0,
-                                                                useGoogleFonts: GoogleFonts.asMap()
-                                                                    .containsKey(
-                                                                      FlutterFlowTheme.of(
-                                                                        context,
-                                                                      ).labelMediumFamily,
-                                                                    ),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        Align(
-                                                          alignment:
-                                                              const AlignmentDirectional(
-                                                                0.0,
-                                                                0.0,
-                                                              ),
-                                                          child: Padding(
-                                                            padding:
-                                                                const EdgeInsetsDirectional.fromSTEB(
                                                                   0.0,
                                                                   0.0,
                                                                   0.0,
-                                                                  16.0,
+                                                                  32.0,
                                                                 ),
                                                             child: Wrap(
                                                               spacing: 16.0,
@@ -2336,15 +2336,15 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                           .google,
                                                                       color: FlutterFlowTheme.of(
                                                                         context,
-                                                                      ).primary,
+                                                                      ).primaryText,
                                                                       size:
                                                                           18.0,
                                                                     ),
                                                                     options: FFButtonOptions(
                                                                       width:
-                                                                          240.0,
+                                                                          310.0,
                                                                       height:
-                                                                          48.0,
+                                                                          50.0,
                                                                       padding:
                                                                           const EdgeInsetsDirectional.fromSTEB(
                                                                             0.0,
@@ -2386,13 +2386,13 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                       borderSide: BorderSide(
                                                                         color: FlutterFlowTheme.of(
                                                                           context,
-                                                                        ).alternate,
+                                                                        ).secondaryBackground,
                                                                         width:
                                                                             1.5,
                                                                       ),
                                                                       borderRadius:
                                                                           BorderRadius.circular(
-                                                                            16.0,
+                                                                            48.0,
                                                                           ),
                                                                       hoverColor: FlutterFlowTheme.of(
                                                                         context,

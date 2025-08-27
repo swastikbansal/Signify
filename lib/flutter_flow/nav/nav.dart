@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '/auth/base_auth_user_provider.dart';
-
+import '/flutter_flow/flutter_flow_util.dart';
 import '/index.dart';
 import '/main.dart';
-import '/flutter_flow/flutter_flow_util.dart';
 
 export 'package:go_router/go_router.dart';
+
 export 'serialization_util.dart';
 
 const kTransitionInfoKey = '__transition_info__';
@@ -19,8 +19,6 @@ const debugRouteLinkMap = {
       'https://app.flutterflow.io/project/signify-hq88od?tab=uiBuilder&page=voicetosign1',
   '/signtovoice2':
       'https://app.flutterflow.io/project/signify-hq88od?tab=uiBuilder&page=signtovoice2',
-  '/education3':
-      'https://app.flutterflow.io/project/signify-hq88od?tab=uiBuilder&page=education3',
   '/onboardingPage':
       'https://app.flutterflow.io/project/signify-hq88od?tab=uiBuilder&page=onboardingPage',
   '/forgotPassword':
@@ -41,8 +39,6 @@ const debugRouteLinkMap = {
       'https://app.flutterflow.io/project/signify-hq88od?tab=uiBuilder&page=requestFeature',
   '/islDict':
       'https://app.flutterflow.io/project/signify-hq88od?tab=uiBuilder&page=islDict',
-  '/islCommunity':
-      'https://app.flutterflow.io/project/signify-hq88od?tab=uiBuilder&page=islCommunity',
   '/authPage':
       'https://app.flutterflow.io/project/signify-hq88od?tab=uiBuilder&page=authPage',
   '/tutorialPage':
@@ -55,6 +51,7 @@ class AppStateNotifier extends ChangeNotifier {
   AppStateNotifier._();
 
   static AppStateNotifier? _instance;
+
   static AppStateNotifier get instance => _instance ??= AppStateNotifier._();
 
   BaseAuthUser? initialUser;
@@ -69,13 +66,19 @@ class AppStateNotifier extends ChangeNotifier {
   bool notifyOnAuthChange = true;
 
   bool get loading => user == null;
+
   bool get loggedIn => user?.loggedIn ?? false;
+
   bool get initiallyLoggedIn => initialUser?.loggedIn ?? false;
+
   bool get shouldRedirect => loggedIn && _redirectLocation != null;
 
   String getRedirectLocation() => _redirectLocation!;
+
   bool hasRedirect() => _redirectLocation != null;
+
   void setRedirectLocationIfUnset(String loc) => _redirectLocation ??= loc;
+
   void clearRedirectLocation() => _redirectLocation = null;
 
   /// Mark as not needing to notify on a sign in / out when we intend
@@ -139,16 +142,6 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
             ),
     ),
     FFRoute(
-      name: 'education3',
-      path: '/education3',
-      builder: (context, params) => params.isEmpty
-          ? const NavBarPage(initialPage: 'education3')
-          : const NavBarPage(
-              initialPage: 'education3',
-              page: Education3Widget(),
-            ),
-    ),
-    FFRoute(
       name: 'onboardingPage',
       path: '/onboardingPage',
       builder: (context, params) => const OnboardingPageWidget(),
@@ -199,11 +192,6 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
       name: 'islDict',
       path: '/islDict',
       builder: (context, params) => const IslDictWidget(),
-    ),
-    FFRoute(
-      name: 'islCommunity',
-      path: '/islCommunity',
-      builder: (context, params) => const IslCommunityWidget(),
     ),
     FFRoute(
       name: 'authPage',
@@ -276,13 +264,17 @@ extension NavigationExtensions on BuildContext {
 
 extension GoRouterExtensions on GoRouter {
   AppStateNotifier get appState => AppStateNotifier.instance;
+
   void prepareAuthEvent([bool ignoreRedirect = false]) =>
       appState.hasRedirect() && !ignoreRedirect
       ? null
       : appState.updateNotifyOnAuthChange(false);
+
   bool shouldRedirect(bool ignoreRedirect) =>
       !ignoreRedirect && appState.hasRedirect();
+
   void clearRedirectLocation() => appState.clearRedirectLocation();
+
   void setRedirectLocationIfUnset(String location) =>
       appState.updateNotifyOnAuthChange(false);
 }
@@ -290,10 +282,12 @@ extension GoRouterExtensions on GoRouter {
 extension _GoRouterStateExtensions on GoRouterState {
   Map<String, dynamic> get extraMap =>
       extra != null ? extra as Map<String, dynamic> : {};
+
   Map<String, dynamic> get allParams => <String, dynamic>{}
     ..addAll(pathParameters)
     ..addAll(uri.queryParameters)
     ..addAll(extraMap);
+
   TransitionInfo get transitionInfo => extraMap.containsKey(kTransitionInfoKey)
       ? extraMap[kTransitionInfoKey] as TransitionInfo
       : TransitionInfo.appDefault();
@@ -313,9 +307,12 @@ class FFParameters {
       state.allParams.isEmpty ||
       (state.allParams.length == 1 &&
           state.extraMap.containsKey(kTransitionInfoKey));
+
   bool isAsyncParam(MapEntry<String, dynamic> param) =>
       asyncParams.containsKey(param.key) && param.value is String;
+
   bool get hasFutures => state.allParams.entries.any(isAsyncParam);
+
   Future<bool> completeFutures() => Future.wait(
     state.allParams.entries.where(isAsyncParam).map((param) async {
       final doc = await asyncParams[param.key]!(
@@ -446,6 +443,7 @@ class TransitionInfo {
 
 class RootPageContext {
   const RootPageContext(this.isRootPage, [this.errorRoute]);
+
   final bool isRootPage;
   final String? errorRoute;
 

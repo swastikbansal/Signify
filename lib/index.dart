@@ -1,7 +1,6 @@
 // Export pages
 export '/pages/voicetosign1/voicetosign1_widget.dart' show Voicetosign1Widget;
 export '/pages/signtovoice2/signtovoice2_widget.dart' show Signtovoice2Widget;
-export '/pages/education3/education3_widget.dart' show Education3Widget;
 export '/pages/onboarding_page/onboarding_page_widget.dart'
     show OnboardingPageWidget;
 export '/pages/forgot_password/forgot_password_widget.dart'
@@ -16,7 +15,6 @@ export '/pages/report_bug/report_bug_widget.dart' show ReportBugWidget;
 export '/pages/request_feature/request_feature_widget.dart'
     show RequestFeatureWidget;
 export '/pages/isl_dict/isl_dict_widget.dart' show IslDictWidget;
-export '/pages/isl_community/isl_community_widget.dart' show IslCommunityWidget;
 export '/pages/auth_page/auth_page_widget.dart' show AuthPageWidget;
 export '/pages/tutorial_page/tutorial_page_widget.dart' show TutorialPageWidget;
 export '/pages/customs_signs/custom_signs_widget.dart'

@@ -91,9 +91,9 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
 
   @override
   Widget build(BuildContext context) {
-    DebugFlutterFlowModelContext.maybeOf(context)
-        ?.parentModelCallback
-        ?.call(_model);
+    DebugFlutterFlowModelContext.maybeOf(
+      context,
+    )?.parentModelCallback?.call(_model);
 
     return StreamBuilder<UsersRecord>(
       stream: UsersRecord.getDocument(currentUserReference!),
@@ -118,13 +118,13 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
         final islDictUsersRecord = snapshot.data!;
         _model.debugBackendQueries['islDictUsersRecord_Scaffold_fsndxmtc'] =
             debugSerializeParam(
-          islDictUsersRecord,
-          ParamType.Document,
-          link:
-              'https://app.flutterflow.io/project/signify-hq88od?tab=uiBuilder&page=islDict',
-          name: 'users',
-          nullable: false,
-        );
+              islDictUsersRecord,
+              ParamType.Document,
+              link:
+                  'https://app.flutterflow.io/project/signify-hq88od?tab=uiBuilder&page=islDict',
+              name: 'users',
+              nullable: false,
+            );
         debugLogWidgetClass(_model);
 
         return GestureDetector(
@@ -136,15 +136,16 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
               backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
               automaticallyImplyLeading: false,
               title: Text(
-                FFLocalizations.of(context).getText(
-                  '5fzg2vtr' /* ISL Dictionary */,
-                ),
+                FFLocalizations.of(
+                  context,
+                ).getText('5fzg2vtr' /* ISL Dictionary */),
                 style: FlutterFlowTheme.of(context).headlineMedium.override(
-                      fontFamily: 'Space Grotesk',
-                      letterSpacing: 0.0,
-                      useGoogleFonts:
-                          GoogleFonts.asMap().containsKey('Space Grotesk'),
-                    ),
+                  fontFamily: 'Space Grotesk',
+                  letterSpacing: 0.0,
+                  useGoogleFonts: GoogleFonts.asMap().containsKey(
+                    'Space Grotesk',
+                  ),
+                ),
               ),
               actions: const [],
               centerTitle: false,
@@ -158,7 +159,11 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                     alignment: const AlignmentDirectional(0.0, -1.0),
                     child: Padding(
                       padding: const EdgeInsetsDirectional.fromSTEB(
-                          16.0, 0.0, 16.0, 0.0),
+                        16.0,
+                        0.0,
+                        16.0,
+                        0.0,
+                      ),
                       child: SingleChildScrollView(
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
@@ -167,23 +172,30 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                             // Description
                             Padding(
                               padding: const EdgeInsetsDirectional.fromSTEB(
-                                  0.0, 8.0, 0.0, 24.0),
+                                0.0,
+                                8.0,
+                                0.0,
+                                24.0,
+                              ),
                               child: Text(
                                 FFLocalizations.of(context).getText(
                                   'tai0ovmf' /* Explore the Indian Sign Language dictionary */,
                                 ),
-                                style: FlutterFlowTheme.of(context)
-                                    .bodyMedium
+                                style: FlutterFlowTheme.of(context).bodyMedium
                                     .override(
-                                      fontFamily: FlutterFlowTheme.of(context)
-                                          .bodyMediumFamily,
-                                      color: FlutterFlowTheme.of(context)
-                                          .secondaryText,
+                                      fontFamily: FlutterFlowTheme.of(
+                                        context,
+                                      ).bodyMediumFamily,
+                                      color: FlutterFlowTheme.of(
+                                        context,
+                                      ).secondaryText,
                                       letterSpacing: 0.0,
                                       useGoogleFonts: GoogleFonts.asMap()
                                           .containsKey(
-                                              FlutterFlowTheme.of(context)
-                                                  .bodyMediumFamily),
+                                            FlutterFlowTheme.of(
+                                              context,
+                                            ).bodyMediumFamily,
+                                          ),
                                     ),
                               ),
                             ),
@@ -192,12 +204,12 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                             Container(
                               width: double.infinity,
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(16.0),
+                                borderRadius: BorderRadius.circular(48.0),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: FlutterFlowTheme.of(context)
-                                        .primary
-                                        .withOpacity(0.1),
+                                    color: FlutterFlowTheme.of(
+                                      context,
+                                    ).primary.withOpacity(0.1),
                                     offset: const Offset(0, 4),
                                     blurRadius: 12.0,
                                     spreadRadius: 0,
@@ -212,7 +224,8 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                                   const Duration(milliseconds: 500),
                                   () async {
                                     await _model.searchSigns(
-                                        _model.textController?.text ?? '');
+                                      _model.textController?.text ?? '',
+                                    );
                                     safeSetState(() {});
                                   },
                                 ),
@@ -223,76 +236,91 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                                   labelStyle: FlutterFlowTheme.of(context)
                                       .labelMedium
                                       .override(
-                                        fontFamily: FlutterFlowTheme.of(context)
-                                            .labelMediumFamily,
+                                        fontFamily: FlutterFlowTheme.of(
+                                          context,
+                                        ).labelMediumFamily,
                                         letterSpacing: 0.0,
                                         useGoogleFonts: GoogleFonts.asMap()
                                             .containsKey(
-                                                FlutterFlowTheme.of(context)
-                                                    .labelMediumFamily),
+                                              FlutterFlowTheme.of(
+                                                context,
+                                              ).labelMediumFamily,
+                                            ),
                                       ),
                                   hintText:
                                       'Search for signs, words, or phrases...',
                                   hintStyle: FlutterFlowTheme.of(context)
                                       .labelMedium
                                       .override(
-                                        fontFamily: FlutterFlowTheme.of(context)
-                                            .labelMediumFamily,
-                                        color: FlutterFlowTheme.of(context)
-                                            .secondaryText,
+                                        fontFamily: FlutterFlowTheme.of(
+                                          context,
+                                        ).labelMediumFamily,
+                                        color: FlutterFlowTheme.of(
+                                          context,
+                                        ).secondaryText,
                                         letterSpacing: 0.0,
                                         useGoogleFonts: GoogleFonts.asMap()
                                             .containsKey(
-                                                FlutterFlowTheme.of(context)
-                                                    .labelMediumFamily),
+                                              FlutterFlowTheme.of(
+                                                context,
+                                              ).labelMediumFamily,
+                                            ),
                                       ),
                                   enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
-                                      color: FlutterFlowTheme.of(context)
-                                          .alternate,
+                                      color: FlutterFlowTheme.of(
+                                        context,
+                                      ).alternate,
                                       width: 2.0,
                                     ),
-                                    borderRadius: BorderRadius.circular(16.0),
+                                    borderRadius: BorderRadius.circular(48.0),
                                   ),
                                   focusedBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
-                                      color:
-                                          FlutterFlowTheme.of(context).primary,
+                                      color: FlutterFlowTheme.of(
+                                        context,
+                                      ).primary,
                                       width: 2.0,
                                     ),
-                                    borderRadius: BorderRadius.circular(16.0),
+                                    borderRadius: BorderRadius.circular(48.0),
                                   ),
                                   errorBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
                                       color: FlutterFlowTheme.of(context).error,
                                       width: 2.0,
                                     ),
-                                    borderRadius: BorderRadius.circular(16.0),
+                                    borderRadius: BorderRadius.circular(48.0),
                                   ),
                                   focusedErrorBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
                                       color: FlutterFlowTheme.of(context).error,
                                       width: 2.0,
                                     ),
-                                    borderRadius: BorderRadius.circular(16.0),
+                                    borderRadius: BorderRadius.circular(48.0),
                                   ),
                                   filled: true,
-                                  fillColor: FlutterFlowTheme.of(context)
-                                      .secondaryBackground,
+                                  fillColor: FlutterFlowTheme.of(
+                                    context,
+                                  ).secondaryBackground,
                                   contentPadding:
                                       const EdgeInsetsDirectional.fromSTEB(
-                                          20.0, 20.0, 20.0, 20.0),
+                                        20.0,
+                                        20.0,
+                                        20.0,
+                                        20.0,
+                                      ),
                                   prefixIcon: Container(
                                     padding: const EdgeInsets.all(12.0),
                                     child: Icon(
                                       Icons.search_rounded,
-                                      color:
-                                          FlutterFlowTheme.of(context).secondaryText,
+                                      color: FlutterFlowTheme.of(
+                                        context,
+                                      ).secondaryText,
                                       size: 24.0,
                                     ),
                                   ),
-                                  suffixIcon: _model
-                                          .textController!.text.isNotEmpty
+                                  suffixIcon:
+                                      _model.textController!.text.isNotEmpty
                                       ? Container(
                                           padding: const EdgeInsets.all(12.0),
                                           child: GestureDetector(
@@ -302,28 +330,31 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                                             },
                                             child: Icon(
                                               Icons.clear_rounded,
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .secondaryText,
+                                              color: FlutterFlowTheme.of(
+                                                context,
+                                              ).secondaryText,
                                               size: 20.0,
                                             ),
                                           ),
                                         )
                                       : null,
                                 ),
-                                style: FlutterFlowTheme.of(context)
-                                    .bodyLarge
+                                style: FlutterFlowTheme.of(context).bodyLarge
                                     .override(
-                                      fontFamily: FlutterFlowTheme.of(context)
-                                          .bodyLargeFamily,
+                                      fontFamily: FlutterFlowTheme.of(
+                                        context,
+                                      ).bodyLargeFamily,
                                       letterSpacing: 0.0,
                                       useGoogleFonts: GoogleFonts.asMap()
                                           .containsKey(
-                                              FlutterFlowTheme.of(context)
-                                                  .bodyLargeFamily),
+                                            FlutterFlowTheme.of(
+                                              context,
+                                            ).bodyLargeFamily,
+                                          ),
                                     ),
-                                cursorColor:
-                                    FlutterFlowTheme.of(context).primary,
+                                cursorColor: FlutterFlowTheme.of(
+                                  context,
+                                ).primary,
                                 validator: _model.textControllerValidator
                                     .asValidator(context),
                               ),
@@ -459,12 +490,14 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                                       width: 280.0,
                                       height: 280.0,
                                       decoration: BoxDecoration(
-                                        borderRadius:
-                                            BorderRadius.circular(16.0),
+                                        borderRadius: BorderRadius.circular(
+                                          16.0,
+                                        ),
                                       ),
                                       child: ClipRRect(
-                                        borderRadius:
-                                            BorderRadius.circular(16.0),
+                                        borderRadius: BorderRadius.circular(
+                                          16.0,
+                                        ),
                                         child: Image.asset(
                                           'assets/images/dictionary.png',
                                           width: 280.0,
@@ -472,52 +505,56 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                                           fit: BoxFit.cover,
                                           errorBuilder:
                                               (context, error, stackTrace) {
-                                            return Container(
-                                              width: 280.0,
-                                              height: 280.0,
-                                              decoration: BoxDecoration(
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .accent1,
-                                                borderRadius:
-                                                    BorderRadius.circular(16.0),
-                                              ),
-                                              child: Icon(
-                                                Icons.book,
-                                                size: 100.0,
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .primary,
-                                              ),
-                                            );
-                                          },
+                                                return Container(
+                                                  width: 280.0,
+                                                  height: 280.0,
+                                                  decoration: BoxDecoration(
+                                                    color: FlutterFlowTheme.of(
+                                                      context,
+                                                    ).accent1,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          16.0,
+                                                        ),
+                                                  ),
+                                                  child: Icon(
+                                                    Icons.book,
+                                                    size: 100.0,
+                                                    color: FlutterFlowTheme.of(
+                                                      context,
+                                                    ).primary,
+                                                  ),
+                                                );
+                                              },
                                         ),
                                       ),
                                     ),
                                     const SizedBox(height: 24.0),
                                     Padding(
                                       padding: const EdgeInsets.symmetric(
-                                          horizontal: 32.0),
+                                        horizontal: 32.0,
+                                      ),
                                       child: Text(
                                         'Discover the Indian Sign Language gesture for any word you type',
                                         textAlign: TextAlign.center,
                                         style: FlutterFlowTheme.of(context)
                                             .bodyLarge
                                             .override(
-                                              fontFamily:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyLargeFamily,
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .secondaryText,
+                                              fontFamily: FlutterFlowTheme.of(
+                                                context,
+                                              ).bodyLargeFamily,
+                                              color: FlutterFlowTheme.of(
+                                                context,
+                                              ).secondaryText,
                                               letterSpacing: 0.0,
                                               lineHeight: 1.5,
                                               useGoogleFonts:
                                                   GoogleFonts.asMap()
                                                       .containsKey(
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .bodyLargeFamily),
+                                                        FlutterFlowTheme.of(
+                                                          context,
+                                                        ).bodyLargeFamily,
+                                                      ),
                                             ),
                                       ),
                                     ),
@@ -539,15 +576,17 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                                     style: FlutterFlowTheme.of(context)
                                         .headlineSmall
                                         .override(
-                                          fontFamily:
-                                              FlutterFlowTheme.of(context)
-                                                  .headlineSmallFamily,
+                                          fontFamily: FlutterFlowTheme.of(
+                                            context,
+                                          ).headlineSmallFamily,
                                           letterSpacing: 0.0,
                                           fontWeight: FontWeight.w600,
                                           useGoogleFonts: GoogleFonts.asMap()
                                               .containsKey(
-                                                  FlutterFlowTheme.of(context)
-                                                      .headlineSmallFamily),
+                                                FlutterFlowTheme.of(
+                                                  context,
+                                                ).headlineSmallFamily,
+                                              ),
                                         ),
                                   ),
                                   if (_model.isLoadingDriveVideos)
@@ -556,8 +595,9 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                                       height: 20.0,
                                       child: CircularProgressIndicator(
                                         strokeWidth: 2.0,
-                                        color: FlutterFlowTheme.of(context)
-                                            .primary,
+                                        color: FlutterFlowTheme.of(
+                                          context,
+                                        ).primary,
                                       ),
                                     ),
                                 ],
@@ -565,18 +605,21 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                               const SizedBox(height: 8.0),
                               Text(
                                 _model.getSearchStatusMessage(),
-                                style: FlutterFlowTheme.of(context)
-                                    .bodySmall
+                                style: FlutterFlowTheme.of(context).bodySmall
                                     .override(
-                                      fontFamily: FlutterFlowTheme.of(context)
-                                          .bodySmallFamily,
-                                      color: FlutterFlowTheme.of(context)
-                                          .secondaryText,
+                                      fontFamily: FlutterFlowTheme.of(
+                                        context,
+                                      ).bodySmallFamily,
+                                      color: FlutterFlowTheme.of(
+                                        context,
+                                      ).secondaryText,
                                       letterSpacing: 0.0,
                                       useGoogleFonts: GoogleFonts.asMap()
                                           .containsKey(
-                                              FlutterFlowTheme.of(context)
-                                                  .bodySmallFamily),
+                                            FlutterFlowTheme.of(
+                                              context,
+                                            ).bodySmallFamily,
+                                          ),
                                     ),
                               ),
                               const SizedBox(height: 16.0),
@@ -588,16 +631,20 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                                   style: FlutterFlowTheme.of(context)
                                       .titleMedium
                                       .override(
-                                        fontFamily: FlutterFlowTheme.of(context)
-                                            .titleMediumFamily,
-                                        color: FlutterFlowTheme.of(context)
-                                            .primary,
+                                        fontFamily: FlutterFlowTheme.of(
+                                          context,
+                                        ).titleMediumFamily,
+                                        color: FlutterFlowTheme.of(
+                                          context,
+                                        ).primary,
                                         letterSpacing: 0.0,
                                         fontWeight: FontWeight.w500,
                                         useGoogleFonts: GoogleFonts.asMap()
                                             .containsKey(
-                                                FlutterFlowTheme.of(context)
-                                                    .titleMediumFamily),
+                                              FlutterFlowTheme.of(
+                                                context,
+                                              ).titleMediumFamily,
+                                            ),
                                       ),
                                 ),
                                 const SizedBox(height: 12.0),
@@ -605,27 +652,30 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                                     .take(5)
                                     .map(
                                       (video) => Padding(
-                                        padding:
-                                            const EdgeInsets.only(bottom: 12.0),
+                                        padding: const EdgeInsets.only(
+                                          bottom: 12.0,
+                                        ),
                                         child: GestureDetector(
                                           onTap: () {
                                             _model
                                                 .addDriveVideoToRecentlyViewed(
-                                                    video);
+                                                  video,
+                                                );
                                             _showDriveVideoBottomSheet(video);
                                             safeSetState(() {});
                                           },
                                           child: Container(
                                             padding: const EdgeInsets.all(16.0),
                                             decoration: BoxDecoration(
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .secondaryBackground,
+                                              color: FlutterFlowTheme.of(
+                                                context,
+                                              ).secondaryBackground,
                                               borderRadius:
                                                   BorderRadius.circular(12.0),
                                               border: Border.all(
-                                                color: const Color(0xFF4285F4)
-                                                    .withOpacity(0.3),
+                                                color: const Color(
+                                                  0xFF4285F4,
+                                                ).withOpacity(0.3),
                                                 width: 1.0,
                                               ),
                                             ),
@@ -637,17 +687,19 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                                                   decoration: BoxDecoration(
                                                     gradient:
                                                         const LinearGradient(
-                                                      colors: [
-                                                        Color(0xFF4285F4),
-                                                        Color(0xFF34A853)
-                                                      ],
-                                                      begin: Alignment.topLeft,
-                                                      end:
-                                                          Alignment.bottomRight,
-                                                    ),
+                                                          colors: [
+                                                            Color(0xFF4285F4),
+                                                            Color(0xFF34A853),
+                                                          ],
+                                                          begin:
+                                                              Alignment.topLeft,
+                                                          end: Alignment
+                                                              .bottomRight,
+                                                        ),
                                                     borderRadius:
                                                         BorderRadius.circular(
-                                                            8.0),
+                                                          8.0,
+                                                        ),
                                                   ),
                                                   child: const Icon(
                                                     Icons.play_arrow,
@@ -665,42 +717,46 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                                                       Text(
                                                         _model
                                                             .extractWordFromVideoName(
-                                                                video.name),
+                                                              video.name,
+                                                            ),
                                                         style:
                                                             FlutterFlowTheme.of(
-                                                                    context)
-                                                                .bodyLarge
-                                                                .override(
-                                                                  fontFamily: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyLargeFamily,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500,
-                                                                  letterSpacing:
-                                                                      0.0,
-                                                                  useGoogleFonts: GoogleFonts
-                                                                          .asMap()
-                                                                      .containsKey(
-                                                                          FlutterFlowTheme.of(context)
-                                                                              .bodyLargeFamily),
-                                                                ),
+                                                              context,
+                                                            ).bodyLarge.override(
+                                                              fontFamily:
+                                                                  FlutterFlowTheme.of(
+                                                                    context,
+                                                                  ).bodyLargeFamily,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                              letterSpacing:
+                                                                  0.0,
+                                                              useGoogleFonts: GoogleFonts.asMap()
+                                                                  .containsKey(
+                                                                    FlutterFlowTheme.of(
+                                                                      context,
+                                                                    ).bodyLargeFamily,
+                                                                  ),
+                                                            ),
                                                       ),
                                                     ],
                                                   ),
                                                 ),
                                                 Container(
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                      horizontal: 8.0,
-                                                      vertical: 4.0),
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                        horizontal: 8.0,
+                                                        vertical: 4.0,
+                                                      ),
                                                   decoration: BoxDecoration(
-                                                    color:
-                                                        const Color(0xFF4285F4)
-                                                            .withOpacity(0.1),
+                                                    color: const Color(
+                                                      0xFF4285F4,
+                                                    ).withOpacity(0.1),
                                                     borderRadius:
                                                         BorderRadius.circular(
-                                                            12.0),
+                                                          12.0,
+                                                        ),
                                                   ),
                                                   child: Row(
                                                     mainAxisSize:
@@ -708,35 +764,40 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                                                     children: [
                                                       const Icon(
                                                         Icons.play_circle_fill,
-                                                        color:
-                                                            Color(0xFF4285F4),
+                                                        color: Color(
+                                                          0xFF4285F4,
+                                                        ),
                                                         size: 14.0,
                                                       ),
                                                       const SizedBox(
-                                                          width: 4.0),
+                                                        width: 4.0,
+                                                      ),
                                                       Text(
                                                         'Watch',
                                                         style:
                                                             FlutterFlowTheme.of(
-                                                                    context)
-                                                                .bodySmall
-                                                                .override(
-                                                                  fontFamily: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodySmallFamily,
-                                                                  color: const Color(
-                                                                      0xFF4285F4),
-                                                                  letterSpacing:
-                                                                      0.0,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500,
-                                                                  useGoogleFonts: GoogleFonts
-                                                                          .asMap()
-                                                                      .containsKey(
-                                                                          FlutterFlowTheme.of(context)
-                                                                              .bodySmallFamily),
-                                                                ),
+                                                              context,
+                                                            ).bodySmall.override(
+                                                              fontFamily:
+                                                                  FlutterFlowTheme.of(
+                                                                    context,
+                                                                  ).bodySmallFamily,
+                                                              color:
+                                                                  const Color(
+                                                                    0xFF4285F4,
+                                                                  ),
+                                                              letterSpacing:
+                                                                  0.0,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                              useGoogleFonts: GoogleFonts.asMap()
+                                                                  .containsKey(
+                                                                    FlutterFlowTheme.of(
+                                                                      context,
+                                                                    ).bodySmallFamily,
+                                                                  ),
+                                                            ),
                                                       ),
                                                     ],
                                                   ),
@@ -758,12 +819,14 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                                   width: double.infinity,
                                   padding: const EdgeInsets.all(24.0),
                                   decoration: BoxDecoration(
-                                    color: FlutterFlowTheme.of(context)
-                                        .secondaryBackground,
+                                    color: FlutterFlowTheme.of(
+                                      context,
+                                    ).secondaryBackground,
                                     borderRadius: BorderRadius.circular(12.0),
                                     border: Border.all(
-                                      color: FlutterFlowTheme.of(context)
-                                          .alternate,
+                                      color: FlutterFlowTheme.of(
+                                        context,
+                                      ).alternate,
                                       width: 1.0,
                                     ),
                                   ),
@@ -771,8 +834,9 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                                     children: [
                                       Icon(
                                         Icons.search_off,
-                                        color: FlutterFlowTheme.of(context)
-                                            .secondaryText,
+                                        color: FlutterFlowTheme.of(
+                                          context,
+                                        ).secondaryText,
                                         size: 48.0,
                                       ),
                                       const SizedBox(height: 12.0),
@@ -781,16 +845,17 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                                         style: FlutterFlowTheme.of(context)
                                             .titleMedium
                                             .override(
-                                              fontFamily:
-                                                  FlutterFlowTheme.of(context)
-                                                      .titleMediumFamily,
+                                              fontFamily: FlutterFlowTheme.of(
+                                                context,
+                                              ).titleMediumFamily,
                                               letterSpacing: 0.0,
-                                              useGoogleFonts: GoogleFonts
-                                                      .asMap()
-                                                  .containsKey(
-                                                      FlutterFlowTheme.of(
-                                                              context)
-                                                          .titleMediumFamily),
+                                              useGoogleFonts:
+                                                  GoogleFonts.asMap()
+                                                      .containsKey(
+                                                        FlutterFlowTheme.of(
+                                                          context,
+                                                        ).titleMediumFamily,
+                                                      ),
                                             ),
                                       ),
                                       const SizedBox(height: 8.0),
@@ -800,19 +865,20 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
-                                              fontFamily:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyMediumFamily,
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .secondaryText,
+                                              fontFamily: FlutterFlowTheme.of(
+                                                context,
+                                              ).bodyMediumFamily,
+                                              color: FlutterFlowTheme.of(
+                                                context,
+                                              ).secondaryText,
                                               letterSpacing: 0.0,
-                                              useGoogleFonts: GoogleFonts
-                                                      .asMap()
-                                                  .containsKey(
-                                                      FlutterFlowTheme.of(
-                                                              context)
-                                                          .bodyMediumFamily),
+                                              useGoogleFonts:
+                                                  GoogleFonts.asMap()
+                                                      .containsKey(
+                                                        FlutterFlowTheme.of(
+                                                          context,
+                                                        ).bodyMediumFamily,
+                                                      ),
                                             ),
                                       ),
                                     ],
@@ -1050,7 +1116,7 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
       'Sep',
       'Oct',
       'Nov',
-      'Dec'
+      'Dec',
     ];
     return monthNames[month];
   }
@@ -1081,9 +1147,9 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                     width: 40.0,
                     height: 4.0,
                     decoration: BoxDecoration(
-                      color: FlutterFlowTheme.of(context)
-                          .secondaryText
-                          .withOpacity(0.3),
+                      color: FlutterFlowTheme.of(
+                        context,
+                      ).secondaryText.withOpacity(0.3),
                       borderRadius: BorderRadius.circular(2.0),
                     ),
                   ),
@@ -1092,7 +1158,9 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 12.0, vertical: 6.0),
+                          horizontal: 12.0,
+                          vertical: 6.0,
+                        ),
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
                             colors: [Color(0xFF667eea), Color(0xFF764ba2)],
@@ -1103,17 +1171,19 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                         ),
                         child: Text(
                           'Word of the Day',
-                          style: FlutterFlowTheme.of(context)
-                              .labelMedium
+                          style: FlutterFlowTheme.of(context).labelMedium
                               .override(
-                                fontFamily: FlutterFlowTheme.of(context)
-                                    .labelMediumFamily,
+                                fontFamily: FlutterFlowTheme.of(
+                                  context,
+                                ).labelMediumFamily,
                                 color: Colors.white,
                                 letterSpacing: 0.0,
                                 fontWeight: FontWeight.w500,
                                 useGoogleFonts: GoogleFonts.asMap().containsKey(
-                                    FlutterFlowTheme.of(context)
-                                        .labelMediumFamily),
+                                  FlutterFlowTheme.of(
+                                    context,
+                                  ).labelMediumFamily,
+                                ),
                               ),
                         ),
                       ),
@@ -1167,18 +1237,20 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                               const SizedBox(height: 8.0),
                               Text(
                                 'ISL',
-                                style: FlutterFlowTheme.of(context)
-                                    .titleMedium
+                                style: FlutterFlowTheme.of(context).titleMedium
                                     .override(
-                                      fontFamily: FlutterFlowTheme.of(context)
-                                          .titleMediumFamily,
+                                      fontFamily: FlutterFlowTheme.of(
+                                        context,
+                                      ).titleMediumFamily,
                                       color: Colors.white,
                                       letterSpacing: 0.0,
                                       fontWeight: FontWeight.bold,
                                       useGoogleFonts: GoogleFonts.asMap()
                                           .containsKey(
-                                              FlutterFlowTheme.of(context)
-                                                  .titleMediumFamily),
+                                            FlutterFlowTheme.of(
+                                              context,
+                                            ).titleMediumFamily,
+                                          ),
                                     ),
                               ),
                             ],
@@ -1195,32 +1267,37 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                         children: [
                           Text(
                             _model.wordOfTheDay?.word ?? 'Hello',
-                            style: FlutterFlowTheme.of(context)
-                                .displayMedium
+                            style: FlutterFlowTheme.of(context).displayMedium
                                 .override(
-                                  fontFamily: FlutterFlowTheme.of(context)
-                                      .displayMediumFamily,
+                                  fontFamily: FlutterFlowTheme.of(
+                                    context,
+                                  ).displayMediumFamily,
                                   fontSize: 48.0,
                                   fontWeight: FontWeight.bold,
                                   letterSpacing: 0.0,
                                   useGoogleFonts: GoogleFonts.asMap()
-                                      .containsKey(FlutterFlowTheme.of(context)
-                                          .displayMediumFamily),
+                                      .containsKey(
+                                        FlutterFlowTheme.of(
+                                          context,
+                                        ).displayMediumFamily,
+                                      ),
                                 ),
                           ),
                           const SizedBox(height: 12.0),
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 20.0, vertical: 8.0),
+                              horizontal: 20.0,
+                              vertical: 8.0,
+                            ),
                             decoration: BoxDecoration(
-                              color: FlutterFlowTheme.of(context)
-                                  .primary
-                                  .withOpacity(0.1),
+                              color: FlutterFlowTheme.of(
+                                context,
+                              ).primary.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(20.0),
                               border: Border.all(
-                                color: FlutterFlowTheme.of(context)
-                                    .primary
-                                    .withOpacity(0.3),
+                                color: FlutterFlowTheme.of(
+                                  context,
+                                ).primary.withOpacity(0.3),
                                 width: 1.0,
                               ),
                             ),
@@ -1235,19 +1312,22 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                                 const SizedBox(width: 6.0),
                                 Text(
                                   _model.wordOfTheDay?.category ?? 'Greetings',
-                                  style: FlutterFlowTheme.of(context)
-                                      .bodyMedium
+                                  style: FlutterFlowTheme.of(context).bodyMedium
                                       .override(
-                                        fontFamily: FlutterFlowTheme.of(context)
-                                            .bodyMediumFamily,
-                                        color: FlutterFlowTheme.of(context)
-                                            .primary,
+                                        fontFamily: FlutterFlowTheme.of(
+                                          context,
+                                        ).bodyMediumFamily,
+                                        color: FlutterFlowTheme.of(
+                                          context,
+                                        ).primary,
                                         letterSpacing: 0.0,
                                         fontWeight: FontWeight.w500,
                                         useGoogleFonts: GoogleFonts.asMap()
                                             .containsKey(
-                                                FlutterFlowTheme.of(context)
-                                                    .bodyMediumFamily),
+                                              FlutterFlowTheme.of(
+                                                context,
+                                              ).bodyMediumFamily,
+                                            ),
                                       ),
                                 ),
                               ],
@@ -1285,17 +1365,19 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                               const SizedBox(width: 8.0),
                               Text(
                                 'Meaning',
-                                style: FlutterFlowTheme.of(context)
-                                    .titleMedium
+                                style: FlutterFlowTheme.of(context).titleMedium
                                     .override(
-                                      fontFamily: FlutterFlowTheme.of(context)
-                                          .titleMediumFamily,
+                                      fontFamily: FlutterFlowTheme.of(
+                                        context,
+                                      ).titleMediumFamily,
                                       fontWeight: FontWeight.w600,
                                       letterSpacing: 0.0,
                                       useGoogleFonts: GoogleFonts.asMap()
                                           .containsKey(
-                                              FlutterFlowTheme.of(context)
-                                                  .titleMediumFamily),
+                                            FlutterFlowTheme.of(
+                                              context,
+                                            ).titleMediumFamily,
+                                          ),
                                     ),
                               ),
                             ],
@@ -1304,16 +1386,19 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                           Text(
                             _model.wordOfTheDay?.description ??
                                 'A greeting sign used to acknowledge someone',
-                            style: FlutterFlowTheme.of(context)
-                                .bodyMedium
+                            style: FlutterFlowTheme.of(context).bodyMedium
                                 .override(
-                                  fontFamily: FlutterFlowTheme.of(context)
-                                      .bodyMediumFamily,
+                                  fontFamily: FlutterFlowTheme.of(
+                                    context,
+                                  ).bodyMediumFamily,
                                   letterSpacing: 0.0,
                                   lineHeight: 1.5,
                                   useGoogleFonts: GoogleFonts.asMap()
-                                      .containsKey(FlutterFlowTheme.of(context)
-                                          .bodyMediumFamily),
+                                      .containsKey(
+                                        FlutterFlowTheme.of(
+                                          context,
+                                        ).bodyMediumFamily,
+                                      ),
                                 ),
                           ),
                         ],
@@ -1332,17 +1417,20 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                               onPressed: () {
                                 Navigator.pop(context);
                                 _model.markSignAsLearned(
-                                    _model.wordOfTheDay?.id ?? '');
+                                  _model.wordOfTheDay?.id ?? '',
+                                );
                                 safeSetState(() {});
                               },
                               icon: const Icon(Icons.play_arrow),
                               label: const Text('Practice Now'),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    FlutterFlowTheme.of(context).primary,
+                                backgroundColor: FlutterFlowTheme.of(
+                                  context,
+                                ).primary,
                                 foregroundColor: Colors.white,
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 16.0),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16.0,
+                                ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12.0),
                                 ),
@@ -1361,7 +1449,8 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                             child: IconButton(
                               onPressed: () {
                                 _model.toggleFavorite(
-                                    _model.wordOfTheDay?.id ?? '');
+                                  _model.wordOfTheDay?.id ?? '',
+                                );
                                 safeSetState(() {});
                               },
                               icon: Icon(
@@ -1424,16 +1513,19 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                     Expanded(
                       child: Text(
                         _model.extractWordFromVideoName(video?.name ?? 'Video'),
-                        style:
-                            FlutterFlowTheme.of(context).headlineSmall.override(
-                                  fontFamily: FlutterFlowTheme.of(context)
-                                      .headlineSmallFamily,
-                                  letterSpacing: 0.0,
-                                  fontWeight: FontWeight.w600,
-                                  useGoogleFonts: GoogleFonts.asMap()
-                                      .containsKey(FlutterFlowTheme.of(context)
-                                          .headlineSmallFamily),
-                                ),
+                        style: FlutterFlowTheme.of(context).headlineSmall
+                            .override(
+                              fontFamily: FlutterFlowTheme.of(
+                                context,
+                              ).headlineSmallFamily,
+                              letterSpacing: 0.0,
+                              fontWeight: FontWeight.w600,
+                              useGoogleFonts: GoogleFonts.asMap().containsKey(
+                                FlutterFlowTheme.of(
+                                  context,
+                                ).headlineSmallFamily,
+                              ),
+                            ),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -1499,8 +1591,9 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                                   Text(
                                     'Loading video...',
                                     style: TextStyle(
-                                      color: FlutterFlowTheme.of(context)
-                                          .primaryText,
+                                      color: FlutterFlowTheme.of(
+                                        context,
+                                      ).primaryText,
                                       fontSize: 16.0,
                                     ),
                                   ),
@@ -1510,8 +1603,9 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                                       child: Text(
                                         'Using demo video for testing',
                                         style: TextStyle(
-                                          color: FlutterFlowTheme.of(context)
-                                              .secondaryText,
+                                          color: FlutterFlowTheme.of(
+                                            context,
+                                          ).secondaryText,
                                           fontSize: 12.0,
                                         ),
                                       ),
@@ -1528,24 +1622,26 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                                   Container(
                                     padding: const EdgeInsets.all(20.0),
                                     decoration: BoxDecoration(
-                                      color: FlutterFlowTheme.of(context)
-                                          .primary
-                                          .withOpacity(0.1),
+                                      color: FlutterFlowTheme.of(
+                                        context,
+                                      ).primary.withOpacity(0.1),
                                       shape: BoxShape.circle,
                                     ),
                                     child: Icon(
                                       Icons.play_arrow,
                                       size: 60.0,
-                                      color:
-                                          FlutterFlowTheme.of(context).primary,
+                                      color: FlutterFlowTheme.of(
+                                        context,
+                                      ).primary,
                                     ),
                                   ),
                                   const SizedBox(height: 16.0),
                                   Text(
                                     'Tap to play video',
                                     style: TextStyle(
-                                      color: FlutterFlowTheme.of(context)
-                                          .primaryText,
+                                      color: FlutterFlowTheme.of(
+                                        context,
+                                      ).primaryText,
                                       fontSize: 16.0,
                                       fontWeight: FontWeight.w500,
                                     ),
@@ -1554,8 +1650,9 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                                   Text(
                                     'Sign language demonstration',
                                     style: TextStyle(
-                                      color: FlutterFlowTheme.of(context)
-                                          .secondaryText,
+                                      color: FlutterFlowTheme.of(
+                                        context,
+                                      ).secondaryText,
                                       fontSize: 14.0,
                                     ),
                                   ),
@@ -1575,8 +1672,9 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                                   if (video?.name != null) {
                                     final wordName = _model
                                         .extractWordFromVideoName(video.name);
-                                    await _model
-                                        .initializeVideoWithFallback(wordName);
+                                    await _model.initializeVideoWithFallback(
+                                      wordName,
+                                    );
                                     if (_model.isVideoInitialized) {
                                       _model.playVideo();
                                     }
@@ -1586,15 +1684,17 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         content: Text(
-                                            'Playing ${_model.extractWordFromVideoName(video?.name ?? '')} sign video...'),
-                                        backgroundColor:
-                                            FlutterFlowTheme.of(context)
-                                                .alternate,
+                                          'Playing ${_model.extractWordFromVideoName(video?.name ?? '')} sign video...',
+                                        ),
+                                        backgroundColor: FlutterFlowTheme.of(
+                                          context,
+                                        ).alternate,
                                         duration: const Duration(seconds: 2),
                                         behavior: SnackBarBehavior.floating,
                                         shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10.0),
+                                          borderRadius: BorderRadius.circular(
+                                            10.0,
+                                          ),
                                         ),
                                         margin: const EdgeInsets.all(16.0),
                                       ),
@@ -1604,14 +1704,16 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                               },
                               child: Container(
                                 color: Colors.transparent,
-                                child: _model.isVideoInitialized &&
+                                child:
+                                    _model.isVideoInitialized &&
                                         !_model.isVideoPlaying
                                     ? Center(
                                         child: Container(
                                           padding: const EdgeInsets.all(16.0),
                                           decoration: BoxDecoration(
-                                            color:
-                                                Colors.black.withOpacity(0.5),
+                                            color: Colors.black.withOpacity(
+                                              0.5,
+                                            ),
                                             shape: BoxShape.circle,
                                           ),
                                           child: const Icon(
@@ -1634,7 +1736,9 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                               right: 16.0,
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
-                                    vertical: 8.0, horizontal: 12.0),
+                                  vertical: 8.0,
+                                  horizontal: 12.0,
+                                ),
                                 decoration: BoxDecoration(
                                   color: Colors.black.withOpacity(0.7),
                                   borderRadius: BorderRadius.circular(8.0),
@@ -1675,19 +1779,22 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                               right: 16.0,
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
-                                    vertical: 8.0, horizontal: 12.0),
+                                  vertical: 8.0,
+                                  horizontal: 12.0,
+                                ),
                                 decoration: BoxDecoration(
-                                  color: FlutterFlowTheme.of(context)
-                                      .primaryText
-                                      .withOpacity(0.8),
+                                  color: FlutterFlowTheme.of(
+                                    context,
+                                  ).primaryText.withOpacity(0.8),
                                   borderRadius: BorderRadius.circular(8.0),
                                 ),
                                 child: Row(
                                   children: [
                                     Icon(
                                       Icons.videocam,
-                                      color: FlutterFlowTheme.of(context)
-                                          .primaryBackground,
+                                      color: FlutterFlowTheme.of(
+                                        context,
+                                      ).primaryBackground,
                                       size: 20.0,
                                     ),
                                     const SizedBox(width: 8.0),
@@ -1695,8 +1802,9 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                                       child: Text(
                                         'ISL Sign Video',
                                         style: TextStyle(
-                                          color: FlutterFlowTheme.of(context)
-                                              .primaryBackground,
+                                          color: FlutterFlowTheme.of(
+                                            context,
+                                          ).primaryBackground,
                                           fontSize: 14.0,
                                         ),
                                       ),
@@ -1715,13 +1823,13 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                 Text(
                   _model.extractWordFromVideoName(video?.name ?? ''),
                   style: FlutterFlowTheme.of(context).titleLarge.override(
-                        fontFamily:
-                            FlutterFlowTheme.of(context).titleLargeFamily,
-                        letterSpacing: 0.0,
-                        fontWeight: FontWeight.w600,
-                        useGoogleFonts: GoogleFonts.asMap().containsKey(
-                            FlutterFlowTheme.of(context).titleLargeFamily),
-                      ),
+                    fontFamily: FlutterFlowTheme.of(context).titleLargeFamily,
+                    letterSpacing: 0.0,
+                    fontWeight: FontWeight.w600,
+                    useGoogleFonts: GoogleFonts.asMap().containsKey(
+                      FlutterFlowTheme.of(context).titleLargeFamily,
+                    ),
+                  ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 8.0),
@@ -1729,13 +1837,13 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                 Text(
                   'Indian Sign Language',
                   style: FlutterFlowTheme.of(context).labelMedium.override(
-                        fontFamily:
-                            FlutterFlowTheme.of(context).labelMediumFamily,
-                        color: FlutterFlowTheme.of(context).secondaryText,
-                        letterSpacing: 0.0,
-                        useGoogleFonts: GoogleFonts.asMap().containsKey(
-                            FlutterFlowTheme.of(context).labelMediumFamily),
-                      ),
+                    fontFamily: FlutterFlowTheme.of(context).labelMediumFamily,
+                    color: FlutterFlowTheme.of(context).secondaryText,
+                    letterSpacing: 0.0,
+                    useGoogleFonts: GoogleFonts.asMap().containsKey(
+                      FlutterFlowTheme.of(context).labelMediumFamily,
+                    ),
+                  ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 24.0),
@@ -1754,12 +1862,14 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                               content: Text(
                                 'Added to learned signs! Daily task progress updated.',
                                 style: TextStyle(
-                                  color:
-                                      FlutterFlowTheme.of(context).primaryText,
+                                  color: FlutterFlowTheme.of(
+                                    context,
+                                  ).primaryText,
                                 ),
                               ),
-                              backgroundColor:
-                                  FlutterFlowTheme.of(context).alternate,
+                              backgroundColor: FlutterFlowTheme.of(
+                                context,
+                              ).alternate,
                               behavior: SnackBarBehavior.floating,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10.0),
@@ -1768,8 +1878,10 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                             ),
                           );
                         },
-                        icon:
-                            const Icon(Icons.check_circle, color: Colors.black),
+                        icon: const Icon(
+                          Icons.check_circle,
+                          color: Colors.black,
+                        ),
                         label: const Text(
                           'Mark as Learned',
                           style: TextStyle(color: Colors.black),
@@ -1782,9 +1894,9 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
                             borderRadius: BorderRadius.circular(12.0),
                           ),
                           elevation: 2.0,
-                          shadowColor: FlutterFlowTheme.of(context)
-                              .success
-                              .withOpacity(0.3),
+                          shadowColor: FlutterFlowTheme.of(
+                            context,
+                          ).success.withOpacity(0.3),
                         ),
                       ),
                     ),
@@ -1840,27 +1952,26 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(
-              icon,
-              color: Colors.black.withOpacity(0.8),
-              size: 28.0,
-            ),
+            Icon(icon, color: Colors.black.withOpacity(0.8), size: 28.0),
             const Spacer(),
             Text(
               title,
               style: FlutterFlowTheme.of(context).titleSmall.override(
-                    fontFamily: FlutterFlowTheme.of(context).titleSmallFamily,
-                    color: Colors.black,
-                    letterSpacing: 0.0,
-                    fontWeight: FontWeight.w600,
-                    useGoogleFonts: GoogleFonts.asMap().containsKey(
-                        FlutterFlowTheme.of(context).titleSmallFamily),
-                  ),
+                fontFamily: FlutterFlowTheme.of(context).titleSmallFamily,
+                color: Colors.black,
+                letterSpacing: 0.0,
+                fontWeight: FontWeight.w600,
+                useGoogleFonts: GoogleFonts.asMap().containsKey(
+                  FlutterFlowTheme.of(context).titleSmallFamily,
+                ),
+              ),
             ),
             const SizedBox(height: 4.0),
             Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 8.0,
+                vertical: 4.0,
+              ),
               decoration: BoxDecoration(
                 color: Colors.black.withOpacity(0.15),
                 borderRadius: BorderRadius.circular(12.0),
@@ -1868,14 +1979,15 @@ class _IslDictWidgetState extends State<IslDictWidget> with RouteAware {
               child: Text(
                 progress,
                 style: FlutterFlowTheme.of(context).bodySmall.override(
-                      fontFamily: FlutterFlowTheme.of(context).bodySmallFamily,
-                      color: Colors.black.withOpacity(0.8),
-                      letterSpacing: 0.0,
-                      fontSize: 11.0,
-                      fontWeight: FontWeight.w500,
-                      useGoogleFonts: GoogleFonts.asMap().containsKey(
-                          FlutterFlowTheme.of(context).bodySmallFamily),
-                    ),
+                  fontFamily: FlutterFlowTheme.of(context).bodySmallFamily,
+                  color: Colors.black.withOpacity(0.8),
+                  letterSpacing: 0.0,
+                  fontSize: 11.0,
+                  fontWeight: FontWeight.w500,
+                  useGoogleFonts: GoogleFonts.asMap().containsKey(
+                    FlutterFlowTheme.of(context).bodySmallFamily,
+                  ),
+                ),
               ),
             ),
           ],

@@ -1,12 +1,14 @@
+import 'package:easy_debounce/easy_debounce.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
 import '/auth/firebase_auth/auth_util.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
-import 'package:easy_debounce/easy_debounce.dart';
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'forgot_password_model.dart';
+
 export 'forgot_password_model.dart';
 
 class ForgotPasswordWidget extends StatefulWidget {
@@ -295,7 +297,7 @@ class _ForgotPasswordWidgetState extends State<ForgotPasswordWidget>
                         color: FlutterFlowTheme.of(context).alternate,
                         width: 1.0,
                       ),
-                      borderRadius: BorderRadius.circular(12.0),
+                      borderRadius: BorderRadius.circular(48.0),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide(
@@ -324,7 +326,7 @@ class _ForgotPasswordWidgetState extends State<ForgotPasswordWidget>
                     hoverColor: FlutterFlowTheme.of(context).primaryBackground,
                     prefixIcon: Icon(
                       Icons.mail_outline_rounded,
-                      color: FlutterFlowTheme.of(context).secondary,
+                      color: FlutterFlowTheme.of(context).secondaryText,
                       size: 24.0,
                     ),
                     suffixIcon: _model
@@ -401,7 +403,7 @@ class _ForgotPasswordWidgetState extends State<ForgotPasswordWidget>
                               FlutterFlowTheme.of(context).titleMediumFamily),
                         ),
                     elevation: 2.0,
-                    borderRadius: BorderRadius.circular(12.0),
+                    borderRadius: BorderRadius.circular(48.0),
                     hoverColor: FlutterFlowTheme.of(context).secondary,
                   ),
                 ),

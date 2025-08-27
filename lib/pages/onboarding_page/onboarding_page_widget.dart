@@ -572,9 +572,9 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
 
   @override
   Widget build(BuildContext context) {
-    DebugFlutterFlowModelContext.maybeOf(context)
-        ?.parentModelCallback
-        ?.call(_model);
+    DebugFlutterFlowModelContext.maybeOf(
+      context,
+    )?.parentModelCallback?.call(_model);
 
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
@@ -587,11 +587,10 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
           child: Stack(
             children: [
               PageView(
-                controller:
-                    _model.pageViewController ??= PageController(initialPage: 0)
-                      ..addListener(() {
-                        debugLogWidgetClass(_model);
-                      }),
+                controller: _model.pageViewController ??=
+                    PageController(initialPage: 0)..addListener(() {
+                      debugLogWidgetClass(_model);
+                    }),
                 scrollDirection: Axis.horizontal,
                 children: [
                   Column(
@@ -611,7 +610,8 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                           fit: BoxFit.cover,
                         ),
                       ).animateOnPageLoad(
-                          animationsMap['imageOnPageLoadAnimation1']!),
+                        animationsMap['imageOnPageLoadAnimation1']!,
+                      ),
                       Padding(
                         padding: const EdgeInsets.all(20.0),
                         child: Column(
@@ -623,8 +623,7 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                               FFLocalizations.of(context).getText(
                                 'c6gmj20a' /* Bridging Communication Gaps */,
                               ),
-                              style: FlutterFlowTheme.of(context)
-                                  .headlineSmall
+                              style: FlutterFlowTheme.of(context).headlineSmall
                                   .override(
                                     fontFamily: 'Space Grotesk',
                                     letterSpacing: 0.0,
@@ -632,113 +631,152 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                                         .containsKey('Space Grotesk'),
                                   ),
                             ).animateOnPageLoad(
-                                animationsMap['textOnPageLoadAnimation1']!),
-                            Padding(
-                              padding: const EdgeInsetsDirectional.fromSTEB(
-                                  0.0, 12.0, 0.0, 0.0),
-                              child: Text(
-                                FFLocalizations.of(context).getText(
-                                  'jot5sle1' /* Welcome to Signify, your compa... */,
-                                ),
-                                style: FlutterFlowTheme.of(context)
-                                    .labelMedium
-                                    .override(
-                                      fontFamily: FlutterFlowTheme.of(context)
-                                          .labelMediumFamily,
-                                      letterSpacing: 0.0,
-                                      useGoogleFonts: GoogleFonts.asMap()
-                                          .containsKey(
-                                              FlutterFlowTheme.of(context)
-                                                  .labelMediumFamily),
-                                    ),
-                              ).animateOnPageLoad(
-                                  animationsMap['textOnPageLoadAnimation2']!),
+                              animationsMap['textOnPageLoadAnimation1']!,
                             ),
                             Padding(
                               padding: const EdgeInsetsDirectional.fromSTEB(
-                                  0.0, 20.0, 0.0, 0.0),
+                                0.0,
+                                12.0,
+                                0.0,
+                                0.0,
+                              ),
+                              child:
+                                  Text(
+                                    FFLocalizations.of(context).getText(
+                                      'jot5sle1' /* Welcome to Signify, your compa... */,
+                                    ),
+                                    style: FlutterFlowTheme.of(context)
+                                        .labelMedium
+                                        .override(
+                                          fontFamily: FlutterFlowTheme.of(
+                                            context,
+                                          ).labelMediumFamily,
+                                          letterSpacing: 0.0,
+                                          useGoogleFonts: GoogleFonts.asMap()
+                                              .containsKey(
+                                                FlutterFlowTheme.of(
+                                                  context,
+                                                ).labelMediumFamily,
+                                              ),
+                                        ),
+                                  ).animateOnPageLoad(
+                                    animationsMap['textOnPageLoadAnimation2']!,
+                                  ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsetsDirectional.fromSTEB(
+                                0.0,
+                                20.0,
+                                0.0,
+                                0.0,
+                              ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.max,
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Expanded(
-                                    child: FFButtonWidget(
-                                      onPressed: () async {
-                                        context.pushNamed('authPage');
-                                      },
-                                      text: FFLocalizations.of(context).getText(
-                                        'nmhf95lf' /* Skip */,
-                                      ),
-                                      options: FFButtonOptions(
-                                        width: double.infinity,
-                                        height: 50.0,
-                                        padding: const EdgeInsetsDirectional
-                                            .fromSTEB(0.0, 0.0, 0.0, 0.0),
-                                        iconPadding: const EdgeInsetsDirectional
-                                            .fromSTEB(0.0, 0.0, 0.0, 0.0),
-                                        color: FlutterFlowTheme.of(context)
-                                            .secondaryBackground,
-                                        textStyle: FlutterFlowTheme.of(context)
-                                            .titleLarge
-                                            .override(
-                                              fontFamily:
-                                                  FlutterFlowTheme.of(context)
-                                                      .titleLargeFamily,
-                                              letterSpacing: 0.0,
-                                              useGoogleFonts: GoogleFonts
-                                                      .asMap()
-                                                  .containsKey(
+                                    child:
+                                        FFButtonWidget(
+                                          onPressed: () async {
+                                            context.pushNamed('authPage');
+                                          },
+                                          text: FFLocalizations.of(
+                                            context,
+                                          ).getText('nmhf95lf' /* Skip */),
+                                          options: FFButtonOptions(
+                                            width: double.infinity,
+                                            height: 50.0,
+                                            padding:
+                                                const EdgeInsetsDirectional.fromSTEB(
+                                                  0.0,
+                                                  0.0,
+                                                  0.0,
+                                                  0.0,
+                                                ),
+                                            iconPadding:
+                                                const EdgeInsetsDirectional.fromSTEB(
+                                                  0.0,
+                                                  0.0,
+                                                  0.0,
+                                                  0.0,
+                                                ),
+                                            color: FlutterFlowTheme.of(
+                                              context,
+                                            ).secondaryBackground,
+                                            textStyle:
+                                                FlutterFlowTheme.of(
+                                                  context,
+                                                ).titleLarge.override(
+                                                  fontFamily:
                                                       FlutterFlowTheme.of(
-                                                              context)
-                                                          .titleLargeFamily),
+                                                        context,
+                                                      ).titleLargeFamily,
+                                                  letterSpacing: 0.0,
+                                                  useGoogleFonts:
+                                                      GoogleFonts.asMap()
+                                                          .containsKey(
+                                                            FlutterFlowTheme.of(
+                                                              context,
+                                                            ).titleLargeFamily,
+                                                          ),
+                                                ),
+                                            elevation: 0.0,
+                                            borderSide: const BorderSide(
+                                              color: Colors.transparent,
+                                              width: 1.0,
                                             ),
-                                        elevation: 0.0,
-                                        borderSide: const BorderSide(
-                                          color: Colors.transparent,
-                                          width: 1.0,
+                                            borderRadius: BorderRadius.circular(
+                                              50.0,
+                                            ),
+                                            hoverColor: FlutterFlowTheme.of(
+                                              context,
+                                            ).primaryBackground,
+                                            hoverBorderSide: BorderSide(
+                                              color: FlutterFlowTheme.of(
+                                                context,
+                                              ).primary,
+                                              width: 1.0,
+                                            ),
+                                            hoverTextColor: FlutterFlowTheme.of(
+                                              context,
+                                            ).primaryText,
+                                          ),
+                                        ).animateOnPageLoad(
+                                          animationsMap['buttonOnPageLoadAnimation1']!,
                                         ),
-                                        borderRadius:
-                                            BorderRadius.circular(50.0),
-                                        hoverColor: FlutterFlowTheme.of(context)
-                                            .primaryBackground,
-                                        hoverBorderSide: BorderSide(
-                                          color: FlutterFlowTheme.of(context)
-                                              .primary,
-                                          width: 1.0,
-                                        ),
-                                        hoverTextColor:
-                                            FlutterFlowTheme.of(context)
-                                                .primaryText,
-                                      ),
-                                    ).animateOnPageLoad(animationsMap[
-                                        'buttonOnPageLoadAnimation1']!),
                                   ),
                                   FlutterFlowIconButton(
                                     borderColor: Colors.transparent,
                                     borderRadius: 30.0,
                                     borderWidth: 1.0,
                                     buttonSize: 50.0,
-                                    fillColor: FlutterFlowTheme.of(context)
-                                        .secondaryBackground,
-                                    hoverColor: FlutterFlowTheme.of(context)
-                                        .secondaryBackground,
-                                    hoverIconColor:
-                                        FlutterFlowTheme.of(context).primary,
+                                    fillColor: FlutterFlowTheme.of(
+                                      context,
+                                    ).secondaryBackground,
+                                    hoverColor: FlutterFlowTheme.of(
+                                      context,
+                                    ).secondaryBackground,
+                                    hoverIconColor: FlutterFlowTheme.of(
+                                      context,
+                                    ).primary,
                                     icon: Icon(
                                       Icons.navigate_next_rounded,
-                                      color: FlutterFlowTheme.of(context)
-                                          .primaryText,
+                                      color: FlutterFlowTheme.of(
+                                        context,
+                                      ).primaryText,
                                       size: 36.0,
                                     ),
                                     onPressed: () async {
                                       await _model.pageViewController?.nextPage(
-                                        duration:
-                                            const Duration(milliseconds: 300),
+                                        duration: const Duration(
+                                          milliseconds: 300,
+                                        ),
                                         curve: Curves.ease,
                                       );
                                     },
-                                  ).animateOnPageLoad(animationsMap[
-                                      'iconButtonOnPageLoadAnimation1']!),
+                                  ).animateOnPageLoad(
+                                    animationsMap['iconButtonOnPageLoadAnimation1']!,
+                                  ),
                                 ].divide(const SizedBox(width: 180.0)),
                               ),
                             ),
@@ -752,19 +790,29 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                     children: [
                       Padding(
                         padding: const EdgeInsetsDirectional.fromSTEB(
-                            10.0, 0.0, 10.0, 0.0),
-                        child: Lottie.asset(
-                          'assets/jsons/AI_Lines_Signify_Animation.json',
-                          width: 500.0,
-                          height: 450.0,
-                          fit: BoxFit.contain,
-                          animate: true,
-                        ).animateOnPageLoad(animationsMap[
-                            'lottieAnimationOnPageLoadAnimation1']!),
+                          10.0,
+                          0.0,
+                          10.0,
+                          0.0,
+                        ),
+                        child:
+                            Lottie.asset(
+                              'assets/jsons/AI_Lines_Signify_Animation.json',
+                              width: 500.0,
+                              height: 450.0,
+                              fit: BoxFit.contain,
+                              animate: true,
+                            ).animateOnPageLoad(
+                              animationsMap['lottieAnimationOnPageLoadAnimation1']!,
+                            ),
                       ),
                       Padding(
                         padding: const EdgeInsetsDirectional.fromSTEB(
-                            20.0, 0.0, 20.0, 0.0),
+                          20.0,
+                          0.0,
+                          20.0,
+                          0.0,
+                        ),
                         child: Column(
                           mainAxisSize: MainAxisSize.max,
                           mainAxisAlignment: MainAxisAlignment.start,
@@ -774,8 +822,7 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                               FFLocalizations.of(context).getText(
                                 'y4avf05w' /* Real-Time Translation empowere... */,
                               ),
-                              style: FlutterFlowTheme.of(context)
-                                  .headlineSmall
+                              style: FlutterFlowTheme.of(context).headlineSmall
                                   .override(
                                     fontFamily: 'Space Grotesk',
                                     letterSpacing: 0.0,
@@ -783,112 +830,146 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                                         .containsKey('Space Grotesk'),
                                   ),
                             ).animateOnPageLoad(
-                                animationsMap['textOnPageLoadAnimation3']!),
-                            Padding(
-                              padding: const EdgeInsetsDirectional.fromSTEB(
-                                  0.0, 12.0, 0.0, 0.0),
-                              child: Text(
-                                FFLocalizations.of(context).getText(
-                                  '76k8ranp' /* Experience bidirectional trans... */,
-                                ),
-                                style: FlutterFlowTheme.of(context)
-                                    .labelMedium
-                                    .override(
-                                      fontFamily: FlutterFlowTheme.of(context)
-                                          .labelMediumFamily,
-                                      letterSpacing: 0.0,
-                                      useGoogleFonts: GoogleFonts.asMap()
-                                          .containsKey(
-                                              FlutterFlowTheme.of(context)
-                                                  .labelMediumFamily),
-                                    ),
-                              ).animateOnPageLoad(
-                                  animationsMap['textOnPageLoadAnimation4']!),
+                              animationsMap['textOnPageLoadAnimation3']!,
                             ),
                             Padding(
                               padding: const EdgeInsetsDirectional.fromSTEB(
-                                  0.0, 20.0, 0.0, 0.0),
+                                0.0,
+                                12.0,
+                                0.0,
+                                0.0,
+                              ),
+                              child:
+                                  Text(
+                                    FFLocalizations.of(context).getText(
+                                      '76k8ranp' /* Experience bidirectional trans... */,
+                                    ),
+                                    style: FlutterFlowTheme.of(context)
+                                        .labelMedium
+                                        .override(
+                                          fontFamily: FlutterFlowTheme.of(
+                                            context,
+                                          ).labelMediumFamily,
+                                          letterSpacing: 0.0,
+                                          useGoogleFonts: GoogleFonts.asMap()
+                                              .containsKey(
+                                                FlutterFlowTheme.of(
+                                                  context,
+                                                ).labelMediumFamily,
+                                              ),
+                                        ),
+                                  ).animateOnPageLoad(
+                                    animationsMap['textOnPageLoadAnimation4']!,
+                                  ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsetsDirectional.fromSTEB(
+                                0.0,
+                                20.0,
+                                0.0,
+                                0.0,
+                              ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.max,
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Expanded(
-                                    child: FFButtonWidget(
-                                      onPressed: () async {
-                                        context.pushNamed('authPage');
-                                      },
-                                      text: FFLocalizations.of(context).getText(
-                                        'ssnpotf0' /* Skip */,
-                                      ),
-                                      options: FFButtonOptions(
-                                        width: double.infinity,
-                                        height: 50.0,
-                                        padding: const EdgeInsets.all(0.0),
-                                        iconPadding: const EdgeInsetsDirectional
-                                            .fromSTEB(0.0, 0.0, 0.0, 0.0),
-                                        color: FlutterFlowTheme.of(context)
-                                            .secondaryBackground,
-                                        textStyle: FlutterFlowTheme.of(context)
-                                            .titleLarge
-                                            .override(
-                                              fontFamily:
-                                                  FlutterFlowTheme.of(context)
-                                                      .titleLargeFamily,
-                                              letterSpacing: 0.0,
-                                              useGoogleFonts: GoogleFonts
-                                                      .asMap()
-                                                  .containsKey(
+                                    child:
+                                        FFButtonWidget(
+                                          onPressed: () async {
+                                            context.pushNamed('authPage');
+                                          },
+                                          text: FFLocalizations.of(
+                                            context,
+                                          ).getText('ssnpotf0' /* Skip */),
+                                          options: FFButtonOptions(
+                                            width: double.infinity,
+                                            height: 50.0,
+                                            padding: const EdgeInsets.all(0.0),
+                                            iconPadding:
+                                                const EdgeInsetsDirectional.fromSTEB(
+                                                  0.0,
+                                                  0.0,
+                                                  0.0,
+                                                  0.0,
+                                                ),
+                                            color: FlutterFlowTheme.of(
+                                              context,
+                                            ).secondaryBackground,
+                                            textStyle:
+                                                FlutterFlowTheme.of(
+                                                  context,
+                                                ).titleLarge.override(
+                                                  fontFamily:
                                                       FlutterFlowTheme.of(
-                                                              context)
-                                                          .titleLargeFamily),
+                                                        context,
+                                                      ).titleLargeFamily,
+                                                  letterSpacing: 0.0,
+                                                  useGoogleFonts:
+                                                      GoogleFonts.asMap()
+                                                          .containsKey(
+                                                            FlutterFlowTheme.of(
+                                                              context,
+                                                            ).titleLargeFamily,
+                                                          ),
+                                                ),
+                                            elevation: 0.0,
+                                            borderSide: const BorderSide(
+                                              color: Colors.transparent,
+                                              width: 1.0,
                                             ),
-                                        elevation: 0.0,
-                                        borderSide: const BorderSide(
-                                          color: Colors.transparent,
-                                          width: 1.0,
+                                            borderRadius: BorderRadius.circular(
+                                              50.0,
+                                            ),
+                                            hoverColor: FlutterFlowTheme.of(
+                                              context,
+                                            ).primaryBackground,
+                                            hoverBorderSide: BorderSide(
+                                              color: FlutterFlowTheme.of(
+                                                context,
+                                              ).primary,
+                                              width: 1.0,
+                                            ),
+                                            hoverTextColor: FlutterFlowTheme.of(
+                                              context,
+                                            ).primaryText,
+                                          ),
+                                        ).animateOnPageLoad(
+                                          animationsMap['buttonOnPageLoadAnimation2']!,
                                         ),
-                                        borderRadius:
-                                            BorderRadius.circular(50.0),
-                                        hoverColor: FlutterFlowTheme.of(context)
-                                            .primaryBackground,
-                                        hoverBorderSide: BorderSide(
-                                          color: FlutterFlowTheme.of(context)
-                                              .primary,
-                                          width: 1.0,
-                                        ),
-                                        hoverTextColor:
-                                            FlutterFlowTheme.of(context)
-                                                .primaryText,
-                                      ),
-                                    ).animateOnPageLoad(animationsMap[
-                                        'buttonOnPageLoadAnimation2']!),
                                   ),
                                   FlutterFlowIconButton(
                                     borderColor: Colors.transparent,
                                     borderRadius: 30.0,
                                     borderWidth: 1.0,
                                     buttonSize: 50.0,
-                                    fillColor: FlutterFlowTheme.of(context)
-                                        .secondaryBackground,
-                                    hoverColor: FlutterFlowTheme.of(context)
-                                        .secondaryBackground,
-                                    hoverIconColor:
-                                        FlutterFlowTheme.of(context).primary,
+                                    fillColor: FlutterFlowTheme.of(
+                                      context,
+                                    ).secondaryBackground,
+                                    hoverColor: FlutterFlowTheme.of(
+                                      context,
+                                    ).secondaryBackground,
+                                    hoverIconColor: FlutterFlowTheme.of(
+                                      context,
+                                    ).primary,
                                     icon: Icon(
                                       Icons.navigate_next_rounded,
-                                      color: FlutterFlowTheme.of(context)
-                                          .primaryText,
+                                      color: FlutterFlowTheme.of(
+                                        context,
+                                      ).primaryText,
                                       size: 36.0,
                                     ),
                                     onPressed: () async {
                                       await _model.pageViewController?.nextPage(
-                                        duration:
-                                            const Duration(milliseconds: 300),
+                                        duration: const Duration(
+                                          milliseconds: 300,
+                                        ),
                                         curve: Curves.ease,
                                       );
                                     },
-                                  ).animateOnPageLoad(animationsMap[
-                                      'iconButtonOnPageLoadAnimation2']!),
+                                  ).animateOnPageLoad(
+                                    animationsMap['iconButtonOnPageLoadAnimation2']!,
+                                  ),
                                 ].divide(const SizedBox(width: 180.0)),
                               ),
                             ),
@@ -906,8 +987,9 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                         height: 400.0,
                         fit: BoxFit.contain,
                         animate: true,
-                      ).animateOnPageLoad(animationsMap[
-                          'lottieAnimationOnPageLoadAnimation2']!),
+                      ).animateOnPageLoad(
+                        animationsMap['lottieAnimationOnPageLoadAnimation2']!,
+                      ),
                       Padding(
                         padding: const EdgeInsets.all(20.0),
                         child: Column(
@@ -918,8 +1000,7 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                               FFLocalizations.of(context).getText(
                                 '1w7hr0eo' /* Personalized Communication in ... */,
                               ),
-                              style: FlutterFlowTheme.of(context)
-                                  .headlineSmall
+                              style: FlutterFlowTheme.of(context).headlineSmall
                                   .override(
                                     fontFamily: 'Space Grotesk',
                                     letterSpacing: 0.0,
@@ -927,113 +1008,152 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                                         .containsKey('Space Grotesk'),
                                   ),
                             ).animateOnPageLoad(
-                                animationsMap['textOnPageLoadAnimation5']!),
-                            Padding(
-                              padding: const EdgeInsetsDirectional.fromSTEB(
-                                  0.0, 12.0, 0.0, 0.0),
-                              child: Text(
-                                FFLocalizations.of(context).getText(
-                                  'sw3las2m' /* Add your own signs to make com... */,
-                                ),
-                                style: FlutterFlowTheme.of(context)
-                                    .labelMedium
-                                    .override(
-                                      fontFamily: FlutterFlowTheme.of(context)
-                                          .labelMediumFamily,
-                                      letterSpacing: 0.0,
-                                      useGoogleFonts: GoogleFonts.asMap()
-                                          .containsKey(
-                                              FlutterFlowTheme.of(context)
-                                                  .labelMediumFamily),
-                                    ),
-                              ).animateOnPageLoad(
-                                  animationsMap['textOnPageLoadAnimation6']!),
+                              animationsMap['textOnPageLoadAnimation5']!,
                             ),
                             Padding(
                               padding: const EdgeInsetsDirectional.fromSTEB(
-                                  0.0, 20.0, 0.0, 0.0),
+                                0.0,
+                                12.0,
+                                0.0,
+                                0.0,
+                              ),
+                              child:
+                                  Text(
+                                    FFLocalizations.of(context).getText(
+                                      'sw3las2m' /* Add your own signs to make com... */,
+                                    ),
+                                    style: FlutterFlowTheme.of(context)
+                                        .labelMedium
+                                        .override(
+                                          fontFamily: FlutterFlowTheme.of(
+                                            context,
+                                          ).labelMediumFamily,
+                                          letterSpacing: 0.0,
+                                          useGoogleFonts: GoogleFonts.asMap()
+                                              .containsKey(
+                                                FlutterFlowTheme.of(
+                                                  context,
+                                                ).labelMediumFamily,
+                                              ),
+                                        ),
+                                  ).animateOnPageLoad(
+                                    animationsMap['textOnPageLoadAnimation6']!,
+                                  ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsetsDirectional.fromSTEB(
+                                0.0,
+                                20.0,
+                                0.0,
+                                0.0,
+                              ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.max,
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Expanded(
-                                    child: FFButtonWidget(
-                                      onPressed: () async {
-                                        context.pushNamed('authPage');
-                                      },
-                                      text: FFLocalizations.of(context).getText(
-                                        '3yheu48w' /* Skip */,
-                                      ),
-                                      options: FFButtonOptions(
-                                        width: double.infinity,
-                                        height: 50.0,
-                                        padding: const EdgeInsetsDirectional
-                                            .fromSTEB(0.0, 0.0, 0.0, 0.0),
-                                        iconPadding: const EdgeInsetsDirectional
-                                            .fromSTEB(0.0, 0.0, 0.0, 0.0),
-                                        color: FlutterFlowTheme.of(context)
-                                            .secondaryBackground,
-                                        textStyle: FlutterFlowTheme.of(context)
-                                            .titleLarge
-                                            .override(
-                                              fontFamily:
-                                                  FlutterFlowTheme.of(context)
-                                                      .titleLargeFamily,
-                                              letterSpacing: 0.0,
-                                              useGoogleFonts: GoogleFonts
-                                                      .asMap()
-                                                  .containsKey(
+                                    child:
+                                        FFButtonWidget(
+                                          onPressed: () async {
+                                            context.pushNamed('authPage');
+                                          },
+                                          text: FFLocalizations.of(
+                                            context,
+                                          ).getText('3yheu48w' /* Skip */),
+                                          options: FFButtonOptions(
+                                            width: double.infinity,
+                                            height: 50.0,
+                                            padding:
+                                                const EdgeInsetsDirectional.fromSTEB(
+                                                  0.0,
+                                                  0.0,
+                                                  0.0,
+                                                  0.0,
+                                                ),
+                                            iconPadding:
+                                                const EdgeInsetsDirectional.fromSTEB(
+                                                  0.0,
+                                                  0.0,
+                                                  0.0,
+                                                  0.0,
+                                                ),
+                                            color: FlutterFlowTheme.of(
+                                              context,
+                                            ).secondaryBackground,
+                                            textStyle:
+                                                FlutterFlowTheme.of(
+                                                  context,
+                                                ).titleLarge.override(
+                                                  fontFamily:
                                                       FlutterFlowTheme.of(
-                                                              context)
-                                                          .titleLargeFamily),
+                                                        context,
+                                                      ).titleLargeFamily,
+                                                  letterSpacing: 0.0,
+                                                  useGoogleFonts:
+                                                      GoogleFonts.asMap()
+                                                          .containsKey(
+                                                            FlutterFlowTheme.of(
+                                                              context,
+                                                            ).titleLargeFamily,
+                                                          ),
+                                                ),
+                                            elevation: 0.0,
+                                            borderSide: const BorderSide(
+                                              color: Colors.transparent,
+                                              width: 1.0,
                                             ),
-                                        elevation: 0.0,
-                                        borderSide: const BorderSide(
-                                          color: Colors.transparent,
-                                          width: 1.0,
+                                            borderRadius: BorderRadius.circular(
+                                              50.0,
+                                            ),
+                                            hoverColor: FlutterFlowTheme.of(
+                                              context,
+                                            ).primaryBackground,
+                                            hoverBorderSide: BorderSide(
+                                              color: FlutterFlowTheme.of(
+                                                context,
+                                              ).primary,
+                                              width: 1.0,
+                                            ),
+                                            hoverTextColor: FlutterFlowTheme.of(
+                                              context,
+                                            ).primaryText,
+                                          ),
+                                        ).animateOnPageLoad(
+                                          animationsMap['buttonOnPageLoadAnimation3']!,
                                         ),
-                                        borderRadius:
-                                            BorderRadius.circular(50.0),
-                                        hoverColor: FlutterFlowTheme.of(context)
-                                            .primaryBackground,
-                                        hoverBorderSide: BorderSide(
-                                          color: FlutterFlowTheme.of(context)
-                                              .primary,
-                                          width: 1.0,
-                                        ),
-                                        hoverTextColor:
-                                            FlutterFlowTheme.of(context)
-                                                .primaryText,
-                                      ),
-                                    ).animateOnPageLoad(animationsMap[
-                                        'buttonOnPageLoadAnimation3']!),
                                   ),
                                   FlutterFlowIconButton(
                                     borderColor: Colors.transparent,
                                     borderRadius: 30.0,
                                     borderWidth: 1.0,
                                     buttonSize: 50.0,
-                                    fillColor: FlutterFlowTheme.of(context)
-                                        .secondaryBackground,
-                                    hoverColor: FlutterFlowTheme.of(context)
-                                        .secondaryBackground,
-                                    hoverIconColor:
-                                        FlutterFlowTheme.of(context).primary,
+                                    fillColor: FlutterFlowTheme.of(
+                                      context,
+                                    ).secondaryBackground,
+                                    hoverColor: FlutterFlowTheme.of(
+                                      context,
+                                    ).secondaryBackground,
+                                    hoverIconColor: FlutterFlowTheme.of(
+                                      context,
+                                    ).primary,
                                     icon: Icon(
                                       Icons.navigate_next_rounded,
-                                      color: FlutterFlowTheme.of(context)
-                                          .primaryText,
+                                      color: FlutterFlowTheme.of(
+                                        context,
+                                      ).primaryText,
                                       size: 36.0,
                                     ),
                                     onPressed: () async {
                                       await _model.pageViewController?.nextPage(
-                                        duration:
-                                            const Duration(milliseconds: 300),
+                                        duration: const Duration(
+                                          milliseconds: 300,
+                                        ),
                                         curve: Curves.ease,
                                       );
                                     },
-                                  ).animateOnPageLoad(animationsMap[
-                                      'iconButtonOnPageLoadAnimation3']!),
+                                  ).animateOnPageLoad(
+                                    animationsMap['iconButtonOnPageLoadAnimation3']!,
+                                  ),
                                 ].divide(const SizedBox(width: 180.0)),
                               ),
                             ),
@@ -1055,7 +1175,8 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                           alignment: const Alignment(0.0, 1.0),
                         ),
                       ).animateOnPageLoad(
-                          animationsMap['imageOnPageLoadAnimation2']!),
+                        animationsMap['imageOnPageLoadAnimation2']!,
+                      ),
                       Padding(
                         padding: const EdgeInsets.all(20.0),
                         child: Column(
@@ -1064,127 +1185,167 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                           children: [
                             Align(
                               alignment: const AlignmentDirectional(-1.0, 0.0),
-                              child: Text(
-                                FFLocalizations.of(context).getText(
-                                  'vsvgd9v9' /* Inclusive and Empowering */,
-                                ),
-                                style: FlutterFlowTheme.of(context)
-                                    .headlineSmall
-                                    .override(
-                                      fontFamily: 'Space Grotesk',
-                                      letterSpacing: 0.0,
-                                      useGoogleFonts: GoogleFonts.asMap()
-                                          .containsKey('Space Grotesk'),
+                              child:
+                                  Text(
+                                    FFLocalizations.of(context).getText(
+                                      'vsvgd9v9' /* Inclusive and Empowering */,
                                     ),
-                              ).animateOnPageLoad(
-                                  animationsMap['textOnPageLoadAnimation7']!),
+                                    style: FlutterFlowTheme.of(context)
+                                        .headlineSmall
+                                        .override(
+                                          fontFamily: 'Space Grotesk',
+                                          letterSpacing: 0.0,
+                                          useGoogleFonts: GoogleFonts.asMap()
+                                              .containsKey('Space Grotesk'),
+                                        ),
+                                  ).animateOnPageLoad(
+                                    animationsMap['textOnPageLoadAnimation7']!,
+                                  ),
                             ),
                             Padding(
                               padding: const EdgeInsetsDirectional.fromSTEB(
-                                  0.0, 12.0, 0.0, 0.0),
-                              child: Text(
-                                FFLocalizations.of(context).getText(
-                                  'lwn9s3f7' /* No interpreters needed! Empowe... */,
-                                ),
-                                style: FlutterFlowTheme.of(context)
-                                    .labelMedium
-                                    .override(
-                                      fontFamily: FlutterFlowTheme.of(context)
-                                          .labelMediumFamily,
-                                      letterSpacing: 0.0,
-                                      useGoogleFonts: GoogleFonts.asMap()
-                                          .containsKey(
-                                              FlutterFlowTheme.of(context)
-                                                  .labelMediumFamily),
+                                0.0,
+                                12.0,
+                                0.0,
+                                0.0,
+                              ),
+                              child:
+                                  Text(
+                                    FFLocalizations.of(context).getText(
+                                      'lwn9s3f7' /* No interpreters needed! Empowe... */,
                                     ),
-                              ).animateOnPageLoad(
-                                  animationsMap['textOnPageLoadAnimation8']!),
+                                    style: FlutterFlowTheme.of(context)
+                                        .labelMedium
+                                        .override(
+                                          fontFamily: FlutterFlowTheme.of(
+                                            context,
+                                          ).labelMediumFamily,
+                                          letterSpacing: 0.0,
+                                          useGoogleFonts: GoogleFonts.asMap()
+                                              .containsKey(
+                                                FlutterFlowTheme.of(
+                                                  context,
+                                                ).labelMediumFamily,
+                                              ),
+                                        ),
+                                  ).animateOnPageLoad(
+                                    animationsMap['textOnPageLoadAnimation8']!,
+                                  ),
                             ),
                             Padding(
                               padding: const EdgeInsetsDirectional.fromSTEB(
-                                  0.0, 20.0, 0.0, 0.0),
+                                0.0,
+                                20.0,
+                                0.0,
+                                0.0,
+                              ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.max,
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
                                   Expanded(
-                                    child: FFButtonWidget(
-                                      onPressed: () async {
-                                        context.pushNamed('authPage');
-                                      },
-                                      text: FFLocalizations.of(context).getText(
-                                        'gr44ucqc' /* Skip */,
-                                      ),
-                                      options: FFButtonOptions(
-                                        width: double.infinity,
-                                        height: 50.0,
-                                        padding: const EdgeInsetsDirectional
-                                            .fromSTEB(0.0, 0.0, 0.0, 0.0),
-                                        iconPadding: const EdgeInsetsDirectional
-                                            .fromSTEB(0.0, 0.0, 0.0, 0.0),
-                                        color: FlutterFlowTheme.of(context)
-                                            .secondaryBackground,
-                                        textStyle: FlutterFlowTheme.of(context)
-                                            .titleLarge
-                                            .override(
-                                              fontFamily:
-                                                  FlutterFlowTheme.of(context)
-                                                      .titleLargeFamily,
-                                              letterSpacing: 0.0,
-                                              useGoogleFonts: GoogleFonts
-                                                      .asMap()
-                                                  .containsKey(
+                                    child:
+                                        FFButtonWidget(
+                                          onPressed: () async {
+                                            context.pushNamed('authPage');
+                                          },
+                                          text: FFLocalizations.of(
+                                            context,
+                                          ).getText('gr44ucqc' /* Skip */),
+                                          options: FFButtonOptions(
+                                            width: double.infinity,
+                                            height: 50.0,
+                                            padding:
+                                                const EdgeInsetsDirectional.fromSTEB(
+                                                  0.0,
+                                                  0.0,
+                                                  0.0,
+                                                  0.0,
+                                                ),
+                                            iconPadding:
+                                                const EdgeInsetsDirectional.fromSTEB(
+                                                  0.0,
+                                                  0.0,
+                                                  0.0,
+                                                  0.0,
+                                                ),
+                                            color: FlutterFlowTheme.of(
+                                              context,
+                                            ).secondaryBackground,
+                                            textStyle:
+                                                FlutterFlowTheme.of(
+                                                  context,
+                                                ).titleLarge.override(
+                                                  fontFamily:
                                                       FlutterFlowTheme.of(
-                                                              context)
-                                                          .titleLargeFamily),
+                                                        context,
+                                                      ).titleLargeFamily,
+                                                  letterSpacing: 0.0,
+                                                  useGoogleFonts:
+                                                      GoogleFonts.asMap()
+                                                          .containsKey(
+                                                            FlutterFlowTheme.of(
+                                                              context,
+                                                            ).titleLargeFamily,
+                                                          ),
+                                                ),
+                                            elevation: 0.0,
+                                            borderSide: const BorderSide(
+                                              color: Colors.transparent,
+                                              width: 1.0,
                                             ),
-                                        elevation: 0.0,
-                                        borderSide: const BorderSide(
-                                          color: Colors.transparent,
-                                          width: 1.0,
+                                            borderRadius: BorderRadius.circular(
+                                              50.0,
+                                            ),
+                                            hoverColor: FlutterFlowTheme.of(
+                                              context,
+                                            ).primaryBackground,
+                                            hoverBorderSide: BorderSide(
+                                              color: FlutterFlowTheme.of(
+                                                context,
+                                              ).primary,
+                                              width: 1.0,
+                                            ),
+                                            hoverTextColor: FlutterFlowTheme.of(
+                                              context,
+                                            ).primaryText,
+                                          ),
+                                        ).animateOnPageLoad(
+                                          animationsMap['buttonOnPageLoadAnimation4']!,
                                         ),
-                                        borderRadius:
-                                            BorderRadius.circular(50.0),
-                                        hoverColor: FlutterFlowTheme.of(context)
-                                            .primaryBackground,
-                                        hoverBorderSide: BorderSide(
-                                          color: FlutterFlowTheme.of(context)
-                                              .primary,
-                                          width: 1.0,
-                                        ),
-                                        hoverTextColor:
-                                            FlutterFlowTheme.of(context)
-                                                .primaryText,
-                                      ),
-                                    ).animateOnPageLoad(animationsMap[
-                                        'buttonOnPageLoadAnimation4']!),
                                   ),
                                   FlutterFlowIconButton(
                                     borderColor: Colors.transparent,
                                     borderRadius: 30.0,
                                     borderWidth: 1.0,
                                     buttonSize: 50.0,
-                                    fillColor: FlutterFlowTheme.of(context)
-                                        .secondaryBackground,
-                                    hoverColor: FlutterFlowTheme.of(context)
-                                        .secondaryBackground,
-                                    hoverIconColor:
-                                        FlutterFlowTheme.of(context).primary,
+                                    fillColor: FlutterFlowTheme.of(
+                                      context,
+                                    ).secondaryBackground,
+                                    hoverColor: FlutterFlowTheme.of(
+                                      context,
+                                    ).secondaryBackground,
+                                    hoverIconColor: FlutterFlowTheme.of(
+                                      context,
+                                    ).primary,
                                     icon: Icon(
                                       Icons.navigate_next_rounded,
-                                      color: FlutterFlowTheme.of(context)
-                                          .primaryText,
+                                      color: FlutterFlowTheme.of(
+                                        context,
+                                      ).primaryText,
                                       size: 36.0,
                                     ),
                                     onPressed: () async {
                                       await _model.pageViewController?.nextPage(
-                                        duration:
-                                            const Duration(milliseconds: 300),
+                                        duration: const Duration(
+                                          milliseconds: 300,
+                                        ),
                                         curve: Curves.ease,
                                       );
                                     },
-                                  ).animateOnPageLoad(animationsMap[
-                                      'iconButtonOnPageLoadAnimation4']!),
+                                  ).animateOnPageLoad(
+                                    animationsMap['iconButtonOnPageLoadAnimation4']!,
+                                  ),
                                 ].divide(const SizedBox(width: 180.0)),
                               ),
                             ),
@@ -1207,21 +1368,22 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                           children: [
                             Align(
                               alignment: const AlignmentDirectional(0.0, 1.0),
-                              child: Lottie.asset(
-                                'assets/jsons/loading_face_animation_faster.json',
-                                width: 500.0,
-                                height: 450.0,
-                                fit: BoxFit.contain,
-                                animate: true,
-                              ).animateOnPageLoad(animationsMap[
-                                  'lottieAnimationOnPageLoadAnimation3']!),
+                              child:
+                                  Lottie.asset(
+                                    'assets/jsons/loading_face_animation_faster.json',
+                                    width: 500.0,
+                                    height: 450.0,
+                                    fit: BoxFit.contain,
+                                    animate: true,
+                                  ).animateOnPageLoad(
+                                    animationsMap['lottieAnimationOnPageLoadAnimation3']!,
+                                  ),
                             ),
                             Text(
-                              FFLocalizations.of(context).getText(
-                                '6of0ekmf' /* Your Journey Begins */,
-                              ),
-                              style: FlutterFlowTheme.of(context)
-                                  .headlineSmall
+                              FFLocalizations.of(
+                                context,
+                              ).getText('6of0ekmf' /* Your Journey Begins */),
+                              style: FlutterFlowTheme.of(context).headlineSmall
                                   .override(
                                     fontFamily: 'Space Grotesk',
                                     letterSpacing: 0.0,
@@ -1229,105 +1391,148 @@ class _OnboardingPageWidgetState extends State<OnboardingPageWidget>
                                         .containsKey('Space Grotesk'),
                                   ),
                             ).animateOnPageLoad(
-                                animationsMap['textOnPageLoadAnimation9']!),
-                            Padding(
-                              padding: const EdgeInsetsDirectional.fromSTEB(
-                                  20.0, 12.0, 20.0, 12.0),
-                              child: Text(
-                                FFLocalizations.of(context).getText(
-                                  'p21jlt05' /* Ready to redefine communicatio... */,
-                                ),
-                                textAlign: TextAlign.center,
-                                style: FlutterFlowTheme.of(context)
-                                    .labelMedium
-                                    .override(
-                                      fontFamily: FlutterFlowTheme.of(context)
-                                          .labelMediumFamily,
-                                      letterSpacing: 0.0,
-                                      useGoogleFonts: GoogleFonts.asMap()
-                                          .containsKey(
-                                              FlutterFlowTheme.of(context)
-                                                  .labelMediumFamily),
-                                    ),
-                              ).animateOnPageLoad(
-                                  animationsMap['textOnPageLoadAnimation10']!),
+                              animationsMap['textOnPageLoadAnimation9']!,
                             ),
                             Padding(
                               padding: const EdgeInsetsDirectional.fromSTEB(
-                                  0.0, 36.0, 0.0, 0.0),
-                              child: FFButtonWidget(
-                                onPressed: () async {
-                                  context.pushNamed(
-                                    'authPage',
-                                    extra: <String, dynamic>{
-                                      kTransitionInfoKey: const TransitionInfo(
-                                        hasTransition: true,
-                                        transitionType: PageTransitionType.fade,
-                                        duration: Duration(milliseconds: 600),
-                                      ),
+                                20.0,
+                                12.0,
+                                20.0,
+                                12.0,
+                              ),
+                              child:
+                                  Text(
+                                    FFLocalizations.of(context).getText(
+                                      'p21jlt05' /* Ready to redefine communicatio... */,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                    style: FlutterFlowTheme.of(context)
+                                        .labelMedium
+                                        .override(
+                                          fontFamily: FlutterFlowTheme.of(
+                                            context,
+                                          ).labelMediumFamily,
+                                          letterSpacing: 0.0,
+                                          useGoogleFonts: GoogleFonts.asMap()
+                                              .containsKey(
+                                                FlutterFlowTheme.of(
+                                                  context,
+                                                ).labelMediumFamily,
+                                              ),
+                                        ),
+                                  ).animateOnPageLoad(
+                                    animationsMap['textOnPageLoadAnimation10']!,
+                                  ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsetsDirectional.fromSTEB(
+                                0.0,
+                                36.0,
+                                0.0,
+                                0.0,
+                              ),
+                              child:
+                                  FFButtonWidget(
+                                    onPressed: () async {
+                                      context.pushNamed(
+                                        'authPage',
+                                        extra: <String, dynamic>{
+                                          kTransitionInfoKey:
+                                              const TransitionInfo(
+                                                hasTransition: true,
+                                                transitionType:
+                                                    PageTransitionType.fade,
+                                                duration: Duration(
+                                                  milliseconds: 600,
+                                                ),
+                                              ),
+                                        },
+                                      );
                                     },
-                                  );
-                                },
-                                text: FFLocalizations.of(context).getText(
-                                  '3guo8uqw' /* Get Started */,
-                                ),
-                                options: FFButtonOptions(
-                                  width: 160.0,
-                                  height: 50.0,
-                                  padding: const EdgeInsetsDirectional.fromSTEB(
-                                      0.0, 0.0, 0.0, 0.0),
-                                  iconPadding:
-                                      const EdgeInsetsDirectional.fromSTEB(
-                                          0.0, 0.0, 0.0, 0.0),
-                                  color: FlutterFlowTheme.of(context).primary,
-                                  textStyle: FlutterFlowTheme.of(context)
-                                      .titleSmall
-                                      .override(
-                                        fontFamily: FlutterFlowTheme.of(context)
-                                            .titleSmallFamily,
-                                        color: FlutterFlowTheme.of(context)
-                                            .customColor5,
-                                        letterSpacing: 0.0,
-                                        useGoogleFonts: GoogleFonts.asMap()
-                                            .containsKey(
-                                                FlutterFlowTheme.of(context)
-                                                    .titleSmallFamily),
+                                    text: FFLocalizations.of(
+                                      context,
+                                    ).getText('3guo8uqw' /* Get Started */),
+                                    options: FFButtonOptions(
+                                      width: 160.0,
+                                      height: 50.0,
+                                      padding:
+                                          const EdgeInsetsDirectional.fromSTEB(
+                                            0.0,
+                                            0.0,
+                                            0.0,
+                                            0.0,
+                                          ),
+                                      iconPadding:
+                                          const EdgeInsetsDirectional.fromSTEB(
+                                            0.0,
+                                            0.0,
+                                            0.0,
+                                            0.0,
+                                          ),
+                                      color: FlutterFlowTheme.of(
+                                        context,
+                                      ).primary,
+                                      textStyle: FlutterFlowTheme.of(context)
+                                          .titleSmall
+                                          .override(
+                                            fontFamily: FlutterFlowTheme.of(
+                                              context,
+                                            ).titleSmallFamily,
+                                            color: FlutterFlowTheme.of(
+                                              context,
+                                            ).customColor5,
+                                            letterSpacing: 0.0,
+                                            useGoogleFonts: GoogleFonts.asMap()
+                                                .containsKey(
+                                                  FlutterFlowTheme.of(
+                                                    context,
+                                                  ).titleSmallFamily,
+                                                ),
+                                          ),
+                                      elevation: 2.0,
+                                      borderSide: BorderSide(
+                                        color: FlutterFlowTheme.of(
+                                          context,
+                                        ).primary,
                                       ),
-                                  elevation: 2.0,
-                                  borderSide: BorderSide(
-                                    color: FlutterFlowTheme.of(context).primary,
+                                      borderRadius: BorderRadius.circular(48.0),
+                                      hoverColor: FlutterFlowTheme.of(
+                                        context,
+                                      ).primaryBackground,
+                                      hoverBorderSide: BorderSide(
+                                        color: FlutterFlowTheme.of(
+                                          context,
+                                        ).primary,
+                                      ),
+                                      hoverTextColor: FlutterFlowTheme.of(
+                                        context,
+                                      ).primaryText,
+                                    ),
+                                  ).animateOnPageLoad(
+                                    animationsMap['buttonOnPageLoadAnimation5']!,
                                   ),
-                                  borderRadius: BorderRadius.circular(12.0),
-                                  hoverColor: FlutterFlowTheme.of(context)
-                                      .primaryBackground,
-                                  hoverBorderSide: BorderSide(
-                                    color: FlutterFlowTheme.of(context).primary,
-                                  ),
-                                  hoverTextColor:
-                                      FlutterFlowTheme.of(context).primaryText,
-                                ),
-                              ).animateOnPageLoad(
-                                  animationsMap['buttonOnPageLoadAnimation5']!),
                             ),
                           ],
                         ),
                       ),
-                    ).animateOnPageLoad(
-                        animationsMap['containerOnPageLoadAnimation']!),
+                    ).animateOnPageLoad(animationsMap['containerOnPageLoadAnimation']!),
                   ),
                 ],
               ),
               Align(
                 alignment: const AlignmentDirectional(0.0, 1.0),
                 child: Padding(
-                  padding:
-                      const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 56.0),
+                  padding: const EdgeInsetsDirectional.fromSTEB(
+                    0.0,
+                    0.0,
+                    0.0,
+                    56.0,
+                  ),
                   child: smooth_page_indicator.SmoothPageIndicator(
                     controller: _model.pageViewController ??=
-                        PageController(initialPage: 0)
-                          ..addListener(() {
-                            debugLogWidgetClass(_model);
-                          }),
+                        PageController(initialPage: 0)..addListener(() {
+                          debugLogWidgetClass(_model);
+                        }),
                     count: 5,
                     axisDirection: Axis.horizontal,
                     onDotClicked: (i) async {

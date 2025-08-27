@@ -1137,7 +1137,7 @@ class _EditProfileWidgetState extends State<EditProfileWidget>
                                 ).getText('3b1h7pk6' /* Save */),
                                 options: FFButtonOptions(
                                   width: MediaQuery.sizeOf(context).width * 0.5,
-                                  height: 56.0,
+                                  height: 48.0,
                                   padding: const EdgeInsetsDirectional.fromSTEB(
                                     24.0,
                                     0.0,
@@ -1175,7 +1175,7 @@ class _EditProfileWidgetState extends State<EditProfileWidget>
                                     color: Colors.transparent,
                                     width: 0.0,
                                   ),
-                                  borderRadius: BorderRadius.circular(16.0),
+                                  borderRadius: BorderRadius.circular(48.0),
                                   hoverColor: FlutterFlowTheme.of(
                                     context,
                                   ).primaryBackground,
