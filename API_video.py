@@ -49,34 +49,42 @@ def calulating_percentage(avg, all_classes):
 
     return threshold_percentage
 
-def load_models(model_type:str = "Default"):
-    if model_type == "Default":
-        """Load all models"""
+def load_models(model_type: str = "Default"):
+    """
+    Load models for given model_type. Accepts values case-insensitively.
+    If model_type == 'custom' (case-insensitive) -> load custom models,
+    otherwise load default models. Raises FileNotFoundError with helpful message
+    if any model file is missing.
+    """
+    model_type_normalized = (model_type or "Default").strip().lower()
+    if model_type_normalized == "custom":
+        left_model_filename = r'./Custom_Dataset/Models/left_model_new.p'
+        right_model_filename = r'./Custom_Dataset/Models/right_model_new.p'
+        pose_model_filename = r'./Custom_Dataset/Models/pose_model_new.p'
+    else:
         left_model_filename = r'./Models/left_model.p'
         right_model_filename = r'./Models/right_model.p'
         pose_model_filename = r'./Models/pose_model.p'
 
-    elif model_type == "Custom":
-        left_model_filename = r'./Custom_Dataset/Models/left_model_new.p'
-        right_model_filename = r'./Custom_Dataset/Models/right_model_new.p'
-        pose_model_filename = r'./Custom_Dataset/Models/pose_model_new.p'
-
-
     def load_model(filename):
+        if not os.path.exists(filename):
+            raise FileNotFoundError(f"Model file not found: {filename}")
         with open(filename, 'rb') as f:
             model_data = pickle.load(f)
+        # Support both {'model': model} and plain model object pickles
+        if isinstance(model_data, dict) and 'model' in model_data:
             return model_data['model']
-   
+        return model_data
 
-    return (load_model(left_model_filename), 
-            load_model(right_model_filename), 
-            load_model(pose_model_filename))
-
-def switch_model_internal(model_type: str):
-    """Internal function to switch models"""
-    global left_model, right_model, pose_model
-    left_model, right_model, pose_model = load_models(model_type)
-    print(f"Models switched to: {model_type}")
+    try:
+        return (
+            load_model(left_model_filename),
+            load_model(right_model_filename),
+            load_model(pose_model_filename)
+        )
+    except Exception as e:
+        print(f"Failed to load models for type '{model_type}': {e}")
+        raise
 
 def display_frames():
     """
@@ -98,112 +106,115 @@ def display_frames():
     cv2.destroyAllWindows()
 
 def process_image(img, USE_REST:bool = False):
-    """Process a single image (np.array) to get a prediction."""
-    global accumulated_probs, frame_count
+	"""Process a single image (np.array) to get a prediction."""
+	global accumulated_probs, frame_count
 
-    pred = None
-    left_probs, right_probs, pose_probs = None, None, None
+	pred = None
+	left_probs, right_probs, pose_probs = None, None, None
 
-    img.flags.writeable = False
-    img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    res_pose = pose.process(img_rgb)
-    res_hands = hands.process(img_rgb)
-    img.flags.writeable = True
-    annotated = img.copy()
-    
+	img.flags.writeable = False
+	img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+	res_pose = pose.process(img_rgb)
+	res_hands = hands.process(img_rgb)
+	img.flags.writeable = True
+	annotated = img.copy()
+	
 
-    try:
-        if USE_REST:
-            resting = utils.is_resting(res_hands, annotated.shape, rest_delay_seconds=REST_DELAY, fps=None)
-        else:
-            resting = False
-    except Exception as e:
-        print(f"Rest detection error: {e}")
-        resting = False
+	try:
+		if USE_REST:
+			resting = utils.is_resting(res_hands, annotated.shape, rest_delay_seconds=REST_DELAY, fps=None)
+		else:
+			resting = False
+	except Exception as e:
+		print(f"Rest detection error: {e}")
+		resting = False
 
-    if resting:
-        return {"prediction": "rest"}, annotated
+	if resting:
+		return {"prediction": "rest"}, annotated
 
-    try:
-        if getattr(res_hands, "multi_hand_landmarks", None):
-            for hand_landmarks, handedness in zip(res_hands.multi_hand_landmarks, res_hands.multi_handedness):
-                label = handedness.classification[0].label
-                features = utils.extract_hand_features(
-                    hand_landmarks.landmark,
-                    res_pose.pose_landmarks.landmark if res_pose.pose_landmarks else []
-                )
+	try:
+		if getattr(res_hands, "multi_hand_landmarks", None):
+			for hand_landmarks, handedness in zip(res_hands.multi_hand_landmarks, res_hands.multi_handedness):
+				label = handedness.classification[0].label
+				features = utils.extract_hand_features(
+					hand_landmarks.landmark,
+					res_pose.pose_landmarks.landmark if res_pose.pose_landmarks else []
+				)
 
-                if label == 'Left':
-                    left_probs = left_model.predict_proba([features])[0]
-                elif label == 'Right':
-                    right_probs = right_model.predict_proba([features])[0]
+				if label == 'Left':
+					left_probs = left_model.predict_proba([features])[0]
+				elif label == 'Right':
+					right_probs = right_model.predict_proba([features])[0]
 
-                # Draw hand landmarks on the frame
-                mp.solutions.drawing_utils.draw_landmarks(
-                    img, hand_landmarks, mp.solutions.hands.HAND_CONNECTIONS
-                )
+				# Draw hand landmarks on the frame
+				mp.solutions.drawing_utils.draw_landmarks(
+					img, hand_landmarks, mp.solutions.hands.HAND_CONNECTIONS
+				)
 
-        if getattr(res_pose, "pose_landmarks", None):
-            pose_landmarks = res_pose.pose_landmarks
-            pose_features = utils.extract_pose_features(pose_landmarks.landmark)
-            pose_prediction = pose_model.predict([pose_features])[0]
-            pose_probs = pose_model.predict_proba([pose_features])[0]
-            # Draw pose landmarks on the frame
-            mp.solutions.drawing_utils.draw_landmarks(
-                img, pose_landmarks, mp_pose.POSE_CONNECTIONS
-            )
+		if getattr(res_pose, "pose_landmarks", None):
+			pose_landmarks = res_pose.pose_landmarks
+			pose_features = utils.extract_pose_features(pose_landmarks.landmark)
+			pose_prediction = pose_model.predict([pose_features])[0]
+			pose_probs = pose_model.predict_proba([pose_features])[0]
+			# Draw pose landmarks on the frame
+			mp.solutions.drawing_utils.draw_landmarks(
+				img, pose_landmarks, mp_pose.POSE_CONNECTIONS
+			)
 
-    except Exception as e:
-        print(f"Feature extraction error: {e}")
-        return {"message": "Feature extraction failed", "frame_count": frame_count}, annotated
+	except Exception as e:
+		print(f"Feature extraction error: {e}")
+		return {"message": "Feature extraction failed", "frame_count": frame_count}, annotated
 
-    # Gathering all class labels used by the three models
-    all_classes = sorted(
-        set(left_model.classes_).union(
-        set(right_model.classes_)).union(
-        set(pose_model.classes_))
-    )
+	# Gathering all class labels used by the three models (normalize as strings)
+	all_classes = sorted(
+		set(map(str, left_model.classes_)).union(
+		set(map(str, right_model.classes_))).union(
+		set(map(str, pose_model.classes_)))
+	)
 
-    # Aligning probabilities with the master list of classes
-    left_probs_aligned = np.zeros(len(all_classes))
-    right_probs_aligned = np.zeros(len(all_classes))
-    pose_probs_aligned = np.zeros(len(all_classes))
+	# Helper to align probabilities to all_classes (returns numpy array of len(all_classes))
+	def align_probs(probs, model_classes):
+		aligned = np.zeros(len(all_classes), dtype=float)
+		if probs is None:
+			return aligned
+		# Normalize keys to lowercase strings for robust matching
+		model_cls_list = [str(c).lower() for c in model_classes]
+		probs_arr = np.array(probs, dtype=float)
+		if len(model_cls_list) != len(probs_arr):
+			print(f"Warning: model_classes length ({len(model_cls_list)}) != probs length ({len(probs_arr)})")
+		mapping = {mc: p for mc, p in zip(model_cls_list, probs_arr)}
+		aligned = np.array([mapping.get(str(cls).lower(), 0.0) for cls in all_classes], dtype=float) * 100.0
+		return aligned
 
-    if left_probs is not None:
-        left_dict = dict(zip(left_model.classes_, left_probs))
-        left_probs_aligned = np.array([left_dict.get(cls, 0) for cls in all_classes]) * 100
+	# Align probabilities for each source ensuring identical shapes
+	left_probs_aligned = align_probs(left_probs, getattr(left_model, 'classes_', []))
+	right_probs_aligned = align_probs(right_probs, getattr(right_model, 'classes_', []))
+	pose_probs_aligned = align_probs(pose_probs, getattr(pose_model, 'classes_', []))
 
-    if right_probs is not None:
-        right_dict = dict(zip(right_model.classes_, right_probs))
-        right_probs_aligned = np.array([right_dict.get(cls, 0) for cls in all_classes]) * 100
+	# Determine the number of available sources (hand(s)/pose)
+	num_sources = sum(prob is not None for prob in [left_probs, right_probs, pose_probs])
+	if num_sources == 0:
+		return {"message": "No valid data", "frame_count": frame_count}, annotated
 
-    if pose_probs is not None:
-        pose_dict = dict(zip(pose_model.classes_, pose_probs))
-        pose_probs_aligned = np.array([pose_dict.get(cls, 0) for cls in all_classes]) * 100
+	# Now safe to compute averaged probabilities (aligned arrays have same shape)
+	avg = (left_probs_aligned + right_probs_aligned + pose_probs_aligned) / (100.0 * num_sources)
 
-    # Determine the number of available sources (hand(s)/pose)
-    num_sources = sum(prob is not None for prob in [left_probs, right_probs, pose_probs])
-    if num_sources == 0:
-        return {"message": "No valid data", "frame_count": frame_count}, annotated
+	# Convert these averages into final percentages based on custom thresholds
+	avg_probs = calulating_percentage(avg, all_classes)
 
-    avg = (left_probs_aligned + right_probs_aligned + pose_probs_aligned) / (100 * num_sources)
+	if accumulated_probs is None:
+		accumulated_probs = np.zeros_like(avg_probs)
+	accumulated_probs += avg_probs
+	frame_count += 1
 
-    # Convert these averages into final percentages based on custom thresholds
-    avg_probs = calulating_percentage(avg, all_classes)
+	# Updating the final prediction text after a fixed no. of frames
+	if frame_count == 5:
+		max_idx = np.argmax(accumulated_probs)
+		pred = all_classes[max_idx]
+		accumulated_probs = None
+		frame_count = 0
 
-    if accumulated_probs is None:
-        accumulated_probs = np.zeros_like(avg_probs)
-    accumulated_probs += avg_probs
-    frame_count += 1
-
-    # Updating the final prediction text after a fixed no. of frames
-    if frame_count == 5:
-        max_idx = np.argmax(accumulated_probs)
-        pred = all_classes[max_idx]
-        accumulated_probs = None
-        frame_count = 0
-
-    return ({"prediction": pred} if pred else {"message": "Collecting frames", "frame_count": frame_count}), annotated
+	return ({"prediction": pred} if pred else {"message": "Collecting frames", "frame_count": frame_count}), annotated
 
 # Rest detection parameters
 REST_SPEED_THRESHOLD :float = 30.0   # pixels/second; lower => more sensitive to rest
@@ -236,7 +247,7 @@ trainer = Trainer(hands,pose)
 
 @app.route('/')
 def home():
-    return f"<h1>Signify API</h1><br><h2>Current Model: {model_type}</h2>"
+    return f"<h1>Signify API</h1>"
 
 @app.route('/customTrain', methods= ["POST"])
 def custom_model():
@@ -254,16 +265,30 @@ def custom_model():
 	except Exception as e:
 		return jsonify({"status": "error", "message": f"Error training model: {str(e)}"}), 500
 
-@app.route('/switchModel', methods=['POST'])
+@app.route('/switchModel', methods=['POST', 'GET'])
 def switch_model():
     """Switch the model based on the response received from the model."""
     try:
-        data = request.json
-        model_type = data.get('modelType', 'Default')
-        switch_model_internal(model_type)
-        return jsonify({"status": "success", "message": f"Switched to model type {model_type}"}), 200
+        data = request.get_json(silent=True) or {}
+        requested = data.get('modelType', 'Default') if isinstance(data, dict) else 'Default'
+        req_norm = (requested or "Default").strip().lower()
+        # Normalize into exact 'Default' or 'Custom' strings used by load_models
+        if req_norm == 'custom':
+            chosen = 'Custom'
+        else:
+            chosen = 'Default'
+
+        switch_model_internal(chosen)
+        return jsonify({"status": "success", "message": f"Switched to model type {chosen}"}), 200
     except Exception as e:
         return jsonify({"status": "error", "message": f"Error switching model: {str(e)}"}), 500
+
+def switch_model_internal(model_type: str):
+    """Internal function to switch models"""
+    global left_model, right_model, pose_model
+    left_model, right_model, pose_model = load_models(model_type)
+    print(f"Models switched to: {model_type}")
+
 
 @app.route('/processFrame', methods=['POST'])
 def process_frame():
