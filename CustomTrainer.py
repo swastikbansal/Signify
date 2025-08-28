@@ -9,6 +9,7 @@ from supabase import create_client, Client
 from dotenv import load_dotenv
 from utils import Utils
 
+
 # TO DO
 # Delete the images from supabase after downloading and training the model successfully
 # Upload Model analytics with model
@@ -52,9 +53,9 @@ class Trainer:
         self.supabase: Client = create_client(self.SUPABASE_URL, self.SUPABASE_KEY)
         self.SUPABASE_BUCKET:str = "Custom_Dataset"
     
-    def download_files(self,bucket: str, path: str = ""):
+    def download_files(self, path: str = ""):
         """Recursively list all files in a Supabase storage bucket."""
-        items = self.supabase.storage.from_(bucket).list(path)
+        items = self.supabase.storage.from_(self.SUPABASE_BUCKET).list(path)
         all_files = []
 
         for item in items:
@@ -66,7 +67,7 @@ class Trainer:
             if item["metadata"] is None:  
                 sub_path = f"{path}/{item['name']}" if path else item["name"]
 
-                all_files.extend(self.download_files(bucket, sub_path))
+                all_files.extend(self.download_files(sub_path))
 
             # File
             else:  
@@ -80,15 +81,21 @@ class Trainer:
                         .download(rf"{file_path}")
                         )
                     f.write(response)
-                print(f"Downloaded: {file_path}")
                 
                 all_files.append(file_path)
 
         return all_files
 
     def download_images(self):
-        files = self.download_files(self.SUPABASE_BUCKET)
-
+        # Request files from the root of the bucket (empty path)
+        files = self.download_files("")  
+        print(f"Downloaded files: {files}")
+        if not files:
+            print("No files downloaded.")
+        else:
+            print(f"Downloaded images: {files}")
+        return files
+        
     def process_hand(self, hand_label:str) -> tuple:
         """Iterate through each class folder in the data directory"""
         # Reset data and labels for each hand type
@@ -231,9 +238,32 @@ class Trainer:
             )
             print(f"Uploaded model to Supabase: {newModel_file}")
 
+    def delete_images(self, files):
+        """
+        Delete local copies and remove files from Supabase bucket.
+        'files' is expected to be a list of file paths relative to the bucket root
+        (the same strings produced by download_files).
+        """
+        for file in files:
+            local_path = os.path.normpath(os.path.join(self.DATA_FOLDER, file))
+            try:
+                if os.path.exists(local_path):
+                    os.remove(local_path)
+                else:
+                    print(f"Local file not found (skipping): {local_path}")
+            except Exception as e:
+                print(f"Failed to delete local file {local_path}: {e}")
+
+            try:
+                self.supabase.storage.from_(self.SUPABASE_BUCKET).remove([file])
+            except Exception as e:
+                print(f"Failed to delete remote file {file} from Supabase: {e}")
+
+        print("Deleting images")
+
     def run_training(self) -> bool:
         try:
-            self.download_images()
+            files = self.download_images()
             
             # Extracting data
             left_data, left_labels = self.process_hand('Left')
@@ -254,8 +284,11 @@ class Trainer:
             self.upload_model(f'{self.MODEL_PATH}/pose_model_new.p')
             self.upload_model(f'{self.MODEL_PATH}/left_model_new.p')
             self.upload_model(f'{self.MODEL_PATH}/right_model_new.p')
-        
+
+            self.delete_images(files)
+
             return True
+
         except Exception as e:
             print(f"Training failed: {e}")
             return False

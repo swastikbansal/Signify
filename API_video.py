@@ -61,14 +61,22 @@ def load_models(model_type:str = "Default"):
         right_model_filename = r'./Custom_Dataset/Models/right_model_new.p'
         pose_model_filename = r'./Custom_Dataset/Models/pose_model_new.p'
 
+
     def load_model(filename):
         with open(filename, 'rb') as f:
             model_data = pickle.load(f)
             return model_data['model']
+   
 
     return (load_model(left_model_filename), 
             load_model(right_model_filename), 
             load_model(pose_model_filename))
+
+def switch_model_internal(model_type: str):
+    """Internal function to switch models"""
+    global left_model, right_model, pose_model
+    left_model, right_model, pose_model = load_models(model_type)
+    print(f"Models switched to: {model_type}")
 
 def display_frames():
     """
@@ -228,36 +236,34 @@ trainer = Trainer(hands,pose)
 
 @app.route('/')
 def home():
-    return "<h1>Signify API</h1>"
+    return f"<h1>Signify API</h1><br><h2>Current Model: {model_type}</h2>"
 
-@app.route('/customTrain', methods= ['GET',"POST"])
+@app.route('/customTrain', methods= ["POST"])
 def custom_model():
-    try:
-        status = trainer.run_training()
-        if status:
-            print("Model training completed")
-            switch_model_internal("Custom")
-            return jsonify({"status": "success", "message": "Custom model training completed and switched"}), 200
-    except Exception as e:
-        return jsonify({"status": "error", "message": f"Error training model: {str(e)}"}), 500
+	"""
+	Trigger custom training (POST)   
+	Always returns a valid Flask response to avoid None being returned.
+	"""
+	try:
+		status = trainer.run_training()
+		if status:
+			print("Model training completed")
+			return jsonify({"status": "success", "message": "Custom model training completed and switched"}), 200
+		else:
+			return jsonify({"status": "failed", "message": "Custom training did not complete successfully"}), 500
+	except Exception as e:
+		return jsonify({"status": "error", "message": f"Error training model: {str(e)}"}), 500
 
-
-@app.route('/switchModel', methods=['POST', 'GET'])
+@app.route('/switchModel', methods=['POST'])
 def switch_model():
     """Switch the model based on the response received from the model."""
     try:
         data = request.json
-        model_type = data.get('model', 'Default')
+        model_type = data.get('modelType', 'Default')
         switch_model_internal(model_type)
         return jsonify({"status": "success", "message": f"Switched to model type {model_type}"}), 200
     except Exception as e:
         return jsonify({"status": "error", "message": f"Error switching model: {str(e)}"}), 500
-
-def switch_model_internal(model_type: str):
-    """Internal function to switch models"""
-    global left_model, right_model, pose_model
-    left_model, right_model, pose_model = load_models(model_type)
-    print(f"Models switched to: {model_type}")
 
 @app.route('/processFrame', methods=['POST'])
 def process_frame():
@@ -339,7 +345,6 @@ def health_check():
     }), 200
 
 if __name__ == '__main__':
-    # Start the display thread
     display_thread = threading.Thread(target=display_frames)
     display_thread.daemon = True
     display_thread.start()
@@ -347,7 +352,7 @@ if __name__ == '__main__':
     print("Starting prediction API server...")
     print("Endpoints available:")
     print("- POST /processFrame - Process received frame and return predictions")
-    print("- GET, POST /customTrain - Train a custom model")
+    print("- POST /customTrain - Train a custom model")
     print("- POST /switchModel - Switch between models")
     print("- POST /reset - Reset frame accumulation")
     print("- GET /health - Health check")
