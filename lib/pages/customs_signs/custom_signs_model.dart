@@ -179,10 +179,11 @@ class CustomSignsModel extends FlutterFlowModel<CustomSignsPage> {
       isTraining = true;
       trainingError = null;
 
+      debugPrint("Calling $_customSignsEndpoint");
       final response = await http.post(
         Uri.parse(_customSignsEndpoint),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'file_paths': filePaths, 'labels': labels}),
+        // body: jsonEncode({'file_paths': filePaths, 'labels': labels}),
       );
 
       if (response.statusCode == 200) {
@@ -217,7 +218,7 @@ class CustomSignsModel extends FlutterFlowModel<CustomSignsPage> {
       final response = await http.post(
         Uri.parse(_switchModelEndpoint),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'model_type': 'custom'}),
+        body: jsonEncode({'modelType': 'custom'}),
       );
 
       if (response.statusCode == 200) {
@@ -310,24 +311,25 @@ class CustomSignsModel extends FlutterFlowModel<CustomSignsPage> {
       isUploading = false;
 
       // Start training if uploads were successful DO NOT TOUCH FOR NOW
-      // if (successes.isNotEmpty) {
-      //   final filePaths = successes
-      //       .map((r) => _safeString(r.path))
-      //       .where((s) => s.isNotEmpty)
-      //       .toList();
-      //   final labels = successes
-      //       .map((r) => _safeString(r.label))
-      //       .where((s) => s.isNotEmpty)
-      //       .toList();
+      if (successes.isNotEmpty) {
+        final filePaths = successes
+            .map((r) => _safeString(r.path))
+            .where((s) => s.isNotEmpty)
+            .toList();
+        final labels = successes
+            .map((r) => _safeString(r.label))
+            .where((s) => s.isNotEmpty)
+            .toList();
 
-      //   final trainingSuccess = await trainCustomModel(filePaths, labels);
+        debugPrint("Calling custom training API");  
+        final trainingSuccess = await trainCustomModel(filePaths, labels);
 
-      //   // Update the status based on training result
-      //   uploadedFiles[0]['status'] = trainingSuccess ? 'processed' : 'failed';
-      //   if (!trainingSuccess && trainingError != null) {
-      //     uploadedFiles[0]['error'] = trainingError;
-      //   }
-      // }
+        // Update the status based on training result
+        uploadedFiles[0]['status'] = trainingSuccess ? 'processed' : 'failed';
+        if (!trainingSuccess && trainingError != null) {
+          uploadedFiles[0]['error'] = trainingError;
+        }
+      }
 
       selectedFiles = null;
       customFileNames.clear();
