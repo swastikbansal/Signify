@@ -10,8 +10,8 @@ import 'package:model_viewer_plus/model_viewer_plus.dart';
 
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import '/services/supabase_animation_service.dart';
 import '/services/error_service.dart';
+import '/services/supabase_animation_service.dart';
 import 'voicetosign1_model.dart';
 
 export 'voicetosign1_model.dart';
@@ -101,7 +101,6 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
   Timer? _animationTimer;
   int _currentAnimationIndex = 0;
   bool _isSequenceActive = false;
-  String? _currentAnimationUrl;
 
   // Double-buffered model viewers for seamless swaps
   String? _viewerUrlA;
@@ -127,6 +126,32 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
     _model.textController ??= TextEditingController()
       ..addListener(() {
         debugLogWidgetClass(_model);
+        // Hyper preloading as user types (debounced)
+        _prefetchDebounce?.cancel();
+        _prefetchDebounce = Timer(const Duration(milliseconds: 180), () async {
+          final text = _model.textController!.text;
+          final words = text
+              .toLowerCase()
+              .trim()
+              .split(RegExp(r'\s+'))
+              .map((w) => w.replaceAll(RegExp(r'[^\w]'), ''))
+              .where((w) => w.isNotEmpty)
+              .toList();
+          if (words.isEmpty) return;
+          // Limit to last few unique words to avoid overfetch
+          final unique = <String>{};
+          final recent = <String>[];
+          for (final w in words.reversed) {
+            if (unique.add(w)) recent.add(w);
+            if (recent.length >= 6) break;
+          }
+          final target = recent.reversed.toList();
+          // Warm caches without blocking UI
+          unawaited(SupabaseAnimationService.ultraPreloadAnimations(target));
+          unawaited(
+            SupabaseAnimationService.getBatchAnimationsWithMetadata(target),
+          );
+        });
       });
     _model.textFieldFocusNode ??= FocusNode();
 
@@ -222,8 +247,6 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
         : null;
 
     setState(() {
-      _currentAnimationUrl = currentAnimationData.url;
-
       currentAnimation = currentAnimationData.url;
       currentWord = currentWordData;
     });
@@ -311,7 +334,6 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
     setState(() {
       _isSequenceActive = false;
       _currentAnimationIndex = 0;
-      _currentAnimationUrl = null;
 
       // Return to default animation smoothly
       currentAnimation = defaultAnimation;
@@ -849,9 +871,11 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
                           disablePan: true,
                           disableTap: true,
                           disableZoom: true,
-                          // Increase model-viewer cache to keep multiple GLBs hot
+                          // Increase model-viewer cache and reduce render cost
                           relatedJs:
-                              'try{self.ModelViewerElement&&(self.ModelViewerElement.modelCacheSize=20)}catch(e){}',
+                              'try{if(self.ModelViewerElement){self.ModelViewerElement.modelCacheSize=64}}catch(e){};'
+                              'try{document.querySelectorAll("model-viewer").forEach(el=>{if(el.minimumRenderScale!==undefined) el.minimumRenderScale=0.5; if(el.msaa!==undefined) el.msaa=false;});}catch(e){};'
+                              'try{const s=document.createElement("style"); s.textContent="model-viewer::part(progress-bar){display:none !important;} model-viewer::part(ar-button){display:none !important;}"; document.head.appendChild(s);}catch(e){}',
                         ),
                       ),
                     ),
@@ -878,7 +902,9 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
                           disableTap: true,
                           disableZoom: true,
                           relatedJs:
-                              'try{self.ModelViewerElement&&(self.ModelViewerElement.modelCacheSize=20)}catch(e){}',
+                              'try{if(self.ModelViewerElement){self.ModelViewerElement.modelCacheSize=64}}catch(e){};'
+                              'try{document.querySelectorAll("model-viewer").forEach(el=>{if(el.minimumRenderScale!==undefined) el.minimumRenderScale=0.5; if(el.msaa!==undefined) el.msaa=false;});}catch(e){};'
+                              'try{const s=document.createElement("style"); s.textContent="model-viewer::part(progress-bar){display:none !important;} model-viewer::part(ar-button){display:none !important;}"; document.head.appendChild(s);}catch(e){}',
                         ),
                       ),
                     ),

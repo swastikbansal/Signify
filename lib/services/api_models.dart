@@ -2,6 +2,7 @@
 ///
 /// This file contains all API response handling classes and
 /// custom exceptions for consistent error management.
+library;
 
 import 'dart:convert';
 

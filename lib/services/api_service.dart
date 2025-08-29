@@ -2,11 +2,11 @@
 ///
 /// This service provides a centralized way to make API calls across the app.
 /// It handles different request types, error handling, retries, and logging.
+library;
 
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
 

@@ -1,4 +1,5 @@
 /// API Configuration for Signify App
+library;
 
 /// This file contains all API-related configuration including
 /// base URLs, timeouts, and environment settings.
@@ -8,7 +9,7 @@ enum ApiEnvironment { development, production, staging }
 class ApiConfig {
   // Environment-specific base URLs
   static const Map<ApiEnvironment, String> _baseUrls = {
-    ApiEnvironment.development: 'http://192.168.29.42:5000',
+    ApiEnvironment.development:  'http://10.134.241.185:5000',
     ApiEnvironment.production: 'https://philosia-codecult-signify.hf.space',
   };
 
