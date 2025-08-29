@@ -6,19 +6,13 @@
 # =============================================================================
 # CORE OPTIMIZATION SETTINGS
 # =============================================================================
-# Optimize for performance and size
--optimizationpasses 3
--allowaccessmodification
--dontusemixedcaseclassnames
--dontskipnonpubliclibraryclasses
--dontpreverify
+## Keep R8 configuration conservative; rely on R8 defaults for optimization/shrinking
+# (Removing legacy ProGuard directives that can increase memory usage or cause instability.)
 -verbose
 
-# Advanced optimizations (exclude problematic ones)
--optimizations !code/simplification/arithmetic,!code/simplification/cast,!field/*,!class/merging/*,!method/removal/parameter,!method/propagation/parameter
+## Removed custom optimization includes/excludes; use R8 defaults
 
-# Package flattening for better obfuscation
--repackageclasses ''
+## Avoid package reordering to reduce reflection breakage
 
 # =============================================================================
 # DEBUGGING AND STACK TRACE SUPPORT
@@ -49,6 +43,14 @@
 # Dart VM service protocol
 -keep class io.flutter.view.VsyncWaiter { *; }
 -keep class io.flutter.view.AccessibilityBridge { *; }
+
+# WebView and JS bridges often use reflection; preserve JS interfaces
+-keepclassmembers class * {
+    @android.webkit.JavascriptInterface <methods>;
+}
+
+# Preserve Kotlin metadata for reflection/serialization
+-keep class kotlin.Metadata { *; }
 
 # =============================================================================
 # FIREBASE AND GOOGLE SERVICES (CONSOLIDATED & OPTIMIZED)

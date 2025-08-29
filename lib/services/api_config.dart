@@ -13,7 +13,7 @@ class ApiConfig {
     ApiEnvironment.production: 'https://philosia-codecult-signify.hf.space',
   };
 
-  static ApiEnvironment _currentEnvironment = ApiEnvironment.development;
+  static ApiEnvironment _currentEnvironment = ApiEnvironment.production;
 
   // Timeout configurations
   static const Duration defaultTimeout = Duration(seconds: 30);
