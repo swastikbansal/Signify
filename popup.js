@@ -1,83 +1,42 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const sentenceInput = document.getElementById('sentenceInput');
-    const showViewerBtn = document.getElementById('showViewer');
-    const hideViewerBtn = document.getElementById('hideViewer');
-    const statusDiv = document.getElementById('status');
-
-    // Load saved sentence from storage
-    chrome.storage.local.get(['savedSentence'], function(result) {
-        if (result.savedSentence) {
-            sentenceInput.value = result.savedSentence;
-        }
-    });
-
-    // Save sentence when typing
-    sentenceInput.addEventListener('input', function() {
-        chrome.storage.local.set({savedSentence: sentenceInput.value});
-    });
-
-    // Show viewer
-    showViewerBtn.addEventListener('click', function() {
-        const sentence = sentenceInput.value.trim();
-        if (!sentence) {
-            statusDiv.textContent = 'Please enter a sentence first.';
-            return;
-        }
-
-        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-            chrome.tabs.sendMessage(tabs[0].id, {
-                action: 'showViewer',
-                sentence: sentence
-            }, function(response) {
-                if (chrome.runtime.lastError) {
-                    statusDiv.textContent = 'Error: Could not inject viewer. Try refreshing the page.';
-                } else {
-                    statusDiv.textContent = 'Viewer shown! Processing sentence...';
-                }
-            });
-        });
-    });
-
-    // Hide viewer
-    hideViewerBtn.addEventListener('click', function() {
-        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-            chrome.tabs.sendMessage(tabs[0].id, {
-                action: 'hideViewer'
-            }, function(response) {
-                if (chrome.runtime.lastError) {
-                    statusDiv.textContent = 'Error: Could not hide viewer.';
-                } else {
-                    statusDiv.textContent = 'Viewer hidden.';
-                }
-            });
-        });
-    });
-
-    // Listen for messages from content script
-    chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-        if (request.action === 'updateStatus') {
-            statusDiv.textContent = request.status;
-        }
-    });
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        await loadSettings();
+        await loadFavoriteSites();
+        setupEventListeners();
+    wireStaticButtons();
+    await loadTransparencySettings();
+    } catch (e) {
+        console.error('Popup init failed', e);
+    }
 });
 
 // Load user settings
 async function loadSettings() {
     try {
-        const settings = await chrome.storage.sync.get([
-            'autoStart',
-            'showAvatar'
-        ]);
-
-        // Update toggle states - default to true if not set
-        updateToggle('autoStartToggle', settings.autoStart !== false);
-        updateToggle('showAvatarToggle', settings.showAvatar !== false);
+    const settings = await chrome.storage.sync.get(['autoStart']);
+    updateToggle('autoStartToggle', settings.autoStart !== false);
         
         console.log('Loaded settings:', settings);
         
     } catch (error) {
         console.error('Error loading settings:', error);
     }
+}
+
+// Load transparency / panel settings from local storage
+async function loadTransparencySettings() {
+    try {
+        const local = await chrome.storage.local.get(['signifyPanelAlpha','signifyPanelVisible']);
+        const visible = !!local.signifyPanelVisible;
+        updateToggle('panelBgToggle', visible);
+        const controls = document.getElementById('panelBgControls');
+        if (controls) controls.style.display = visible ? 'flex' : 'none';
+        const alpha = (typeof local.signifyPanelAlpha === 'number') ? local.signifyPanelAlpha : 0.55;
+        const range = document.getElementById('panelAlphaRange');
+        const val = document.getElementById('panelAlphaValue');
+        if (range) range.value = Math.round(alpha*100);
+        if (val) val.textContent = Math.round(alpha*100)+'%';
+    } catch (e) { console.warn('Transparency load failed', e); }
 }
 
 // Load favorite sites
@@ -163,6 +122,36 @@ function setupEventListeners() {
     });
 }
 
+function wireStaticButtons() {
+    // Toggle auto-start via click
+    const autoToggle = document.getElementById('autoStartToggle');
+    if (autoToggle) {
+        autoToggle.addEventListener('click', () => toggleSetting('autoStart'));
+        autoToggle.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                toggleSetting('autoStart');
+            }
+        });
+    }
+    const bgToggle = document.getElementById('panelBgToggle');
+    if (bgToggle) {
+        bgToggle.addEventListener('click', togglePanelBackground);
+        bgToggle.addEventListener('keydown', (e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); togglePanelBackground(); }});
+    }
+    const alphaRange = document.getElementById('panelAlphaRange');
+    if (alphaRange) {
+        alphaRange.addEventListener('input', handleAlphaChange);
+    }
+    // Favorite site static buttons
+    const ytBtn = document.getElementById('favYouTube');
+    if (ytBtn) ytBtn.addEventListener('click', () => openSite('https://www.youtube.com'));
+    const addBtn = document.getElementById('favAdd');
+    if (addBtn) addBtn.addEventListener('click', addSite);
+    const helpBtn = document.getElementById('helpBtn');
+    if (helpBtn) helpBtn.addEventListener('click', openHelp);
+}
+
 // Update toggle appearance
 function updateToggle(toggleId, isActive) {
     const toggle = document.getElementById(toggleId);
@@ -208,6 +197,39 @@ async function toggleSetting(setting) {
             console.log('Content script not available or not on YouTube');
         }
     }
+}
+
+async function togglePanelBackground() {
+    const toggleElement = document.getElementById('panelBgToggle');
+    if (!toggleElement) return;
+    const willActivate = !toggleElement.classList.contains('active');
+    toggleElement.classList.toggle('active', willActivate);
+    // Show/hide controls
+    const controls = document.getElementById('panelBgControls');
+    if (controls) controls.style.display = willActivate ? 'flex' : 'none';
+    await chrome.storage.local.set({ signifyPanelVisible: willActivate });
+    // Send message to active tab to update immediately
+    try {
+        const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+        if (tabs[0]) {
+            chrome.tabs.sendMessage(tabs[0].id, { action: 'updateTransparency', visible: willActivate });
+        }
+    } catch (e) { console.log('Could not send visibility update', e); }
+}
+
+async function handleAlphaChange(e) {
+    const range = e.target;
+    const val = document.getElementById('panelAlphaValue');
+    const pct = parseInt(range.value,10);
+    if (val) val.textContent = pct+'%';
+    const alpha = pct/100;
+    await chrome.storage.local.set({ signifyPanelAlpha: alpha });
+    try {
+        const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+        if (tabs[0]) {
+            chrome.tabs.sendMessage(tabs[0].id, { action: 'updateTransparency', alpha });
+        }
+    } catch (err) { console.log('Alpha update message failed', err); }
 }
 
 // Open site function

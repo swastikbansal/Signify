@@ -13,7 +13,7 @@ class ISLExtensionViewer {
         this.isInitialized = false;
     this.defaultModelPath = null; // cached resolved default.glb path (remote preferred)
     // When false, don't show looping default avatar in idle state; only show during actual word animations
-    this.enableIdleDefault = true; // play default animation by default
+    this.enableIdleDefault = false;
     // Caching & preloading
     this.modelCache = new Map(); // key: resolved fullPath -> gltf
     this.preloadPromises = new Map(); // key: resolved fullPath -> promise
@@ -39,10 +39,6 @@ class ISLExtensionViewer {
             trimLeading: true,          // only trim beginning static frames
             trimTrailing: false         // keep trailing hold so sign meaning stays visible
         };
-    // Continuous streaming (YouTube) playback queue
-    this.wordQueue = [];
-    this.isProcessingQueue = false;
-    this.lastQueuedWord = null;
         // Root continuity tracking
         this.lastRootPos = { x:0, y:0, z:0 };
         this.hasLastRoot = false;
@@ -64,20 +60,20 @@ class ISLExtensionViewer {
         this.availableModels = [];
     }
 
-    async createViewer() {
+    async createViewer({ suppressHeader = false } = {}) {
         if (this.container) return;
 
         // Create container
         this.container = document.createElement('div');
         this.container.id = 'isl-viewer-container';
         
-        // Create header
+        // Create (optional) header — hidden when suppressHeader
         const header = document.createElement('div');
         header.id = 'isl-viewer-header';
         header.innerHTML = `
             <span>ISL Animation Viewer</span>
-            <button id="isl-viewer-close">×</button>
-        `;
+            <button id="isl-viewer-close">×</button>`;
+        if (suppressHeader) header.style.display = 'none';
         
         // Create canvas
         this.canvas = document.createElement('canvas');
@@ -103,9 +99,8 @@ class ISLExtensionViewer {
         document.body.appendChild(this.container);
         
         // Setup close button
-        document.getElementById('isl-viewer-close').addEventListener('click', () => {
-            this.hideViewer();
-        });
+    const closeBtn = document.getElementById('isl-viewer-close');
+    if (closeBtn) closeBtn.addEventListener('click', () => { this.hideViewer(); });
 
         // Load Three.js if not already loaded
         await this.loadThreeJS();
@@ -159,14 +154,16 @@ class ISLExtensionViewer {
         
         console.log('Initializing Three.js scene...');
         
-        this.scene = new THREE.Scene();
-        this.scene.background = new THREE.Color(0x2a2a2a);
+    this.scene = new THREE.Scene();
+    // Transparent background to blend with page / container when toggled
+    this.scene.background = null;
         
         // Closer framing from knee to head with tighter field of view
         this.camera = new THREE.PerspectiveCamera(45, 320 / 350, 0.1, 1000);
         this.camera.position.set(0, 1.3, 1.8);
         
-        this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: true });
+    this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: true, alpha: true, premultipliedAlpha: false });
+        this.renderer.setClearColor(0x000000, 0); // fully transparent
         this.renderer.setSize(320, 350);
         this.renderer.shadowMap.enabled = true;
         this.renderer.outputEncoding = THREE.sRGBEncoding;
@@ -817,52 +814,6 @@ class ISLExtensionViewer {
         await this.playClipSequential(clip, true);
     }
 
-    enqueueWord(word) {
-        if (!word) return;
-        const w = word.toLowerCase();
-        // Avoid enqueueing duplicates back-to-back
-        if (this.lastQueuedWord === w) return;
-        this.lastQueuedWord = w;
-        this.wordQueue.push(w);
-        if (!this.isProcessingQueue) this.processQueue();
-    }
-
-    async processQueue() {
-        if (this.isProcessingQueue) return;
-        this.isProcessingQueue = true;
-        while (this.wordQueue.length) {
-            const current = this.wordQueue.shift();
-            try {
-                await this.ensureBaseAvatar();
-                let clip = await this.fetchClipForWord(current).catch(()=> this.clipCache.get('__default__'));
-                if (!clip && this.clipCache.get('__default__')) clip = this.clipCache.get('__default__');
-                if (clip) {
-                    // If more words already queued, treat as not last to allow overlap timing logic
-                    const isLast = this.wordQueue.length === 0;
-                    await this.playClipSequential(clip, isLast);
-                }
-            } catch (e) {
-                console.warn('[ISL][QUEUE][ERR]', current, e.message);
-                // attempt idle fallback
-                try { await this.playIdleLoop(); } catch(_){ }
-            }
-        }
-        // When queue drains, keep idle loop (if enabled)
-        if (this.enableIdleDefault && this.clipCache.get('__default__')) {
-            // If currentAction finished or not default, softly transition back
-            if (this.currentAction && this.currentAction.getClip() !== this.clipCache.get('__default__')) {
-                const idle = this.mixer.clipAction(this.clipCache.get('__default__'));
-                idle.reset();
-                idle.setLoop(THREE.LoopRepeat);
-                idle.timeScale = this.playbackSpeed * 0.6;
-                if (this.currentAction) this.currentAction.crossFadeTo(idle, 0.25, false); else idle.fadeIn(0.25);
-                idle.play();
-                this.currentAction = idle;
-            }
-        }
-        this.isProcessingQueue = false;
-    }
-
     animate() {
         if (!this.isInitialized || !this.container || this.container.style.display === 'none') return;
         
@@ -913,6 +864,17 @@ let syncInterval = null;
 let isYouTubePage = false;
 let currentVideoId = null; // track current YouTube video id for SPA navigation
 let transcriptVideoId = null; // video id the current transcript belongs to
+let autoStartEnabled = true; // default; will load from storage
+
+// Load auto-start preference from sync storage
+function loadAutoStartSetting() {
+    try {
+        chrome.storage.sync.get(['autoStart'], (res) => {
+            if (typeof res.autoStart === 'boolean') autoStartEnabled = res.autoStart;
+        });
+    } catch(_) {}
+}
+loadAutoStartSetting();
 
 function getYouTubeVideoId() {
     try {
@@ -1080,9 +1042,12 @@ function syncWithVideo(video) {
 function updateCurrentWord(word) {
     const display = document.getElementById('currentWordDisplay');
     if (display) {
-        display.textContent = word;
-        display.classList.add('word-animation');
-        setTimeout(() => display.classList.remove('word-animation'), 600);
+    display.style.display='block';
+    display.textContent = word;
+    display.classList.remove('word-animation');
+    void display.offsetWidth; // reflow for animation restart
+    display.classList.add('word-animation');
+    setTimeout(() => display.classList.remove('word-animation'), 650);
     }
 }
 
@@ -1144,86 +1109,100 @@ function showAvatarInterface() {
     const container = document.createElement('div');
     container.id = 'signify-avatar-container';
     container.innerHTML = `
-        <div class="signify-header">
-            <div class="signify-title">🤟 Signify ISL Translator</div>
-            <button id="signify-close" title="Close">✕</button>
-        </div>
-        <div class="avatar-display" id="avatarDisplay">
+        <div class="avatar-display" id="avatarDisplay" data-alpha="0.55">
+            <div class="floating-header" id="signifyFloatingHeader">
+                <div class="fh-actions" style="margin-left:auto;">
+                    <button id="signify-transparency" class="edge-ui" title="Adjust transparency">💡</button>
+                    <button id="signify-close" class="edge-ui" title="Close">✕</button>
+                </div>
+            </div>
             <div class="avatar-loading">Loading 3D Avatar...</div>
-        </div>
-        <div class="current-word-display" id="currentWordDisplay">Ready to translate</div>
-    `;
-    
-    // Add styles
+            <div class="current-word-overlay" id="currentWordDisplay">Ready</div>
+            <div class="transparency-pop edge-ui" id="signifyTransPanel">
+                <label for="signifyOpacityRange">Opacity</label>
+                <input type="range" id="signifyOpacityRange" min="0" max="100" value="55" />
+            </div>
+            <div class="signify-resize-handle edge-ui" id="signifyResizeHandle" title="Resize"></div>
+        </div>`;
+
     const style = document.createElement('style');
     style.textContent = `
-        #signify-avatar-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            width: 320px;
-            height: 450px;
-            background: #1a1a1a;
-            border: 2px solid #333;
-            border-radius: 10px;
-            z-index: 10000;
-            font-family: Arial, sans-serif;
-        }
-        .signify-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #333;
-            color: white;
-            padding: 10px;
-            border-radius: 8px 8px 0 0;
-        }
-        .signify-title {
-            font-weight: bold;
-            font-size: 14px;
-        }
-        #signify-close {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 18px;
-            cursor: pointer;
-            padding: 0;
-            width: 20px;
-            height: 20px;
-        }
-        .avatar-display {
-            height: 360px;
-            background: #2a2a2a;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #666;
-        }
-        .current-word-display {
-            padding: 10px;
-            text-align: center;
-            background: #222;
-            color: #ffeb3b;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 0 0 8px 8px;
-        }
-        .word-animation {
-            animation: wordPulse 0.6s ease-in-out;
-        }
-        @keyframes wordPulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
+    #signify-avatar-container { position:fixed; top:20px; right:20px; width:300px; height:380px; z-index:10000; font-family:Arial,sans-serif; box-sizing:border-box; }
+    #signify-avatar-container, #signify-avatar-container * { box-sizing:border-box; }
+    #signify-avatar-container.dragging { cursor:grabbing; }
+    .avatar-display { width:100%; height:100%; position:relative; background:transparent; }
+    .avatar-display.panel { backdrop-filter:blur(4px); border:1px solid rgba(255,255,255,0.25); border-radius:10px; background:rgba(10,10,10,var(--panel-alpha,0.4)); }
+    .floating-header { position:absolute; top:0; left:0; right:0; height:34px; display:flex; align-items:center; justify-content:flex-end; padding:4px 10px; background:rgba(20,20,20,0.28); backdrop-filter:blur(6px) saturate(160%); border-bottom:1px solid rgba(255,255,255,0.15); border-radius:10px 10px 0 0; color:#eee; font-size:13px; font-weight:600; letter-spacing:.4px; opacity:0; transition:opacity .25s; pointer-events:none; }
+    #signify-avatar-container.edge-reveal .floating-header { opacity:1; pointer-events:auto; }
+    .floating-header .fh-actions { display:flex; gap:6px; }
+    .floating-header button { background:rgba(50,50,50,0.55); border:1px solid rgba(255,255,255,0.35); color:#eee; padding:3px 8px; font-size:12px; cursor:pointer; border-radius:6px; line-height:1; backdrop-filter:blur(4px); }
+    .floating-header button:hover { background:rgba(80,80,80,0.7); }
+    .transparency-pop { position:absolute; top:34px; right:6px; background:rgba(25,25,25,0.85); padding:8px 10px 12px; border:1px solid rgba(255,255,255,0.25); border-radius:10px; display:flex; flex-direction:column; gap:6px; width:140px; box-shadow:0 4px 14px -4px rgba(0,0,0,0.55); opacity:0; pointer-events:none; transform:translateY(-6px); transition:opacity .25s, transform .25s; z-index:30; }
+    .transparency-pop label { font-size:11px; letter-spacing:.5px; color:#eee; }
+    .transparency-pop input[type=range] { width:100%; accent-color:#ffeb3b; }
+    #signify-avatar-container.show-trans-panel #signifyTransPanel { opacity:1; pointer-events:auto; transform:translateY(0); }
+    #isl-viewer-container { background:transparent !important; }
+    #isl-viewer-canvas { background:transparent !important; pointer-events:none; }
+    .current-word-overlay { z-index:25; }
+    .current-word-overlay { position:absolute; bottom:8px; left:50%; transform:translateX(-50%); background:rgba(25,25,25,0.75); padding:4px 12px; border-radius:14px; color:#ffeb3b; font-size:14px; font-weight:600; letter-spacing:.4px; box-shadow:0 2px 6px rgba(0,0,0,0.45); max-width:85%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; pointer-events:none; }
+    .signify-resize-handle { position:absolute; width:14px; height:14px; right:4px; bottom:4px; cursor:nwse-resize; background:linear-gradient(135deg,rgba(255,255,255,0.6),rgba(255,255,255,0.15)); border:1px solid rgba(255,255,255,0.5); border-radius:4px; box-shadow:0 1px 3px rgba(0,0,0,0.4); opacity:0; transition:opacity .25s; }
+    #signify-avatar-container.edge-reveal .signify-resize-handle { opacity:1; }
+    .word-animation { animation: wordPulse 0.6s ease-in-out; }
+    @keyframes wordPulse { 0%,100% { transform:scale(1);} 50% { transform:scale(1.1);} }
     `;
     document.head.appendChild(style);
-    
     document.body.appendChild(container);
+    // Initial left/top placement
+    requestAnimationFrame(()=>{ const r=container.getBoundingClientRect(); container.style.left=(window.innerWidth - r.width - 20)+'px'; container.style.top=r.top+'px'; container.style.right=''; });
 
-    document.getElementById('signify-close').addEventListener('click', () => {
-    closeSignifyUI();
+    const transBtn = document.getElementById('signify-transparency');
+    const closeBtn = document.getElementById('signify-close');
+    const opacityRange = document.getElementById('signifyOpacityRange');
+    const avatarDisplay = document.getElementById('avatarDisplay');
+    const applyAlpha = (val)=>{ const alpha = Math.min(1, Math.max(0, val)); avatarDisplay.style.setProperty('--panel-alpha', alpha); avatarDisplay.dataset.alpha = alpha; if(!avatarDisplay.classList.contains('panel')) avatarDisplay.classList.add('panel'); };
+    // Restore saved transparency
+    chrome.storage?.local?.get(['signifyPanelAlpha','signifyPanelVisible'], (d)=>{ if(typeof d.signifyPanelAlpha==='number') { applyAlpha(d.signifyPanelAlpha); opacityRange.value = Math.round(d.signifyPanelAlpha*100); } if(d.signifyPanelVisible){ avatarDisplay.classList.add('panel'); container.classList.add('show-trans-panel'); transBtn.title='Hide background'; } });
+    transBtn.addEventListener('click', ()=>{
+        const panelVisible = avatarDisplay.classList.toggle('panel');
+        container.classList.toggle('show-trans-panel', panelVisible);
+        transBtn.title = panelVisible ? 'Hide background' : 'Show background';
+        chrome.storage?.local?.set({ signifyPanelVisible: panelVisible });
     });
+    opacityRange.addEventListener('input', ()=>{ const v = parseInt(opacityRange.value,10); const alpha = (v/100); applyAlpha(alpha); chrome.storage?.local?.set({ signifyPanelAlpha: alpha }); });
+    closeBtn.addEventListener('click', ()=> closeSignifyUI());
+
+    // Drag from empty space inside avatar area (excluding buttons & resize handle)
+    (function drag(){ let dragging=false,sx=0,sy=0,sl=0,st=0; const start=(e)=>{ if(e.target.closest('.edge-controls')|| e.target.classList.contains('signify-resize-handle')) return; dragging=true; container.classList.add('dragging'); sx=e.clientX; sy=e.clientY; const r=container.getBoundingClientRect(); sl=r.left; st=r.top; document.body.style.userSelect='none'; }; const move=(e)=>{ if(!dragging)return; const dx=e.clientX-sx, dy=e.clientY-sy; let nl=sl+dx, nt=st+dy; const maxL=window.innerWidth-container.offsetWidth; const maxT=window.innerHeight-container.offsetHeight; if(nl<0)nl=0; if(nt<0)nt=0; if(nl>maxL)nl=maxL; if(nt>maxT)nt=maxT; container.style.left=nl+'px'; container.style.top=nt+'px'; }; const end=()=>{ if(dragging){ dragging=false; container.classList.remove('dragging'); document.body.style.userSelect=''; } }; container.addEventListener('mousedown',start); window.addEventListener('mousemove',move); window.addEventListener('mouseup',end); window.addEventListener('mouseleave',end); })();
+
+    // Resize
+    (function resize(){ const handle=document.getElementById('signifyResizeHandle'); let resizing=false,sx=0,sy=0,sw=0,sh=0; const MIN_W=180,MIN_H=220,MAX_W=800,MAX_H=900; handle.addEventListener('mousedown',e=>{ e.stopPropagation(); resizing=true; sx=e.clientX; sy=e.clientY; sw=container.offsetWidth; sh=container.offsetHeight; document.body.style.userSelect='none'; }); window.addEventListener('mousemove',e=>{ if(!resizing) return; const dx=e.clientX-sx, dy=e.clientY-sy; let w=sw+dx, h=sh+dy; if(w<MIN_W)w=MIN_W; if(h<MIN_H)h=MIN_H; if(w>MAX_W)w=MAX_W; if(h>MAX_H)h=MAX_H; container.style.width=w+'px'; container.style.height=h+'px'; }); window.addEventListener('mouseup',()=>{ if(resizing){ resizing=false; document.body.style.userSelect=''; }}); window.addEventListener('mouseleave',()=>{ if(resizing){ resizing=false; document.body.style.userSelect=''; }}); })();
+    // Add live canvas resize inside resize handler (override previous IIFE) for dynamic avatar scaling
+    (function enableDynamicResize(){
+        const handle=document.getElementById('signifyResizeHandle');
+        let resizing=false,sx=0,sy=0,sw=0,sh=0; const MIN_W=180,MIN_H=220,MAX_W=800,MAX_H=900;
+        const applySize=()=>{
+            if (islViewer && islViewer.renderer && islViewer.camera) {
+                const w = container.offsetWidth;
+                const h = container.offsetHeight;
+                try {
+                    islViewer.renderer.setSize(w, h);
+                    islViewer.camera.aspect = w / h;
+                    islViewer.camera.updateProjectionMatrix();
+                } catch(_){}
+                const canvas = document.getElementById('isl-viewer-canvas');
+                if (canvas) { canvas.style.width='100%'; canvas.style.height='100%'; }
+                const islCont = document.getElementById('isl-viewer-container');
+                if (islCont) { islCont.style.width='100%'; islCont.style.height='100%'; }
+            }
+        };
+        handle.addEventListener('mousedown',e=>{ e.stopPropagation(); resizing=true; sx=e.clientX; sy=e.clientY; sw=container.offsetWidth; sh=container.offsetHeight; document.body.style.userSelect='none'; });
+        window.addEventListener('mousemove',e=>{ if(!resizing) return; const dx=e.clientX-sx, dy=e.clientY-sy; let w=sw+dx, h=sh+dy; if(w<MIN_W)w=MIN_W; if(h<MIN_H)h=MIN_H; if(w>MAX_W)w=MAX_W; if(h>MAX_H)h=MAX_H; container.style.width=w+'px'; container.style.height=h+'px'; applySize(); });
+        const end=()=>{ if(resizing){ resizing=false; document.body.style.userSelect=''; applySize(); }};
+        window.addEventListener('mouseup',end); window.addEventListener('mouseleave',end); window.addEventListener('resize',applySize);
+    })();
+
+    // Edge reveal
+    const EDGE=14; container.addEventListener('mousemove',e=>{ const {offsetX,offsetY}=e; const w=container.clientWidth,h=container.clientHeight; const near=offsetX<EDGE||offsetY<EDGE||(w-offsetX)<EDGE||(h-offsetY)<EDGE; container.classList.toggle('edge-reveal',near); }); container.addEventListener('mouseleave',()=>container.classList.remove('edge-reveal'));
 
     // Initialize the ISL viewer in the avatar display
     createImmediateAvatar();
@@ -1239,20 +1218,34 @@ function createImmediateAvatar() {
     if (avatarDisplay) {
         avatarDisplay.innerHTML = '';
         
-        islViewer.createViewer().then(() => {
+    islViewer.createViewer({ suppressHeader: true }).then(() => {
             // Move the ISL viewer container into the avatar display
             const islContainer = document.getElementById('isl-viewer-container');
             if (islContainer) {
                 islContainer.style.position = 'relative';
                 islContainer.style.width = '100%';
                 islContainer.style.height = '100%';
-                // Hide inner header so only one close button remains
-                const innerHeader = islContainer.querySelector('#isl-viewer-header');
-                if (innerHeader) innerHeader.style.display = 'none';
+        islContainer.style.background = 'transparent';
+        const innerHeader = islContainer.querySelector('#isl-viewer-header');
+        if (innerHeader) { try { innerHeader.remove(); } catch(_) { innerHeader.style.display='none'; } }
                 // Rebind inner close (if shown) to unified cleanup
                 const innerClose = islContainer.querySelector('#isl-viewer-close');
                 if (innerClose) innerClose.onclick = () => closeSignifyUI();
                 avatarDisplay.appendChild(islContainer);
+                // Adjust camera framing to crop below knees for mini window
+                try {
+                    if (islViewer && islViewer.camera) {
+                        islViewer.camera.position.y = 1.25; // raise viewpoint
+                        islViewer.controls.target.y = 1.25; // focus mid torso
+                    }
+                } catch(_) {}
+                // Initial size fit to container
+                try {
+                    const w = avatarDisplay.clientWidth;
+                    const h = avatarDisplay.clientHeight;
+                    islViewer.renderer.setSize(w,h);
+                    islViewer.camera.aspect = w/h; islViewer.camera.updateProjectionMatrix();
+                } catch(_){}
                 islViewer.showViewer();
             }
         });
@@ -1310,10 +1303,33 @@ function initYouTubeIntegration() {
     
     if (isYouTubePage) {
         console.log('YouTube page detected, initializing Signify integration');
+        loadAutoStartSetting();
         
         // Wait for YouTube player to load
         setTimeout(() => {
             createSignifyButton();
+            if (autoStartEnabled) {
+                // Attach auto-start hook to video play
+                const startIfReady = () => {
+                    if (translationActive) return; // already active
+                    const video = document.querySelector('video');
+                    if (!video) return;
+                    // When user plays video, automatically start translation
+                    video.addEventListener('play', autoStartPlayListener, { once: true });
+                    // If video already playing (autoplay / resumed)
+                    if (!video.paused && !video.ended) {
+                        autoStartPlayListener();
+                    }
+                };
+                startIfReady();
+                // In case video element replaced dynamically
+                const mo = new MutationObserver(() => {
+                    if (!translationActive) startIfReady();
+                });
+                mo.observe(document.body, { childList:true, subtree:true });
+                // Stop observing once active
+                const stopObs = setInterval(()=>{ if (translationActive) { try { mo.disconnect(); } catch(_){} clearInterval(stopObs);} }, 2000);
+            }
         }, 2000);
         
         // Handle navigation within YouTube (SPA routing)
@@ -1362,6 +1378,23 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     closeSignifyUI();
         sendResponse({success: true});
     }
+    else if (request.action === 'updateAutoStart') {
+        autoStartEnabled = !!request.autoStart;
+        if (!autoStartEnabled && translationActive) {
+            // User turned off while active; keep current session but don't auto-trigger new ones
+            // Optionally could close: uncomment next line to auto-close
+            // closeSignifyUI();
+        } else if (autoStartEnabled && isYouTubePage && !translationActive) {
+            // Immediately hook into current video if present
+            const video = document.querySelector('video');
+            if (video) {
+                video.addEventListener('play', autoStartPlayListener, { once: true });
+                if (!video.paused && !video.ended) autoStartPlayListener();
+            }
+        }
+        sendResponse && sendResponse({success:true});
+        return true;
+    }
     else if (request.action === 'toggleYouTubeTranslation') {
         if (isYouTubePage) {
             if (translationActive) {
@@ -1378,7 +1411,35 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         }
         return true;
     }
+    else if (request.action === 'updateTransparency') {
+        // Ensure UI exists before applying changes
+        const avatarDisplay = document.getElementById('avatarDisplay');
+        if (!avatarDisplay) {
+            // Optionally ignore if not visible yet
+            sendResponse && sendResponse({ success: false, error: 'avatar not present' });
+            return true;
+        }
+        if (typeof request.visible === 'boolean') {
+            avatarDisplay.classList.toggle('panel', request.visible);
+            chrome.storage?.local?.set({ signifyPanelVisible: request.visible });
+        }
+        if (typeof request.alpha === 'number') {
+            const clamped = Math.min(1, Math.max(0, request.alpha));
+            avatarDisplay.style.setProperty('--panel-alpha', clamped);
+            avatarDisplay.dataset.alpha = clamped;
+            chrome.storage?.local?.set({ signifyPanelAlpha: clamped });
+        }
+        sendResponse && sendResponse({ success: true });
+        return true;
+    }
 });
+
+// Auto-start handler separated so it can be reused
+function autoStartPlayListener() {
+    if (translationActive) return;
+    showAvatarInterface();
+    extractTranscriptAndStart();
+}
 
 // Clean up on page unload
 window.addEventListener('beforeunload', function() {
