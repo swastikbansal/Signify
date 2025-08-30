@@ -29,6 +29,8 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
   late Animation<double> _movingLineAnimation;
   bool isGlowActive = false;
   bool isSpeakerOn = false; // Add speaker toggle state
+  // UI-only secondary dropdown (Default/Custom)
+  String _modeDropdownValue = 'Default';
 
   // ScrollController for auto-scroll functionality
   late ScrollController _textFieldScrollController;
@@ -461,6 +463,51 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                               ),
                               child: Row(
                                 children: [
+                                  // New UI-only dropdown (Default/Custom)
+                                  Container(
+                                    margin: const EdgeInsets.only(right: 12.0),
+                                    child: Tooltip(
+                                      message: 'Select model for sign detection',
+                                      decoration: BoxDecoration(
+                                        color: FlutterFlowTheme.of(
+                                          context,
+                                        ).alternate,
+                                        borderRadius: BorderRadius.circular(
+                                          8.0,
+                                        ),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withOpacity(
+                                              0.1,
+                                            ),
+                                            blurRadius: 4.0,
+                                            offset: const Offset(0, 2),
+                                          ),
+                                        ],
+                                      ),
+                                      textStyle: TextStyle(
+                                        color: FlutterFlowTheme.of(
+                                          context,
+                                        ).primaryText,
+                                        fontSize: 12.0,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                      preferBelow: false,
+                                      showDuration: const Duration(seconds: 2),
+                                      child: ModernDropDown(
+                                        value: _modeDropdownValue,
+                                        options: const ['Default', 'Custom'],
+                                        onChanged: (val) {
+                                          if (val == null) return;
+                                          setState(() {
+                                            _modeDropdownValue = val;
+                                          });
+                                        },
+                                        width: 100.0,
+                                        height: 40.0,
+                                      ),
+                                    ),
+                                  ),
                                   // Modern Android-style scrollable language dropdown
                                   Container(
                                     margin: const EdgeInsets.only(right: 12.0),
@@ -530,9 +577,11 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                                     ),
                                   ),
 
-                                  // Speaker toggle button with TTS state
+                                  const Spacer(),
+
+                                  // Camera toggle button
                                   Container(
-                                    margin: const EdgeInsets.only(right: 8.0),
+                                    margin: const EdgeInsets.only(right: 12.0), //TODO
                                     child: Tooltip(
                                       message: _model.ttsToggleState
                                           ? 'Turn off text-to-speech'
@@ -671,10 +720,7 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                                       ),
                                     ),
                                   ),
-
-                                  const Spacer(),
-
-                                  // Camera toggle button
+                                  // Speaker toggle button moved next to camera button
                                   Container(
                                     // margin: const EdgeInsets.only(right: 4.0),
                                     child: Tooltip(

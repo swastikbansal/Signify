@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/services/supabase_storage_service.dart';
+import '/services/uploaded_files_service.dart';
 import 'custom_signs_widget.dart' show CustomSignsPage;
 
 class CustomSignsModel extends FlutterFlowModel<CustomSignsPage> {
@@ -21,7 +22,7 @@ class CustomSignsModel extends FlutterFlowModel<CustomSignsPage> {
   final Map<String, DebugDataField> debugGeneratorVariables = {};
   final Map<String, DebugDataField> debugBackendQueries = {};
   final Map<String, FlutterFlowModel> widgetBuilderComponents = {};
-  final String _apiUrl = 'http://10.90.1.82:5000';
+  final String _apiUrl = 'http://10.29.46.248:5000';
   // String _apiUrl = 'https://philosia-codecult-signify.hf.space/process_frame';
 
   String get _customSignsEndpoint => '$_apiUrl/customTrain';
@@ -30,6 +31,25 @@ class CustomSignsModel extends FlutterFlowModel<CustomSignsPage> {
   @override
   void initState(BuildContext context) {
     debugLogWidgetClass(this);
+    _loadUploadedFiles();
+  }
+
+  /// Load uploaded files from persistent storage for the current user
+  Future<void> _loadUploadedFiles() async {
+    try {
+      uploadedFiles = await UploadedFilesService.instance.getUploadedFiles();
+      debugPrint(
+        'Loaded ${uploadedFiles.length} uploaded files from storage for current user',
+      );
+    } catch (e) {
+      debugPrint('Error loading uploaded files: $e');
+      uploadedFiles = [];
+    }
+  }
+
+  /// Public method to refresh uploaded files data (useful for manual refresh)
+  Future<void> refreshUploadedFiles() async {
+    await _loadUploadedFiles();
   }
 
   @override
@@ -176,10 +196,13 @@ class CustomSignsModel extends FlutterFlowModel<CustomSignsPage> {
     List<String> filePaths,
     List<String> labels,
   ) async {
+    bool trainingSuccess = false;
+
     try {
       isTraining = true;
       trainingError = null;
 
+      debugPrint("Calling custom training API");
       debugPrint("Calling $_customSignsEndpoint");
       final response = await http.post(
         Uri.parse(_customSignsEndpoint),
@@ -188,30 +211,30 @@ class CustomSignsModel extends FlutterFlowModel<CustomSignsPage> {
       );
 
       if (response.statusCode == 200) {
-        final responseData = jsonDecode(response.body);
-        debugPrint('Training response: $responseData');
+        trainingSuccess = true;
+        debugPrint('Training completed successfully - HTTP 200');
 
-        // Check if training was successful
-        if (responseData['status'] == 'success' ||
-            responseData['success'] == true) {
-          // return await switchToCustomModel();
-        } else {
-          trainingError = responseData['message'] ?? 'Training failed';
-          return false;
+        // Log response for debugging purposes
+        try {
+          final responseData = jsonDecode(response.body);
+          debugPrint('Training response: $responseData');
+        } catch (e) {
+          debugPrint(
+            'Could not parse response body, but training successful based on HTTP 200',
+          );
         }
       } else {
         trainingError = 'Server error: ${response.statusCode}';
         debugPrint('Training failed with status: ${response.statusCode}');
-        return false;
       }
     } catch (e) {
       trainingError = 'Network error: $e';
       debugPrint('Error during training: $e');
-      return false;
     } finally {
       isTraining = false;
-      return false;
     }
+
+    return trainingSuccess;
   }
 
   /// Switch to the newly trained custom model
@@ -259,7 +282,7 @@ class CustomSignsModel extends FlutterFlowModel<CustomSignsPage> {
       // Calculate total size of successful uploads
       double totalSize = successes.fold(
         0.0,
-        (sum, r) => sum + (r.sizeBytes ?? 0) / (1024 * 1024),
+        (sum, r) => sum + r.sizeBytes / (1024 * 1024),
       );
 
       // Batch label shown in UI
@@ -290,7 +313,7 @@ class CustomSignsModel extends FlutterFlowModel<CustomSignsPage> {
         }
       }).toList();
 
-      uploadedFiles.insert(0, {
+      final newFileEntry = {
         'fileName': batchLabel,
         'uploadDate': dateTimeFormat("MMM d, y", getCurrentTimestamp),
         'fileSize': '${totalSize.toStringAsFixed(1)} MB',
@@ -308,7 +331,11 @@ class CustomSignsModel extends FlutterFlowModel<CustomSignsPage> {
             .map((r) => _safeString(r.path))
             .where((s) => s.isNotEmpty)
             .toList(),
-      });
+      };
+
+      // Add to local list and persist to storage
+      uploadedFiles.insert(0, newFileEntry);
+      await UploadedFilesService.instance.addUploadedFile(newFileEntry);
 
       isUploading = false;
 
@@ -323,14 +350,20 @@ class CustomSignsModel extends FlutterFlowModel<CustomSignsPage> {
             .where((s) => s.isNotEmpty)
             .toList();
 
-        debugPrint("Calling custom training API");  
+        debugPrint("Calling custom training API");
         final trainingSuccess = await trainCustomModel(filePaths, labels);
 
         // Update the status based on training result
-        uploadedFiles[0]['status'] = trainingSuccess ? 'processed' : 'failed';
+        uploadedFiles[0]['status'] = trainingSuccess ? 'trained' : 'failed';
         if (!trainingSuccess && trainingError != null) {
           uploadedFiles[0]['error'] = trainingError;
         }
+
+        // Persist the status update
+        await UploadedFilesService.instance.updateUploadedFile(
+          0,
+          uploadedFiles[0],
+        );
       }
 
       selectedFiles = null;
@@ -349,6 +382,7 @@ class CustomSignsModel extends FlutterFlowModel<CustomSignsPage> {
   Future<void> deleteFile(int index) async {
     if (index >= 0 && index < uploadedFiles.length) {
       uploadedFiles.removeAt(index);
+      await UploadedFilesService.instance.removeUploadedFile(index);
       // Note: UI state updates will be handled in the widget using safeSetState()
     }
   }
@@ -356,6 +390,8 @@ class CustomSignsModel extends FlutterFlowModel<CustomSignsPage> {
   /// Method to get file status color
   Color getStatusColor(String status, BuildContext context) {
     switch (status.toLowerCase()) {
+      case 'trained':
+        return Colors.green;
       case 'processed':
         return Colors.green;
       case 'processing':

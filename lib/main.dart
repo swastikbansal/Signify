@@ -19,6 +19,7 @@ import 'flutter_flow/flutter_flow_util.dart';
 import 'flutter_flow/internationalization.dart';
 import 'index.dart';
 import 'services/error_service.dart';
+import 'services/uploaded_files_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,6 +34,9 @@ void main() async {
 
   await FlutterFlowTheme.initialize();
   await FFLocalizations.initialize();
+
+  // Initialize uploaded files service
+  await UploadedFilesService.initialize();
 
   // Industry-standard error handling
   ErrorWidget.builder = (FlutterErrorDetails details) {
