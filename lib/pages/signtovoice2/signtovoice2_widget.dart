@@ -467,7 +467,8 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                                   Container(
                                     margin: const EdgeInsets.only(right: 12.0),
                                     child: Tooltip(
-                                      message: 'Select model for sign detection',
+                                      message:
+                                          'Select model for sign detection',
                                       decoration: BoxDecoration(
                                         color: FlutterFlowTheme.of(
                                           context,
@@ -581,7 +582,7 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
 
                                   // Camera toggle button
                                   Container(
-                                    margin: const EdgeInsets.only(right: 12.0), //TODO
+                                    margin: const EdgeInsets.only(right: 12.0),
                                     child: Tooltip(
                                       message: _model.ttsToggleState
                                           ? 'Turn off text-to-speech'
