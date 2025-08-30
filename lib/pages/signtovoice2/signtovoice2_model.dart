@@ -1,17 +1,16 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'package:image/image.dart' as img;
 import 'package:translator/translator.dart';
 
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/form_field_controller.dart';
-import '/services/api_service.dart';
-import '/services/api_config.dart';
-import '/services/api_models.dart';
 import 'signtovoice2_widget.dart' show Signtovoice2Widget;
 
 class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
@@ -40,7 +39,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
       try {
         _stateChangeCallback!();
       } catch (e) {
-        debugPrint('Error in state change callback: $e');
+        print('Error in state change callback: $e');
       }
     }
   }
@@ -85,14 +84,14 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   List<String> get sentenceWords => List.from(_currentSentence);
 
   // API related state
-  // Use the unified API service instead of direct HTTP calls
-  final ApiService _apiService = ApiService();
+  String _apiUrl = 'http://10.90.1.82:5000/processFrame';
+  // String _apiUrl = 'https://philosia-codecult-signify.hf.space/processFrame';
 
   bool _isApiEnabled = true;
   int _lastApiCallTime = 0;
-  static const int _apiCallInterval = 200; // API call interval in milliseconds
+  static const int _apiCallInterval = 50; // API call interval in milliseconds
 
-  static const int _jpegQuality = 70; // Quality for JPEG encoding
+  static const int _jpegQuality = 10; // Quality for JPEG encoding
 
   bool _apiInFlight = false;
 
@@ -199,14 +198,14 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
       _flutterTts!.setStartHandler(() {
         _isSpeaking = true;
         _notifyStateChange();
-        debugPrint("TTS: Speech started");
+        print("TTS: Speech started");
       });
 
       _flutterTts!.setCompletionHandler(() {
         _isSpeaking = false;
         // Don't change the toggle state - keep TTS enabled if it was enabled
         _notifyStateChange();
-        debugPrint(
+        print(
           "TTS: Speech completed - TTS remains ${_ttsToggleState ? 'ON' : 'OFF'}",
         );
       });
@@ -214,13 +213,13 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
       _flutterTts!.setErrorHandler((msg) {
         _isSpeaking = false;
         _notifyStateChange();
-        debugPrint("TTS Error: $msg");
+        print("TTS Error: $msg");
       });
 
       _flutterTts!.setCancelHandler(() {
         _isSpeaking = false;
         _notifyStateChange();
-        debugPrint("TTS: Speech cancelled");
+        print("TTS: Speech cancelled");
       });
 
       // Set default TTS settings
@@ -230,11 +229,9 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
       await _flutterTts!.setLanguage(_selectedLanguage);
 
       _isTtsInitialized = true;
-      debugPrint(
-        "TTS initialized successfully with language: $_selectedLanguage",
-      );
+      print("TTS initialized successfully with language: $_selectedLanguage");
     } catch (e) {
-      debugPrint("Error initializing TTS: $e");
+      print("Error initializing TTS: $e");
       _isTtsInitialized = false;
     }
   }
@@ -245,7 +242,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
     }
 
     if (text.trim().isEmpty) {
-      debugPrint("No text to speak");
+      print("No text to speak");
       return;
     }
 
@@ -256,10 +253,10 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
       // Set the language before speaking
       await _flutterTts!.setLanguage(_selectedLanguage);
 
-      debugPrint("Speaking text: '$text' in language: $_selectedLanguage");
+      print("Speaking text: '$text' in language: $_selectedLanguage");
       await _flutterTts!.speak(text);
     } catch (e) {
-      debugPrint("Error speaking text: $e");
+      print("Error speaking text: $e");
       _isSpeaking = false;
       _notifyStateChange();
     }
@@ -271,9 +268,9 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
         await _flutterTts!.stop();
         _isSpeaking = false;
         _notifyStateChange();
-        debugPrint("TTS: Speech stopped");
+        print("TTS: Speech stopped");
       } catch (e) {
-        debugPrint("Error stopping TTS: $e");
+        print("Error stopping TTS: $e");
       }
     }
   }
@@ -284,7 +281,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
     if (_flutterTts != null) {
       try {
         await _flutterTts!.setLanguage(_selectedLanguage);
-        debugPrint("TTS language changed to: $_selectedLanguage");
+        print("TTS language changed to: $_selectedLanguage");
         _notifyStateChange();
 
         // Retranslate current sentence when language changes
@@ -292,7 +289,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
           await translateCurrentSentence();
         }
       } catch (e) {
-        debugPrint("Error setting TTS language: $e");
+        print("Error setting TTS language: $e");
       }
     }
   }
@@ -303,9 +300,9 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
     if (_flutterTts != null) {
       try {
         await _flutterTts!.setSpeechRate(_speechRate);
-        debugPrint("TTS speech rate changed to: $_speechRate");
+        print("TTS speech rate changed to: $_speechRate");
       } catch (e) {
-        debugPrint("Error setting speech rate: $e");
+        print("Error setting speech rate: $e");
       }
     }
   }
@@ -316,9 +313,9 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
     if (_flutterTts != null) {
       try {
         await _flutterTts!.setVolume(_speechVolume);
-        debugPrint("TTS volume changed to: $_speechVolume");
+        print("TTS volume changed to: $_speechVolume");
       } catch (e) {
-        debugPrint("Error setting speech volume: $e");
+        print("Error setting speech volume: $e");
       }
     }
   }
@@ -329,9 +326,9 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
     if (_flutterTts != null) {
       try {
         await _flutterTts!.setPitch(_speechPitch);
-        debugPrint("TTS pitch changed to: $_speechPitch");
+        print("TTS pitch changed to: $_speechPitch");
       } catch (e) {
-        debugPrint("Error setting speech pitch: $e");
+        print("Error setting speech pitch: $e");
       }
     }
   }
@@ -342,7 +339,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
     if (text.isNotEmpty) {
       await speakText(text);
     } else {
-      debugPrint("No text in the text field to speak");
+      print("No text in the text field to speak");
     }
   }
 
@@ -352,12 +349,12 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
       // Currently ON - turn OFF
       _ttsToggleState = false;
       await stopSpeaking();
-      debugPrint("TTS toggled OFF");
+      print("TTS toggled OFF");
     } else {
       // Currently OFF - turn ON and speak entire sentence
       _ttsToggleState = true;
       await speakCurrentSentence();
-      debugPrint("TTS toggled ON - speaking entire sentence");
+      print("TTS toggled ON - speaking entire sentence");
     }
     _notifyStateChange();
   }
@@ -365,14 +362,14 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   // Toggle auto-speak mode
   void toggleAutoSpeak() {
     _autoSpeakEnabled = !_autoSpeakEnabled;
-    debugPrint("Auto-speak ${_autoSpeakEnabled ? 'enabled' : 'disabled'}");
+    print("Auto-speak ${_autoSpeakEnabled ? 'enabled' : 'disabled'}");
     _notifyStateChange();
   }
 
   // Set auto-speak mode
   void setAutoSpeak(bool enabled) {
     _autoSpeakEnabled = enabled;
-    debugPrint("Auto-speak ${_autoSpeakEnabled ? 'enabled' : 'disabled'}");
+    print("Auto-speak ${_autoSpeakEnabled ? 'enabled' : 'disabled'}");
     _notifyStateChange();
   }
 
@@ -382,7 +379,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
     if (!enabled) {
       stopSpeaking(); // Stop any ongoing speech when turning off
     }
-    debugPrint("TTS toggle set to: ${_ttsToggleState ? 'ON' : 'OFF'}");
+    print("TTS toggle set to: ${_ttsToggleState ? 'ON' : 'OFF'}");
     _notifyStateChange();
   }
 
@@ -410,7 +407,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
         )[0]; // Extract base language code
       }
 
-      debugPrint("Translating '$text' to language: $translateLangCode");
+      print("Translating '$text' to language: $translateLangCode");
 
       var translation = await _translator.translate(
         text,
@@ -419,14 +416,14 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
       );
 
       String translatedText = translation.text;
-      debugPrint("Translation result: '$translatedText'");
+      print("Translation result: '$translatedText'");
 
       _isTranslating = false;
       _notifyStateChange();
 
       return translatedText;
     } catch (e) {
-      debugPrint("Translation error: $e");
+      print("Translation error: $e");
       _isTranslating = false;
       _notifyStateChange();
       return text; // Return original text on error
@@ -436,7 +433,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   // Method to enable/disable translation
   void setTranslationEnabled(bool enabled) {
     _translationEnabled = enabled;
-    debugPrint("Translation ${_translationEnabled ? 'enabled' : 'disabled'}");
+    print("Translation ${_translationEnabled ? 'enabled' : 'disabled'}");
     _notifyStateChange();
   }
 
@@ -455,23 +452,20 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
 
       if (translatedText != currentText && textController != null) {
         textController!.text = translatedText;
-        debugPrint(
-          "Updated text field with translated text: '$translatedText'",
-        );
+        print("Updated text field with translated text: '$translatedText'");
       }
     } catch (e) {
-      debugPrint("Error translating current sentence: $e");
+      print("Error translating current sentence: $e");
     }
   }
 
   // Sentence management methods
   void _addWordToSentence(String word) async {
     if (word.trim().isEmpty) return;
+    // Always append word (duplicate suppression removed for simplicity)
     _currentSentence.add(word.trim());
 
-    debugPrint(
-      'Added word to sentence: "$word" -> "${_currentSentence.join(' ')}"',
-    );
+    print('Added word to sentence: "$word" -> "${_currentSentence.join(' ')}"');
 
     // Translate the complete sentence to the selected language
     String currentSentenceText = _currentSentence.join(' ');
@@ -486,8 +480,8 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
           _selectedLanguage,
         );
       } catch (e) {
-        debugPrint('Translation error: $e');
-        translatedText = currentSentenceText;
+        print('Translation error: $e');
+        translatedText = currentSentenceText; // Fall back to original text
       }
     }
 
@@ -506,14 +500,14 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
         try {
           wordToSpeak = await translateText(word.trim(), _selectedLanguage);
         } catch (e) {
-          debugPrint('Translation error for new word: $e');
+          print('Translation error for new word: $e');
           wordToSpeak = word.trim(); // Fall back to original word
         }
       }
 
       // Speak only the new word
       await speakText(wordToSpeak);
-      debugPrint("Speaking new word: '$wordToSpeak' (TTS is ON)");
+      print("Speaking new word: '$wordToSpeak' (TTS is ON)");
     }
   }
 
@@ -524,7 +518,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
     }
     // Reset TTS toggle state when sentence is cleared
     _ttsToggleState = false;
-    debugPrint('Sentence cleared - TTS toggle reset to OFF');
+    print('Sentence cleared - TTS toggle reset to OFF');
     _notifyStateChange();
   }
 
@@ -546,7 +540,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
             _selectedLanguage,
           );
         } catch (e) {
-          debugPrint('Translation error: $e');
+          print('Translation error: $e');
           translatedText = currentSentenceText; // Fall back to original text
         }
       }
@@ -554,9 +548,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
       if (textController != null) {
         textController!.text = translatedText;
       }
-      debugPrint(
-        'Removed word: "$removedWord" -> "${_currentSentence.join(' ')}"',
-      );
+      print('Removed word: "$removedWord" -> "${_currentSentence.join(' ')}"');
       _notifyStateChange();
     }
   }
@@ -586,40 +578,45 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   void initState(BuildContext context) {
     debugLogWidgetClass(this);
 
+    // Initialize HTTP client with connection pooling
     _initializeHttpClient();
 
+    // Initialize TTS
     initializeTts();
   }
 
+  // Convert CameraImage to JPEG bytes for API transmission
   Future<Uint8List?> _convertCameraImageToJpeg(CameraImage image) async {
     try {
       late img.Image convertedImage;
 
-      //Switching encoding on the bases of phone
       if (image.format.group == ImageFormatGroup.yuv420) {
+        // Handle YUV420 format (most common on Android)
         convertedImage = _convertYUV420toImage(image);
       } else if (image.format.group == ImageFormatGroup.bgra8888) {
+        // Handle BGRA8888 format (common on iOS and our preferred format)
         convertedImage = img.Image.fromBytes(
           width: image.width,
           height: image.height,
           bytes: image.planes[0].bytes.buffer,
         );
       } else if (image.format.group == ImageFormatGroup.jpeg) {
-        debugPrint('Using native JPEG: ${image.planes[0].bytes.length} bytes');
+        // Handle native JPEG - use directly but with quality control
+        print('Using native JPEG: ${image.planes[0].bytes.length} bytes');
         return image.planes[0].bytes;
       } else {
-        debugPrint('Unsupported image format: ${image.format.group}');
+        print('Unsupported image format: ${image.format.group}');
         return null;
       }
 
       // Encode to JPEG with consistent quality
       final jpegBytes = img.encodeJpg(convertedImage, quality: _jpegQuality);
-      debugPrint(
+      print(
         'JPEG encoded: ${jpegBytes.length} bytes (${convertedImage.width}x${convertedImage.height}) q=$_jpegQuality',
       );
       return Uint8List.fromList(jpegBytes);
     } catch (e) {
-      debugPrint('Error converting camera image to JPEG: $e');
+      print('Error converting camera image to JPEG: $e');
       return null;
     }
   }
@@ -663,6 +660,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   }
 
   // Send camera frame to API for prediction
+  // Add connection pooling and retry logic
   Future<void> _sendFrameToApi(CameraImage image) async {
     try {
       if (_apiInFlight) {
@@ -680,106 +678,136 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
       // Convert camera image to JPEG
       final jpegBytes = await _convertCameraImageToJpeg(image);
       if (jpegBytes == null) {
-        debugPrint('Failed to convert camera image to JPEG');
+        print('Failed to convert camera image to JPEG');
         _apiInFlight = false;
         return;
       }
 
-      // Use the unified API service for frame processing
-      try {
-        final response = await _apiService.processFrame(
-          frameBytes: jpegBytes,
-          timestamp: currentTime.toString(),
-          cameraType: isFrontCamera ? 'front' : 'back',
-          width: image.width,
-          height: image.height,
+      // Create multipart request with enhanced connection pooling
+      var request = http.MultipartRequest('POST', Uri.parse(_apiUrl));
+      request.headers['Connection'] = 'keep-alive';
+      request.headers['Keep-Alive'] = 'timeout=30, max=100';
+
+      // Add the image file
+      request.files.add(
+        http.MultipartFile.fromBytes(
+          'frame',
+          jpegBytes,
           filename: 'frame_$currentTime.jpg',
-        );
+          contentType: MediaType('image', 'jpeg'),
+        ),
+      );
 
-        final elapsed = DateTime.now()
-            .difference(DateTime.fromMillisecondsSinceEpoch(currentTime))
-            .inMilliseconds;
-        debugPrint(
-          'API responded in ${elapsed}ms status=${response.isSuccess}',
-        );
+      // Add additional metadata (wall clock + monotonic frame index)
+      request.fields['timestamp'] = currentTime.toString();
+      request.fields['camera_type'] = isFrontCamera ? 'front' : 'back';
+      request.fields['width'] = image.width.toString();
+      request.fields['height'] = image.height.toString();
 
-        if (response.isSuccess && response.data != null) {
-          final frameData = response.data!;
-          debugPrint('Frame API call successful: ${frameData.status}');
+      print('Sending frame to API: ${jpegBytes.length} bytes');
 
-          if (frameData.isSuccess) {
-            // Extract prediction from successful response
-            if (frameData.hasPrediction) {
-              debugPrint(
-                'Received prediction from frame API: ${frameData.prediction}',
-              );
+      // Send the request with timeout using persistent client
+      http.StreamedResponse response;
+      final sendStart = DateTime.now();
+      try {
+        response = await _httpClient
+            .send(request)
+            .timeout(const Duration(seconds: 2));
+      } on TimeoutException catch (_) {
+        print('Frame API call timed out after 2s');
+        _errorMessage = 'API timeout';
+        _notifyStateChange();
+        return;
+      }
 
-              _predictionHistory.add(frameData.prediction!);
+      final elapsed = DateTime.now().difference(sendStart).inMilliseconds;
+      final responseString = await response.stream.bytesToString();
+      print(
+        'API responded in ${elapsed}ms status=${response.statusCode} len=${responseString.length}',
+      );
 
-              _addWordToSentence(frameData.prediction!);
+      if (response.statusCode == 200) {
+        print('Frame API call successful: $responseString');
+        // (Adaptive encoding removed – fixed size/quality used)
 
-              _notifyStateChange();
+        // Parse the JSON response (handle both Map and List forms)
+        try {
+          final dynamic decoded = json.decode(responseString);
+
+          Map<String, dynamic>? responseData;
+
+          if (decoded is Map<String, dynamic>) {
+            responseData = decoded;
+          } else if (decoded is List) {
+            // Find the first map element in the list
+            for (final item in decoded) {
+              if (item is Map<String, dynamic>) {
+                responseData = item;
+                break;
+              }
             }
-          } else if (frameData.isCollecting) {
-            // Still collecting frames, log progress
-            debugPrint(
-              'API collecting frames: ${frameData.message} (frames: ${frameData.frameCount})',
-            );
           }
-        } else {
-          debugPrint('Frame API call failed: ${response.getErrorMessage()}');
 
-          // Set error message to trigger red glow
-          _errorMessage = 'API Error: ${response.statusCode}';
-          _notifyStateChange();
+          if (responseData == null) {
+            throw FormatException('Unexpected API response shape');
+          }
 
-          // Clear error after 3 seconds
-          Future.delayed(const Duration(seconds: 3), () {
-            if (_errorMessage.startsWith('API Error:')) {
-              _errorMessage = '';
+          final status = responseData['status'] as String?;
+
+          if (status == 'success') {
+            // Extract prediction from successful response
+            final prediction = responseData['prediction'] as String?;
+            if (prediction != null &&
+                prediction.isNotEmpty &&
+                prediction != 'rest') {
+              print('Received prediction from frame API: $prediction');
+
+              // Update prediction history
+              _predictionHistory.add(prediction);
+
+              // Add word to sentence (updates text field and TTS accordingly)
+              _addWordToSentence(prediction);
+
+              // Notify UI to update
               _notifyStateChange();
             }
-          });
-        }
-      } catch (parseError) {
-        // Handle JSON parsing errors specifically
-        debugPrint('JSON parsing error in API response: $parseError');
+          } else if (status == 'collecting') {
+            // Still collecting frames, log progress and surface message
+            final message = responseData['message'] as String?;
+            final frameCount = responseData['frame_count'];
+            print('API collecting frames: $message (frames: $frameCount)');
 
-        // Set a more specific error message for JSON issues
-        _errorMessage = 'API Response Format Error';
+            // Optionally reflect collecting state in the text field so users see activity
+            if (textController != null && (textController!.text.isEmpty)) {
+              final collectingMsg = message ?? 'Collecting frames...';
+              textController!.text = collectingMsg;
+              _notifyStateChange();
+            }
+          } else {
+            print('API returned unknown status: $status');
+          }
+        } catch (parseError) {
+          print('Error parsing frame API response: $parseError');
+          print('Raw response: $responseString');
+        }
+      } else {
+        print('Frame API call failed with status: ${response.statusCode}');
+        print('Response: $responseString');
+
+        // Set error message to trigger red glow
+        _errorMessage = 'API Error: ${response.statusCode}';
         _notifyStateChange();
 
         // Clear error after 3 seconds
         Future.delayed(const Duration(seconds: 3), () {
-          if (_errorMessage == 'API Response Format Error') {
+          if (_errorMessage.startsWith('API Error:')) {
             _errorMessage = '';
             _notifyStateChange();
           }
         });
       }
-    } on ApiException catch (e) {
-      debugPrint('API exception sending frame: $e');
-
-      // Set error message based on exception type
-      if (e is TimeoutException) {
-        _errorMessage = 'API timeout';
-      } else if (e is NetworkException) {
-        _errorMessage = 'Network Error: ${e.message.substring(0, 30)}...';
-      } else {
-        _errorMessage = 'API Error: ${e.message.substring(0, 30)}...';
-      }
-      _notifyStateChange();
-
-      // Clear error after 3 seconds
-      Future.delayed(const Duration(seconds: 3), () {
-        if (_errorMessage.startsWith('API') ||
-            _errorMessage.startsWith('Network')) {
-          _errorMessage = '';
-          _notifyStateChange();
-        }
-      });
     } catch (e) {
-      debugPrint('Error sending frame to API: $e');
+      print('Error sending frame to API: $e');
 
       // Set error message to trigger red glow
       _errorMessage = 'Network Error: ${e.toString().substring(0, 30)}...';
@@ -799,17 +827,15 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
 
   // (Adaptive encoding removed – using fixed parameters)
 
-  // Method to update API URL (now handled by ApiConfig)
+  // Method to update API URL
   void setApiUrl(String url) {
-    // Use the unified API configuration
-    ApiConfig.setCustomBaseUrl(url);
-    debugPrint('API URL updated via ApiConfig: $url');
+    _apiUrl = url;
   }
 
   // Method to toggle API calls
   void setApiEnabled(bool enabled) {
     _isApiEnabled = enabled;
-    debugPrint(
+    print(
       'API prediction ${enabled ? 'enabled' : 'disabled'} - using ${enabled ? 'remote' : 'local'} prediction',
     );
   }
@@ -817,7 +843,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   // Method to toggle between API-based and local prediction
   void togglePredictionMode() {
     _isApiEnabled = !_isApiEnabled;
-    debugPrint(
+    print(
       'Switched to ${_isApiEnabled ? 'API-based' : 'local'} prediction mode',
     );
     _notifyStateChange();
@@ -829,8 +855,8 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   // Method to get API status
   bool get isApiEnabled => _isApiEnabled;
 
-  // Method to get current API URL (now from ApiConfig)
-  String get apiUrl => ApiConfig.baseUrl;
+  // Method to get current API URL
+  String get apiUrl => _apiUrl;
 
   // Method to reset API call timer (useful for immediate API calls)
   void resetApiTimer() {
@@ -891,7 +917,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
           // Set exposure compensation for better lighting (optional)
           // await _cameraController!.setExposureOffset(0.0);
         } catch (e) {
-          debugPrint('Advanced camera settings not available: $e');
+          print('Advanced camera settings not available: $e');
         }
 
         // Start image stream for camera processing
@@ -903,21 +929,19 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
 
         _isCameraInitialized = true;
         _notifyStateChange();
-        debugPrint(
+        print(
           'Medium-quality camera initialized successfully: ${_cameraController!.description.name}',
         );
-        debugPrint('Camera is front: $isFrontCamera');
-        debugPrint(
-          'Camera resolution: ${_cameraController!.value.previewSize}',
-        );
-        debugPrint(
+        print('Camera is front: $isFrontCamera');
+        print('Camera resolution: ${_cameraController!.value.previewSize}');
+        print(
           'Camera aspect ratio: ${cameraAspectRatio?.toStringAsFixed(3) ?? "Unknown"}',
         );
-        debugPrint('Image format: ${ImageFormatGroup.bgra8888}');
-        debugPrint('Resolution preset: Medium');
+        print('Image format: ${ImageFormatGroup.bgra8888}');
+        print('Resolution preset: Medium');
       }
     } catch (e) {
-      debugPrint('Error initializing camera: $e');
+      print('Error initializing camera: $e');
       _errorMessage = 'Camera initialization failed: $e';
       _isCameraInitialized = false;
       _notifyStateChange();
@@ -925,14 +949,15 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   }
 
   // Add frame throttling variables
-  bool _isProcessingFrame = false;
+  // Simplified frame processing: drop frames while API request converting/sending
+  bool _isProcessingFrame = false; // retained for watchdog safety
 
   void _processCameraImage(CameraImage image) {
     if (_isDetecting && _isInitialized && !_isProcessingFrame) {
       try {
         // Only process if no request in flight
-        if (_apiInFlight) return;
-        _isProcessingFrame = true;
+        if (_apiInFlight) return; // Drop frame silently
+        _isProcessingFrame = true; // Mark for watchdog
         Timer(const Duration(seconds: 5), () {
           if (_isProcessingFrame) {
             _isProcessingFrame = false;
@@ -942,7 +967,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
 
         // Debug logging (only occasionally to avoid spam)
         if (DateTime.now().millisecondsSinceEpoch % 1000 < 100) {
-          debugPrint(
+          print(
             'Processing camera image: ${image.width}x${image.height}, format: ${image.format.group.name}, planes: ${image.planes.length}',
           );
         }
@@ -951,19 +976,19 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
         if (_isApiEnabled) {
           _sendFrameToApi(image)
               .timeout(const Duration(seconds: 5))
-              .catchError((e) => debugPrint('Frame send error: $e'))
+              .catchError((e) => print('Frame send error: $e'))
               .whenComplete(() => _isProcessingFrame = false);
         } else {
           _isProcessingFrame = false;
         }
       } catch (e) {
-        debugPrint('Error in image processing: $e');
+        print('Error in image processing: $e');
         _isProcessingFrame = false;
       }
     } else {
       // Debug why processing is not happening
       if (DateTime.now().millisecondsSinceEpoch % 2000 < 100) {
-        debugPrint(
+        print(
           'Not processing image - isDetecting: $_isDetecting, isInitialized: $_isInitialized, isProcessing: $_isProcessingFrame',
         );
       }
@@ -984,9 +1009,9 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
       _isCameraOn = false;
       _isProcessingFrame = false;
       _notifyStateChange();
-      debugPrint('Camera disposed');
+      print('Camera disposed');
     } catch (e) {
-      debugPrint('Error disposing camera: $e');
+      print('Error disposing camera: $e');
     }
   }
 
@@ -1015,8 +1040,8 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
         try {
           _errorMessage = '';
           _isInitialized = true; // Add this line to set initialized to true
-          debugPrint('Detection started - API-based processing');
-          debugPrint(
+          print('Detection started - API-based processing');
+          print(
             'Detection initialized: $_isInitialized, detecting: $_isDetecting',
           );
         } catch (e) {
@@ -1024,12 +1049,12 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
           _isDetecting = false;
           _isInitialized = false; // Add this line
           await _disposeActiveCamera();
-          debugPrint('Error starting detection: $e');
+          print('Error starting detection: $e');
         }
       }
       _notifyStateChange();
     } catch (e) {
-      debugPrint('Error toggling detection: $e');
+      print('Error toggling detection: $e');
       _isDetecting = false;
       _isInitialized = false; // Add this line
       _errorMessage = 'Toggle error: $e';
@@ -1065,9 +1090,9 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
       // Clear state callback to prevent memory leaks
       _stateChangeCallback = null;
 
-      debugPrint('SignToVoice2Model disposed successfully with memory cleanup');
+      print('SignToVoice2Model disposed successfully with memory cleanup');
     } catch (e) {
-      debugPrint('Error during dispose: $e');
+      print('Error during dispose: $e');
     }
   }
 

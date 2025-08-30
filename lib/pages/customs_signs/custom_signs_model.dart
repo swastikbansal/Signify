@@ -1,11 +1,11 @@
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import 'custom_signs_widget.dart' show CustomSignsPage;
-import 'package:flutter/material.dart';
-import 'package:file_picker/file_picker.dart';
 import '/services/supabase_storage_service.dart';
-import '/services/api_service.dart';
-import '/services/api_models.dart';
+import 'custom_signs_widget.dart' show CustomSignsPage;
 
 class CustomSignsModel extends FlutterFlowModel<CustomSignsPage> {
   FilePickerResult? selectedFiles;
@@ -21,9 +21,11 @@ class CustomSignsModel extends FlutterFlowModel<CustomSignsPage> {
   final Map<String, DebugDataField> debugGeneratorVariables = {};
   final Map<String, DebugDataField> debugBackendQueries = {};
   final Map<String, FlutterFlowModel> widgetBuilderComponents = {};
+  final String _apiUrl = 'http://10.90.1.82:5000';
+  // String _apiUrl = 'https://philosia-codecult-signify.hf.space/process_frame';
 
-  // Use the unified API service
-  final ApiService _apiService = ApiService();
+  String get _customSignsEndpoint => '$_apiUrl/customTrain';
+  String get _switchModelEndpoint => '$_apiUrl/switchModel';
 
   @override
   void initState(BuildContext context) {
@@ -178,60 +180,58 @@ class CustomSignsModel extends FlutterFlowModel<CustomSignsPage> {
       isTraining = true;
       trainingError = null;
 
-      debugPrint("Calling custom training API via ApiService");
-
-      // Use the unified API service for training
-      final response = await _apiService.trainCustomModel(
-        filePaths: filePaths,
-        labels: labels,
+      debugPrint("Calling $_customSignsEndpoint");
+      final response = await http.post(
+        Uri.parse(_customSignsEndpoint),
+        headers: {'Content-Type': 'application/json'},
+        // body: jsonEncode({'file_paths': filePaths, 'labels': labels}),
       );
 
-      if (response.isSuccess && response.data != null) {
-        final trainingData = response.data!;
-        debugPrint('Training response: ${trainingData.message}');
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        debugPrint('Training response: $responseData');
 
         // Check if training was successful
-        if (trainingData.isSuccess) {
-          return await switchToCustomModel();
+        if (responseData['status'] == 'success' ||
+            responseData['success'] == true) {
+          // return await switchToCustomModel();
         } else {
-          trainingError = trainingData.message ?? 'Training failed';
+          trainingError = responseData['message'] ?? 'Training failed';
           return false;
         }
       } else {
         trainingError = 'Server error: ${response.statusCode}';
-        debugPrint('Training failed: ${response.getErrorMessage()}');
+        debugPrint('Training failed with status: ${response.statusCode}');
         return false;
       }
-    } on ApiException catch (e) {
-      trainingError = 'API error: ${e.message}';
-      debugPrint('API error during training: $e');
-      return false;
     } catch (e) {
       trainingError = 'Network error: $e';
       debugPrint('Error during training: $e');
       return false;
     } finally {
       isTraining = false;
+      return false;
     }
   }
 
   /// Switch to the newly trained custom model
   Future<bool> switchToCustomModel() async {
     try {
-      // Use the unified API service for model switching
-      final response = await _apiService.switchModel(modelType: 'custom');
+      final response = await http.post(
+        Uri.parse(_switchModelEndpoint),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'modelType': 'custom'}),
+      );
 
-      if (response.isSuccess && response.data != null) {
-        final switchData = response.data!;
-        debugPrint('Model switch response successful: ${switchData.message}');
-        return switchData.isSuccess;
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        debugPrint('Model switch response: $responseData');
+        return responseData['status'] == 'success' ||
+            responseData['success'] == true;
       } else {
-        debugPrint('Model switch failed: ${response.getErrorMessage()}');
+        debugPrint('Model switch failed with status: ${response.statusCode}');
         return false;
       }
-    } on ApiException catch (e) {
-      debugPrint('API error switching model: $e');
-      return false;
     } catch (e) {
       debugPrint('Error switching model: $e');
       return false;
@@ -259,7 +259,7 @@ class CustomSignsModel extends FlutterFlowModel<CustomSignsPage> {
       // Calculate total size of successful uploads
       double totalSize = successes.fold(
         0.0,
-        (sum, r) => sum + (r.sizeBytes / (1024 * 1024)),
+        (sum, r) => sum + (r.sizeBytes ?? 0) / (1024 * 1024),
       );
 
       // Batch label shown in UI
@@ -323,7 +323,7 @@ class CustomSignsModel extends FlutterFlowModel<CustomSignsPage> {
             .where((s) => s.isNotEmpty)
             .toList();
 
-        debugPrint("Calling custom training API");
+        debugPrint("Calling custom training API");  
         final trainingSuccess = await trainCustomModel(filePaths, labels);
 
         // Update the status based on training result

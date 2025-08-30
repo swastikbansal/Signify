@@ -106,7 +106,8 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
   String? _viewerUrlA;
   String? _viewerUrlB;
   bool _useViewerA = true; // which viewer is currently visible
-  final Duration _crossfadeDuration = const Duration(milliseconds: 150);
+  // Remove crossfade: use hard swaps to avoid any fade blending
+  final Duration _crossfadeDuration = const Duration(milliseconds: 20);
 
   // Image handling variables - use paths instead of File objects for safety
   List<String> uploadedImagePaths = [];
@@ -873,8 +874,8 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
                           disableZoom: true,
                           // Increase model-viewer cache and reduce render cost
                           relatedJs:
-                              'try{if(self.ModelViewerElement){self.ModelViewerElement.modelCacheSize=64}}catch(e){};'
-                              'try{document.querySelectorAll("model-viewer").forEach(el=>{if(el.minimumRenderScale!==undefined) el.minimumRenderScale=0.5; if(el.msaa!==undefined) el.msaa=false;});}catch(e){};'
+                              'try{if(self.ModelViewerElement){self.ModelViewerElement.modelCacheSize=64; self.ModelViewerElement.minimumRenderScale=0.20;}}catch(e){};'
+                              'try{document.querySelectorAll("model-viewer").forEach(el=>{el.setAttribute("shadow-intensity","0"); if(el.msaa!==undefined) el.msaa=false;});}catch(e){};'
                               'try{const s=document.createElement("style"); s.textContent="model-viewer::part(progress-bar){display:none !important;} model-viewer::part(ar-button){display:none !important;}"; document.head.appendChild(s);}catch(e){}',
                         ),
                       ),
@@ -902,8 +903,8 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
                           disableTap: true,
                           disableZoom: true,
                           relatedJs:
-                              'try{if(self.ModelViewerElement){self.ModelViewerElement.modelCacheSize=64}}catch(e){};'
-                              'try{document.querySelectorAll("model-viewer").forEach(el=>{if(el.minimumRenderScale!==undefined) el.minimumRenderScale=0.5; if(el.msaa!==undefined) el.msaa=false;});}catch(e){};'
+                              'try{if(self.ModelViewerElement){self.ModelViewerElement.modelCacheSize=64; self.ModelViewerElement.minimumRenderScale=0.20;}}catch(e){};'
+                              'try{document.querySelectorAll("model-viewer").forEach(el=>{el.setAttribute("shadow-intensity","0"); if(el.msaa!==undefined) el.msaa=false;});}catch(e){};'
                               'try{const s=document.createElement("style"); s.textContent="model-viewer::part(progress-bar){display:none !important;} model-viewer::part(ar-button){display:none !important;}"; document.head.appendChild(s);}catch(e){}',
                         ),
                       ),
