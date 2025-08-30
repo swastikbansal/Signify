@@ -148,12 +148,12 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
   // Required override methods for FlutterFlowModel
   @override
   WidgetClassDebugData toWidgetClassDebugData() => WidgetClassDebugData(
-        widgetParameters: debugGeneratorVariables,
-        backendQueries: debugBackendQueries,
-        componentStates: widgetBuilderComponents.map(
-          (key, value) => MapEntry(key, value.toWidgetClassDebugData()),
-        ),
-      );
+    widgetParameters: debugGeneratorVariables,
+    backendQueries: debugBackendQueries,
+    componentStates: widgetBuilderComponents.map(
+      (key, value) => MapEntry(key, value.toWidgetClassDebugData()),
+    ),
+  );
 
   Map<String, FlutterFlowModel> get widgetBuilderComponents =>
       <String, FlutterFlowModel>{};
@@ -353,8 +353,10 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
 
   void _initializeRecentlyViewed() {
     // Get recently viewed signs (from local storage or backend)
-    recentlyViewedSigns =
-        allSigns.where((sign) => sign.viewCount > 0).take(4).toList();
+    recentlyViewedSigns = allSigns
+        .where((sign) => sign.viewCount > 0)
+        .take(4)
+        .toList();
   }
 
   void _initializeWordOfTheDay() {
@@ -451,7 +453,8 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
       final testResults = await GoogleDriveService.searchVideos('');
       if (kDebugMode) {
         print(
-            '✅ Google Drive test successful. Found ${testResults.length} total videos');
+          '✅ Google Drive test successful. Found ${testResults.length} total videos',
+        );
         for (var video in testResults.take(5)) {
           print('📹 Sample video: ${video.name}');
         }
@@ -650,15 +653,17 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
       allSigns[signIndex] = updatedSign;
 
       // Update filtered signs if it contains this sign
-      final filteredIndex =
-          filteredSigns.indexWhere((sign) => sign.id == signId);
+      final filteredIndex = filteredSigns.indexWhere(
+        (sign) => sign.id == signId,
+      );
       if (filteredIndex != -1) {
         filteredSigns[filteredIndex] = updatedSign;
       }
 
       // Update recently viewed if it contains this sign
-      final recentIndex =
-          recentlyViewedSigns.indexWhere((sign) => sign.id == signId);
+      final recentIndex = recentlyViewedSigns.indexWhere(
+        (sign) => sign.id == signId,
+      );
       if (recentIndex != -1) {
         recentlyViewedSigns[recentIndex] = updatedSign;
       }
@@ -676,8 +681,10 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
         streakDays: dailyTask!.streakDays,
         isCompleted: dailyTask!.learnedToday + 1 >= dailyTask!.targetSigns,
         targetSigns: dailyTask!.targetSigns,
-        learnedToday:
-            (dailyTask!.learnedToday + 1).clamp(0, dailyTask!.targetSigns),
+        learnedToday: (dailyTask!.learnedToday + 1).clamp(
+          0,
+          dailyTask!.targetSigns,
+        ),
       );
     }
 
@@ -703,15 +710,17 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
       allSigns[signIndex] = updatedSign;
 
       // Update filtered signs if it contains this sign
-      final filteredIndex =
-          filteredSigns.indexWhere((sign) => sign.id == signId);
+      final filteredIndex = filteredSigns.indexWhere(
+        (sign) => sign.id == signId,
+      );
       if (filteredIndex != -1) {
         filteredSigns[filteredIndex] = updatedSign;
       }
 
       // Update recently viewed if it contains this sign
-      final recentIndex =
-          recentlyViewedSigns.indexWhere((sign) => sign.id == signId);
+      final recentIndex = recentlyViewedSigns.indexWhere(
+        (sign) => sign.id == signId,
+      );
       if (recentIndex != -1) {
         recentlyViewedSigns[recentIndex] = updatedSign;
       }
@@ -854,15 +863,19 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
   // Extract word from video name (helper method)
   String extractWordFromVideoName(String videoName) {
     // Remove file extension and clean up the name
-    String cleanName =
-        videoName.replaceAll(RegExp(r'\.(mp4|avi|mov|wmv)$'), '');
+    String cleanName = videoName.replaceAll(
+      RegExp(r'\.(mp4|avi|mov|wmv)$'),
+      '',
+    );
     // Replace underscores/dashes with spaces and capitalize
     cleanName = cleanName.replaceAll(RegExp(r'[_\-]'), ' ');
     return cleanName
         .split(' ')
-        .map((word) => word.isNotEmpty
-            ? word[0].toUpperCase() + word.substring(1).toLowerCase()
-            : '')
+        .map(
+          (word) => word.isNotEmpty
+              ? word[0].toUpperCase() + word.substring(1).toLowerCase()
+              : '',
+        )
         .join(' ');
   }
 
@@ -908,7 +921,8 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
       if (kDebugMode) {
         print('❌ Failed to initialize video: $e');
         print(
-            '💡 This is normal if video assets are not yet added to the project');
+          '💡 This is normal if video assets are not yet added to the project',
+        );
         print('💡 Video files should be placed in: assets/videos/');
       }
 
@@ -961,8 +975,9 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
 
           // Look for exact match first
           for (final video in driveResults) {
-            final videoWord =
-                extractWordFromVideoName(video.name).toLowerCase();
+            final videoWord = extractWordFromVideoName(
+              video.name,
+            ).toLowerCase();
             if (videoWord == videoName.toLowerCase()) {
               bestMatch = video;
               break;
@@ -974,19 +989,59 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
 
           if (kDebugMode) {
             print('✅ Found Google Drive video: ${bestMatch.name}');
-            print('🎬 Drive video URL: ${bestMatch.webViewLink}');
+            print('🎬 Drive file id: ${bestMatch.id}');
           }
 
-          // Get the direct video URL for streaming
-          final streamUrl =
-              await GoogleDriveService.getVideoStreamUrl(bestMatch.id);
-          if (streamUrl != null) {
-            await initializeVideo(streamUrl);
-            if (isVideoInitialized) {
+          // Use optimized stream source (alt=media + Authorization header)
+          final source = await GoogleDriveService.getOptimizedVideoStreamSource(
+            bestMatch.id,
+            warmup: true,
+          );
+          if (source != null) {
+            // Dispose previous controller if exists
+            if (videoController != null) {
+              try {
+                await videoController!.dispose();
+              } catch (_) {}
+            }
+
+            if (kDebugMode) {
+              print('🚀 Initializing VideoPlayer with optimized Drive stream');
+              print('🔗 ${source.uri}');
+            }
+
+            try {
+              videoController = VideoPlayerController.networkUrl(
+                source.uri,
+                httpHeaders: source.headers,
+              );
+
+              await videoController!.initialize();
+              isVideoInitialized = true;
+              isVideoPlaying = false;
+
+              // Listen to video completion
+              videoController!.addListener(() {
+                if (videoController!.value.position >=
+                    videoController!.value.duration) {
+                  isVideoPlaying = false;
+                }
+              });
+
               if (kDebugMode) {
-                print('✅ Successfully initialized Google Drive video');
+                print('✅ Video initialized successfully from Google Drive');
+                print('📱 Duration: ${videoController!.value.duration}');
+                print('📐 Aspect ratio: ${videoController!.value.aspectRatio}');
               }
               return;
+            } catch (e) {
+              if (kDebugMode) {
+                print('❌ Optimized Drive stream init failed: $e');
+              }
+            }
+          } else {
+            if (kDebugMode) {
+              print('⚠️ Could not obtain optimized Drive stream source');
             }
           }
         }
@@ -996,7 +1051,7 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
         }
       } catch (e) {
         if (kDebugMode) {
-          print('❌ Error searching Google Drive: $e');
+          print('❌ Error searching/initializing from Google Drive: $e');
         }
       }
     }
@@ -1014,9 +1069,10 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
     if (!isVideoInitialized) {
       if (kDebugMode) {
         print('💡 No video found for: $videoName');
-        print('📝 Checked: Google Drive and local assets');
+        print('📝 Checked: Google Drive (optimized) and local assets');
         print(
-            '📝 To add videos: Upload to Google Drive or place in assets/videos/');
+          '📝 To add videos: Upload to Google Drive or place in assets/videos/',
+        );
       }
     }
   }
