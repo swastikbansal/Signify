@@ -30,19 +30,8 @@ class ISLExtensionViewer {
             fadePortion: 0.18,
             minFade: 0.08,
             maxFade: 0.35,
-            preloadAhead: 4,
-            inertialSeconds: 0.22,      // ease-in time for new clip
-            trimStatic: true,           // trim leading/trailing static frames
-            motionEpsilon: 0.0006,      // root movement threshold for static detection
-            motionFadeWeight: 0.55,     // influence of motion magnitude on fade length
-            minCompletionPortion: 0.9,  // ensure at least 90% of a clip time is shown before next starts
-            trimLeading: true,          // only trim beginning static frames
-            trimTrailing: false         // keep trailing hold so sign meaning stays visible
+            preloadAhead: 4
         };
-        // Root continuity tracking
-        this.lastRootPos = { x:0, y:0, z:0 };
-        this.hasLastRoot = false;
-        this.lastClipMotion = 0; // accumulated distance of last clip root path
 
         // Known models; actual URLs will be resolved from Supabase when configured,
         // otherwise they fall back to local extension assets under animation/
@@ -60,29 +49,24 @@ class ISLExtensionViewer {
         this.availableModels = [];
     }
 
-    async createViewer({ suppressHeader = false } = {}) {
+    async createViewer() {
         if (this.container) return;
 
         // Create container
         this.container = document.createElement('div');
         this.container.id = 'isl-viewer-container';
         
-        // Create (optional) header — hidden when suppressHeader
+        // Create header
         const header = document.createElement('div');
         header.id = 'isl-viewer-header';
         header.innerHTML = `
             <span>ISL Animation Viewer</span>
-            <button id="isl-viewer-close">×</button>`;
-        if (suppressHeader) header.style.display = 'none';
+            <button id="isl-viewer-close">×</button>
+        `;
         
         // Create canvas
         this.canvas = document.createElement('canvas');
         this.canvas.id = 'isl-viewer-canvas';
-        
-        // Create status
-        const status = document.createElement('div');
-        status.id = 'isl-viewer-status';
-        status.textContent = 'Ready';
         
         // Create loading indicator
         const loading = document.createElement('div');
@@ -92,15 +76,15 @@ class ISLExtensionViewer {
         // Assemble container
         this.container.appendChild(header);
         this.container.appendChild(this.canvas);
-        this.container.appendChild(status);
         this.container.appendChild(loading);
         
         // Add to page
         document.body.appendChild(this.container);
         
         // Setup close button
-    const closeBtn = document.getElementById('isl-viewer-close');
-    if (closeBtn) closeBtn.addEventListener('click', () => { this.hideViewer(); });
+        document.getElementById('isl-viewer-close').addEventListener('click', () => {
+            this.hideViewer();
+        });
 
         // Load Three.js if not already loaded
         await this.loadThreeJS();
@@ -155,18 +139,18 @@ class ISLExtensionViewer {
         console.log('Initializing Three.js scene...');
         
     this.scene = new THREE.Scene();
-    // Transparent background to blend with page / container when toggled
+    // Transparent by default; panel background (if enabled) supplies tint
     this.scene.background = null;
         
         // Closer framing from knee to head with tighter field of view
         this.camera = new THREE.PerspectiveCamera(45, 320 / 350, 0.1, 1000);
         this.camera.position.set(0, 1.3, 1.8);
         
-    this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: true, alpha: true, premultipliedAlpha: false });
-        this.renderer.setClearColor(0x000000, 0); // fully transparent
+    this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: true, alpha: true });
         this.renderer.setSize(320, 350);
         this.renderer.shadowMap.enabled = true;
         this.renderer.outputEncoding = THREE.sRGBEncoding;
+    this.renderer.setClearColor(0x000000, 0); // fully transparent canvas
 
         this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
         this.controls.enableDamping = true;
@@ -187,10 +171,9 @@ class ISLExtensionViewer {
                 console.log('Initial model loaded successfully');
             } catch (error) {
                 console.error('Failed to load initial model:', error);
+                // status element removed; keep optional in case legacy markup exists
                 const statusElem = document.getElementById('isl-viewer-status');
-                if (statusElem) {
-                    statusElem.textContent = 'Ready (default model failed to load)';
-                }
+                statusElem && (statusElem.textContent = 'Ready (default model failed to load)');
             }
         }
         
@@ -324,9 +307,7 @@ class ISLExtensionViewer {
                     });
                     
                     const statusElem = document.getElementById('isl-viewer-status');
-                    if (statusElem) {
-                        statusElem.textContent = 'Failed to load 3D animation library. Please refresh the page.';
-                    }
+                    statusElem && (statusElem.textContent = 'Failed to load 3D animation library. Please refresh the page.');
                     
                     return reject(new Error('THREE.js or GLTFLoader not available for animation playback.'));
                 }
@@ -427,9 +408,7 @@ class ISLExtensionViewer {
                 } else {
                     console.log(`[ISL][FETCH][NO_ANIMATION] src="${fullPath}"`);
                     const statusElem = document.getElementById('isl-viewer-status');
-                    if (statusElem) {
-                        statusElem.textContent = 'Model loaded but no animations found.';
-                    }
+                    statusElem && (statusElem.textContent = 'Model loaded but no animations found.');
                     setTimeout(resolve, 1000);
                 }
             } catch (error) {
@@ -440,9 +419,7 @@ class ISLExtensionViewer {
                 }
 
                 const statusElem = document.getElementById('isl-viewer-status');
-                if (statusElem) {
-                    statusElem.textContent = `Failed to load animation: ${error.message}`;
-                }
+                statusElem && (statusElem.textContent = `Failed to load animation: ${error.message}`);
                 reject(error);
             }
         });
@@ -605,121 +582,12 @@ class ISLExtensionViewer {
             }
             // Retarget track root if needed
             clip = this.retargetClipRoot(clip, gltf.scene, this.baseAvatar || gltf.scene);
-            // Preprocess clip (trim static ends, compute motion metrics)
-            clip = this.preprocessClip(clip);
             const storeKey = fallback ? `__fallback_${key}` : key;
             this.clipCache.set(storeKey, clip);
             return clip;
         })();
         this.clipPromises.set(key, p);
         try { return await p; } finally { this.clipPromises.delete(key); }
-    }
-
-    preprocessClip(clip) {
-        if (!clip) return clip;
-        if (this.smoothConfig.trimStatic) clip = this.trimStaticExtents(clip);
-        const posTrack = clip.tracks.find(t => t.name.endsWith('.position'));
-        if (posTrack) {
-            let dist = 0;
-            for (let i=3;i<posTrack.values.length;i+=3) {
-                const dx = posTrack.values[i] - posTrack.values[i-3];
-                const dy = posTrack.values[i+1] - posTrack.values[i-2];
-                const dz = posTrack.values[i+2] - posTrack.values[i-1];
-                dist += Math.sqrt(dx*dx + dy*dy + dz*dz);
-            }
-            clip.userData = clip.userData || {};
-            clip.userData.rootMotion = dist;
-        }
-        return clip;
-    }
-
-    trimStaticExtents(clip) {
-        const posTrack = clip.tracks.find(t => t.name.endsWith('.position'));
-        if (!posTrack) return clip;
-        const { motionEpsilon } = this.smoothConfig;
-        const times = posTrack.times;
-        const values = posTrack.values;
-        const len = times.length;
-        if (len < 3) return clip;
-        const isStatic = (i) => {
-            const a = i*3, b = (i+1)*3;
-            const dx = values[b]-values[a];
-            const dy = values[b+1]-values[a+1];
-            const dz = values[b+2]-values[a+2];
-            return (dx*dx+dy*dy+dz*dz) < motionEpsilon;
-        };
-        let start=0,end=len-1;
-        if (this.smoothConfig.trimLeading) {
-            for (let i=0;i<len-2;i++){ if(!isStatic(i)){ start=Math.max(0,i-1); break; } }
-        }
-        if (this.smoothConfig.trimTrailing) {
-            for (let i=len-2;i>=1;i--){ if(!isStatic(i)){ end=Math.min(len-1,i+1); break; } }
-        }
-        if (start===0 && end===len-1) return clip; // nothing to trim
-        const newTimes = times.slice(start,end+1);
-        const newVals = values.slice(start*3,(end+1)*3);
-        const sliceOther = (track) => {
-            if (track===posTrack) return new THREE.VectorKeyframeTrack(posTrack.name, newTimes.map(t=>t-newTimes[0]), newVals);
-            if (!track.times || track.times.length<2) return track;
-            const t0=newTimes[0], t1=newTimes[newTimes.length-1];
-            const inT=track.times;
-            let s=0,e=inT.length-1; while(s<inT.length && inT[s]<t0) s++; while(e>0 && inT[e]>t1) e--; if(e-s<1) return track;
-            const comp=track.getValueSize();
-            const tSlice=Array.from(inT.slice(s,e+1), tm => tm - t0);
-            const vSlice=track.values.slice(s*comp,(e+1)*comp);
-            const ctor=track.constructor; return new ctor(track.name,tSlice,vSlice);
-        };
-        const newTracks = clip.tracks.map(tr => sliceOther(tr));
-        return new THREE.AnimationClip(clip.name, newTimes[newTimes.length-1]-newTimes[0], newTracks);
-    }
-
-    applyRootContinuity(clip) {
-        if (!this.hasLastRoot) return clip;
-        const posTrack = clip.tracks.find(t => t.name.endsWith('.position'));
-        if (!posTrack) return clip;
-        const baseX = posTrack.values[0];
-        const baseY = posTrack.values[1];
-        const baseZ = posTrack.values[2];
-        const dx = this.lastRootPos.x - baseX;
-        const dy = this.lastRootPos.y - baseY;
-        const dz = this.lastRootPos.z - baseZ;
-        if (Math.abs(dx)+Math.abs(dy)+Math.abs(dz) < 1e-6) return clip;
-        const shifted = posTrack.values.slice();
-        for (let i=0;i<shifted.length;i+=3){ shifted[i]+=dx; shifted[i+1]+=dy; shifted[i+2]+=dz; }
-        const newTrack = new THREE.VectorKeyframeTrack(posTrack.name, posTrack.times, shifted);
-        const newTracks = clip.tracks.map(tr => tr===posTrack ? newTrack : tr);
-        return new THREE.AnimationClip(clip.name, clip.duration, newTracks);
-    }
-
-    captureLastRootPose(clip) {
-        const posTrack = clip.tracks.find(t => t.name.endsWith('.position'));
-        if (!posTrack) return;
-        const n = posTrack.values.length;
-        this.lastRootPos.x = posTrack.values[n-3];
-        this.lastRootPos.y = posTrack.values[n-2];
-        this.lastRootPos.z = posTrack.values[n-1];
-        this.hasLastRoot = true;
-        this.lastClipMotion = clip.userData?.rootMotion || 0;
-    }
-
-    inertialize(action) {
-        if (!action) return;
-        const total = this.smoothConfig.inertialSeconds;
-        if (!total) return;
-        const baseScale = this.playbackSpeed;
-        const start = (performance && performance.now) ? performance.now() : Date.now();
-        const step = () => {
-            const now = (performance && performance.now) ? performance.now() : Date.now();
-            const dt = (now - start)/1000;
-            if (dt < total && action.enabled) {
-                const k = dt/total; // 0..1
-                action.timeScale = baseScale * (0.4 + 0.6*k*k); // ease-in quadratic
-                requestAnimationFrame(step);
-            } else {
-                action.timeScale = baseScale;
-            }
-        };
-        requestAnimationFrame(step);
     }
 
     retargetClipRoot(clip, sourceScene, targetScene) {
@@ -739,18 +607,12 @@ class ISLExtensionViewer {
     }
 
     adaptiveFade(clip) {
-    let base = clip.duration * this.smoothConfig.fadePortion;
-    const motion = clip.userData?.rootMotion || 0;
-    const norm = Math.min(1, motion / 0.35); // assume >0.35 significant
-    base *= (0.5 + norm * this.smoothConfig.motionFadeWeight); // scale by motion
-    // Never let fade exceed half of clip shown portion to avoid hiding sign core
-    const maxAllowed = Math.min(this.smoothConfig.maxFade, (clip.duration * 0.5));
-    return Math.min(maxAllowed, Math.max(this.smoothConfig.minFade, base));
+        const raw = clip.duration * this.smoothConfig.fadePortion;
+        return Math.min(this.smoothConfig.maxFade, Math.max(this.smoothConfig.minFade, raw));
     }
 
     async playClipSequential(clip, isLast) {
         if (!this.mixer || !clip) return;
-        clip = this.applyRootContinuity(clip);
         const fade = this.adaptiveFade(clip);
         const action = this.mixer.clipAction(clip);
         action.reset();
@@ -764,13 +626,8 @@ class ISLExtensionViewer {
         }
         this.currentAction = action;
         action.play();
-        this.inertialize(action);
-    const effectiveDuration = clip.duration / this.playbackSpeed;
-    setTimeout(() => { try { this.captureLastRootPose(clip); } catch(_){} }, Math.max(0,(effectiveDuration-0.03)*1000));
-    // Ensure minimum completion portion
-    const minPlay = effectiveDuration * this.smoothConfig.minCompletionPortion;
-    const candidate = effectiveDuration - this.smoothConfig.overlapSeconds;
-    const wait = isLast ? effectiveDuration : Math.max(minPlay, candidate, 0.05);
+        const effectiveDuration = clip.duration / this.playbackSpeed;
+        const wait = isLast ? effectiveDuration : Math.max(0.05, effectiveDuration - this.smoothConfig.overlapSeconds);
         return new Promise(resolve => setTimeout(resolve, wait * 1000));
     }
 
@@ -778,7 +635,7 @@ class ISLExtensionViewer {
         this.sequenceAbortToken++;
         const token = this.sequenceAbortToken;
         this.isPlayingSequence = true;
-        const statusElem = document.getElementById('isl-viewer-status');
+    const statusElem = document.getElementById('isl-viewer-status');
         try {
             await this.ensureBaseAvatar();
             // Preload initial batch
@@ -788,16 +645,16 @@ class ISLExtensionViewer {
             for (let i=0;i<words.length;i++) {
                 if (token !== this.sequenceAbortToken) return; // aborted
                 const w = words[i];
-                if (statusElem) statusElem.textContent = `Playing: ${w} (${i+1}/${words.length})`;
+                statusElem && (statusElem.textContent = `Playing: ${w} (${i+1}/${words.length})`);
                 const clip = await this.fetchClipForWord(w).catch(()=> this.clipCache.get('__default__'));
                 await this.playClipSequential(clip, i === words.length - 1);
                 const preloadIndex = i + this.smoothConfig.preloadAhead;
                 if (preloadIndex < words.length) this.fetchClipForWord(words[preloadIndex]).catch(()=>{});
             }
-            if (statusElem) statusElem.textContent = 'Sequence complete.';
+            statusElem && (statusElem.textContent = 'Sequence complete.');
         } catch (e) {
             console.error('[ISL][SEQUENCE][ERROR]', e);
-            if (statusElem) statusElem.textContent = 'Playback error.';
+            statusElem && (statusElem.textContent = 'Playback error.');
         } finally {
             if (!this.enableIdleDefault) {
                 // leave last pose; optional fade-out could be added
@@ -863,18 +720,12 @@ let lastSyncedWord = '';
 let syncInterval = null;
 let isYouTubePage = false;
 let currentVideoId = null; // track current YouTube video id for SPA navigation
-let transcriptVideoId = null; // video id the current transcript belongs to
-let autoStartEnabled = true; // default; will load from storage
-
-// Load auto-start preference from sync storage
-function loadAutoStartSetting() {
-    try {
-        chrome.storage.sync.get(['autoStart'], (res) => {
-            if (typeof res.autoStart === 'boolean') autoStartEnabled = res.autoStart;
-        });
-    } catch(_) {}
-}
-loadAutoStartSetting();
+// Auto-start preference (default true unless user explicitly disabled)
+let autoStartEnabled = true;
+let autoStartAttempted = false; // prevent duplicate auto-start attempts per video load
+// Panel background transparency settings
+let panelBgVisible = false; // stored in chrome.storage.local.signifyPanelVisible
+let panelBgAlpha = 0.55;    // stored in chrome.storage.local.signifyPanelAlpha (0..1)
 
 function getYouTubeVideoId() {
     try {
@@ -935,49 +786,41 @@ function waitForElement(selector, timeout = 10000) {
     });
 }
 
-async function extractTranscript({ force = false, retry = 0 } = {}) {
-    const vid = getYouTubeVideoId();
-    if (!vid) return;
-    if (!force && transcriptVideoId === vid && transcriptData.length) return; // already fresh
+async function extractTranscript() {
     transcriptData = [];
-    lastSyncedWord = '';
     try {
-        transcriptVideoId = vid;
-        // Try to open transcript panel if not present
-        let segments = document.querySelectorAll('ytd-transcript-segment-renderer');
-        if (!segments.length) {
-            const btn = document.querySelector('button[aria-label="Show transcript"], button[aria-label="Transcript"], button[aria-label*="transcript"]');
-            if (btn) {
-                btn.click();
-                await waitForElement('ytd-transcript-segment-renderer');
-                segments = document.querySelectorAll('ytd-transcript-segment-renderer');
-            }
-        }
-        if (!segments.length && retry < 3) {
-            // DOM not ready yet for new video; retry with backoff
-            setTimeout(() => extractTranscript({ force: true, retry: retry + 1 }), 600 * (retry + 1));
-            return;
-        }
-        segments.forEach(segment => {
+        const transcriptButton = await waitForElement('button[aria-label="Show transcript"]');
+        transcriptButton.click();
+
+        await waitForElement('ytd-transcript-segment-renderer');
+        const segments = document.querySelectorAll('ytd-transcript-segment-renderer');
+
+        segments.forEach((segment, index) => {
             const timeEl = segment.querySelector('.segment-timestamp');
             const textEl = segment.querySelector('.segment-text');
-            if (!timeEl || !textEl) return;
-            const timeText = timeEl.textContent.trim();
-            const startTime = parseTimeToSeconds(timeText);
-            const segmentText = textEl.textContent.trim();
-            const words = segmentText.split(/\s+/).filter(Boolean);
-            const wordDuration = words.length ? (5 / words.length) : 0.5; // crude fallback
-            words.forEach((word, wi) => {
-                const cleanedWord = word.toLowerCase().replace(/[^\w\s'-]/g, '');
-                const wordStartTime = startTime + wi * wordDuration;
-                const wordEndTime = startTime + (wi + 1) * wordDuration;
-                transcriptData.push({ word: cleanedWord, startTime: wordStartTime, endTime: wordEndTime, originalText: word });
-            });
+            if (timeEl && textEl) {
+                const timeText = timeEl.textContent.trim();
+                const startTime = parseTimeToSeconds(timeText);
+                const segmentText = textEl.textContent.trim();
+                const words = segmentText.split(/\s+/).filter(Boolean);
+                const wordDuration = 5 / words.length;
+
+                words.forEach((word, wordIndex) => {
+                    const cleanedWord = word.toLowerCase().replace(/[^\w\s'-]/g, '');
+                    const wordStartTime = startTime + (wordIndex * wordDuration);
+                    const wordEndTime = startTime + ((wordIndex + 1) * wordDuration);
+                    transcriptData.push({
+                        word: cleanedWord,
+                        startTime: wordStartTime,
+                        endTime: wordEndTime,
+                        originalText: word
+                    });
+                });
+            }
         });
-        console.log('[Signify] Transcript extracted for', vid, 'words=', transcriptData.length, 'retry=', retry);
+        console.log('Transcript extracted:', transcriptData.length, 'words');
     } catch (error) {
-        console.error('[Signify] Transcript extraction failed (retry', retry, '):', error);
-        if (retry < 3) setTimeout(() => extractTranscript({ force: true, retry: retry + 1 }), 800 * (retry + 1));
+        console.error('Transcript extraction failed:', error);
     }
 }
 
@@ -1042,24 +885,25 @@ function syncWithVideo(video) {
 function updateCurrentWord(word) {
     const display = document.getElementById('currentWordDisplay');
     if (display) {
-    display.style.display='block';
-    display.textContent = word;
-    display.classList.remove('word-animation');
-    void display.offsetWidth; // reflow for animation restart
-    display.classList.add('word-animation');
-    setTimeout(() => display.classList.remove('word-animation'), 650);
+        display.textContent = word;
+        display.classList.add('word-animation');
+        setTimeout(() => display.classList.remove('word-animation'), 600);
     }
 }
 
 function handleVideoPlay() {
     const video = document.querySelector('video');
     if (!video) return;
-    const vid = getYouTubeVideoId();
-    const needForce = transcriptVideoId !== vid;
-    extractTranscript({ force: needForce }).then(() => {
+    
+    if (transcriptData.length === 0) {
+        extractTranscript().then(() => {
+            translationActive = true;
+            syncWithVideo(video);
+        });
+    } else {
         translationActive = true;
         syncWithVideo(video);
-    });
+    }
 }
 
 function createSignifyButton() {
@@ -1109,100 +953,92 @@ function showAvatarInterface() {
     const container = document.createElement('div');
     container.id = 'signify-avatar-container';
     container.innerHTML = `
-        <div class="avatar-display" id="avatarDisplay" data-alpha="0.55">
-            <div class="floating-header" id="signifyFloatingHeader">
-                <div class="fh-actions" style="margin-left:auto;">
-                    <button id="signify-transparency" class="edge-ui" title="Adjust transparency">💡</button>
-                    <button id="signify-close" class="edge-ui" title="Close">✕</button>
-                </div>
-            </div>
+        <div class="signify-header">
+            <div class="signify-title">🤟 Signify ISL Translator</div>
+            <button id="signify-close" title="Close">✕</button>
+        </div>
+        <div class="avatar-display" id="avatarDisplay">
             <div class="avatar-loading">Loading 3D Avatar...</div>
-            <div class="current-word-overlay" id="currentWordDisplay">Ready</div>
-            <div class="transparency-pop edge-ui" id="signifyTransPanel">
-                <label for="signifyOpacityRange">Opacity</label>
-                <input type="range" id="signifyOpacityRange" min="0" max="100" value="55" />
-            </div>
-            <div class="signify-resize-handle edge-ui" id="signifyResizeHandle" title="Resize"></div>
-        </div>`;
-
+        </div>
+        <div class="current-word-display" id="currentWordDisplay">Ready to translate</div>
+    `;
+    
+    // Add styles
     const style = document.createElement('style');
     style.textContent = `
-    #signify-avatar-container { position:fixed; top:20px; right:20px; width:300px; height:380px; z-index:10000; font-family:Arial,sans-serif; box-sizing:border-box; }
-    #signify-avatar-container, #signify-avatar-container * { box-sizing:border-box; }
-    #signify-avatar-container.dragging { cursor:grabbing; }
-    .avatar-display { width:100%; height:100%; position:relative; background:transparent; }
-    .avatar-display.panel { backdrop-filter:blur(4px); border:1px solid rgba(255,255,255,0.25); border-radius:10px; background:rgba(10,10,10,var(--panel-alpha,0.4)); }
-    .floating-header { position:absolute; top:0; left:0; right:0; height:34px; display:flex; align-items:center; justify-content:flex-end; padding:4px 10px; background:rgba(20,20,20,0.28); backdrop-filter:blur(6px) saturate(160%); border-bottom:1px solid rgba(255,255,255,0.15); border-radius:10px 10px 0 0; color:#eee; font-size:13px; font-weight:600; letter-spacing:.4px; opacity:0; transition:opacity .25s; pointer-events:none; }
-    #signify-avatar-container.edge-reveal .floating-header { opacity:1; pointer-events:auto; }
-    .floating-header .fh-actions { display:flex; gap:6px; }
-    .floating-header button { background:rgba(50,50,50,0.55); border:1px solid rgba(255,255,255,0.35); color:#eee; padding:3px 8px; font-size:12px; cursor:pointer; border-radius:6px; line-height:1; backdrop-filter:blur(4px); }
-    .floating-header button:hover { background:rgba(80,80,80,0.7); }
-    .transparency-pop { position:absolute; top:34px; right:6px; background:rgba(25,25,25,0.85); padding:8px 10px 12px; border:1px solid rgba(255,255,255,0.25); border-radius:10px; display:flex; flex-direction:column; gap:6px; width:140px; box-shadow:0 4px 14px -4px rgba(0,0,0,0.55); opacity:0; pointer-events:none; transform:translateY(-6px); transition:opacity .25s, transform .25s; z-index:30; }
-    .transparency-pop label { font-size:11px; letter-spacing:.5px; color:#eee; }
-    .transparency-pop input[type=range] { width:100%; accent-color:#ffeb3b; }
-    #signify-avatar-container.show-trans-panel #signifyTransPanel { opacity:1; pointer-events:auto; transform:translateY(0); }
-    #isl-viewer-container { background:transparent !important; }
-    #isl-viewer-canvas { background:transparent !important; pointer-events:none; }
-    .current-word-overlay { z-index:25; }
-    .current-word-overlay { position:absolute; bottom:8px; left:50%; transform:translateX(-50%); background:rgba(25,25,25,0.75); padding:4px 12px; border-radius:14px; color:#ffeb3b; font-size:14px; font-weight:600; letter-spacing:.4px; box-shadow:0 2px 6px rgba(0,0,0,0.45); max-width:85%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; pointer-events:none; }
-    .signify-resize-handle { position:absolute; width:14px; height:14px; right:4px; bottom:4px; cursor:nwse-resize; background:linear-gradient(135deg,rgba(255,255,255,0.6),rgba(255,255,255,0.15)); border:1px solid rgba(255,255,255,0.5); border-radius:4px; box-shadow:0 1px 3px rgba(0,0,0,0.4); opacity:0; transition:opacity .25s; }
-    #signify-avatar-container.edge-reveal .signify-resize-handle { opacity:1; }
-    .word-animation { animation: wordPulse 0.6s ease-in-out; }
-    @keyframes wordPulse { 0%,100% { transform:scale(1);} 50% { transform:scale(1.1);} }
+        #signify-avatar-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 320px;
+            height: 450px;
+            background: #1a1a1a;
+            border: 2px solid #333;
+            border-radius: 10px;
+            z-index: 10000;
+            font-family: Arial, sans-serif;
+        }
+        .signify-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #333;
+            color: white;
+            padding: 10px;
+            border-radius: 8px 8px 0 0;
+        }
+        .signify-title {
+            font-weight: bold;
+            font-size: 14px;
+        }
+        #signify-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 0;
+            width: 20px;
+            height: 20px;
+        }
+        .avatar-display {
+            height: 360px;
+            background: #2a2a2a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+        }
+        .current-word-display {
+            padding: 10px;
+            text-align: center;
+            background: #222;
+            color: #ffeb3b;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 0 0 8px 8px;
+        }
+        .word-animation {
+            animation: wordPulse 0.6s ease-in-out;
+        }
+        @keyframes wordPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
     `;
     document.head.appendChild(style);
+    
     document.body.appendChild(container);
-    // Initial left/top placement
-    requestAnimationFrame(()=>{ const r=container.getBoundingClientRect(); container.style.left=(window.innerWidth - r.width - 20)+'px'; container.style.top=r.top+'px'; container.style.right=''; });
 
-    const transBtn = document.getElementById('signify-transparency');
-    const closeBtn = document.getElementById('signify-close');
-    const opacityRange = document.getElementById('signifyOpacityRange');
-    const avatarDisplay = document.getElementById('avatarDisplay');
-    const applyAlpha = (val)=>{ const alpha = Math.min(1, Math.max(0, val)); avatarDisplay.style.setProperty('--panel-alpha', alpha); avatarDisplay.dataset.alpha = alpha; if(!avatarDisplay.classList.contains('panel')) avatarDisplay.classList.add('panel'); };
-    // Restore saved transparency
-    chrome.storage?.local?.get(['signifyPanelAlpha','signifyPanelVisible'], (d)=>{ if(typeof d.signifyPanelAlpha==='number') { applyAlpha(d.signifyPanelAlpha); opacityRange.value = Math.round(d.signifyPanelAlpha*100); } if(d.signifyPanelVisible){ avatarDisplay.classList.add('panel'); container.classList.add('show-trans-panel'); transBtn.title='Hide background'; } });
-    transBtn.addEventListener('click', ()=>{
-        const panelVisible = avatarDisplay.classList.toggle('panel');
-        container.classList.toggle('show-trans-panel', panelVisible);
-        transBtn.title = panelVisible ? 'Hide background' : 'Show background';
-        chrome.storage?.local?.set({ signifyPanelVisible: panelVisible });
+    // Apply current (default) transparency immediately, then load saved and re-apply
+    applyPanelTransparency();
+    loadPanelTransparencySettings().then(applyPanelTransparency).catch(()=>{});
+
+    makeDraggable(container, '.signify-header');
+
+    document.getElementById('signify-close').addEventListener('click', () => {
+    closeSignifyUI();
     });
-    opacityRange.addEventListener('input', ()=>{ const v = parseInt(opacityRange.value,10); const alpha = (v/100); applyAlpha(alpha); chrome.storage?.local?.set({ signifyPanelAlpha: alpha }); });
-    closeBtn.addEventListener('click', ()=> closeSignifyUI());
-
-    // Drag from empty space inside avatar area (excluding buttons & resize handle)
-    (function drag(){ let dragging=false,sx=0,sy=0,sl=0,st=0; const start=(e)=>{ if(e.target.closest('.edge-controls')|| e.target.classList.contains('signify-resize-handle')) return; dragging=true; container.classList.add('dragging'); sx=e.clientX; sy=e.clientY; const r=container.getBoundingClientRect(); sl=r.left; st=r.top; document.body.style.userSelect='none'; }; const move=(e)=>{ if(!dragging)return; const dx=e.clientX-sx, dy=e.clientY-sy; let nl=sl+dx, nt=st+dy; const maxL=window.innerWidth-container.offsetWidth; const maxT=window.innerHeight-container.offsetHeight; if(nl<0)nl=0; if(nt<0)nt=0; if(nl>maxL)nl=maxL; if(nt>maxT)nt=maxT; container.style.left=nl+'px'; container.style.top=nt+'px'; }; const end=()=>{ if(dragging){ dragging=false; container.classList.remove('dragging'); document.body.style.userSelect=''; } }; container.addEventListener('mousedown',start); window.addEventListener('mousemove',move); window.addEventListener('mouseup',end); window.addEventListener('mouseleave',end); })();
-
-    // Resize
-    (function resize(){ const handle=document.getElementById('signifyResizeHandle'); let resizing=false,sx=0,sy=0,sw=0,sh=0; const MIN_W=180,MIN_H=220,MAX_W=800,MAX_H=900; handle.addEventListener('mousedown',e=>{ e.stopPropagation(); resizing=true; sx=e.clientX; sy=e.clientY; sw=container.offsetWidth; sh=container.offsetHeight; document.body.style.userSelect='none'; }); window.addEventListener('mousemove',e=>{ if(!resizing) return; const dx=e.clientX-sx, dy=e.clientY-sy; let w=sw+dx, h=sh+dy; if(w<MIN_W)w=MIN_W; if(h<MIN_H)h=MIN_H; if(w>MAX_W)w=MAX_W; if(h>MAX_H)h=MAX_H; container.style.width=w+'px'; container.style.height=h+'px'; }); window.addEventListener('mouseup',()=>{ if(resizing){ resizing=false; document.body.style.userSelect=''; }}); window.addEventListener('mouseleave',()=>{ if(resizing){ resizing=false; document.body.style.userSelect=''; }}); })();
-    // Add live canvas resize inside resize handler (override previous IIFE) for dynamic avatar scaling
-    (function enableDynamicResize(){
-        const handle=document.getElementById('signifyResizeHandle');
-        let resizing=false,sx=0,sy=0,sw=0,sh=0; const MIN_W=180,MIN_H=220,MAX_W=800,MAX_H=900;
-        const applySize=()=>{
-            if (islViewer && islViewer.renderer && islViewer.camera) {
-                const w = container.offsetWidth;
-                const h = container.offsetHeight;
-                try {
-                    islViewer.renderer.setSize(w, h);
-                    islViewer.camera.aspect = w / h;
-                    islViewer.camera.updateProjectionMatrix();
-                } catch(_){}
-                const canvas = document.getElementById('isl-viewer-canvas');
-                if (canvas) { canvas.style.width='100%'; canvas.style.height='100%'; }
-                const islCont = document.getElementById('isl-viewer-container');
-                if (islCont) { islCont.style.width='100%'; islCont.style.height='100%'; }
-            }
-        };
-        handle.addEventListener('mousedown',e=>{ e.stopPropagation(); resizing=true; sx=e.clientX; sy=e.clientY; sw=container.offsetWidth; sh=container.offsetHeight; document.body.style.userSelect='none'; });
-        window.addEventListener('mousemove',e=>{ if(!resizing) return; const dx=e.clientX-sx, dy=e.clientY-sy; let w=sw+dx, h=sh+dy; if(w<MIN_W)w=MIN_W; if(h<MIN_H)h=MIN_H; if(w>MAX_W)w=MAX_W; if(h>MAX_H)h=MAX_H; container.style.width=w+'px'; container.style.height=h+'px'; applySize(); });
-        const end=()=>{ if(resizing){ resizing=false; document.body.style.userSelect=''; applySize(); }};
-        window.addEventListener('mouseup',end); window.addEventListener('mouseleave',end); window.addEventListener('resize',applySize);
-    })();
-
-    // Edge reveal
-    const EDGE=14; container.addEventListener('mousemove',e=>{ const {offsetX,offsetY}=e; const w=container.clientWidth,h=container.clientHeight; const near=offsetX<EDGE||offsetY<EDGE||(w-offsetX)<EDGE||(h-offsetY)<EDGE; container.classList.toggle('edge-reveal',near); }); container.addEventListener('mouseleave',()=>container.classList.remove('edge-reveal'));
 
     // Initialize the ISL viewer in the avatar display
     createImmediateAvatar();
@@ -1218,35 +1054,22 @@ function createImmediateAvatar() {
     if (avatarDisplay) {
         avatarDisplay.innerHTML = '';
         
-    islViewer.createViewer({ suppressHeader: true }).then(() => {
+        islViewer.createViewer().then(() => {
             // Move the ISL viewer container into the avatar display
             const islContainer = document.getElementById('isl-viewer-container');
             if (islContainer) {
                 islContainer.style.position = 'relative';
                 islContainer.style.width = '100%';
                 islContainer.style.height = '100%';
-        islContainer.style.background = 'transparent';
-        const innerHeader = islContainer.querySelector('#isl-viewer-header');
-        if (innerHeader) { try { innerHeader.remove(); } catch(_) { innerHeader.style.display='none'; } }
+                // Hide inner header so only one close button remains
+                const innerHeader = islContainer.querySelector('#isl-viewer-header');
+                if (innerHeader) innerHeader.style.display = 'none';
                 // Rebind inner close (if shown) to unified cleanup
                 const innerClose = islContainer.querySelector('#isl-viewer-close');
                 if (innerClose) innerClose.onclick = () => closeSignifyUI();
                 avatarDisplay.appendChild(islContainer);
-                // Adjust camera framing to crop below knees for mini window
-                try {
-                    if (islViewer && islViewer.camera) {
-                        islViewer.camera.position.y = 1.25; // raise viewpoint
-                        islViewer.controls.target.y = 1.25; // focus mid torso
-                    }
-                } catch(_) {}
-                // Initial size fit to container
-                try {
-                    const w = avatarDisplay.clientWidth;
-                    const h = avatarDisplay.clientHeight;
-                    islViewer.renderer.setSize(w,h);
-                    islViewer.camera.aspect = w/h; islViewer.camera.updateProjectionMatrix();
-                } catch(_){}
                 islViewer.showViewer();
+                applyPanelTransparency();
             }
         });
     }
@@ -1287,11 +1110,9 @@ function monitorVideoChange() {
             currentVideoId = newId;
             transcriptData = [];
             lastSyncedWord = '';
-            transcriptVideoId = null;
             if (translationActive) {
-                console.log('[Signify] Detected video change, scheduling transcript refresh');
-                // Give YouTube DOM time to swap transcript elements
-                setTimeout(() => handleVideoPlay(), 1000);
+                console.log('[Signify] Detected video change, re-extracting transcript');
+                handleVideoPlay();
             }
         }
     }, 1500);
@@ -1303,33 +1124,18 @@ function initYouTubeIntegration() {
     
     if (isYouTubePage) {
         console.log('YouTube page detected, initializing Signify integration');
-        loadAutoStartSetting();
+        // Load autoStart preference once at integration init
+        chrome.storage.sync.get(['autoStart']).then(res => {
+            autoStartEnabled = res.autoStart !== false; // default true
+            if (autoStartEnabled) {
+                // Defer auto-start slightly to allow player DOM to settle
+                setTimeout(tryAutoStartTranslation, 1800);
+            }
+        }).catch(()=>{});
         
         // Wait for YouTube player to load
         setTimeout(() => {
             createSignifyButton();
-            if (autoStartEnabled) {
-                // Attach auto-start hook to video play
-                const startIfReady = () => {
-                    if (translationActive) return; // already active
-                    const video = document.querySelector('video');
-                    if (!video) return;
-                    // When user plays video, automatically start translation
-                    video.addEventListener('play', autoStartPlayListener, { once: true });
-                    // If video already playing (autoplay / resumed)
-                    if (!video.paused && !video.ended) {
-                        autoStartPlayListener();
-                    }
-                };
-                startIfReady();
-                // In case video element replaced dynamically
-                const mo = new MutationObserver(() => {
-                    if (!translationActive) startIfReady();
-                });
-                mo.observe(document.body, { childList:true, subtree:true });
-                // Stop observing once active
-                const stopObs = setInterval(()=>{ if (translationActive) { try { mo.disconnect(); } catch(_){} clearInterval(stopObs);} }, 2000);
-            }
         }, 2000);
         
         // Handle navigation within YouTube (SPA routing)
@@ -1344,6 +1150,38 @@ function initYouTubeIntegration() {
             subtree: true
         });
     monitorVideoChange();
+    }
+}
+
+function tryAutoStartTranslation() {
+    if (!autoStartEnabled || autoStartAttempted) return;
+    // Only on YouTube watch pages
+    if (!detectYouTubePage()) return;
+    const hasUI = !!document.getElementById('signify-avatar-container');
+    if (hasUI) return; // already open
+    const videoEl = document.querySelector('video');
+    if (videoEl) {
+        console.log('[Signify][AutoStart] Starting translation automatically');
+        autoStartAttempted = true;
+        showAvatarInterface();
+        extractTranscriptAndStart();
+    } else {
+        // Retry a few times until video appears
+        let retries = 0;
+        const maxRetries = 8;
+        const interval = setInterval(() => {
+            if (autoStartAttempted || !autoStartEnabled) { clearInterval(interval); return; }
+            const v = document.querySelector('video');
+            if (v) {
+                console.log('[Signify][AutoStart] Video element found after retry; starting');
+                autoStartAttempted = true;
+                clearInterval(interval);
+                showAvatarInterface();
+                extractTranscriptAndStart();
+            } else if (++retries >= maxRetries) {
+                clearInterval(interval);
+            }
+        }, 750);
     }
 }
 
@@ -1378,23 +1216,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     closeSignifyUI();
         sendResponse({success: true});
     }
-    else if (request.action === 'updateAutoStart') {
-        autoStartEnabled = !!request.autoStart;
-        if (!autoStartEnabled && translationActive) {
-            // User turned off while active; keep current session but don't auto-trigger new ones
-            // Optionally could close: uncomment next line to auto-close
-            // closeSignifyUI();
-        } else if (autoStartEnabled && isYouTubePage && !translationActive) {
-            // Immediately hook into current video if present
-            const video = document.querySelector('video');
-            if (video) {
-                video.addEventListener('play', autoStartPlayListener, { once: true });
-                if (!video.paused && !video.ended) autoStartPlayListener();
-            }
-        }
-        sendResponse && sendResponse({success:true});
-        return true;
-    }
     else if (request.action === 'toggleYouTubeTranslation') {
         if (isYouTubePage) {
             if (translationActive) {
@@ -1411,35 +1232,22 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         }
         return true;
     }
+    else if (request.action === 'updateAutoStart') {
+        autoStartEnabled = !!request.autoStart;
+        console.log('[Signify] Auto-start preference updated ->', autoStartEnabled);
+        if (autoStartEnabled) {
+            // Attempt immediate auto-start if conditions fit
+            tryAutoStartTranslation();
+        }
+        sendResponse && sendResponse({success:true});
+    }
     else if (request.action === 'updateTransparency') {
-        // Ensure UI exists before applying changes
-        const avatarDisplay = document.getElementById('avatarDisplay');
-        if (!avatarDisplay) {
-            // Optionally ignore if not visible yet
-            sendResponse && sendResponse({ success: false, error: 'avatar not present' });
-            return true;
-        }
-        if (typeof request.visible === 'boolean') {
-            avatarDisplay.classList.toggle('panel', request.visible);
-            chrome.storage?.local?.set({ signifyPanelVisible: request.visible });
-        }
-        if (typeof request.alpha === 'number') {
-            const clamped = Math.min(1, Math.max(0, request.alpha));
-            avatarDisplay.style.setProperty('--panel-alpha', clamped);
-            avatarDisplay.dataset.alpha = clamped;
-            chrome.storage?.local?.set({ signifyPanelAlpha: clamped });
-        }
-        sendResponse && sendResponse({ success: true });
-        return true;
+        if (typeof request.visible === 'boolean') panelBgVisible = request.visible;
+        if (typeof request.alpha === 'number') panelBgAlpha = request.alpha;
+        applyPanelTransparency();
+        sendResponse && sendResponse({success:true});
     }
 });
-
-// Auto-start handler separated so it can be reused
-function autoStartPlayListener() {
-    if (translationActive) return;
-    showAvatarInterface();
-    extractTranscriptAndStart();
-}
 
 // Clean up on page unload
 window.addEventListener('beforeunload', function() {
@@ -1450,3 +1258,100 @@ window.addEventListener('beforeunload', function() {
         clearInterval(syncInterval);
     }
 });
+
+// ================= Transparency Helpers =================
+async function loadPanelTransparencySettings() {
+    try {
+        const local = await chrome.storage.local.get(['signifyPanelAlpha','signifyPanelVisible']);
+        if (typeof local.signifyPanelVisible === 'boolean') panelBgVisible = local.signifyPanelVisible;
+        if (typeof local.signifyPanelAlpha === 'number') panelBgAlpha = local.signifyPanelAlpha;
+    } catch(_) {}
+}
+
+function applyPanelTransparency() {
+    const outer = document.getElementById('signify-avatar-container');
+    if (outer) {
+        if (panelBgVisible) {
+            outer.style.setProperty('background', `rgba(26,26,26,${panelBgAlpha})`, 'important');
+            outer.style.setProperty('backdrop-filter', 'blur(4px)', 'important');
+            outer.style.setProperty('border', '2px solid rgba(255,255,255,0.08)', 'important');
+        } else {
+            outer.style.setProperty('background', 'transparent', 'important');
+            outer.style.setProperty('backdrop-filter', 'none', 'important');
+            outer.style.setProperty('border', 'none', 'important');
+        }
+    }
+    const avatarDisplay = document.getElementById('avatarDisplay');
+    if (avatarDisplay) avatarDisplay.style.background = 'transparent';
+    // Make header and word display transparent for full effect
+    const header = outer ? outer.querySelector('.signify-header') : null;
+    if (header) {
+        header.style.setProperty('background', panelBgVisible ? 'rgba(40,40,40,'+panelBgAlpha+')' : 'transparent', 'important');
+        header.style.setProperty('border-bottom', panelBgVisible ? '1px solid rgba(255,255,255,0.06)' : 'none', 'important');
+    }
+    const wordDisplay = outer ? outer.querySelector('.current-word-display') : null;
+    if (wordDisplay) {
+        wordDisplay.style.setProperty('background', panelBgVisible ? 'rgba(34,34,34,'+panelBgAlpha+')' : 'transparent', 'important');
+    }
+    const inner = document.getElementById('isl-viewer-container');
+    if (inner) {
+        inner.style.setProperty('background', 'transparent', 'important');
+        inner.style.setProperty('border', panelBgVisible ? '1px solid rgba(255,255,255,0.05)' : 'none', 'important');
+        inner.style.setProperty('box-shadow', panelBgVisible ? '0 4px 18px rgba(0,0,0,0.45)' : 'none', 'important');
+        // Allow dragging stand-alone viewer by its header if not embedded
+        if (!document.getElementById('signify-avatar-container')) {
+            makeDraggable(inner, '#isl-viewer-header');
+        }
+    }
+    // Update Three.js scene background if viewer exists
+    if (islViewer && islViewer.scene) {
+        if (panelBgVisible) {
+            // subtle dark translucency behind model only if panel visible; keep clear to allow panel color show
+            islViewer.scene.background = null; // keep null so renderer alpha shows panel/background
+        } else {
+            islViewer.scene.background = null; // fully transparent
+        }
+    }
+}
+
+// ================= Drag Helper =================
+function makeDraggable(container, handleSelector) {
+    const handle = container.querySelector(handleSelector) || container;
+    let isDown = false, startX = 0, startY = 0, origX = 0, origY = 0;
+    const onDown = (e) => {
+        const evt = e.touches ? e.touches[0] : e;
+        isDown = true;
+        startX = evt.clientX;
+        startY = evt.clientY;
+        const rect = container.getBoundingClientRect();
+        origX = rect.left;
+        origY = rect.top;
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onUp);
+        document.addEventListener('touchmove', onMove, { passive:false });
+        document.addEventListener('touchend', onUp);
+        e.preventDefault();
+    };
+    const onMove = (e) => {
+        if (!isDown) return;
+        const evt = e.touches ? e.touches[0] : e;
+        const dx = evt.clientX - startX;
+        const dy = evt.clientY - startY;
+        container.style.position = 'fixed';
+        container.style.left = (origX + dx) + 'px';
+        container.style.top = (origY + dy) + 'px';
+        container.style.right = 'auto';
+        container.style.bottom = 'auto';
+        if (e.cancelable) e.preventDefault();
+    };
+    const onUp = () => {
+        isDown = false;
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+        document.removeEventListener('touchmove', onMove);
+        document.removeEventListener('touchend', onUp);
+    };
+    handle.style.cursor = 'move';
+    handle.addEventListener('mousedown', onDown);
+    handle.addEventListener('touchstart', onDown, { passive:false });
+}
