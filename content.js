@@ -317,10 +317,14 @@ class ISLExtensionViewer {
                     loadingElement.style.display = 'block';
                 }
 
-                // Instead of removing immediately, fade out previous animation if desired (simple clear for now)
+                // Remove both current model and base avatar to ensure clean state
                 if (this.currentModel) {
                     try { this.scene.remove(this.currentModel); } catch(_){}
                     this.currentModel = null;
+                }
+                if (this.baseAvatar) {
+                    try { this.scene.remove(this.baseAvatar); } catch(_){}
+                    // Don't set baseAvatar to null, just remove from scene so we can restore it later
                 }
                 if (this.mixer) {
                     try { this.mixer.stopAllAction(); } catch(_){}
@@ -635,7 +639,13 @@ class ISLExtensionViewer {
         this.sequenceAbortToken++;
         const token = this.sequenceAbortToken;
         this.isPlayingSequence = true;
-    const statusElem = document.getElementById('isl-viewer-status');
+        const statusElem = document.getElementById('isl-viewer-status');
+        
+        // Remove base avatar from scene during word animations to avoid overlap
+        if (this.baseAvatar && this.scene) {
+            try { this.scene.remove(this.baseAvatar); } catch(_){}
+        }
+        
         try {
             await this.ensureBaseAvatar();
             // Preload initial batch
@@ -656,8 +666,12 @@ class ISLExtensionViewer {
             console.error('[ISL][SEQUENCE][ERROR]', e);
             statusElem && (statusElem.textContent = 'Playback error.');
         } finally {
-            if (!this.enableIdleDefault) {
-                // leave last pose; optional fade-out could be added
+            // Restore base avatar if idle mode is enabled
+            if (this.enableIdleDefault && this.baseAvatar && this.scene) {
+                try { 
+                    this.scene.add(this.baseAvatar);
+                    await this.playIdleLoop();
+                } catch(_){}
             }
             this.isPlayingSequence = false;
             chrome.runtime.sendMessage({ action: 'updateStatus', status: 'Animation sequence completed!' });
@@ -666,9 +680,23 @@ class ISLExtensionViewer {
 
     async playWord(word) {
         if (!word) return;
+        
+        // Remove base avatar from scene during word animation to avoid overlap
+        if (this.baseAvatar && this.scene) {
+            try { this.scene.remove(this.baseAvatar); } catch(_){}
+        }
+        
         await this.ensureBaseAvatar();
         const clip = await this.fetchClipForWord(word).catch(()=> this.clipCache.get('__default__'));
         await this.playClipSequential(clip, true);
+        
+        // Restore base avatar if idle mode is enabled after single word animation
+        if (this.enableIdleDefault && this.baseAvatar && this.scene) {
+            try { 
+                this.scene.add(this.baseAvatar);
+                await this.playIdleLoop();
+            } catch(_){}
+        }
     }
 
     animate() {
