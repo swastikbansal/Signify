@@ -1,18 +1,14 @@
 # =============================================================================
-# PRODUCTION-GRADE PROGUARD RULES FOR FLUTTER + FIREBASE
-# Optimized for Performance, Security, and Stability
+# PRODUCTION-GRADE R8/PROGUARD RULES FOR FLUTTER + FIREBASE
+# Optimized for performance, stability, and safe code shrinking
 # =============================================================================
 
 # =============================================================================
 # CORE OPTIMIZATION SETTINGS
 # =============================================================================
-## Keep R8 configuration conservative; rely on R8 defaults for optimization/shrinking
-# (Removing legacy ProGuard directives that can increase memory usage or cause instability.)
--verbose
-
-## Removed custom optimization includes/excludes; use R8 defaults
-
-## Avoid package reordering to reduce reflection breakage
+## Keep configuration conservative; rely on R8 defaults for optimization/shrinking
+# Avoid noisy logs; use AGP outputs and mapping.txt for details
+# (Removed -verbose)
 
 # =============================================================================
 # DEBUGGING AND STACK TRACE SUPPORT
@@ -55,7 +51,7 @@
 # =============================================================================
 # FIREBASE AND GOOGLE SERVICES (CONSOLIDATED & OPTIMIZED)
 # =============================================================================
-# Core Firebase classes
+## Firebase and Google Play Services
 -keep class com.google.firebase.** { *; }
 -keep class com.google.android.gms.** { *; }
 -keep class com.google.firebase.iid.** { *; }
@@ -70,14 +66,12 @@
 -keep class com.google.firebase.functions.** { *; }
 -keep class com.google.firebase.appcheck.** { *; }
 
-# Google Play Services
+## Google Play Services (selective keeps)
 -keep class com.google.android.gms.common.** { *; }
--keep class com.google.android.gms.ads.** { *; }
 -keep class com.google.android.gms.tasks.** { *; }
 -keep class com.google.android.gms.location.** { *; }
--keep class com.google.android.gms.maps.** { *; }
 
-# ML Kit and Vision
+## ML Kit and Vision
 -keep class com.google.mlkit.** { *; }
 -keep class com.google.android.gms.vision.** { *; }
 -keep class com.google.mlkit.vision.** { *; }
@@ -85,61 +79,57 @@
 # =============================================================================
 # KOTLIN AND COROUTINES
 # =============================================================================
-# Kotlin reflection and metadata
+## Kotlin reflection and metadata
 -keep class kotlin.Metadata { *; }
 -keep class kotlin.reflect.** { *; }
--keepclassmembers class **$WhenMappings {
-    <fields>;
-}
+-keepclassmembers class **$WhenMappings { <fields>; }
 
-# Kotlin Coroutines (optimized)
+## Kotlin Coroutines (optimized)
 -keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}
 -keepnames class kotlinx.coroutines.CoroutineExceptionHandler {}
 -keep class kotlinx.coroutines.** { *; }
 -dontwarn kotlinx.coroutines.**
 
-# Kotlin serialization
+## Kotlin serialization
 -keepattributes *Annotation*, InnerClasses
 -dontnote kotlinx.serialization.AnnotationsKt
 
 # =============================================================================
 # ANDROID ARCHITECTURE COMPONENTS
 # =============================================================================
-# AndroidX and Support Libraries
+## AndroidX and Support Libraries
 -keep class androidx.** { *; }
 -keep interface androidx.** { *; }
 -dontwarn androidx.**
 
-# Architecture Components
+## Architecture Components
 -keep class androidx.lifecycle.** { *; }
 -keep class androidx.room.** { *; }
 -keep class androidx.work.** { *; }
 -keep class androidx.navigation.** { *; }
 
-# Camera X
+## CameraX
 -keep class androidx.camera.** { *; }
 -dontwarn androidx.camera.**
 
 # =============================================================================
 # MEDIA AND CAMERA HANDLING
 # =============================================================================
-# Camera and media processing
+## Camera and media processing
 -keep class android.hardware.camera2.** { *; }
 -keep class android.media.** { *; }
--keepclassmembers class * {
-    @android.webkit.JavascriptInterface <methods>;
-}
+-keepclassmembers class * { @android.webkit.JavascriptInterface <methods>; }
 
 # =============================================================================
 # NETWORKING AND JSON
 # =============================================================================
-# OkHttp and Retrofit (if used)
+## OkHttp and Retrofit (if used)
 -dontwarn okhttp3.**
 -dontwarn okio.**
 -dontwarn retrofit2.**
 -keepnames class okhttp3.internal.publicsuffix.PublicSuffixDatabase
 
-# Gson (consolidated)
+## Gson (consolidated)
 -keep class sun.misc.Unsafe { *; }
 -keep class com.google.gson.** { *; }
 -keep class * implements com.google.gson.TypeAdapter
@@ -147,23 +137,19 @@
 -keep class * implements com.google.gson.JsonSerializer
 -keep class * implements com.google.gson.JsonDeserializer
 
-# JSON and reflection
--keepclassmembers,allowobfuscation class * {
-    @com.google.gson.annotations.SerializedName <fields>;
-}
+## JSON and reflection
+-keepclassmembers,allowobfuscation class * { @com.google.gson.annotations.SerializedName <fields>; }
 
 # =============================================================================
 # NATIVE METHODS AND JNI
 # =============================================================================
-# Keep all native methods
--keepclasseswithmembernames class * {
-    native <methods>;
-}
+## Keep all native methods
+-keepclasseswithmembernames class * { native <methods>; }
 
 # =============================================================================
 # SERIALIZATION
 # =============================================================================
-# Serializable classes
+## Serializable classes
 -keep class * implements java.io.Serializable {
     static final long serialVersionUID;
     private static final java.io.ObjectStreamField[] serialPersistentFields;
@@ -173,27 +159,22 @@
     java.lang.Object readResolve();
 }
 
-# Parcelable classes
--keep class * implements android.os.Parcelable {
-    public static final android.os.Parcelable$Creator *;
-}
+## Parcelable classes
+-keep class * implements android.os.Parcelable { public static final android.os.Parcelable$Creator *; }
 
 # =============================================================================
 # ENUMS AND ANNOTATIONS
 # =============================================================================
-# Keep enum methods
--keepclassmembers enum * {
-    public static **[] values();
-    public static ** valueOf(java.lang.String);
-}
+## Enums
+-keepclassmembers enum * { public static **[] values(); public static ** valueOf(java.lang.String); }
 
-# Keep annotations
+## Annotations
 -keep class * extends java.lang.annotation.Annotation { *; }
 
 # =============================================================================
 # SECURITY AND OBFUSCATION ENHANCEMENTS
 # =============================================================================
-# Remove debugging information
+## Strip logging (keeps warnings/errors)
 -assumenosideeffects class android.util.Log {
     public static *** d(...);
     public static *** v(...);
@@ -203,7 +184,7 @@
 # =============================================================================
 # WARNING SUPPRESSIONS (CONSOLIDATED)
 # =============================================================================
-# Common warnings to suppress
+## Common warning suppressions
 -dontwarn org.checkerframework.**
 -dontwarn javax.annotation.**
 -dontwarn org.jetbrains.annotations.**
@@ -213,10 +194,10 @@
 -dontwarn sun.misc.SignalHandler
 -dontwarn java.lang.invoke.StringConcatFactory
 
-# Google Play Core
+## Google Play Core
 -dontwarn com.google.android.play.core.**
 
-# Firebase specific warnings
+## Firebase specific warnings
 -dontwarn com.google.firebase.**
 -dontwarn com.google.android.gms.**
 -dontwarn com.google.mlkit.**
@@ -224,14 +205,14 @@
 # =============================================================================
 # FLUTTER-SPECIFIC OPTIMIZATIONS
 # =============================================================================
-# Flutter engine optimizations
+## Flutter engine
 -keep class io.flutter.embedding.engine.** { *; }
 -keep class io.flutter.embedding.android.** { *; }
 
-# Platform views
+## Platform views
 -keep class io.flutter.plugin.platform.** { *; }
 
-# Accessibility
+## Accessibility
 -keep class io.flutter.view.AccessibilityBridge$** { *; }
 
 # =============================================================================

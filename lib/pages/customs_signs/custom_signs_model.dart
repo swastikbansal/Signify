@@ -22,7 +22,10 @@ class CustomSignsModel extends FlutterFlowModel<CustomSignsPage> {
   final Map<String, DebugDataField> debugGeneratorVariables = {};
   final Map<String, DebugDataField> debugBackendQueries = {};
   final Map<String, FlutterFlowModel> widgetBuilderComponents = {};
-  final String _apiUrl = 'http://10.29.46.248:5000';
+
+  final String _apiUrl = 'http://10.81.24.166:5000'; // Swastik WIFI
+  // final String _apiUrl = 'http://10.90.1.175:5000'; // MU WIFI
+  // final String _apiUrl = 'http://10.29.46.248:5000'; // Yatharth WIFI
   // String _apiUrl = 'https://philosia-codecult-signify.hf.space/process_frame';
 
   String get _customSignsEndpoint => '$_apiUrl/customTrain';

@@ -84,8 +84,19 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   List<String> get sentenceWords => List.from(_currentSentence);
 
   // API related state
-  String _apiUrl = 'http://10.90.1.82:5000/processFrame';
-  // String _apiUrl = 'https://philosia-codecult-signify.hf.space/processFrame';
+  // String _apiUrl = 'http://10.29.46.248:5000/processFrame'; // Yatharth WIFI
+  // String _apiUrl = 'https://philosia-codecult-signify.hf.space/processFrame'; // Production API
+  // String _apiUrl = 'http://10.90.1.175:5000/processFrame'; // MU WIFI
+  String _apiUrl = 'http://10.81.24.166:5000/processFrame'; // Swastik WIFI
+
+  // Model switching state
+  String _currentModelType = 'default'; // 'default' or 'custom' model
+  // Model switch API endpoint for Custom model
+  // final String _modelSwitchApiUrl = 'http://10.29.46.248:5000'; // Yatharth WIFI
+  // final String _modelSwitchApiUrl = 'http://10.90.1.175:5000'; // MU WIFI
+  final String _modelSwitchApiUrl = 'http://10.81.24.166:5000'; // Swastik WIFI
+
+  bool _isModelSwitching = false;
 
   bool _isApiEnabled = true;
   int _lastApiCallTime = 0;
@@ -180,6 +191,10 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   bool get translationEnabled => _translationEnabled;
 
   bool get isTranslating => _isTranslating;
+
+  // Model switching getters
+  String get currentModelType => _currentModelType;
+  bool get isModelSwitching => _isModelSwitching;
 
   void resetState() {
     _errorMessage = '';
@@ -437,6 +452,94 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
     _notifyStateChange();
   }
 
+  // Model switching functionality
+  Future<bool> switchToDefaultModel() async {
+    if (_currentModelType == 'default' || _isModelSwitching) {
+      return _currentModelType == 'default';
+    }
+
+    try {
+      _isModelSwitching = true;
+      _notifyStateChange();
+
+      final response = await http.post(
+        Uri.parse('$_modelSwitchApiUrl/switchModel'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'modelType': 'default'}),
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        if (responseData['status'] == 'success' ||
+            responseData['success'] == true) {
+          _currentModelType = 'default';
+          print('Successfully switched to default model');
+          _notifyStateChange();
+          return true;
+        }
+      }
+
+      print('Failed to switch to default model: ${response.statusCode}');
+      return false;
+    } catch (e) {
+      print('Error switching to default model: $e');
+      return false;
+    } finally {
+      _isModelSwitching = false;
+      _notifyStateChange();
+    }
+  }
+
+  Future<bool> switchToCustomModel() async {
+    if (_currentModelType == 'custom' || _isModelSwitching) {
+      return _currentModelType == 'custom';
+    }
+
+    try {
+      _isModelSwitching = true;
+      _notifyStateChange();
+
+      final response = await http.post(
+        Uri.parse('$_modelSwitchApiUrl/switchModel'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'modelType': 'custom'}),
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        if (responseData['status'] == 'success' ||
+            responseData['success'] == true) {
+          _currentModelType = 'custom';
+          print('Successfully switched to custom model');
+          _notifyStateChange();
+          return true;
+        }
+      }
+
+      print('Failed to switch to custom model: ${response.statusCode}');
+      return false;
+    } catch (e) {
+      print('Error switching to custom model: $e');
+      return false;
+    } finally {
+      _isModelSwitching = false;
+      _notifyStateChange();
+    }
+  }
+
+  // Method to switch model based on string type
+  Future<bool> switchModel(String modelType) async {
+    switch (modelType.toLowerCase()) {
+      case 'default':
+        return await switchToDefaultModel();
+      case 'custom':
+        return await switchToCustomModel();
+      default:
+        print('Invalid model type: $modelType');
+        return false;
+    }
+  }
+
   // Method to translate and update current sentence
   Future<void> translateCurrentSentence() async {
     if (!_translationEnabled || _currentSentence.isEmpty) {
@@ -666,6 +769,15 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
       if (_apiInFlight) {
         return; // Drop frame if a request is already in flight
       }
+
+      // Skip API calls if not enabled (during model switching)
+      if (!_isApiEnabled) {
+        debugPrint(
+          '⏸️ [API] Skipping frame - API disabled during model switch',
+        );
+        return;
+      }
+
       // Throttle API calls to prevent overwhelming the server
       int currentTime = DateTime.now().millisecondsSinceEpoch;
       if (currentTime - _lastApiCallTime < _apiCallInterval) {
@@ -678,7 +790,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
       // Convert camera image to JPEG
       final jpegBytes = await _convertCameraImageToJpeg(image);
       if (jpegBytes == null) {
-        print('Failed to convert camera image to JPEG');
+        debugPrint('❌ [API] Failed to convert camera image to JPEG');
         _apiInFlight = false;
         return;
       }
@@ -703,8 +815,12 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
       request.fields['camera_type'] = isFrontCamera ? 'front' : 'back';
       request.fields['width'] = image.width.toString();
       request.fields['height'] = image.height.toString();
+      request.fields['model_type'] =
+          _currentModelType; // Add current model type
 
-      print('Sending frame to API: ${jpegBytes.length} bytes');
+      debugPrint(
+        '📤 [API] Sending frame: ${jpegBytes.length} bytes, model: $_currentModelType',
+      );
 
       // Send the request with timeout using persistent client
       http.StreamedResponse response;
@@ -714,7 +830,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
             .send(request)
             .timeout(const Duration(seconds: 2));
       } on TimeoutException catch (_) {
-        print('Frame API call timed out after 2s');
+        debugPrint('⏰ [API] Frame API call timed out after 2s');
         _errorMessage = 'API timeout';
         _notifyStateChange();
         return;
@@ -722,12 +838,18 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
 
       final elapsed = DateTime.now().difference(sendStart).inMilliseconds;
       final responseString = await response.stream.bytesToString();
-      print(
-        'API responded in ${elapsed}ms status=${response.statusCode} len=${responseString.length}',
+      debugPrint(
+        '📡 [API] Response in ${elapsed}ms - Status: ${response.statusCode}, Length: ${responseString.length}',
       );
 
       if (response.statusCode == 200) {
-        print('Frame API call successful: $responseString');
+        debugPrint('✅ [API] Frame API call successful: $responseString');
+        // Clear any previous error
+        if (_errorMessage.isNotEmpty) {
+          _errorMessage = '';
+          _notifyStateChange();
+        }
+
         // (Adaptive encoding removed – fixed size/quality used)
 
         // Parse the JSON response (handle both Map and List forms)
@@ -760,7 +882,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
             if (prediction != null &&
                 prediction.isNotEmpty &&
                 prediction != 'rest') {
-              print('Received prediction from frame API: $prediction');
+              debugPrint('🎯 [API] Received prediction: $prediction');
 
               // Update prediction history
               _predictionHistory.add(prediction);
@@ -775,7 +897,9 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
             // Still collecting frames, log progress and surface message
             final message = responseData['message'] as String?;
             final frameCount = responseData['frame_count'];
-            print('API collecting frames: $message (frames: $frameCount)');
+            debugPrint(
+              '📊 [API] Collecting frames: $message (frames: $frameCount)',
+            );
 
             // Optionally reflect collecting state in the text field so users see activity
             if (textController != null && (textController!.text.isEmpty)) {
@@ -784,15 +908,30 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
               _notifyStateChange();
             }
           } else {
-            print('API returned unknown status: $status');
+            debugPrint('⚠️ [API] Unknown status: $status');
           }
         } catch (parseError) {
-          print('Error parsing frame API response: $parseError');
-          print('Raw response: $responseString');
+          debugPrint('❌ [API] Error parsing response: $parseError');
+          debugPrint('📄 [API] Raw response: $responseString');
         }
+      } else if (response.statusCode == 500) {
+        debugPrint('💥 [API] Server error 500 - Model may be switching');
+        debugPrint('📄 [API] Error response: $responseString');
+
+        // Special handling for 500 errors - likely during model switching
+        _errorMessage = 'Model switching in progress...';
+        _notifyStateChange();
+
+        // Clear error after shorter time for 500 errors
+        Future.delayed(const Duration(seconds: 2), () {
+          if (_errorMessage == 'Model switching in progress...') {
+            _errorMessage = '';
+            _notifyStateChange();
+          }
+        });
       } else {
-        print('Frame API call failed with status: ${response.statusCode}');
-        print('Response: $responseString');
+        debugPrint('❌ [API] Failed with status: ${response.statusCode}');
+        debugPrint('📄 [API] Response: $responseString');
 
         // Set error message to trigger red glow
         _errorMessage = 'API Error: ${response.statusCode}';
@@ -807,7 +946,7 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
         });
       }
     } catch (e) {
-      print('Error sending frame to API: $e');
+      debugPrint('💥 [API] Exception sending frame: $e');
 
       // Set error message to trigger red glow
       _errorMessage = 'Network Error: ${e.toString().substring(0, 30)}...';

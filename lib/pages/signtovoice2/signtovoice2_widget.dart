@@ -40,6 +40,11 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
     super.initState();
     _model = createModel(context, () => Signtovoice2Model());
 
+    // Sync dropdown value with model state
+    _modeDropdownValue = _model.currentModelType == 'default'
+        ? 'Default'
+        : 'Custom';
+
     try {
       _model.textController ??= TextEditingController()
         ..addListener(() {
@@ -85,6 +90,14 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
     _model.setStateChangeCallback(() {
       try {
         if (mounted) {
+          // Sync dropdown value with model state
+          final expectedDropdownValue = _model.currentModelType == 'default'
+              ? 'Default'
+              : 'Custom';
+          if (_modeDropdownValue != expectedDropdownValue) {
+            _modeDropdownValue = expectedDropdownValue;
+          }
+
           // Trigger glow animation when detection state changes
           if (_model.isDetecting && !_glowController.isAnimating) {
             _startGlowAnimation();
@@ -144,6 +157,23 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
         }
       }
     });
+  }
+
+  // Method to handle model switching
+  Future<void> _switchModel(String modelType) async {
+    debugPrint('🔄 [UI] User selected model: $modelType');
+
+    if (modelType == 'Default') {
+      debugPrint('🔄 [UI] Calling switchToDefaultModel()...');
+      final success = await _model.switchToDefaultModel();
+      debugPrint('🔄 [UI] switchToDefaultModel() result: $success');
+    } else if (modelType == 'Custom') {
+      debugPrint('🔄 [UI] Calling switchToCustomModel()...');
+      final success = await _model.switchToCustomModel();
+      debugPrint('🔄 [UI] switchToCustomModel() result: $success');
+    }
+
+    debugPrint('🔄 [UI] Model switch process completed for: $modelType');
   }
 
   // Method to start continuous glow animation for API processing
@@ -499,10 +529,18 @@ class _Signtovoice2WidgetState extends State<Signtovoice2Widget>
                                         value: _modeDropdownValue,
                                         options: const ['Default', 'Custom'],
                                         onChanged: (val) {
-                                          if (val == null) return;
+                                          if (val == null ||
+                                              _model.isModelSwitching) {
+                                            return;
+                                          }
+
+                                          // Update UI state first
                                           setState(() {
                                             _modeDropdownValue = val;
                                           });
+
+                                          // Switch model based on selection (async)
+                                          _switchModel(val);
                                         },
                                         width: 100.0,
                                         height: 40.0,
