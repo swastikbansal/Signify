@@ -1,9 +1,8 @@
-import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'google_drive_config.dart';
 
 class GoogleDriveVideo {
@@ -40,23 +39,11 @@ class GoogleDriveVideo {
   }
 }
 
-// Optimized stream source descriptor for Drive videos (URL + required headers)
-class GoogleDriveStreamSource {
-  final Uri uri;
-  final Map<String, String> headers;
-  const GoogleDriveStreamSource({required this.uri, required this.headers});
-}
-
 class GoogleDriveService {
   static const String _baseUrl = 'https://www.googleapis.com/drive/v3';
 
   static String? _accessToken;
   static DateTime? _tokenExpiry;
-
-  // Scopes used for Drive user OAuth
-  static const List<String> _driveScopes = <String>[
-    'https://www.googleapis.com/auth/drive.readonly',
-  ];
 
   // Get access token using service account
   static Future<String> _getAccessToken() async {
@@ -117,48 +104,29 @@ class GoogleDriveService {
     }
   }
 
-  // Initialize Google Sign-In and try lightweight auth (no UI)
-  static Future<void> _initGoogleSignIn() async {
-    try {
-      await GoogleSignIn.instance.initialize();
-      // Fire and forget; returns nullable future per API
-      unawaited(GoogleSignIn.instance.attemptLightweightAuthentication());
-    } catch (e) {
-      if (kDebugMode) {
-        print(
-          '❌ GoogleSignIn initialize/attemptLightweightAuthentication error: $e',
-        );
-      }
-    }
-  }
-
-  // Get user's Google OAuth access token via Google Sign-In (v7.x API)
+  // Get user's Google OAuth token from Firebase Auth
   static Future<String?> _getUserGoogleToken() async {
     try {
-      await _initGoogleSignIn();
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        // Get the user's ID token which might contain Google OAuth info
+        final idToken = await user.getIdToken();
 
-      // Request headers silently (no prompt)
-      final headers = await GoogleSignIn.instance.authorizationClient
-          .authorizationHeaders(_driveScopes, promptIfNecessary: false);
-
-      if (headers != null) {
-        final authHeader = headers['Authorization'] ?? headers['authorization'];
-        if (authHeader != null && authHeader.startsWith('Bearer ')) {
-          final token = authHeader.substring('Bearer '.length);
-          if (kDebugMode) {
-            print('🔐 Retrieved user access token (length=${token.length})');
-          }
-          return token;
+        // For Google Sign-In users, we need to get the Google OAuth token
+        // This requires additional setup with Google Sign-In package
+        if (kDebugMode) {
+          print('🔐 User is authenticated with Firebase');
+          print('👤 User email: ${user.email}');
         }
-      }
-      if (kDebugMode) {
-        print(
-          'ℹ️ No user authorization headers returned; likely not signed in or scopes not granted.',
-        );
+
+        // If the user signed in with Google, we can access their Google token
+        // For now, return the Firebase ID token - you may need to modify this
+        // based on your Google Sign-In implementation
+        return idToken;
       }
     } catch (e) {
       if (kDebugMode) {
-        print('❌ Error getting user Google token (silent): $e');
+        print('❌ Error getting user Google token: $e');
       }
     }
     return null;
@@ -166,14 +134,16 @@ class GoogleDriveService {
 
   // Enhanced get access token - try user token first, then service account
   static Future<String> _getAccessTokenWithUserAuth() async {
+    // First try to use the user's Google OAuth token
     final userToken = await _getUserGoogleToken();
-    if (userToken != null && userToken.isNotEmpty) {
+    if (userToken != null) {
       if (kDebugMode) {
-        print('✅ Using user\'s Google OAuth token');
+        print('✅ Using user\'s authenticated token');
       }
       return userToken;
     }
 
+    // Fallback to service account
     if (kDebugMode) {
       print('⚠️ User token not available, using service account');
     }
@@ -243,8 +213,8 @@ class GoogleDriveService {
         validateConfiguration();
       }
 
-      // Prefer user OAuth token; fallback to service account
-      final accessToken = await _getAccessTokenWithUserAuth();
+      final accessToken =
+          await _getAccessToken(); // Use service account directly for now
 
       if (kDebugMode) {
         print('🔑 Got access token successfully');
@@ -364,7 +334,6 @@ class GoogleDriveService {
   }
 
   // Search recursively in a folder and its subfolders
-  // ignore: unused_element
   static Future<List<GoogleDriveVideo>> _searchInFolderRecursively(
     String query,
     String folderId,
@@ -609,104 +578,24 @@ class GoogleDriveService {
     }
   }
 
-  // Build a direct media URI that supports HTTP range requests (best for streaming)
-  static Uri _buildMediaUri(String fileId) {
-    return Uri.parse('$_baseUrl/files/$fileId').replace(
-      queryParameters: {
-        'alt': 'media',
-        'supportsAllDrives': 'true',
-        // Helps bypass some warning flows for large files
-        'acknowledgeAbuse': 'true',
-      },
-    );
-  }
-
-  // Internal: auth header map for media requests
-  static Map<String, String> _authHeaders(String accessToken) => {
-    'Authorization': 'Bearer $accessToken',
-  };
-
-  // Optionally warm up the media endpoint to reduce first-frame latency
-  static Future<void> _warmupMediaUri(
-    String fileId,
-    String accessToken, {
-    int prefetchBytes = 512 * 1024,
-  }) async {
-    try {
-      final mediaUri = _buildMediaUri(fileId);
-
-      // 1) HEAD to establish connection and get headers (like Accept-Ranges, Content-Length)
-      final headResp = await http.head(
-        mediaUri,
-        headers: _authHeaders(accessToken),
-      );
-      if (kDebugMode) {
-        final ar = headResp.headers['accept-ranges'];
-        final cl = headResp.headers['content-length'];
-        print(
-          '🚀 Warmup HEAD: status=${headResp.statusCode}, accept-ranges=$ar, content-length=$cl',
-        );
-      }
-
-      // 2) Small ranged GET to prime caches and reduce initial buffering
-      final end = (prefetchBytes - 1).clamp(0, prefetchBytes - 1);
-      final headers = {..._authHeaders(accessToken), 'Range': 'bytes=0-$end'};
-      final rangeResp = await http.get(mediaUri, headers: headers);
-      if (kDebugMode) {
-        print(
-          '📦 Warmup range GET: status=${rangeResp.statusCode}, received=${rangeResp.bodyBytes.length} bytes',
-        );
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('⚠️ Warmup failed (non-fatal): $e');
-      }
-    }
-  }
-
-  // Preferred API: returns a direct media URL + headers for fast streaming
-  // Pass these to VideoPlayerController.networkUrl(uri, httpHeaders: headers)
-  static Future<GoogleDriveStreamSource?> getOptimizedVideoStreamSource(
-    String fileId, {
-    bool warmup = true,
-  }) async {
-    try {
-      // Prefer user token when available
-      final accessToken = await _getAccessTokenWithUserAuth();
-      final mediaUri = _buildMediaUri(fileId);
-
-      if (warmup) {
-        // Fire and forget; don't block UI too long
-        unawaited(_warmupMediaUri(fileId, accessToken));
-      }
-
-      return GoogleDriveStreamSource(
-        uri: mediaUri,
-        headers: _authHeaders(accessToken),
-      );
-    } catch (e) {
-      if (kDebugMode) {
-        print('❌ getOptimizedVideoStreamSource error: $e');
-      }
-      return null;
-    }
-  }
-
-  // Get direct download/stream link (legacy). Prefer getOptimizedVideoStreamSource for lower latency.
+  // Get direct download link for video streaming
   static Future<String?> getVideoStreamUrl(String fileId) async {
     try {
-      // Build alt=media URL and embed token as query param for compatibility with players that can't set headers
-      final token = await _getAccessTokenWithUserAuth();
-      final mediaUri = _buildMediaUri(fileId).replace(
-        queryParameters: {
-          ..._buildMediaUri(fileId).queryParameters,
-          'access_token': token,
-        },
+      final accessToken =
+          await _getAccessToken(); // Use service account directly for now
+
+      final response = await http.get(
+        Uri.parse(
+          '$_baseUrl/files/$fileId',
+        ).replace(queryParameters: {'fields': 'webContentLink,webViewLink'}),
+        headers: {'Authorization': 'Bearer $accessToken'},
       );
-      if (kDebugMode) {
-        print('🔗 Media URL (alt=media) with token param: $mediaUri');
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data['webContentLink'] ?? data['webViewLink'];
       }
-      return mediaUri.toString();
+      return null;
     } catch (e) {
       if (kDebugMode) {
         print('Error getting video stream URL: $e');
@@ -718,7 +607,7 @@ class GoogleDriveService {
   // Get video metadata
   static Future<Map<String, dynamic>?> getVideoMetadata(String fileId) async {
     try {
-      final accessToken = await _getAccessTokenWithUserAuth();
+      final accessToken = await _getAccessToken();
 
       final response = await http.get(
         Uri.parse('$_baseUrl/files/$fileId').replace(

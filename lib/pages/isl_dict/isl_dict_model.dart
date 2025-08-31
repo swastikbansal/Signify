@@ -989,59 +989,20 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
 
           if (kDebugMode) {
             print('✅ Found Google Drive video: ${bestMatch.name}');
-            print('🎬 Drive file id: ${bestMatch.id}');
+            print('🎬 Drive video URL: ${bestMatch.webViewLink}');
           }
 
-          // Use optimized stream source (alt=media + Authorization header)
-          final source = await GoogleDriveService.getOptimizedVideoStreamSource(
+          // Get the direct video URL for streaming
+          final streamUrl = await GoogleDriveService.getVideoStreamUrl(
             bestMatch.id,
-            warmup: true,
           );
-          if (source != null) {
-            // Dispose previous controller if exists
-            if (videoController != null) {
-              try {
-                await videoController!.dispose();
-              } catch (_) {}
-            }
-
-            if (kDebugMode) {
-              print('🚀 Initializing VideoPlayer with optimized Drive stream');
-              print('🔗 ${source.uri}');
-            }
-
-            try {
-              videoController = VideoPlayerController.networkUrl(
-                source.uri,
-                httpHeaders: source.headers,
-              );
-
-              await videoController!.initialize();
-              isVideoInitialized = true;
-              isVideoPlaying = false;
-
-              // Listen to video completion
-              videoController!.addListener(() {
-                if (videoController!.value.position >=
-                    videoController!.value.duration) {
-                  isVideoPlaying = false;
-                }
-              });
-
+          if (streamUrl != null) {
+            await initializeVideo(streamUrl);
+            if (isVideoInitialized) {
               if (kDebugMode) {
-                print('✅ Video initialized successfully from Google Drive');
-                print('📱 Duration: ${videoController!.value.duration}');
-                print('📐 Aspect ratio: ${videoController!.value.aspectRatio}');
+                print('✅ Successfully initialized Google Drive video');
               }
               return;
-            } catch (e) {
-              if (kDebugMode) {
-                print('❌ Optimized Drive stream init failed: $e');
-              }
-            }
-          } else {
-            if (kDebugMode) {
-              print('⚠️ Could not obtain optimized Drive stream source');
             }
           }
         }
@@ -1051,7 +1012,7 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
         }
       } catch (e) {
         if (kDebugMode) {
-          print('❌ Error searching/initializing from Google Drive: $e');
+          print('❌ Error searching Google Drive: $e');
         }
       }
     }
@@ -1069,7 +1030,7 @@ class IslDictModel extends FlutterFlowModel<IslDictWidget> {
     if (!isVideoInitialized) {
       if (kDebugMode) {
         print('💡 No video found for: $videoName');
-        print('📝 Checked: Google Drive (optimized) and local assets');
+        print('📝 Checked: Google Drive and local assets');
         print(
           '📝 To add videos: Upload to Google Drive or place in assets/videos/',
         );
