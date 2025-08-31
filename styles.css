@@ -41,6 +41,12 @@
     justify-content: space-between !important;
     align-items: center !important;
     border-bottom: 1px solid #555 !important;
+    user-select: none !important;
+    cursor: grab !important;
+}
+
+#isl-viewer-header:active {
+    cursor: grabbing !important;
 }
 
 #isl-viewer-close {
@@ -59,7 +65,7 @@
 
 #isl-viewer-canvas {
     width: 100% !important;
-    height: calc(100% - 60px) !important;
+    height: calc(100% - 50px) !important; /* Account for header height */
     display: block !important;
 }
 
@@ -89,4 +95,39 @@
     padding: 10px 15px !important;
     border-radius: 5px !important;
     display: none !important;
+}
+
+/* Resize handles for the ISL viewer */
+.resize-handle {
+    opacity: 0 !important;
+    transition: opacity 0.2s ease !important;
+}
+
+#isl-viewer-container:hover .resize-handle {
+    opacity: 1 !important;
+}
+
+.resize-handle:hover {
+    background: rgba(76, 175, 80, 1) !important;
+}
+
+/* Make header draggable with visual feedback */
+#isl-viewer-header {
+    user-select: none !important;
+    cursor: grab !important;
+}
+
+#isl-viewer-header:active {
+    cursor: grabbing !important;
+}
+
+/* Prevent text selection during drag/resize */
+#isl-viewer-container.dragging,
+#isl-viewer-container.resizing {
+    user-select: none !important;
+}
+
+/* Smooth transitions for resizing */
+#isl-viewer-container {
+    transition: none !important; /* Disable transitions during resize for smooth operation */
 }

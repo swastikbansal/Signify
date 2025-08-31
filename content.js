@@ -60,7 +60,7 @@ class ISLExtensionViewer {
         const header = document.createElement('div');
         header.id = 'isl-viewer-header';
         header.innerHTML = `
-            <span>ISL Animation Viewer</span>
+            <span>📱 ISL Animation Viewer</span>
             <button id="isl-viewer-close">×</button>
         `;
         
@@ -73,10 +73,14 @@ class ISLExtensionViewer {
         loading.id = 'isl-viewer-loading';
         loading.textContent = 'Loading Animation...';
         
+        // Create resize handles
+        const resizeHandles = this.createResizeHandles();
+        
         // Assemble container
         this.container.appendChild(header);
         this.container.appendChild(this.canvas);
         this.container.appendChild(loading);
+        resizeHandles.forEach(handle => this.container.appendChild(handle));
         
         // Add to page
         document.body.appendChild(this.container);
@@ -85,6 +89,17 @@ class ISLExtensionViewer {
         document.getElementById('isl-viewer-close').addEventListener('click', () => {
             this.hideViewer();
         });
+
+        // Setup drag and resize functionality
+        this.setupDragAndResize();
+
+        // Load saved position and size settings
+        setTimeout(() => {
+            if (!this.loadViewerSettings()) {
+                // If no saved settings, ensure the default size is applied correctly
+                this.updateViewerSize(320, 400);
+            }
+        }, 100);
 
         // Load Three.js if not already loaded
         await this.loadThreeJS();
@@ -711,11 +726,14 @@ class ISLExtensionViewer {
     }
 
     onWindowResize() {
-        if (!this.camera || !this.renderer) return;
-        // Keep the viewer size fixed with new dimensions
-        this.camera.aspect = 320 / 350;
-        this.camera.updateProjectionMatrix();
-        this.renderer.setSize(320, 350);
+        if (!this.camera || !this.renderer || !this.container) return;
+        
+        // Get current container dimensions
+        const width = this.container.offsetWidth;
+        const height = this.container.offsetHeight;
+        
+        // Use the new updateViewerSize method
+        this.updateViewerSize(width, height);
     }
 
     showViewer() {
@@ -736,6 +754,253 @@ class ISLExtensionViewer {
         this.container = null;
         this.isInitialized = false;
     }
+
+    createResizeHandles() {
+        const handles = [];
+        const positions = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'];
+        
+        positions.forEach(pos => {
+            const handle = document.createElement('div');
+            handle.className = `resize-handle resize-${pos}`;
+            handle.style.cssText = `
+                position: absolute;
+                background: rgba(76, 175, 80, 0.8);
+                z-index: 10;
+            `;
+            
+            // Set handle positions and sizes
+            switch(pos) {
+                case 'n':
+                    handle.style.cssText += 'top: -4px; left: 8px; right: 8px; height: 8px; cursor: n-resize;';
+                    break;
+                case 'ne':
+                    handle.style.cssText += 'top: -4px; right: -4px; width: 12px; height: 12px; cursor: ne-resize;';
+                    break;
+                case 'e':
+                    handle.style.cssText += 'top: 8px; right: -4px; bottom: 8px; width: 8px; cursor: e-resize;';
+                    break;
+                case 'se':
+                    handle.style.cssText += 'bottom: -4px; right: -4px; width: 12px; height: 12px; cursor: se-resize;';
+                    break;
+                case 's':
+                    handle.style.cssText += 'bottom: -4px; left: 8px; right: 8px; height: 8px; cursor: s-resize;';
+                    break;
+                case 'sw':
+                    handle.style.cssText += 'bottom: -4px; left: -4px; width: 12px; height: 12px; cursor: sw-resize;';
+                    break;
+                case 'w':
+                    handle.style.cssText += 'top: 8px; left: -4px; bottom: 8px; width: 8px; cursor: w-resize;';
+                    break;
+                case 'nw':
+                    handle.style.cssText += 'top: -4px; left: -4px; width: 12px; height: 12px; cursor: nw-resize;';
+                    break;
+            }
+            
+            handles.push(handle);
+        });
+        
+        return handles;
+    }
+
+    setupDragAndResize() {
+        const header = document.getElementById('isl-viewer-header');
+        let isDragging = false;
+        let isResizing = false;
+        let currentHandle = null;
+        let startX, startY, startLeft, startTop, startWidth, startHeight;
+
+        // Make header draggable (but not the close button)
+        header.addEventListener('mousedown', (e) => {
+            if (e.target.id === 'isl-viewer-close') return;
+            
+            isDragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            startLeft = this.container.offsetLeft;
+            startTop = this.container.offsetTop;
+            
+            header.style.cursor = 'grabbing';
+            e.preventDefault();
+        });
+
+        // Setup resize handles
+        this.container.querySelectorAll('.resize-handle').forEach(handle => {
+            handle.addEventListener('mousedown', (e) => {
+                isResizing = true;
+                currentHandle = handle.className.split(' ')[1]; // resize-n, resize-se, etc.
+                startX = e.clientX;
+                startY = e.clientY;
+                startLeft = this.container.offsetLeft;
+                startTop = this.container.offsetTop;
+                startWidth = parseInt(document.defaultView.getComputedStyle(this.container).width, 10);
+                startHeight = parseInt(document.defaultView.getComputedStyle(this.container).height, 10);
+                
+                e.preventDefault();
+                e.stopPropagation();
+            });
+        });
+
+        // Mouse move handler
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                const deltaX = e.clientX - startX;
+                const deltaY = e.clientY - startY;
+                
+                let newLeft = startLeft + deltaX;
+                let newTop = startTop + deltaY;
+                
+                // Keep window within viewport bounds
+                newLeft = Math.max(0, Math.min(newLeft, window.innerWidth - this.container.offsetWidth));
+                newTop = Math.max(0, Math.min(newTop, window.innerHeight - this.container.offsetHeight));
+                
+                this.container.style.left = newLeft + 'px';
+                this.container.style.top = newTop + 'px';
+                this.container.style.right = 'auto'; // Override CSS right positioning
+            }
+            
+            if (isResizing && currentHandle) {
+                const deltaX = e.clientX - startX;
+                const deltaY = e.clientY - startY;
+                
+                let newWidth = startWidth;
+                let newHeight = startHeight;
+                let newLeft = startLeft;
+                let newTop = startTop;
+                
+                // Apply resize based on handle direction
+                if (currentHandle.includes('e')) {
+                    newWidth = Math.max(250, startWidth + deltaX); // Min width 250px
+                }
+                if (currentHandle.includes('w')) {
+                    newWidth = Math.max(250, startWidth - deltaX);
+                    newLeft = startLeft + (startWidth - newWidth);
+                }
+                if (currentHandle.includes('s')) {
+                    newHeight = Math.max(200, startHeight + deltaY); // Min height 200px
+                }
+                if (currentHandle.includes('n')) {
+                    newHeight = Math.max(200, startHeight - deltaY);
+                    newTop = startTop + (startHeight - newHeight);
+                }
+                
+                // Ensure window stays within viewport
+                if (newLeft < 0) {
+                    newWidth += newLeft;
+                    newLeft = 0;
+                }
+                if (newTop < 0) {
+                    newHeight += newTop;
+                    newTop = 0;
+                }
+                if (newLeft + newWidth > window.innerWidth) {
+                    newWidth = window.innerWidth - newLeft;
+                }
+                if (newTop + newHeight > window.innerHeight) {
+                    newHeight = window.innerHeight - newTop;
+                }
+                
+                // Apply new dimensions and position
+                this.container.style.width = newWidth + 'px';
+                this.container.style.height = newHeight + 'px';
+                this.container.style.left = newLeft + 'px';
+                this.container.style.top = newTop + 'px';
+                this.container.style.right = 'auto';
+                
+                // Update renderer and camera
+                this.updateViewerSize(newWidth, newHeight);
+            }
+        });
+
+        // Mouse up handler
+        document.addEventListener('mouseup', () => {
+            if (isDragging) {
+                isDragging = false;
+                header.style.cursor = 'grab';
+                // Save new position
+                this.saveViewerSettings();
+            }
+            if (isResizing) {
+                isResizing = false;
+                currentHandle = null;
+                // Save new size and position
+                this.saveViewerSettings();
+            }
+        });
+
+        // Set initial cursor for header
+        header.style.cursor = 'grab';
+    }
+
+    updateViewerSize(width, height) {
+        if (!this.renderer || !this.camera) return;
+        
+        // Calculate canvas size (subtract header height and padding)
+        const headerHeight = 50; // Approximate header height
+        const canvasWidth = width - 4; // Account for borders
+        const canvasHeight = height - headerHeight - 4;
+        
+        // Update camera aspect ratio
+        this.camera.aspect = canvasWidth / canvasHeight;
+        this.camera.updateProjectionMatrix();
+        
+        // Update renderer size
+        this.renderer.setSize(canvasWidth, canvasHeight);
+        
+        // Update canvas element size
+        this.canvas.style.width = canvasWidth + 'px';
+        this.canvas.style.height = canvasHeight + 'px';
+   }
+
+    // Save viewer position and size to localStorage
+    saveViewerSettings() {
+        if (!this.container) return;
+        
+        const settings = {
+            left: this.container.offsetLeft,
+            top: this.container.offsetTop,
+            width: this.container.offsetWidth,
+            height: this.container.offsetHeight
+        };
+        
+        try {
+            localStorage.setItem('islViewerSettings', JSON.stringify(settings));
+        } catch (e) {
+            console.warn('Failed to save viewer settings:', e);
+        }
+    }
+
+    // Load viewer position and size from localStorage
+    loadViewerSettings() {
+        try {
+            const settings = localStorage.getItem('islViewerSettings');
+            if (settings) {
+                const parsed = JSON.parse(settings);
+                
+                // Validate settings are within current viewport
+                const maxLeft = Math.max(0, window.innerWidth - parsed.width);
+                const maxTop = Math.max(0, window.innerHeight - parsed.height);
+                
+                this.container.style.left = Math.min(parsed.left, maxLeft) + 'px';
+                this.container.style.top = Math.min(parsed.top, maxTop) + 'px';
+                this.container.style.width = Math.max(250, Math.min(parsed.width, window.innerWidth)) + 'px';
+                this.container.style.height = Math.max(200, Math.min(parsed.height, window.innerHeight)) + 'px';
+                this.container.style.right = 'auto';
+                
+                // Update renderer with loaded size
+                this.updateViewerSize(
+                    parseInt(this.container.style.width),
+                    parseInt(this.container.style.height)
+                );
+                
+                return true;
+            }
+        } catch (e) {
+            console.warn('Failed to load viewer settings:', e);
+        }
+        return false;
+    }
+
+    // ...existing code...
 }
 
 // Global viewer instance
