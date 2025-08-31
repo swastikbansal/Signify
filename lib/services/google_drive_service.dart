@@ -1,8 +1,11 @@
 import 'dart:convert';
+import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'google_drive_config.dart';
 
 class GoogleDriveVideo {
@@ -39,11 +42,166 @@ class GoogleDriveVideo {
   }
 }
 
+// Simple generic cache holder with TTL
+class _Cached<T> {
+  final T value;
+  final DateTime expiresAt;
+  const _Cached(this.value, this.expiresAt);
+  bool get isValid => DateTime.now().isBefore(expiresAt);
+}
+
 class GoogleDriveService {
   static const String _baseUrl = 'https://www.googleapis.com/drive/v3';
 
   static String? _accessToken;
   static DateTime? _tokenExpiry;
+
+  // ===== Performance: In-memory caches with TTL =====
+  // Tune TTLs as needed
+  static const Duration _searchTTL = Duration(minutes: 10);
+  static const Duration _streamTTL = Duration(minutes: 30);
+  static const Duration _metadataTTL = Duration(minutes: 60);
+  static const int _warmupPrefetchCount = 6; // prefetch top-N results
+  static const int _warmupConcurrency = 3; // limit concurrent warmups
+
+  // Disk cache key prefixes
+  static const String _diskPrefixStream = 'gdrive_stream_';
+  static const String _diskPrefixMetadata = 'gdrive_meta_';
+
+  // Caches
+  static final Map<String, _Cached<List<GoogleDriveVideo>>> _searchCache = {};
+  static final Map<String, _Cached<String?>> _streamUrlCache = {};
+  static final Map<String, _Cached<Map<String, dynamic>?>> _metadataCache = {};
+
+  // In-flight de-duplication maps
+  static final Map<String, Future<List<GoogleDriveVideo>>> _inFlightSearches =
+      {};
+  static final Map<String, Future<String?>> _inFlightStream = {};
+  static final Map<String, Future<Map<String, dynamic>?>> _inFlightMetadata =
+      {};
+
+  static String _normalizeQuery(String q) => q.trim().toLowerCase();
+  static String _searchKey(String q) {
+    final norm = _normalizeQuery(q);
+    final folder = GoogleDriveConfig.targetFolderId.isEmpty
+        ? 'global'
+        : 'folder:${GoogleDriveConfig.targetFolderId}';
+    return 'q:$norm|$folder|max:${GoogleDriveConfig.maxResults}';
+  }
+
+  static void _cleanupExpiredCaches() {
+    // Remove expired entries to prevent unbounded growth
+    _searchCache.removeWhere((_, v) => !v.isValid);
+    _streamUrlCache.removeWhere((_, v) => !v.isValid);
+    _metadataCache.removeWhere((_, v) => !v.isValid);
+  }
+
+  // ---- Disk cache helpers ----
+  static Future<_Cached<String?>?> _diskGetStreamUrl(String fileId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString('$_diskPrefixStream$fileId');
+      if (raw == null) return null;
+      final obj = jsonDecode(raw) as Map<String, dynamic>;
+      final expiresAtMillis = obj['expiresAt'] as int?;
+      if (expiresAtMillis == null) return null;
+      final expiresAt = DateTime.fromMillisecondsSinceEpoch(expiresAtMillis);
+      if (DateTime.now().isAfter(expiresAt)) return null;
+      final val = obj.containsKey('value') ? obj['value'] as String? : null;
+      return _Cached<String?>(val, expiresAt);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  static Future<void> _diskSetStreamUrl(
+    String fileId,
+    String? url,
+    Duration ttl,
+  ) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final payload = jsonEncode({
+        'value': url,
+        'expiresAt': DateTime.now().add(ttl).millisecondsSinceEpoch,
+      });
+      await prefs.setString('$_diskPrefixStream$fileId', payload);
+    } catch (_) {}
+  }
+
+  static Future<_Cached<Map<String, dynamic>?>?> _diskGetMetadata(
+    String fileId,
+  ) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString('$_diskPrefixMetadata$fileId');
+      if (raw == null) return null;
+      final obj = jsonDecode(raw) as Map<String, dynamic>;
+      final expiresAtMillis = obj['expiresAt'] as int?;
+      if (expiresAtMillis == null) return null;
+      final expiresAt = DateTime.fromMillisecondsSinceEpoch(expiresAtMillis);
+      if (DateTime.now().isAfter(expiresAt)) return null;
+      final val = obj['value'];
+      return _Cached<Map<String, dynamic>?>(
+        val == null ? null : (val as Map<String, dynamic>),
+        expiresAt,
+      );
+    } catch (_) {
+      return null;
+    }
+  }
+
+  static Future<void> _diskSetMetadata(
+    String fileId,
+    Map<String, dynamic>? data,
+    Duration ttl,
+  ) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final payload = jsonEncode({
+        'value': data,
+        'expiresAt': DateTime.now().add(ttl).millisecondsSinceEpoch,
+      });
+      await prefs.setString('$_diskPrefixMetadata$fileId', payload);
+    } catch (_) {}
+  }
+
+  // Warm-up caches for top-N results in background
+  static Future<void> _warmUpCachesForVideos(
+    List<GoogleDriveVideo> videos,
+  ) async {
+    if (videos.isEmpty) return;
+    final top = videos.take(_warmupPrefetchCount).toList();
+
+    // Concurrency-limited prefetcher
+    final semaphore = _Semaphore(_warmupConcurrency);
+    final futures = <Future<void>>[];
+
+    for (final v in top) {
+      futures.add(
+        semaphore.withPermit(() async {
+          try {
+            // Prefetch stream URL
+            await getVideoStreamUrl(v.id);
+          } catch (_) {}
+          try {
+            // Prefetch metadata
+            await getVideoMetadata(v.id);
+          } catch (_) {}
+          try {
+            // Prefetch thumbnail using DefaultCacheManager
+            if (v.thumbnailLink.isNotEmpty) {
+              await DefaultCacheManager().getSingleFile(v.thumbnailLink);
+            }
+          } catch (_) {}
+        }),
+      );
+    }
+
+    // Run without blocking caller
+    // Intentionally not awaited where called; this method itself awaits children
+    await Future.wait(futures);
+  }
 
   // Get access token using service account
   static Future<String> _getAccessToken() async {
@@ -133,6 +291,7 @@ class GoogleDriveService {
   }
 
   // Enhanced get access token - try user token first, then service account
+  // ignore: unused_element
   static Future<String> _getAccessTokenWithUserAuth() async {
     // First try to use the user's Google OAuth token
     final userToken = await _getUserGoogleToken();
@@ -161,7 +320,7 @@ class GoogleDriveService {
         'exp':
             DateTime.now()
                 .add(const Duration(hours: 1))
-                .millisecondsSinceEpoch ~/
+                .millisecondsSinceEpoch /
             1000,
         'iat': DateTime.now().millisecondsSinceEpoch ~/ 1000,
       });
@@ -213,48 +372,80 @@ class GoogleDriveService {
         validateConfiguration();
       }
 
-      final accessToken =
-          await _getAccessToken(); // Use service account directly for now
-
-      if (kDebugMode) {
-        print('🔑 Got access token successfully');
+      // Cache lookup / in-flight de-duplication
+      final key = _searchKey(query);
+      _cleanupExpiredCaches();
+      final cached = _searchCache[key];
+      if (cached != null && cached.isValid) {
+        if (kDebugMode) print('⚡ Returning cached search results for "$query"');
+        // Start warmup in background for better subsequent UX
+        // No await to avoid blocking
+        Future.microtask(() => _warmUpCachesForVideos(cached.value));
+        return cached.value;
+      }
+      final existing = _inFlightSearches[key];
+      if (existing != null) {
+        if (kDebugMode) print('⏳ Awaiting in-flight search for "$query"');
+        final results = await existing;
+        // Also trigger warmup in background
+        Future.microtask(() => _warmUpCachesForVideos(results));
+        return results;
       }
 
-      // If we have a target folder, search in it and its subfolders
-      if (GoogleDriveConfig.targetFolderId.isNotEmpty) {
+      final Future<List<GoogleDriveVideo>> future = (() async {
+        final accessToken = await _getAccessToken();
         if (kDebugMode) {
-          print(
-            '🎯 Target folder configured: ${GoogleDriveConfig.targetFolderId}',
-          );
+          print('🔑 Got access token successfully');
         }
 
-        // First, verify the folder exists and is accessible
-        if (await _verifyFolderAccess(
-          GoogleDriveConfig.targetFolderId,
-          accessToken,
-        )) {
-          if (kDebugMode) {
-            print('✅ Target folder verified, searching within it...');
-          }
-          // Search directly in the folder first (since user mentioned no subfolders)
-          return await _searchInFolderDirectly(
-            query,
-            GoogleDriveConfig.targetFolderId,
-            accessToken,
-          );
-        } else {
+        List<GoogleDriveVideo> results;
+        if (GoogleDriveConfig.targetFolderId.isNotEmpty) {
           if (kDebugMode) {
             print(
-              '⚠️ Target folder not accessible, falling back to global search',
+              '🎯 Target folder configured: ${GoogleDriveConfig.targetFolderId}',
             );
-            print('🌍 Attempting global search as fallback...');
           }
-          return await _searchGlobally(query, accessToken);
-        }
-      }
 
-      // Otherwise search globally
-      return await _searchGlobally(query, accessToken);
+          if (await _verifyFolderAccess(
+            GoogleDriveConfig.targetFolderId,
+            accessToken,
+          )) {
+            if (kDebugMode) {
+              print('✅ Target folder verified, searching within it...');
+            }
+            results = await _searchInFolderDirectly(
+              query,
+              GoogleDriveConfig.targetFolderId,
+              accessToken,
+            );
+          } else {
+            if (kDebugMode) {
+              print(
+                '⚠️ Target folder not accessible, falling back to global search',
+              );
+              print('🌍 Attempting global search as fallback...');
+            }
+            results = await _searchGlobally(query, accessToken);
+          }
+        } else {
+          results = await _searchGlobally(query, accessToken);
+        }
+
+        // Store in cache
+        _searchCache[key] = _Cached(results, DateTime.now().add(_searchTTL));
+
+        // Warm-up prefetch (thumbnails, URLs, metadata) non-blocking
+        Future.microtask(() => _warmUpCachesForVideos(results));
+        return results;
+      })();
+
+      _inFlightSearches[key] = future;
+      try {
+        final res = await future;
+        return res;
+      } finally {
+        _inFlightSearches.remove(key);
+      }
     } catch (e) {
       if (kDebugMode) {
         print('💥 Error in searchVideos: $e');
@@ -334,6 +525,7 @@ class GoogleDriveService {
   }
 
   // Search recursively in a folder and its subfolders
+  // ignore: unused_element
   static Future<List<GoogleDriveVideo>> _searchInFolderRecursively(
     String query,
     String folderId,
@@ -580,10 +772,78 @@ class GoogleDriveService {
 
   // Get direct download link for video streaming
   static Future<String?> getVideoStreamUrl(String fileId) async {
-    try {
-      final accessToken =
-          await _getAccessToken(); // Use service account directly for now
+    // Cache first
+    _cleanupExpiredCaches();
+    final cached = _streamUrlCache[fileId];
+    if (cached != null && cached.isValid) {
+      if (kDebugMode) print('⚡ Using cached stream URL for $fileId');
+      return cached.value;
+    }
 
+    final inflight = _inFlightStream[fileId];
+    if (inflight != null) {
+      if (kDebugMode) print('⏳ Awaiting in-flight stream URL for $fileId');
+      return await inflight;
+    }
+
+    // Try disk cache
+    try {
+      final disk = await _diskGetStreamUrl(fileId);
+      if (disk != null && disk.isValid) {
+        _streamUrlCache[fileId] = disk;
+        if (kDebugMode) print('💾 Using disk-cached stream URL for $fileId');
+        return disk.value;
+      }
+    } catch (_) {}
+
+    final Future<String?> future = _fetchStreamUrlInternal(fileId);
+    _inFlightStream[fileId] = future;
+    try {
+      return await future;
+    } finally {
+      _inFlightStream.remove(fileId);
+    }
+  }
+
+  // Get video metadata
+  static Future<Map<String, dynamic>?> getVideoMetadata(String fileId) async {
+    // Cache first
+    _cleanupExpiredCaches();
+    final cached = _metadataCache[fileId];
+    if (cached != null && cached.isValid) {
+      if (kDebugMode) print('⚡ Using cached metadata for $fileId');
+      return cached.value;
+    }
+
+    final inflight = _inFlightMetadata[fileId];
+    if (inflight != null) {
+      if (kDebugMode) print('⏳ Awaiting in-flight metadata for $fileId');
+      return await inflight;
+    }
+
+    // Try disk cache
+    try {
+      final disk = await _diskGetMetadata(fileId);
+      if (disk != null && disk.isValid) {
+        _metadataCache[fileId] = disk;
+        if (kDebugMode) print('💾 Using disk-cached metadata for $fileId');
+        return disk.value;
+      }
+    } catch (_) {}
+
+    final Future<Map<String, dynamic>?> future = _fetchMetadataInternal(fileId);
+    _inFlightMetadata[fileId] = future;
+    try {
+      return await future;
+    } finally {
+      _inFlightMetadata.remove(fileId);
+    }
+  }
+
+  // Internal helpers to fetch data with proper types (moved here)
+  static Future<String?> _fetchStreamUrlInternal(String fileId) async {
+    try {
+      final accessToken = await _getAccessToken();
       final response = await http.get(
         Uri.parse(
           '$_baseUrl/files/$fileId',
@@ -593,9 +853,21 @@ class GoogleDriveService {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        return data['webContentLink'] ?? data['webViewLink'];
+        final url = data['webContentLink'] ?? data['webViewLink'];
+        _streamUrlCache[fileId] = _Cached(url, DateTime.now().add(_streamTTL));
+        // write-through to disk
+        unawaited(_diskSetStreamUrl(fileId, url, _streamTTL));
+        return url;
+      } else {
+        if (kDebugMode) {
+          print('❌ Failed to get stream URL ($fileId): ${response.statusCode}');
+        }
+        // Negative cache briefly to avoid hammering
+        final ttl = const Duration(minutes: 2);
+        _streamUrlCache[fileId] = _Cached(null, DateTime.now().add(ttl));
+        unawaited(_diskSetStreamUrl(fileId, null, ttl));
+        return null;
       }
-      return null;
     } catch (e) {
       if (kDebugMode) {
         print('Error getting video stream URL: $e');
@@ -604,11 +876,11 @@ class GoogleDriveService {
     }
   }
 
-  // Get video metadata
-  static Future<Map<String, dynamic>?> getVideoMetadata(String fileId) async {
+  static Future<Map<String, dynamic>?> _fetchMetadataInternal(
+    String fileId,
+  ) async {
     try {
       final accessToken = await _getAccessToken();
-
       final response = await http.get(
         Uri.parse('$_baseUrl/files/$fileId').replace(
           queryParameters: {
@@ -620,9 +892,23 @@ class GoogleDriveService {
       );
 
       if (response.statusCode == 200) {
-        return jsonDecode(response.body);
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        _metadataCache[fileId] = _Cached(
+          data,
+          DateTime.now().add(_metadataTTL),
+        );
+        // write-through to disk
+        unawaited(_diskSetMetadata(fileId, data, _metadataTTL));
+        return data;
+      } else {
+        if (kDebugMode) {
+          print('❌ Failed to get metadata ($fileId): ${response.statusCode}');
+        }
+        final ttl = const Duration(minutes: 5);
+        _metadataCache[fileId] = _Cached(null, DateTime.now().add(ttl));
+        unawaited(_diskSetMetadata(fileId, null, ttl));
+        return null;
       }
-      return null;
     } catch (e) {
       if (kDebugMode) {
         print('Error getting video metadata: $e');
@@ -734,5 +1020,64 @@ class GoogleDriveService {
     }
     _accessToken = null;
     _tokenExpiry = null;
+  }
+
+  // Public method to clear all in-memory caches related to Drive fetches
+  static void clearMemoryCaches() {
+    if (kDebugMode) {
+      print('🧹 Clearing GoogleDriveService in-memory caches');
+    }
+    _searchCache.clear();
+    _streamUrlCache.clear();
+    _metadataCache.clear();
+  }
+
+  // Public method to clear on-disk caches for stream URLs and metadata
+  static Future<void> clearDiskCaches() async {
+    if (kDebugMode) {
+      print('🧹 Clearing GoogleDriveService disk caches');
+    }
+    final prefs = await SharedPreferences.getInstance();
+    final keys = prefs.getKeys().toList(growable: false);
+    for (final k in keys) {
+      if (k.startsWith(_diskPrefixStream) ||
+          k.startsWith(_diskPrefixMetadata)) {
+        await prefs.remove(k);
+      }
+    }
+  }
+}
+
+// Lightweight semaphore for concurrency limiting
+class _Semaphore {
+  int _permits;
+  final _waiters = <Completer<void>>[];
+  _Semaphore(this._permits);
+
+  Future<T> withPermit<T>(Future<T> Function() action) async {
+    await _acquire();
+    try {
+      return await action();
+    } finally {
+      _release();
+    }
+  }
+
+  Future<void> _acquire() async {
+    if (_permits > 0) {
+      _permits--;
+      return;
+    }
+    final c = Completer<void>();
+    _waiters.add(c);
+    await c.future;
+  }
+
+  void _release() {
+    if (_waiters.isNotEmpty) {
+      _waiters.removeAt(0).complete();
+    } else {
+      _permits++;
+    }
   }
 }
