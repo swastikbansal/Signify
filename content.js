@@ -1080,41 +1080,68 @@ function waitForElement(selector, timeout = 10000) {
 }
 
 async function extractTranscript() {
+    // Reset previous video data
     transcriptData = [];
     try {
-        const transcriptButton = await waitForElement('button[aria-label="Show transcript"]');
-        transcriptButton.click();
+        // Try to find any transcript-related button (label varies: Show transcript / Open transcript / Hide transcript)
+        let btn = document.querySelector('button[aria-label*="transcript" i]');
+        const segmentsAlready = document.querySelectorAll('ytd-transcript-segment-renderer').length > 0;
+        // Click only if we have a button and no segments yet (panel closed)
+        if (btn && !segmentsAlready) {
+            btn.click();
+        }
 
-        await waitForElement('ytd-transcript-segment-renderer');
+        // Wait for segments to appear OR reuse existing if already present
+        try {
+            await waitForElement('ytd-transcript-segment-renderer');
+        } catch (e) {
+            if (document.querySelectorAll('ytd-transcript-segment-renderer').length === 0) throw e;
+        }
+
         const segments = document.querySelectorAll('ytd-transcript-segment-renderer');
+        if (!segments.length) {
+            console.warn('[Signify][Transcript] No transcript segments found');
+            return false;
+        }
 
-        segments.forEach((segment, index) => {
+        segments.forEach(segment => {
             const timeEl = segment.querySelector('.segment-timestamp');
             const textEl = segment.querySelector('.segment-text');
-            if (timeEl && textEl) {
-                const timeText = timeEl.textContent.trim();
-                const startTime = parseTimeToSeconds(timeText);
-                const segmentText = textEl.textContent.trim();
-                const words = segmentText.split(/\s+/).filter(Boolean);
-                const wordDuration = 5 / words.length;
-
-                words.forEach((word, wordIndex) => {
-                    const cleanedWord = word.toLowerCase().replace(/[^\w\s'-]/g, '');
-                    const wordStartTime = startTime + (wordIndex * wordDuration);
-                    const wordEndTime = startTime + ((wordIndex + 1) * wordDuration);
-                    transcriptData.push({
-                        word: cleanedWord,
-                        startTime: wordStartTime,
-                        endTime: wordEndTime,
-                        originalText: word
-                    });
+            if (!timeEl || !textEl) return;
+            const timeText = timeEl.textContent.trim();
+            const baseStart = parseTimeToSeconds(timeText);
+            const segmentText = textEl.textContent.trim();
+            if (!segmentText) return;
+            const words = segmentText.split(/\s+/).filter(Boolean);
+            // Heuristic duration (improve later using next segment start)
+            const perWord = Math.min(5, Math.max(0.35, 5 / Math.max(1, words.length)));
+            words.forEach((w, i) => {
+                const cleaned = w.toLowerCase().replace(/[^\w\s'-]/g, '');
+                if (!cleaned) return;
+                transcriptData.push({
+                    word: cleaned,
+                    startTime: baseStart + i * perWord,
+                    endTime: baseStart + (i + 1) * perWord,
+                    originalText: w
                 });
-            }
+            });
         });
-        console.log('Transcript extracted:', transcriptData.length, 'words');
-    } catch (error) {
-        console.error('Transcript extraction failed:', error);
+        console.log('[Signify][Transcript] Extracted', transcriptData.length, 'words for video', getYouTubeVideoId());
+        return transcriptData.length > 0;
+    } catch (err) {
+        console.error('[Signify][Transcript] Extraction failed:', err);
+        return false;
     }
+}
+
+async function retryTranscriptExtraction(maxAttempts = 6, delayMs = 1200) {
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        const ok = await extractTranscript();
+        if (ok) return true;
+        await new Promise(r => setTimeout(r, delayMs));
+    }
+    console.warn('[Signify][Transcript] Failed after retries');
+    return false;
 }
 
 function parseTimeToSeconds(timeStr) {
@@ -1405,8 +1432,18 @@ function monitorVideoChange() {
             lastSyncedWord = '';
             if (translationActive) {
                 console.log('[Signify] Detected video change, re-extracting transcript');
-                handleVideoPlay();
+                // Delay slightly for new DOM to settle then retry extraction a few times
+                setTimeout(() => {
+                    retryTranscriptExtraction().then(success => {
+                        if (success) {
+                            const v = document.querySelector('video');
+                            if (v) syncWithVideo(v);
+                        }
+                    });
+                }, 600);
             }
+            // Allow auto-start on next video if UI closed
+            autoStartAttempted = false;
         }
     }, 1500);
 }
