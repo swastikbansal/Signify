@@ -107,7 +107,7 @@ class _Voicetosign1WidgetState extends State<Voicetosign1Widget>
   String? _viewerUrlB;
   bool _useViewerA = true; // which viewer is currently visible
   // Remove crossfade: use hard swaps to avoid any fade blending
-  final Duration _crossfadeDuration = const Duration(milliseconds: 20);
+  final Duration _crossfadeDuration = const Duration(milliseconds: 0);
 
   // Image handling variables - use paths instead of File objects for safety
   List<String> uploadedImagePaths = [];

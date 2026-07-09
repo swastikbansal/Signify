@@ -84,10 +84,8 @@ class Signtovoice2Model extends FlutterFlowModel<Signtovoice2Widget> {
   List<String> get sentenceWords => List.from(_currentSentence);
 
   // API related state
-  // String _apiUrl = 'http://10.29.46.248:5000/processFrame'; // Yatharth WIFI
-  // String _apiUrl = 'https://philosia-codecult-signify.hf.space/processFrame'; // Production API
-  // String _apiUrl = 'http://10.90.1.175:5000/processFrame'; // MU WIFI
-  String _apiUrl = 'http://10.81.24.166:5000/processFrame'; // Swastik WIFI
+  // String _apiUrl: Add your model URL here
+  String _apiUrl = 'https://philosia-codecult-signify.hf.space/processFrame'; // Production API
 
   // Model switching state
   String _currentModelType = 'default'; // 'default' or 'custom' model
