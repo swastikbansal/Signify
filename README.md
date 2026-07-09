@@ -204,32 +204,8 @@ Signify currently supports a robust set of **30+ ISL signs**, including:
    cp .env.example .env
    ```
 
-   Then edit `.env` and fill in your credentials:
+   Then edit `.env` and fill in your credentials.
 
-   ```env
-   # Supabase Configuration
-   SUPABASE_URL=https://your-project.supabase.co
-   SUPABASE_ANON_KEY=your-supabase-anon-key
-
-   # Google Drive Configuration
-   GOOGLE_DRIVE_SERVICE_ACCOUNT={"type": "service_account", ...}
-   GOOGLE_DRIVE_FOLDER_ID=your-folder-id
-
-   # Firebase Web Configuration
-   FIREBASE_WEB_API_KEY=your-firebase-api-key
-   FIREBASE_WEB_AUTH_DOMAIN=your-project.firebaseapp.com
-   FIREBASE_WEB_PROJECT_ID=your-project-id
-   FIREBASE_WEB_STORAGE_BUCKET=your-project.firebasestorage.app
-   FIREBASE_WEB_MESSAGING_SENDER_ID=your-sender-id
-   FIREBASE_WEB_APP_ID=your-app-id
-   FIREBASE_WEB_MEASUREMENT_ID=G-XXXXXXXXXX
-
-   # Security Settings
-   DEBUG_LOGS=false
-   CRASH_REPORTING=true
-   ```
-
-   > ⚠️ **Important:** The `.env` file is gitignored and will NOT be committed. Never share it publicly.
 
 5. **Run the App:**
 
@@ -250,7 +226,6 @@ Signify currently supports a robust set of **30+ ISL signs**, including:
    ```
 
    **Android Studio Tip:** To avoid typing the flag every time, go to **Run → Edit Configurations** and add `--dart-define-from-file=.env` in the **Additional run args** field.
-
 
 ---
 
