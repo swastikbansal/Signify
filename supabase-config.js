@@ -5,8 +5,8 @@
 (function(){
 	const DEFAULT_BUCKET = 'animations';
 	const STATE = {
-		supabaseUrl: 'https://qqyqwtoxjhgashwxyidg.supabase.co/',
-		supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFxeXF3dG94amhnYXNod3h5aWRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM2MjE5NjIsImV4cCI6MjA2OTE5Nzk2Mn0.IOB5ocrqZPKU6luezwhmLGXUkKgks9w0AM7X2-onI-c',
+		supabaseUrl: (window.ENV && window.ENV.supabaseUrl) || '',
+		supabaseAnonKey: (window.ENV && window.ENV.supabaseAnonKey) || '',
 		bucket: 'animations',
 		useSigned: false,
 		initialized: false,

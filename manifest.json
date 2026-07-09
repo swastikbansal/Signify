@@ -14,7 +14,7 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["three.min.js", "GLTFLoader.js", "OrbitControls.js", "supabase-config.js", "content.js"],
+      "js": ["config.js", "three.min.js", "GLTFLoader.js", "OrbitControls.js", "supabase-config.js", "content.js"],
       "css": ["styles.css"],
       "run_at": "document_end"
     }

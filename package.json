@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "postinstall": "node -e \"const fs = require('fs'); if (!fs.existsSync('config.js')) fs.copyFileSync('config.example.js', 'config.js');\""
+  },
   "dependencies": {
     "sharp": "^0.34.3"
   }
