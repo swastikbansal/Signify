@@ -7,136 +7,165 @@
   
   [![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev)
   [![Firebase](https://img.shields.io/badge/Firebase-039BE5?style=for-the-badge&logo=Firebase&logoColor=white)](https://firebase.google.com)
+  [![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com)
+  [![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
   [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 </div>
 
 ---
 
-## 📖 Table of Contents
+## 🚀 About Signify
 
-- [About](#about)
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Architecture](#architecture)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Screenshots](#screenshots)
-- [API Reference](#api-reference)
-- [Contributing](#contributing)
-- [License](#license)
-- [Contact](#contact)
-- [Acknowledgments](#acknowledgments)
+**Signify** is a revolutionary accessibility platform designed to break down communication barriers between the Deaf/Hard-of-Hearing (DHH) community and the hearing world. By leveraging cutting-edge AI and computer vision, Signify provides a seamless, bidirectional bridge for real-time communication.
+
+### 🎯 The Mission
+
+To empower individuals with hearing and speech impairments by providing inclusive tools that convert sign language into spoken/written word and vice-versa, fostering independence in education, healthcare, and daily interactions.
 
 ---
 
-## 🚀 About
+## 🎥 Demo & Walkthrough Video
 
-**Signify** is a revolutionary Flutter application designed to break down communication barriers between the deaf/hard-of-hearing community and hearing individuals. The app provides bidirectional, real-time, multilingual sign language recognition and translation, making communication more accessible and inclusive.
+Here is a demo of Signify in action, showcasing real-time Sign-to-Voice translation and the 3D sign avatar viewer.
 
-### 🎯 Purpose
+### Option 1: Inline Repository Video (GitHub Native)
+If you have uploaded the video to the repository:
+```html
+<video src="assets/videos/signify_demo.mp4" controls width="100%" poster="assets/images/video_poster.png"></video>
+```
 
-In a world where effective communication is essential, Signify serves as a digital bridge, empowering users to:
-
-- Convert sign language gestures to text and speech
-- Translate text to sign language animations
-- Foster inclusive communication in various settings
-- Support multiple languages and sign language variants
+### Option 2: External Video Link (YouTube/Loom)
+[![Signify Demo Walkthrough](assets/images/video_poster.png)](https://www.youtube.com/watch?v=YOUR_VIDEO_ID)
+*(Click the image above to watch the walkthrough on YouTube)*
 
 ---
 
-## ✨ Features
+## ✨ Key Features
 
-### 🎥 **Video-to-Text Conversion**
+### 🎥 **Sign-to-Voice (S2V)**
 
-- Real-time video capture and processing
-- Advanced gesture recognition using AI/ML models
-- Multi-language support for sign language variants
-- High accuracy text output
+- **Real-time Recognition**: Processes camera feed to identify Indian Sign Language (ISL) gestures.
+- **AI-Powered Inference**: Uses MediaPipe and RandomForest classifiers for high-accuracy gesture detection.
+- **Multilingual Output**: Converts recognized signs into text and speech in 8+ regional languages.
 
-### 📝 **Text-to-Sign Translation**
+### 🎙️ **Voice-to-Sign (V2S)**
 
-- Convert written text to sign language animations
-- 3D animated sign language demonstrations
-- Support for complex sentences and phrases
-- Customizable animation speed and style
+- **Speech/Text Recognition**: Captures spoken words using high-fidelity STT.
+- **3D Animation**: Translates words into fluid sign language demonstrations using a built-in 3D model viewer.
+- **Customizable Speed**: Adjust playback to learn or communicate at your own pace.
 
-### 🔍 **Optical Character Recognition (OCR)**
+### 🔍 **Smart Utilities**
 
-- Extract text from images and documents
-- Google ML Kit integration for high accuracy
-- Support for multiple languages
-- Real-time text recognition
+- **ISL Dictionary**: A comprehensive resource for learning standardized Indian Sign Language.
+- **OCR Scanner**: Extract text from physical documents and translate them into signs instantly.
 
-### 🌐 **Cloud Integration**
+---
 
-- Secure data storage with Supabase
-- Firebase configuration management
-- Google Drive API integration
-- Scalable backend infrastructure
+## 🏗 System Architecture
 
-### 📱 **User Experience**
+Signify is designed around a hybrid cloud architecture, combining on-device ML/APIs with cloud-hosted backend systems to guarantee high performance and real-time processing.
 
-- Intuitive, accessible interface design
-- Offline capabilities for basic functions
-- Cross-platform compatibility (iOS & Android)
-- Dark/light theme support
+```mermaid
+graph TD
+    %% Frontend Client Layer
+    subgraph Client [Flutter Mobile App]
+        UI([App User Interface])
+        STT([Speech-to-Text STT])
+        TTS([Text-to-Speech TTS])
+        OCR([Google ML Kit OCR])
+        Viewer3D([Model Viewer Plus 3D])
+    end
+
+    %% Backend Services Layer
+    subgraph Cloud_Backend [Cloud & Backend Services]
+        Firebase_Auth([Firebase Auth])
+        Firestore[(Cloud Firestore<br/>Prefs & History)]
+        Supabase_DB[(Supabase PostgreSQL<br/>Dictionary Metadata)]
+        Supabase_Storage[(Supabase Storage<br/>3D Models .glb)]
+    end
+
+    %% Machine Learning Layer
+    subgraph ML_Services [AI & ML Pipeline]
+        ML_API([Python ML API<br/>Hosted / Local Flask])
+        MediaPipe([MediaPipe Landmark Detection])
+        RF_Models([RandomForest Classifiers])
+    end
+
+    %% Data Flows
+    UI -->|1. Transmits JPEG Frames| ML_API
+    ML_API -->|2. Extracts Landmarks| MediaPipe
+    MediaPipe -->|3. Predicts Gesture| RF_Models
+    RF_Models -->|4. Returns Sign Text| UI
+
+    UI -->|User Auth| Firebase_Auth
+    UI -->|Fetch Preferences/Data| Firestore
+    UI -->|Fetch Sign Metadata| Supabase_DB
+    UI -->|Load .glb animations| Supabase_Storage
+
+    UI -->|Microphone Input| STT
+    UI -->|Audio Output| TTS
+    UI -->|Camera Document Scan| OCR
+    Supabase_Storage -->|Load Model| Viewer3D
+
+    %% Styling Subgraphs
+    style Client fill:#F0F7FF,stroke:#3B82F6,stroke-width:2px,color:#1E3A8A,stroke-dasharray: 5 5
+    style Cloud_Backend fill:#FFF9F2,stroke:#F59E0B,stroke-width:2px,color:#78350F,stroke-dasharray: 5 5
+    style ML_Services fill:#FAF5FF,stroke:#8B5CF6,stroke-width:2px,color:#4C1D95,stroke-dasharray: 5 5
+
+    %% Styling Nodes
+    classDef clientNode fill:#FFFFFF,stroke:#3B82F6,stroke-width:2px,color:#1E3A8A,font-weight:bold;
+    classDef firebaseNode fill:#FFFFFF,stroke:#EF4444,stroke-width:2px,color:#7F1D1D,font-weight:bold;
+    classDef supabaseNode fill:#FFFFFF,stroke:#10B981,stroke-width:2px,color:#064E3B,font-weight:bold;
+    classDef mlNode fill:#FFFFFF,stroke:#8B5CF6,stroke-width:2px,color:#4C1D95,font-weight:bold;
+
+    class UI,STT,TTS,OCR,Viewer3D clientNode;
+    class Firebase_Auth,Firestore firebaseNode;
+    class Supabase_DB,Supabase_Storage supabaseNode;
+    class ML_API,MediaPipe,RF_Models mlNode;
+
+    %% Styling Links
+    linkStyle 0,1,2,3 stroke:#8B5CF6,stroke-width:2px;
+    linkStyle 4,5 stroke:#EF4444,stroke-width:2px;
+    linkStyle 6,7,11 stroke:#10B981,stroke-width:2px;
+    linkStyle 8,9,10 stroke:#3B82F6,stroke-width:2px;
+```
+
+### **Data Pipeline**
+
+1. **Sign-to-Voice (S2V)**:
+   - **Capture**: The Flutter app's camera controller captures feed frames.
+   - **Transmission**: The app encodes frames as JPEG byte lists and posts them to the Python ML API (Flask server on Hugging Face / localhost).
+   - **Feature Extraction**: The Python backend uses MediaPipe to extract coordinates (landmarks) for hands and body pose.
+   - **Classification**: RandomForest classifiers process coordinates to predict gestures, returning the identified sign to the client.
+   - **Output**: The app appends the predicted word to the sentence, translates it if necessary, and optionally reads it aloud via Text-to-Speech (TTS).
+
+2. **Voice-to-Sign (V2S)**:
+   - **Capture**: The microphone captures user speech, which is converted to text using high-fidelity Speech-to-Text (STT).
+   - **Mapping**: The app splits the sentence into words and queries Supabase / local dictionary to map them to specific 3D model paths (`.glb` files).
+   - **Animation**: The 3D avatar is updated sequentially using `model_viewer_plus` with a minor crossfade duration to swap models fluidly.
 
 ---
 
 ## 🛠 Tech Stack
 
-### **Frontend (Client)**
-
-- **Framework**: Flutter (Dart)
-- **ML/Vision**: Google ML Kit (Text Recognition/OCR)
-- **3D Animation**: Model Viewer Plus
-- **Camera**: Camera Plugin
-- **Navigation**: Go Router
-- **State Management**: Flutter built-in
-
-### **Backend Services**
-
-- **Database**: Supabase (PostgreSQL)
-- **Authentication**: Firebase Auth
-- **Storage**: Firebase Storage
-- **ML Processing**: Python-based API
-- **Cloud Functions**: Supabase Edge Functions
-
-### **Development Tools**
-
-- **IDE**: Android Studio / VS Code
-- **Version Control**: Git
-- **CI/CD**: GitHub Actions (planned)
-- **Testing**: Flutter Test Framework
+| Category              | Technologies                                                          |
+| --------------------- | --------------------------------------------------------------------- |
+| **Frontend**    | Flutter, Dart, Go Router, Provider                                    |
+| **Backend**     | Firebase (Auth, Firestore, Storage, Analytics), Supabase (PostgreSQL) |
+| **ML & Vision** | MediaPipe, Google ML Kit (OCR), Scikit-learn (RandomForest)           |
+| **Animations**  | Model Viewer Plus (3D), Lottie, Flutter Animate                       |
+| **Audio**       | Speech To Text (STT), Flutter TTS                                     |
 
 ---
 
-## 🏗 Architecture
+## 📚 Supported Vocabulary
 
-Signify follows a clean client-server architecture with clear separation of concerns:
+Signify currently supports a robust set of **30+ ISL signs**, including:
 
-```
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│                 │    │                  │    │                 │
-│  Flutter Client │◄──►│  Backend API     │◄──►│  ML/AI Models   │
-│                 │    │                  │    │                 │
-│  - UI/UX        │    │  - Video Processing    │  - Sign Language│
-│  - Camera       │    │  - ML Inference  │    │    Recognition  │
-│  - OCR (Local)  │    │  - Data Storage  │    │  - Translation  │
-│  - 3D Animation │    │  - Authentication│    │  - NLP Pipeline │
-│                 │    │                  │    │                 │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
-```
-
-### **Data Flow**
-
-1. **Client captures video** frames using device camera
-2. **Frames are sent** to backend API for ML processing
-3. **Backend processes** video through AI/ML models
-4. **Results are returned** to client as text/translations
-5. **Client displays** results and generates 3D animations
-
-> **Note**: Only OCR (text recognition) is performed on-device using Google ML Kit. All sign language recognition and translation ML processing occurs on the backend for optimal performance and accuracy.
+- **Basics**: Sun, Help, Teacher, Support, Paper, Love, Water.
+- **Actions**: Accident, Yes, Eat, Go, Dance.
+- **Descriptive**: Thick, High, Poor, Important, Deaf, Winner, Deep, Loud, Flat, Slow, Sad.
+- **Educational**: ISL, Friend, School, Pizza.
 
 ---
 
@@ -144,172 +173,100 @@ Signify follows a clean client-server architecture with clear separation of conc
 
 ### **Prerequisites**
 
-- Flutter SDK (≥3.9.0)
-- Dart SDK (≥3.0.0)
+- Flutter SDK (≥ 3.9.0)
+- Python 3.8+ (for the ML API)
 - Android Studio / Xcode
-- Git
 
-### **Clone Repository**
+### **Setup**
 
-```bash
-git clone https://github.com/yourusername/signify.git
-cd signify
-```
+1. **Clone the repository:**
 
-### **Install Dependencies**
+   ```bash
+   git clone https://github.com/yourusername/signify.git
+   cd signify
+   ```
+2. **Install Flutter dependencies:**
 
-```bash
-flutter pub get
-```
+   ```bash
+   flutter pub get
+   ```
+3. **Configure Firebase:**
 
-### **Firebase Setup**
+   - Place your `google-services.json` in `android/app/`.
+   - Place your `GoogleService-Info.plist` in `ios/Runner/`.
+4. **Environment Variables:**
 
-1. Create a new Firebase project
-2. Add your `google-services.json` (Android) to `android/app/`
-3. Add your `GoogleService-Info.plist` (iOS) to `ios/Runner/`
-4. Configure Firebase Auth and Storage
+   - Create a `.env` file based on `.env.example` and add your Supabase API keys.
+5. **Run the App:**
 
-### **Supabase Configuration**
-
-1. Create a Supabase project
-2. Update API keys in your environment configuration
-3. Set up database tables as per schema documentation
-
-### **Run Application**
-
-```bash
-# Debug mode
-flutter run
-
-# Release mode (Android)
-flutter build apk --release
-
-# Release mode (iOS)
-flutter build ios --release
-```
+   ```bash
+   flutter run
+   ```
 
 ---
 
 ## 🎮 Usage
 
-### **Getting Started**
-
-1. **Launch the app** on your device
-2. **Grant permissions** for camera and microphone access
-3. **Create an account** or sign in with existing credentials
-4. **Choose your preferred language** and sign language variant
-
-### **Video-to-Text Translation**
-
-1. Tap the **"Video to Text"** option
-2. Position yourself in front of the camera
-3. Perform sign language gestures
-4. View real-time text translation
-5. Save or share the translated text
-
-### **Text-to-Sign Translation**
-
-1. Select **"Text to Sign"** mode
-2. Type or paste text into the input field
-3. Tap **"Translate"** to generate sign language animation
-4. Watch the 3D animated demonstration
-5. Adjust playback speed as needed
-
-### **OCR Text Recognition**
-
-1. Navigate to **"Text Scanner"**
-2. Point camera at text or upload an image
-3. Tap to capture and extract text
-4. Edit or translate the recognized text
+1. **Launch Signify**: Complete the onboarding and sign in (Anonymous or Social).
+2. **Choose Mode**: Select "Sign to Voice" for gesture recognition or "Voice to Sign" for animations.
+3. **Calibrate**: For Sign-to-Voice, ensure good lighting and position yourself within the camera frame.
+4. **Dictionary**: Explore the "ISL Dictionary" to learn new signs.
 
 ---
 
-## 📸 Screenshots
+## 🗺 Roadmap
 
-> **Coming Soon**: Screenshots and demo videos will be added to showcase the app's interface and functionality.
-
-<div align="center">
-  <img src="assets/images/screenshot_placeholder.png" alt="Home Screen" width="250"/>
-  <img src="assets/images/screenshot_placeholder.png" alt="Video Translation" width="250"/>
-  <img src="assets/images/screenshot_placeholder.png" alt="3D Animation" width="250"/>
-</div>
+- [ ] Expansion to 100+ ISL signs.
+- [ ] Offline ML model execution using TFLite.
+- [ ] Community-contributed sign definitions.
+- [ ] Real-time video call integration with sign translation.
 
 ---
 
-## 🔌 API Reference
+## 🤝 Contributors
 
-### **Backend Endpoints**
+We welcome and thank all the contributors who make Signify possible!
 
-#### **Video Processing**
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/swastikbansal">
+        <img src="https://github.com/swastikbansal.png" width="100px;" alt="Swastik Bansal"/><br />
+        <sub><b>swastikbansal</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/barnes-vidit">
+        <img src="https://github.com/barnes-vidit.png" width="100px;" alt="Vidit Sharma"/><br />
+        <sub><b>barnes-vidit</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/yatharth-1907">
+        <img src="https://github.com/yatharth-1907.png" width="100px;" alt="Yatharth Patankar"/><br />
+          <sub><b>yatharth-1907</b></sub>
+      </a>
+    </td>
+      <td align="center">
+      <a href="https://github.com/prabhjot0109">
+        <img src="https://github.com/prabhjot0109.png" width="100px;" alt="Prabhjot Singh Assi"/><br />
+          <sub><b>prabhjot0109</b></sub>
+      </a>
+    </td>
+        <td align="center">
+      <a href="https://github.com/ujjwal2412">
+        <img src="https://github.com/ujjwal2412.png" width="100px;" alt="Ujjwal Seth"/><br />
+          <sub><b>ujjwal2412</b></sub>
+      </a>
+    </td>
+        <td align="center">
+      <a href="https://github.com/zahararangwala">
+        <img src="https://github.com/zahararangwala.png" width="100px;" alt="Zahara Rangwala"/><br />
+          <sub><b>zahararangwala</b></sub>
+      </a>
+  </tr>
+</table>
 
-```http
-POST /api/v1/process-video
-Content-Type: multipart/form-data
-
-Parameters:
-- video_frames: File[] (Video frames for processing)
-- language: string (Target language code)
-- user_id: string (User identifier)
-```
-
-#### **Text Translation**
-
-```http
-POST /api/v1/translate-text
-Content-Type: application/json
-
-Body:
-{
-  "text": "Hello, how are you?",
-  "target_sign_language": "ASL",
-  "user_id": "user123"
-}
-```
-
-### **Response Format**
-
-```json
-{
-  "success": true,
-  "data": {
-    "translation": "Translated text",
-    "confidence": 0.95,
-    "timestamp": "2024-01-15T10:30:00Z"
-  },
-  "error": null
-}
-```
-
----
-
-## 🤝 Contributing
-
-We welcome contributions from the community! Please read our [Contributing Guidelines](CONTRIBUTING.md) before getting started.
-
-### **Development Process**
-
-1. **Fork** the repository
-2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
-3. **Commit** your changes (`git commit -m 'Add amazing feature'`)
-4. **Push** to the branch (`git push origin feature/amazing-feature`)
-5. **Open** a Pull Request
-
-### **Code Standards**
-
-- Follow [Flutter Style Guide](https://dart.dev/guides/language/effective-dart/style)
-- Write comprehensive unit tests
-- Maintain 80%+ code coverage
-- Use meaningful commit messages
-- Update documentation for new features
-
-### **Bug Reports**
-
-Please use our [Issue Template](ISSUE_TEMPLATE.md) when reporting bugs. Include:
-
-- Device information
-- Steps to reproduce
-- Expected vs actual behavior
-- Screenshots or logs
 
 ---
 
@@ -317,49 +274,7 @@ Please use our [Issue Template](ISSUE_TEMPLATE.md) when reporting bugs. Include:
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-```
-MIT License
-
-Copyright (c) 2024 Signify Team
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-```
-
----
-
-## 🙏 Acknowledgments
-
-### **Open Source Libraries**
-
-- [Flutter](https://flutter.dev) - UI framework
-- [Google ML Kit](https://developers.google.com/ml-kit) - On-device ML
-- [Supabase](https://supabase.com) - Backend infrastructure
-- [Firebase](https://firebase.google.com) - Authentication and storage
-
-### **Research & Data**
-
-- Sign language datasets from academic institutions
-- AI/ML research from the accessibility community
-- User feedback from deaf and hard-of-hearing beta testers
-
-### **Special Thanks**
-
-- The global deaf and hard-of-hearing community for invaluable feedback
-- Open source contributors who made this project possible
-- Academic researchers in sign language recognition
-
 ---
 
 <div align="center">
-  <p><strong>Made with ❤️ for a more inclusive world</strong></p>
-  
-  [⬆️ Back to Top](#signify-)
-</div>
+  <p><strong>Developed with ❤️ by the Signify Team</strong></p>

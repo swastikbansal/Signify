@@ -66,7 +66,6 @@ This document outlines the system architecture for the Signify app - a bidirecti
 ### 5. External Services
 
 - **Google ML Kit**: Text recognition, translation
-- **Google Generative AI**: Enhanced language processing
 - **TTS (Text-to-Speech)**: Voice output
 - **STT (Speech-to-Text)**: Voice input
 
