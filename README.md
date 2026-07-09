@@ -28,14 +28,13 @@ To empower individuals with hearing and speech impairments by providing inclusiv
 
 Here is a demonstration of what Signify does
 
-https://github.com/user-attachments/assets/2fb8e273-153e-4dc0-8d71-71b0e99f31ad
+https://github.com/user-attachments/assets/02f97a65-7394-4ef5-a9ef-95b118944777
 
 ---
 
-
 ## User Flow
 
-<img width="600" height="600" alt="Signify Dark Mode" src="https://github.com/user-attachments/assets/1d931dd1-9942-444b-bc1e-9d512162002a" />
+<img width="600" height="500" alt="Signify Dark Mode" src="https://github.com/user-attachments/assets/1d931dd1-9942-444b-bc1e-9d512162002a" />
 
 ## ✨ Key Features
 
@@ -148,8 +147,6 @@ https://github.com/user-attachments/assets/009d8fb2-f18b-496c-840e-8320315a65c0
 ### ML Model Demo
 
 https://github.com/user-attachments/assets/efc191f6-4b3e-4f33-bd91-20a89f4dacce
-
-<img width="1049" height="569" alt="Picture6" src="https://github.com/user-attachments/assets/ac63e72b-24fd-45ab-bcd4-e9888e2138d5" />
 
 ---
 
