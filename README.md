@@ -24,21 +24,18 @@ To empower individuals with hearing and speech impairments by providing inclusiv
 
 ---
 
-## 🎥 Demo & Walkthrough Video
+## 🎥 Animated Video
 
-Here is a demo of Signify in action, showcasing real-time Sign-to-Voice translation and the 3D sign avatar viewer.
+Here is a demonstration of what Signify does
 
-### Option 1: Inline Repository Video (GitHub Native)
-If you have uploaded the video to the repository:
-```html
-<video src="assets/videos/signify_demo.mp4" controls width="100%" poster="assets/images/video_poster.png"></video>
-```
-
-### Option 2: External Video Link (YouTube/Loom)
-[![Signify Demo Walkthrough](assets/images/video_poster.png)](https://www.youtube.com/watch?v=YOUR_VIDEO_ID)
-*(Click the image above to watch the walkthrough on YouTube)*
+https://github.com/user-attachments/assets/2fb8e273-153e-4dc0-8d71-71b0e99f31ad
 
 ---
+
+
+## User Flow
+
+<img width="600" height="600" alt="Signify Dark Mode" src="https://github.com/user-attachments/assets/1d931dd1-9942-444b-bc1e-9d512162002a" />
 
 ## ✨ Key Features
 
@@ -143,6 +140,16 @@ graph TD
    - **Capture**: The microphone captures user speech, which is converted to text using high-fidelity Speech-to-Text (STT).
    - **Mapping**: The app splits the sentence into words and queries Supabase / local dictionary to map them to specific 3D model paths (`.glb` files).
    - **Animation**: The 3D avatar is updated sequentially using `model_viewer_plus` with a minor crossfade duration to swap models fluidly.
+
+### App Demo
+
+https://github.com/user-attachments/assets/009d8fb2-f18b-496c-840e-8320315a65c0
+
+### ML Model Demo
+
+https://github.com/user-attachments/assets/efc191f6-4b3e-4f33-bd91-20a89f4dacce
+
+<img width="1049" height="569" alt="Picture6" src="https://github.com/user-attachments/assets/ac63e72b-24fd-45ab-bcd4-e9888e2138d5" />
 
 ---
 
