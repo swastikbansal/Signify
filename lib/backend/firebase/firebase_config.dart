@@ -10,18 +10,26 @@ Future initFirebase() async {
     if (kIsWeb) {
       await Firebase.initializeApp(
         options: const FirebaseOptions(
-          apiKey: "AIzaSyD6lO3UDf10T8ie6dlCIuH_fbPBLUhgmjs",
-          authDomain: "signify-ddf70.firebaseapp.com",
-          projectId: "signify-ddf70",
-          storageBucket: "signify-ddf70.firebasestorage.app",
-          messagingSenderId: "608567453337",
-          appId: "1:608567453337:web:bfa5afda8366a5ad9dfa08",
-          measurementId: "G-M4YPCPDN20",
+          apiKey: String.fromEnvironment('FIREBASE_WEB_API_KEY',
+              defaultValue: ''),
+          authDomain: String.fromEnvironment('FIREBASE_WEB_AUTH_DOMAIN',
+              defaultValue: ''),
+          projectId: String.fromEnvironment('FIREBASE_WEB_PROJECT_ID',
+              defaultValue: ''),
+          storageBucket: String.fromEnvironment('FIREBASE_WEB_STORAGE_BUCKET',
+              defaultValue: ''),
+          messagingSenderId: String.fromEnvironment('FIREBASE_WEB_MESSAGING_SENDER_ID',
+              defaultValue: ''),
+          appId: String.fromEnvironment('FIREBASE_WEB_APP_ID',
+              defaultValue: ''),
+          measurementId: String.fromEnvironment('FIREBASE_WEB_MEASUREMENT_ID',
+              defaultValue: ''),
         ),
       );
     } else {
       await Firebase.initializeApp();
     }
+
 
     // Activate App Check after Firebase initialization
     try {

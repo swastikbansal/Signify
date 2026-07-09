@@ -59,3 +59,11 @@ ios/.metadata
 # Environment variables
 .env
 .local.env
+
+# Keystores and Certificates
+*.jks
+*.keystore
+
+# Client secrets and credentials
+client_secret_*.json
+client_secret.json
