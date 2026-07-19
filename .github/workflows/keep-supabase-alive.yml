@@ -2,8 +2,8 @@ name: Keep Supabase Alive
 
 on:
   schedule:
-    # Run at 00:00 UTC every Monday and Thursday (twice a week)
-    - cron: '0 0 * * 1,4'
+    # Run daily at 00:00 UTC to prevent pausing and handle GitHub Action scheduler delays
+    - cron: '0 0 * * *'
   workflow_dispatch: # Allows manual trigger from the GitHub UI
 
 jobs:
@@ -12,6 +12,9 @@ jobs:
     steps:
       - name: Ping Supabase Database
         run: |
-          curl -s "${{ secrets.SUPABASE_URL }}/rest/v1/animations?limit=1" \
+          # Use --fail (-f) to make curl return a non-zero exit code on HTTP errors (e.g. 401, 404, 500).
+          # This ensures the GitHub Action fails visibly instead of showing a false green checkmark.
+          curl -f -s "${{ secrets.SUPABASE_URL }}/rest/v1/animations?limit=1" \
           -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
           -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}"
+
