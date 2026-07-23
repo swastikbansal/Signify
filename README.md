@@ -5,6 +5,7 @@
   
   **Bridging Communication Through Technology**
   
+  [![IEEE Paper](https://img.shields.io/badge/IEEE-006699?style=for-the-badge&logo=ieee&logoColor=white)](https://ieeexplore.ieee.org/document/11609020)
   [![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev)
   [![Firebase](https://img.shields.io/badge/Firebase-039BE5?style=for-the-badge&logo=Firebase&logoColor=white)](https://firebase.google.com)
   [![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com)
@@ -250,6 +251,13 @@ Signify currently supports a robust set of **30+ ISL signs**, including:
 - [ ] Real-time video call integration with sign translation.
 
 ---
+
+## 📜 Research Paper & Citation
+
+If you use Signify or refer to our work, please cite our research paper published on IEEE Xplore:
+
+> 🔗 **IEEE Xplore:** [https://ieeexplore.ieee.org/document/11609020](https://ieeexplore.ieee.org/document/11609020)
+
 
 ## 🤝 Contributors
 
