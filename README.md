@@ -5,11 +5,12 @@
   
   **Bridging Communication Through Technology**
   
+  [![IEEE Paper](https://img.shields.io/badge/IEEE-006699?style=for-the-badge&logo=ieee&logoColor=white)](https://ieeexplore.ieee.org/document/11609020)
   [![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev)
   [![Firebase](https://img.shields.io/badge/Firebase-039BE5?style=for-the-badge&logo=Firebase&logoColor=white)](https://firebase.google.com)
   [![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com)
   [![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
-  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+  [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/Apache-2.0)
 </div>
 
 ---
@@ -250,6 +251,13 @@ Signify currently supports a robust set of **30+ ISL signs**, including:
 - [ ] Real-time video call integration with sign translation.
 
 ---
+
+## 📜 Research Paper & Citation
+
+If you use Signify or refer to our work, please cite our research paper published on IEEE Xplore:
+
+> 🔗 **IEEE Xplore:** [https://ieeexplore.ieee.org/document/11609020](https://ieeexplore.ieee.org/document/11609020)
+
 
 ## 🤝 Contributors
 
